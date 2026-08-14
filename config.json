@@ -14,6 +14,7 @@
     "FILE MOD MENU FF": "https://www.mediafire.com/file/gazxpqvlpnch9o0/File_mod_menu.zip/file",
     "FILE DRAG HS + ATHENA": "https://www.mediafire.com/file/ewao01t0ej9ucb7/DragHS_%252B_Athena.zip/file",
     "FAKE LAG MODS": "https://www.mediafire.com/file/c8mgz29kvkn3wxw/KuramaMods_FakeL_1.0.apk/file",
+    "S3 HACK PROXY": "https://www.mediafire.com/file/6i80o8tuled9t1a/S3HACKS_PROXY_ONLINE.apk/file",
     "FAKE LAG V2": "https://www.mediafire.com/file/pya787udukktyrr/Fake_Lag_V2.apk/file"
   },
   "copyKeys": {
@@ -21,6 +22,10 @@
     "FAKE LAG MODS": "kurama-fakelag-MJHBATDBYZ",
     "BKL SENSI": "Yeat",
     "FAKE LAG V2": "DANIEL-2026"
+  },
+  "getKeyLinks": {
+    "AINCRAD MODS": "https://aincradmods.com/getkey",
+    "S3 HACK PROXY": "https://s3-hacks-get-key.onrender.com/"
   },
   "accountInfo": {
     "8 BALL POOL": { "username": "ADIK", "password": "NCS" }
