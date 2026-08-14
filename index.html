@@ -1,0 +1,3688 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="x-dns-prefetch-control" content="on">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#03050d">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Tarz Store — Premium Digital Shop</title>
+<meta name="description" content="Tarz Store — Premium digital shop terlengkap. Produk berkualitas, harga terjangkau, proses cepat.">
+<meta name="robots" content="index,follow">
+<!-- Preload LCP image (banner pertama) untuk mempercepat FCP & LCP -->
+<link rel="preload" as="image" href="Thamnel1.jpg" fetchpriority="high">
+<!-- Preload logo -->
+<link rel="preload" as="image" href="tarz.jpg" fetchpriority="high">
+<!-- Font: preconnect + async load untuk hindari render-blocking -->
+<link rel="dns-prefetch" href="https://wa.me">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"></noscript>
+<style>
+/* ── RESET & ROOT ── */
+*{margin:0;padding:0;box-sizing:border-box;}
+/* global fix: hilangkan tap highlight segi empat di semua elemen interaktif */
+button,a,[role="button"]{
+  -webkit-tap-highlight-color:transparent;
+}
+:root{
+  --bg:#03050d;
+  --surface:#080d1a;
+  --card:#0b1122;
+  --card2:#0e1529;
+  --blue:#1d6ef5;
+  --blue2:#4d94ff;
+  --cyan:#00d4ff;
+  --text:#eef2ff;
+  --text2:#8a9bbf;
+  --green:#00e5a0;
+  --gold:#f5c842;
+  --border:rgba(255,255,255,.06);
+  --border-strong:rgba(255,255,255,.1);
+  --radius-lg:20px;
+  --radius-md:14px;
+  --radius-sm:10px;
+  --t-fast:.2s;
+  --t-mid:.32s;
+  --t-slow:.42s;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --ease-out:cubic-bezier(.22,1,.36,1);
+  --ease-soft:cubic-bezier(.25,.46,.45,.94);
+}
+
+html{scroll-behavior:smooth;overscroll-behavior-y:none;}
+/* Hormati preferensi reduced-motion + jadi fallback aman kalau device lemot */
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto;}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important;}
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Space Grotesk',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  overflow-x:hidden;
+  min-height:100vh;
+  touch-action:pan-y;
+  -webkit-overflow-scrolling:touch;
+  /* CSS-only ambient — zero JS, zero repaint */
+  background-image:
+    radial-gradient(ellipse 70% 50% at 20% 20%,rgba(29,110,245,.06) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 70%,rgba(0,212,255,.04) 0%,transparent 55%),
+    radial-gradient(ellipse 50% 60% at 50% 100%,rgba(29,110,245,.03) 0%,transparent 50%);
+}
+
+/* ── GRID OVERLAY ──
+   Diubah dari position:fixed → absolute. "fixed" pada background besar
+   memaksa browser mobile membuat compositing layer terpisah yang di-repaint
+   tiap frame scroll (penyebab utama lag/jank saat scroll). Dengan absolute,
+   layer ini ikut men-scroll bersama halaman dan tidak perlu repaint berulang. */
+body::before{
+  content:'';
+  position:absolute;inset:0;z-index:0;
+  background-image:
+    linear-gradient(rgba(29,110,245,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(29,110,245,.03) 1px,transparent 1px);
+  background-size:48px 48px;
+  mask-image:radial-gradient(ellipse 90% 90% at 50% 40%,black 20%,transparent 100%);
+  pointer-events:none;
+}
+
+/* ── WRAPPER ── */
+.wrapper{position:relative;z-index:1;}
+
+/* ── HEADER ── */
+header{
+  width:100%;
+  padding:16px 6%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  position:sticky;top:0;z-index:100;
+  /* background solid (bukan blur) — backdrop-filter pada elemen sticky
+     dipaksa re-render tiap frame scroll di banyak HP kelas menengah-bawah.
+     Solid + opacity tinggi memberi tampilan hampir identik tanpa biaya itu. */
+  background:rgba(5,8,18,.97);
+  border-bottom:1px solid var(--border);
+  transform:translateZ(0);
+  will-change:transform;
+  contain:layout paint;
+}
+
+/* single thin accent line — opacity only, no layout shift */
+header::after{
+  content:'';
+  position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent 0%,var(--blue) 30%,var(--cyan) 50%,var(--blue) 70%,transparent 100%);
+  opacity:.4;
+}
+
+.logo{display:flex;align-items:center;gap:11px;}
+
+.logo-icon{
+  width:40px;height:40px;
+  border-radius:11px;
+  border:1px solid rgba(29,110,245,.3);
+  overflow:hidden;
+  flex-shrink:0;
+  background:rgba(29,110,245,.08);
+  display:flex;align-items:center;justify-content:center;
+}
+.logo-icon img{width:100%;height:100%;object-fit:cover;}
+
+.logo-name{
+  font-family:'Space Grotesk',-apple-system,sans-serif;
+  font-size:1.22rem;font-weight:700;letter-spacing:.5px;
+  font-display:swap;
+  position:relative;
+  display:inline-block;
+  background:linear-gradient(100deg,#dfe8ff 0%,#fff 15%,var(--cyan) 32%,#c9f4ff 42%,#fff 50%,var(--blue2) 60%,#fff 72%,#dfe8ff 88%,#fff 100%);
+  background-size:280% 100%;
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  -webkit-text-fill-color:transparent;
+  text-shadow:0 0 18px rgba(0,212,255,.35);
+  will-change:background-position,filter;
+  opacity:0;
+  /* 3 animasi terpisah dengan timing masing-masing:
+     - logo-intro: sekali saja (fade+geser masuk), TIDAK sentuh letter-spacing
+       supaya lebar teks tidak berubah dan tidak bentrok dengan animasi lain.
+     - logo-shine & logo-glow: mulai SETELAH intro selesai (delay .6s),
+       jalan terus infinite, saling independen (posisi vs filter). */
+  animation-name:logo-intro,logo-shine,logo-glow;
+  animation-duration:.6s,3.2s,2.6s;
+  animation-timing-function:var(--ease-out),linear,ease-in-out;
+  animation-iteration-count:1,infinite,infinite;
+  animation-delay:0s,.6s,.6s;
+  animation-fill-mode:forwards,none,none;
+}
+@keyframes logo-shine{
+  0%{background-position:140% 0;}
+  100%{background-position:-140% 0;}
+}
+/* Pulsasi glow halus di belakang teks — filter drop-shadow saja, tidak trigger layout */
+@keyframes logo-glow{
+  0%,100%{filter:drop-shadow(0 0 6px rgba(0,212,255,.25));}
+  50%{filter:drop-shadow(0 0 14px rgba(0,212,255,.55));}
+}
+/* Entrance sekali: fade + geser masuk dari samping, tanpa ubah lebar teks */
+@keyframes logo-intro{
+  0%{opacity:0;transform:translate3d(-10px,0,0);}
+  100%{opacity:1;transform:translate3d(0,0,0);}
+}
+@media (prefers-reduced-motion: reduce){
+  .logo-name{animation:none;background-position:0 0;filter:none;opacity:1;}
+}
+/* Jeda animasi logo & dot saat tab tidak aktif -> tidak ada kerja render
+   sia-sia di background tab, dan saat kembali tidak ada "lonjakan" jank.
+   animation-play-state butuh nilai per-animasi (logo punya 3 animasi). */
+body.tab-hidden .logo-name{animation-play-state:paused,paused,paused;}
+body.tab-hidden .dot{animation-play-state:paused;}
+.logo-sub{font-size:9px;letter-spacing:2.5px;color:var(--text2);margin-top:1px;text-transform:uppercase;font-weight:600;}
+
+.status-pill{
+  display:flex;align-items:center;gap:7px;
+  background:rgba(0,229,160,.06);
+  border:1px solid rgba(0,229,160,.18);
+  border-radius:999px;padding:6px 13px;
+  font-size:10.5px;font-weight:700;color:var(--green);letter-spacing:1.5px;
+}
+.dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--green);
+  /* opacity-only — no scale/box-shadow repaint */
+  animation:dot-blink 2s ease-in-out infinite;
+}
+@keyframes dot-blink{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+/* ── HERO ── */
+.hero{text-align:center;padding:0 0 0;}
+
+/* ── BANNER SLIDESHOW ── */
+.banner-slider{
+  position:relative;
+  width:calc(100% - 48px);
+  margin:18px auto 0;
+  overflow:hidden;
+  background:#000;
+  border-radius:var(--radius-lg);
+  /* Cegah CLS: aspect ratio 1280:480 = 37.5% */
+  min-height:clamp(120px, 37.5vw, 480px);
+}
+.banner-slider-track{
+  display:flex;
+  transition:transform .55s var(--ease);
+  touch-action:pan-y;
+  transform:translateZ(0);
+  will-change:transform;
+}
+.banner-slide{
+  min-width:100%;
+  position:relative;
+  overflow:hidden;
+}
+.banner-slide img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+  max-height:480px;
+  transform:translateZ(0);
+}
+/* dots — indicator only, no click */
+.banner-dots{
+  position:absolute;
+  bottom:14px;left:50%;transform:translateX(-50%);
+  display:flex;gap:8px;z-index:10;
+}
+.banner-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:rgba(255,255,255,.4);
+  border:none;padding:0;cursor:pointer;
+  transition:background .4s var(--ease),transform .4s var(--ease);
+  -webkit-tap-highlight-color:transparent;
+  will-change:transform;
+}
+.banner-dot.active{
+  background:#fff;
+  transform:scale(1.3);
+}
+@media(max-width:640px){
+  .banner-slider{width:calc(100% - 24px);border-radius:12px;}
+  .banner-slide img{max-height:220px;}
+}
+
+/* ── STATS ── */
+.stats{
+  display:flex;justify-content:center;gap:36px;
+  margin-top:40px;
+}
+.stat{text-align:center;position:relative;}
+.stat::after{
+  content:'';position:absolute;
+  right:-18px;top:50%;transform:translateY(-50%);
+  width:1px;height:28px;background:var(--border);
+}
+.stat:last-child::after{display:none;}
+.stat-num{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:1.5rem;font-weight:700;color:var(--blue2);
+  transition:color var(--t-fast) var(--ease);
+  letter-spacing:-.5px;
+}
+.stat:hover .stat-num{color:var(--cyan);}
+.stat-label{font-size:10px;color:var(--text2);letter-spacing:2px;text-transform:uppercase;margin-top:3px;}
+
+/* ── TABS ── */
+.tabs-wrap{
+  display:flex;justify-content:center;
+  margin:0 6% 0;
+  padding-bottom:20px;
+  border-bottom:1px solid var(--border);
+  position:relative;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.tabs-wrap::after{
+  content:'';position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);
+  width:200px;height:2px;border-radius:99px;
+  background:linear-gradient(90deg,transparent,var(--blue),var(--cyan),var(--blue),transparent);
+  box-shadow:0 0 12px rgba(0,212,255,.5);
+}
+.tabs-wrap::-webkit-scrollbar{display:none;}
+.tabs{
+  display:inline-flex;
+  background:rgba(8,13,26,.7);
+  border:1px solid var(--border-strong);
+  border-radius:var(--radius-md);padding:4px;gap:0;
+  position:relative;flex-shrink:0;
+  box-shadow:0 4px 20px rgba(0,0,0,.3);
+}
+
+/* Sliding indicator — left/width only, GPU-composited */
+.tab-indicator{
+  position:absolute;top:4px;bottom:4px;
+  border-radius:10px;
+  background:linear-gradient(135deg,#1a5fd4,#00bde8);
+  box-shadow:0 0 14px rgba(29,110,245,.35);
+  transition:left var(--t-slow) var(--ease),width var(--t-slow) var(--ease);
+  z-index:0;pointer-events:none;
+  will-change:left,width;
+}
+
+.tab-btn{
+  border:none;padding:11px 28px;
+  border-radius:10px;
+  background:transparent;color:var(--text2);
+  font-family:'Space Grotesk',sans-serif;font-weight:600;
+  font-size:.85rem;cursor:pointer;
+  transition:color var(--t-mid) var(--ease-soft);
+  letter-spacing:.3px;position:relative;z-index:1;
+  display:flex;align-items:center;gap:7px;white-space:nowrap;
+  /* fix: hapus highlight segi empat saat diklik */
+  -webkit-tap-highlight-color:transparent;
+  outline:none;
+  -webkit-appearance:none;
+  appearance:none;
+}
+.tab-btn .tab-icon{
+  display:inline-flex;align-items:center;justify-content:center;
+  transition:transform var(--t-mid) var(--ease);
+  flex-shrink:0;
+}
+.tab-btn.active{color:#fff;}
+.tab-btn.active .tab-icon{transform:scale(1.15);}
+.tab-btn:not(.active):hover{color:var(--text);}
+
+.tab-count{
+  background:rgba(255,255,255,.1);
+  border-radius:999px;padding:1px 6px;
+  font-size:10px;font-weight:700;letter-spacing:.2px;
+  transition:background var(--t-fast);
+}
+.tab-btn.active .tab-count{background:rgba(255,255,255,.18);}
+
+/* ── TAB HEADER ── */
+.tab-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:24px;padding-bottom:18px;
+  border-bottom:1px solid rgba(255,255,255,.05);
+  position:relative;
+}
+.tab-header::after{display:none;}
+.tab-header-left{display:flex;align-items:center;gap:12px;}
+#jasaedit .tab-header::after,#cheat .tab-header::after{display:none;}
+#jasaedit .tab-header,#cheat .tab-header{padding-bottom:0;border-bottom:none;}
+.tab-header-icon{
+  width:42px;height:42px;border-radius:12px;
+  background:linear-gradient(135deg,rgba(29,110,245,.12),rgba(0,212,255,.06));
+  border:1px solid rgba(29,110,245,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.2rem;flex-shrink:0;
+}
+.vip-header{
+  display:flex;align-items:center;justify-content:center;
+  width:100%;
+  padding:4px 12px;border-radius:10px;
+  background:#0a0f1e;
+  border:1px solid rgba(0,212,255,.35);
+  box-shadow:inset 0 1px 0 rgba(0,212,255,.1),0 0 18px rgba(0,212,255,.08);
+  position:relative;overflow:hidden;
+}
+.vip-header::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(115deg,transparent 0%,rgba(0,212,255,.14) 50%,transparent 100%);
+  /* animasi background-position memaksa paint tiap frame (mahal, apalagi elemen
+     ini selalu terlihat di atas layar). Diganti transform (GPU-compositable,
+     tidak trigger paint) — efek visual sama, jauh lebih ringan. */
+  will-change:transform;
+  transform:translate3d(-100%,0,0);
+  animation:vipSweep 3s linear infinite;
+  pointer-events:none;
+}
+@keyframes vipSweep{
+  0%{transform:translate3d(-100%,0,0);}
+  100%{transform:translate3d(100%,0,0);}
+}
+body.tab-hidden .vip-header::before{animation-play-state:paused;}
+.vip-header-body{min-width:0;text-align:center;position:relative;z-index:1;}
+.vip-header-title{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  font-family:'Space Grotesk',sans-serif;font-size:.88rem;font-weight:700;
+  letter-spacing:.5px;text-transform:uppercase;
+  background:linear-gradient(90deg,#1d6ef5,#00d4ff 40%,#c9f4ff 50%,#00d4ff 60%,#1d6ef5);
+  background-size:200% 100%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  text-shadow:0 0 18px rgba(0,212,255,.4);
+  animation:vipTextShine 3s linear infinite;
+}
+#cheat .vip-header-title{letter-spacing:.5px;}
+@keyframes vipTextShine{0%{background-position:200% 0;}100%{background-position:-40% 0;}}
+body.tab-hidden .vip-header-title{animation-play-state:paused;}
+.vip-header-title span{
+  color:#fff;font-weight:700;letter-spacing:.3px;text-transform:none;-webkit-text-fill-color:#fff;
+  text-shadow:0 0 10px rgba(0,212,255,.5);
+}
+#cheat .vip-header-title span,#file .vip-header-title span{
+  padding-left:8px;border-left:1px solid rgba(0,212,255,.3);
+}
+.vip-header-desc{
+  display:block;font-size:10.5px;color:var(--text2);letter-spacing:.1px;margin-top:2px;
+  position:relative;z-index:1;
+}
+.vip-header-desc b{color:var(--cyan);font-weight:600;}
+
+.tab-header-title{
+  font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.4px;
+  color:#fff;
+}
+.tab-header-desc{font-size:11px;color:var(--text2);margin-top:2px;letter-spacing:.2px;}
+
+/* ── PRODUCTS ── */
+.products{padding:24px 6% 72px;}
+
+.tab-content{display:none;}
+.tab-content.active{
+  display:block;
+  animation:tabIn .42s var(--ease) both;
+  will-change:opacity,transform;
+}
+@keyframes tabIn{
+  from{opacity:0;transform:translate3d(0,10px,0);}
+  to{opacity:1;transform:translate3d(0,0,0);}
+}
+
+/* ── GRID ── */
+.product-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  content-visibility:auto;
+  contain-intrinsic-size:0 600px;
+}
+
+/* ── CARD ── */
+.card{
+  background:linear-gradient(160deg,var(--card),var(--card2));
+  border:1px solid var(--border);
+  border-radius:var(--radius-md);padding:11px;
+  display:flex;flex-direction:column;
+  transition:transform var(--t-slow) var(--ease-out),
+             opacity var(--t-mid) var(--ease-soft),
+             border-color var(--t-mid) var(--ease-soft),
+             box-shadow var(--t-slow) var(--ease-soft);
+  position:relative;overflow:hidden;
+  opacity:0;transform:translate3d(0,18px,0);
+  contain:layout style paint;
+}
+
+/* Glow highlight — separate layer, opacity transition only */
+.card::before{
+  content:'';
+  position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 0%,rgba(29,110,245,.08),transparent 65%);
+  opacity:0;
+  transition:opacity var(--t-mid) var(--ease);
+  pointer-events:none;border-radius:var(--radius-md);
+}
+.card:hover::before{opacity:1;}
+
+.card.visible{animation:cardIn .5s var(--ease) forwards;}
+@keyframes cardIn{
+  from{opacity:0;transform:translate3d(0,14px,0);}
+  to{opacity:1;transform:translate3d(0,0,0);}
+}
+
+.card:hover{
+  transform:translate3d(0,-6px,0);
+  border-color:rgba(29,110,245,.35);
+  box-shadow:0 16px 38px rgba(0,0,0,.42);
+}
+@media(hover:none){
+  .card:hover{transform:none;border-color:var(--border);box-shadow:none;}
+  .card:hover::before{opacity:0;}
+}
+
+/* STATUS RIBBON — pita OPEN/CLOSE melilit pojok kiri atas, sama gaya dengan price ribbon */
+.platform-label{
+  position:absolute;top:10px;left:-34px;z-index:5;
+  width:110px;
+  padding:2px 0;
+  font-size:9px;font-weight:800;letter-spacing:1px;
+  text-align:center;color:#fff;pointer-events:none;
+  text-transform:uppercase;
+  transform:rotate(-45deg);
+  transform-origin:center;
+  background-size:200% 100%;
+  box-shadow:0 2px 6px rgba(0,0,0,.35);
+  overflow:hidden;
+}
+.platform-label::after{
+  content:"";
+  position:absolute;inset:0;z-index:1;
+  background:linear-gradient(120deg,transparent 40%,rgba(255,255,255,.55) 50%,transparent 60%);
+  background-size:220% 100%;
+  animation:ribbonSweep 2.5s ease-in-out infinite;
+}
+.platform-label.ios,.platform-label.android,.platform-label.pc{
+  background:linear-gradient(90deg,rgba(29,110,245,.55),rgba(77,148,255,.55),rgba(29,110,245,.55));
+}
+@media(max-width:600px){
+  .platform-label{width:94px;font-size:8px;top:9px;left:-30px;}
+}
+
+/* PRICE RIBBON — pita harga melilit pojok kiri atas gambar produk, dengan shimmer */
+.price-label{
+  position:absolute;top:10px;left:-34px;z-index:5;
+  width:110px;
+  padding:2px 0;
+  font-size:9px;font-weight:800;letter-spacing:.5px;
+  text-align:center;color:#fff;pointer-events:none;
+  transform:rotate(-45deg);
+  transform-origin:center;
+  background:linear-gradient(90deg,#ff5f1f,#ff8a1e,#ff5f1f);
+  background-size:200% 100%;
+  box-shadow:0 2px 6px rgba(0,0,0,.35);
+  overflow:hidden;
+}
+.price-label span{position:relative;z-index:2;}
+.price-label::before{content:"Rp";font-weight:700;opacity:.85;position:relative;z-index:2;}
+.price-label::after{
+  content:"";
+  position:absolute;inset:0;z-index:1;
+  background:linear-gradient(120deg,transparent 40%,rgba(255,255,255,.55) 50%,transparent 60%);
+  background-size:220% 100%;
+  animation:ribbonSweep 2.5s ease-in-out infinite;
+}
+/* Versi CLOSE — pita merah transparan, otomatis saat card berstatus close */
+.card[data-status="close"] .price-label{
+  background:linear-gradient(90deg,rgba(185,28,28,.55),rgba(239,68,68,.55),rgba(185,28,28,.55));
+  background-size:200% 100%;
+}
+.card[data-status="close"] .price-label::before{content:"";}
+.card[data-status="close"] .price-label span::before{content:"CLOSE";}
+.card[data-status="close"] .price-label span{visibility:hidden;}
+.card[data-status="close"] .price-label span::before{visibility:visible;}
+
+/* Versi UPDATE — pita biru transparan, harga tetap terlihat karena produk masih bisa diinstall */
+.card[data-status="update"] .price-label{
+  background:linear-gradient(90deg,rgba(29,110,245,.55),rgba(77,148,255,.55),rgba(29,110,245,.55));
+  background-size:200% 100%;
+}
+
+/* Versi ROOT — pita ungu untuk label khusus non-harga (mis. AINCRAD) */
+.price-label.label-root{
+  background:linear-gradient(90deg,#7c3aed,#a855f7,#7c3aed);
+  background-size:200% 100%;
+}
+.price-label.label-root::before{content:"";}
+
+/* Versi NO ROOT — pita hijau untuk label khusus non-harga (mis. VEXTU PROXY) */
+.price-label.label-noroot{
+  background:linear-gradient(90deg,#0e9f6e,#10d890,#0e9f6e);
+  background-size:200% 100%;
+}
+.price-label.label-noroot::before{content:"";}
+/* Ribbon shine/sweep diubah dari animasi background-position (memaksa paint
+   tiap frame, di composite thread terpisah dari GPU) menjadi animasi transform
+   pada pseudo-element (opacity+translate, GPU-compositable, tidak trigger
+   paint berulang). Efek visual identik tapi jauh lebih ringan, apalagi saat
+   ada banyak ribbon berjalan bersamaan di grid produk. */
+.platform-label,.price-label{
+  animation:none;
+  background-position:0 0!important;
+}
+.platform-label::after,.price-label::after{
+  background:linear-gradient(120deg,transparent 35%,rgba(255,255,255,.55) 50%,transparent 65%);
+  background-size:100% 100%;
+  animation:ribbonSweep 2.6s ease-in-out infinite;
+  will-change:transform;
+  transform:translate3d(-120%,0,0);
+}
+@keyframes ribbonSweep{
+  0%{transform:translate3d(-120%,0,0);}
+  60%,100%{transform:translate3d(120%,0,0);}
+}
+/* Hemat baterai/CPU: hentikan animasi ribbon saat card di luar viewport */
+.card:not(.in-view) .platform-label::after,
+.card:not(.in-view) .price-label::after{
+  animation-play-state:paused;
+}
+@media(max-width:600px){
+  .price-label{width:94px;font-size:8px;top:9px;left:-30px;}
+}
+
+/* ── CLOSE STATUS — pita merah transparan & tombol nonaktif ── */
+.card[data-status="close"] .platform-label{
+  background:linear-gradient(90deg,rgba(185,28,28,.55),rgba(239,68,68,.55),rgba(185,28,28,.55))!important;
+  background-size:200% 100%!important;
+  color:#fff!important;
+}
+.card[data-status="close"] .buy-btn{
+  background:rgba(60,60,80,.5)!important;
+  color:rgba(255,255,255,.28)!important;
+  cursor:not-allowed!important;
+  border-color:rgba(255,255,255,.06)!important;
+  box-shadow:none!important;
+  pointer-events:none!important;
+  transform:none!important;
+}
+.card[data-status="close"] .buy-btn:hover{
+  background:rgba(60,60,80,.5)!important;
+  transform:none!important;
+}
+
+/* ── UPDATE STATUS — pita biru transparan, tombol install TETAP AKTIF ── */
+.card[data-status="update"] .platform-label{
+  background:linear-gradient(90deg,rgba(29,110,245,.55),rgba(77,148,255,.55),rgba(29,110,245,.55))!important;
+  background-size:200% 100%!important;
+  color:#fff!important;
+}
+
+/* CARD BADGE */
+.card-badge{
+  position:absolute;top:20px;right:20px;z-index:2;
+  background:linear-gradient(135deg,var(--gold),#f58f1d);
+  color:#000;font-size:9px;font-weight:800;letter-spacing:1.5px;
+  padding:3px 9px;border-radius:999px;text-transform:uppercase;
+}
+
+/* IMAGE */
+.product-image{
+  width:100%;height:108px;border-radius:12px;
+  overflow:hidden;margin-bottom:10px;
+  background:linear-gradient(135deg,rgba(29,110,245,.09),rgba(0,212,255,.04));
+  position:relative;
+}
+/* Placeholder text */
+.product-image::before{
+  content:attr(data-label);
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;
+  color:rgba(29,110,245,.35);letter-spacing:2px;z-index:0;
+}
+/* Gradient overlay */
+.product-image::after{
+  content:'';position:absolute;inset:0;z-index:1;
+  background:linear-gradient(to top,rgba(8,13,26,.55),transparent 55%);
+}
+.product-image img{
+  width:100%;height:100%;object-fit:cover;
+  /* transform only — GPU composited */
+  transition:transform .6s var(--ease-out),opacity .4s var(--ease-soft);
+  transform:translate3d(0,0,0) scale(1);
+  filter:brightness(.9) saturate(1.05);
+  image-rendering:auto;
+  /* Isolasi setiap gambar jadi layer compositing sendiri yang independen —
+     supaya browser tidak perlu re-decode/re-paint gambar besar berulang
+     kali saat elemen lain di sekitarnya berubah (mis. saat scroll lewat
+     banyak card). Sangat membantu kalau file foto aslinya besar (>1MB). */
+  contain:layout paint;
+}
+.product-image img.img-error{display:none;}
+.card:hover .product-image img{transform:translate3d(0,0,0) scale(1.07);}
+
+/* CARD CONTENT */
+.card h4{font-size:.83rem;font-weight:700;margin-bottom:4px;letter-spacing:.2px;position:relative;z-index:1;min-height:2.4em;line-height:1.2;display:flex;align-items:flex-start;}
+.card-sold{
+  display:flex;align-items:center;gap:4px;
+  font-size:10px;font-weight:700;letter-spacing:.4px;
+  color:#0284c7;margin-bottom:8px;position:relative;z-index:1;
+}
+.card-sold svg{flex-shrink:0;vertical-align:middle;}
+
+.card > p{color:var(--text2);font-size:11.5px;line-height:1.55;margin-bottom:12px;flex:1;position:relative;z-index:1;}
+
+/* ── FILE TAB — kartu produk full-width, foto kiri + info kanan ── */
+#file .product-grid{grid-template-columns:1fr;}
+.file-card{
+  background:linear-gradient(160deg,var(--card),var(--card2));
+  border:1px solid var(--border);
+  border-radius:var(--radius-md);
+  padding:12px;
+  display:flex;flex-direction:column;
+  gap:12px;
+  position:relative;overflow:hidden;
+  contain:layout style paint;
+  transition:transform var(--t-slow) var(--ease-out),
+             border-color var(--t-mid) var(--ease-soft),
+             box-shadow var(--t-slow) var(--ease-soft);
+  opacity:0;transform:translate3d(0,18px,0);
+}
+.file-card.visible{animation:cardIn .5s var(--ease) forwards;}
+.file-card:hover{
+  border-color:rgba(29,110,245,.35);
+  box-shadow:0 16px 38px rgba(0,0,0,.42);
+}
+@media(hover:none){.file-card:hover{box-shadow:none;border-color:var(--border);}}
+
+.file-card-top{
+  display:flex;align-items:flex-start;gap:20px;
+}
+.file-card .product-image{
+  width:96px;height:96px;flex-shrink:0;margin-bottom:0;border-radius:20px;
+}
+.file-card-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:0;justify-content:flex-start;}
+.file-card-info h4{
+  font-size:.95rem;font-weight:700;letter-spacing:.2px;line-height:1.1;
+  min-height:0;margin:0 0 -5px 0;
+}
+.file-card-tags{
+  display:flex;flex-wrap:wrap;gap:5px;
+  margin:0 0 6px 0;
+}
+.file-tag{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:8.5px;font-weight:700;letter-spacing:.5px;
+  color:var(--green);
+  background:rgba(0,229,160,.08);
+  border:1px solid rgba(0,229,160,.22);
+  border-radius:999px;padding:2.5px 8px;
+  text-transform:uppercase;
+}
+.file-tag::before{content:'✓';font-size:9px;}
+.file-card-desc{color:var(--text2);font-size:11.5px;line-height:1.55;}
+/* Tombol download disejajarkan dengan foto (di sisi kanan), ukuran ringkas — bukan lagi full width di bawah */
+.file-card .buy-btn{
+  width:auto;flex-shrink:0;
+  padding:10px 14px;margin-top:0;
+  white-space:nowrap;
+}
+/* Wrapper vertikal untuk tombol Download + JOIN VIP di sisi kanan kartu */
+.file-card-actions{
+  display:flex;flex-direction:column;gap:8px;
+  flex-shrink:0;align-self:center;
+}
+.file-card .join-vip-btn{
+  width:auto;flex-shrink:0;
+  padding:9px 14px;margin-top:0;
+  white-space:nowrap;
+  border:1px solid rgba(245,200,66,.35);
+  border-radius:var(--radius-sm);
+  background:rgba(245,200,66,.08);
+  color:var(--gold);
+  font-family:'Space Grotesk',sans-serif;
+  font-size:11px;font-weight:700;letter-spacing:.5px;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:filter var(--t-fast) var(--ease),transform var(--t-fast) var(--ease);
+}
+.file-card .join-vip-btn:hover{filter:brightness(1.15);transform:translate3d(0,-2px,0);}
+.file-card .join-vip-btn:active{transform:translate3d(0,0,0) scale(.97);filter:brightness(.95);transition-duration:.1s;}
+@media(max-width:600px){
+  .file-card .product-image{width:78px;height:78px;}
+  .file-card-info h4{font-size:.86rem;}
+  .file-card .buy-btn{padding:9px 10px;font-size:9.5px;}
+  .file-card .join-vip-btn{padding:8px 10px;font-size:9.5px;}
+}
+@media(max-width:380px){
+  .file-card .buy-btn span:last-child{display:none;}
+  .file-card .buy-btn{padding:9px;}
+  .file-card .join-vip-btn{padding:8px;}
+}
+
+/* ══════════════════════════════════════
+   MODAL — PROFESSIONAL CHECKOUT SHEET
+══════════════════════════════════════ */
+.modal-overlay{
+  position:fixed;inset:0;z-index:9000;
+  background:rgba(2,4,11,.94);
+  display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity .4s var(--ease-soft);
+  will-change:opacity;
+}
+.modal-overlay.open{opacity:1;pointer-events:auto;}
+
+.modal-sheet{
+  width:100%;max-width:520px;
+  background:#07101f;
+  border:1px solid rgba(29,110,245,.18);
+  border-bottom:none;
+  border-radius:24px 24px 0 0;
+  transform:translate3d(0,100%,0);
+  transition:transform .55s var(--ease-out);
+  will-change:transform;
+  position:relative;
+  overflow:hidden;
+  box-shadow:0 -16px 64px rgba(0,0,0,.7);
+  max-height:92vh;
+  display:flex;flex-direction:column;
+}
+/* top glow line */
+.modal-sheet::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;z-index:2;
+  background:linear-gradient(90deg,transparent 5%,var(--blue) 30%,var(--cyan) 50%,var(--blue) 70%,transparent 95%);
+  opacity:.65;
+}
+.modal-overlay.open .modal-sheet{transform:none;}
+
+/* ── DRAG HANDLE ── */
+.modal-handle{
+  width:36px;height:4px;border-radius:99px;
+  background:rgba(255,255,255,.1);
+  margin:12px auto 0;flex-shrink:0;
+}
+
+/* ── MODAL HEADER ── */
+.modal-header{
+  padding:18px 20px 16px;
+  border-bottom:1px solid rgba(255,255,255,.05);
+  display:flex;align-items:flex-start;gap:14px;
+  flex-shrink:0;position:relative;
+}
+/* subtle bg glow behind header */
+.modal-header::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 100% at 50% 0%,rgba(29,110,245,.07),transparent 70%);
+  pointer-events:none;
+}
+.modal-header-icon{
+  width:48px;height:48px;border-radius:14px;
+  background:linear-gradient(135deg,rgba(29,110,245,.18),rgba(0,212,255,.08));
+  border:1px solid rgba(29,110,245,.3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.4rem;flex-shrink:0;
+  overflow:hidden;
+}
+.modal-header-icon img{
+  width:100%;height:100%;object-fit:cover;border-radius:13px;
+}
+.modal-header-text{flex:1;min-width:0;}
+.modal-product-name{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:.95rem;font-weight:900;letter-spacing:.6px;
+  background:linear-gradient(135deg,#fff 30%,var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  line-height:1.2;margin-bottom:5px;
+}
+.modal-badges{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px;}
+.modal-badge{
+  font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+  padding:3px 9px;border-radius:6px;
+}
+.modal-badge.android{background:rgba(0,170,75,.18);color:#00cc6a;border:1px solid rgba(0,200,90,.25);}
+.modal-badge.ios{background:rgba(29,110,245,.18);color:var(--blue2);border:1px solid rgba(77,148,255,.25);}
+.modal-badge.pc{background:rgba(140,70,240,.18);color:#c084fc;border:1px solid rgba(170,110,255,.25);}
+.modal-badge.status-open{background:rgba(0,229,160,.12);color:var(--green);border:1px solid rgba(0,229,160,.25);}
+.modal-badge.status-close{background:rgba(245,80,80,.1);color:#ff7070;border:1px solid rgba(245,80,80,.2);}
+.modal-badge.status-update{background:rgba(29,110,245,.12);color:#4d94ff;border:1px solid rgba(29,110,245,.25);}
+.modal-product-desc{
+  font-size:11.5px;color:var(--text2);line-height:1.6;
+}
+
+.modal-close{
+  width:32px;height:32px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.07);
+  background:rgba(255,255,255,.03);
+  color:var(--text2);font-size:13px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background var(--t-fast),color var(--t-fast),border-color var(--t-fast);
+  flex-shrink:0;
+  /* fix: hapus highlight segi empat saat diklik */
+  -webkit-tap-highlight-color:transparent;
+  outline:none;
+  -webkit-appearance:none;
+  appearance:none;
+}
+.modal-close:hover{background:rgba(255,80,80,.1);border-color:rgba(255,80,80,.3);color:#ff7070;}
+
+/* ── MODAL SCROLL BODY ── */
+.modal-scroll{
+  overflow-y:auto;flex:1;
+  padding:20px 20px 0;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  /* thin scrollbar */
+  scrollbar-width:thin;scrollbar-color:rgba(29,110,245,.3) transparent;
+}
+.modal-scroll::-webkit-scrollbar{width:3px;}
+.modal-scroll::-webkit-scrollbar-thumb{background:rgba(29,110,245,.3);border-radius:99px;}
+
+/* ── SECTION LABEL ── */
+.modal-section-label{
+  font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--text2);margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+.modal-section-label::after{
+  content:'';flex:1;height:1px;background:rgba(255,255,255,.05);
+}
+
+/* ── PRICE GRID ── */
+.price-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:9px;
+  margin-bottom:20px;
+}
+.price-opt{
+  position:relative;cursor:pointer;
+  border-radius:var(--radius-md);
+  border:1.5px solid rgba(255,255,255,.07);
+  background:rgba(255,255,255,.025);
+  padding:14px 13px;
+  transition:border-color var(--t-fast) var(--ease),
+             background var(--t-fast) var(--ease),
+             transform var(--t-fast) var(--ease);
+  overflow:hidden;
+}
+.price-opt::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 0%,rgba(29,110,245,.1),transparent 70%);
+  opacity:0;transition:opacity var(--t-fast);pointer-events:none;
+}
+.price-opt:hover{border-color:rgba(29,110,245,.28);transform:translate3d(0,-1px,0);}
+.price-opt:hover::before{opacity:1;}
+.price-opt.selected{
+  border-color:rgba(29,110,245,.75);
+  background:rgba(29,110,245,.08);
+}
+.price-opt.selected::before{opacity:1;}
+
+/* selected check badge */
+.price-opt-check{
+  position:absolute;top:9px;right:9px;
+  width:18px;height:18px;border-radius:50%;
+  background:var(--blue2);
+  display:none;align-items:center;justify-content:center;
+}
+.price-opt-check svg{width:10px;height:10px;stroke:#fff;stroke-width:3;fill:none;}
+.price-opt.selected .price-opt-check{display:flex;}
+
+.price-opt-duration{
+  font-size:10px;font-weight:700;letter-spacing:.5px;
+  color:var(--text2);text-transform:uppercase;margin-bottom:5px;
+}
+.price-opt-amount{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:.88rem;font-weight:900;
+  color:#fff;line-height:1.1;
+}
+.price-opt.selected .price-opt-amount{color:var(--cyan);}
+.price-opt-per{font-size:9px;color:var(--text2);margin-top:3px;}
+
+/* ── SPECIAL FEATURE OPTIONS (produk custom, non-paket) ── */
+.feature-grid{
+  display:flex;flex-direction:column;
+  gap:12px;margin-bottom:20px;
+}
+.feature-opt{
+  position:relative;
+  border-radius:var(--radius-md);
+  border:1.5px solid rgba(255,255,255,.07);
+  background:rgba(255,255,255,.025);
+  padding:16px;
+  display:flex;align-items:center;gap:14px;
+  text-decoration:none;
+  transition:border-color var(--t-fast) var(--ease),
+             background var(--t-fast) var(--ease),
+             transform var(--t-fast) var(--ease);
+  cursor:pointer;
+  overflow:hidden;
+}
+.feature-opt::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 0% 0%,rgba(29,110,245,.12),transparent 70%);
+  opacity:0;transition:opacity var(--t-fast);pointer-events:none;
+}
+.feature-opt:hover{border-color:rgba(29,110,245,.32);transform:translate3d(0,-1px,0);}
+.feature-opt:hover::before{opacity:1;}
+.feature-opt.wa{border-color:rgba(0,229,160,.18);}
+.feature-opt.wa:hover{border-color:rgba(0,229,160,.4);}
+.feature-icon{
+  width:44px;height:44px;border-radius:12px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;
+  background:rgba(29,110,245,.12);
+  border:1px solid rgba(29,110,245,.25);
+}
+.feature-opt.wa .feature-icon{
+  background:rgba(0,229,160,.12);
+  border-color:rgba(0,229,160,.3);
+}
+.feature-text{flex:1;min-width:0;}
+.feature-title{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:.86rem;font-weight:800;color:#fff;letter-spacing:.2px;
+}
+.feature-desc{font-size:11px;color:var(--text2);margin-top:2px;line-height:1.4;}
+.feature-arrow{flex-shrink:0;color:var(--text2);transition:transform var(--t-fast) var(--ease),color var(--t-fast);}
+.feature-opt:hover .feature-arrow{transform:translate3d(3px,0,0);color:var(--blue2);}
+.feature-opt.wa:hover .feature-arrow{color:var(--green);}
+
+/* ── SALIN KEY (dibawah fitur APK CHEAT, produk dengan copyKey di config.json) ── */
+.inline-copykey-wrap{
+  margin-top:6px;
+  border-radius:var(--radius-md);
+  border:1.5px solid rgba(29,110,245,.18);
+  background:rgba(29,110,245,.035);
+  padding:12px 14px;
+}
+.inline-copykey-label{
+  font-size:10px;color:var(--text2);letter-spacing:1px;text-transform:uppercase;font-weight:700;
+  margin-bottom:7px;
+}
+.inline-copykey-row{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(0,0,0,.25);border:1.5px solid var(--border-strong);border-radius:var(--radius-sm);
+  padding:11px 8px 11px 14px;
+}
+.inline-copykey-value{
+  flex:1;min-width:0;
+  font-family:'Space Grotesk',monospace;font-size:.82rem;letter-spacing:.4px;color:var(--text);
+  white-space:nowrap;overflow-x:auto;
+}
+.inline-copykey-btn{
+  flex-shrink:0;border:1.5px solid rgba(29,110,245,.35);border-radius:8px;
+  padding:8px 12px;background:rgba(29,110,245,.1);color:var(--blue2);
+  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.75rem;letter-spacing:.2px;
+  cursor:pointer;display:flex;align-items:center;gap:6px;
+  transition:background var(--t-fast),border-color var(--t-fast),transform var(--t-fast);
+  -webkit-tap-highlight-color:transparent;outline:none;-webkit-appearance:none;appearance:none;
+}
+.inline-copykey-btn:hover{background:rgba(29,110,245,.18);border-color:rgba(29,110,245,.55);}
+.inline-copykey-btn:active{transform:scale(.95);}
+
+/* ── FITUR LIST (dibawah Buy Key, mode special) ── */
+.fitur-list-wrap{
+  margin-top:6px;
+  border-radius:var(--radius-md);
+  border:1.5px solid rgba(245,200,66,.16);
+  background:rgba(245,200,66,.035);
+  padding:14px 14px 16px;
+  position:relative;
+  overflow:hidden;
+}
+.fitur-list-wrap::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 100% 0%,rgba(245,200,66,.1),transparent 65%);
+  pointer-events:none;
+}
+.fitur-list-head{
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:11px;position:relative;
+}
+.fitur-list-head-icon{
+  width:26px;height:26px;border-radius:8px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.8rem;
+  color:var(--gold);
+  background:rgba(245,200,66,.14);
+  border:1px solid rgba(245,200,66,.3);
+}
+.fitur-list-head-icon svg{display:block;}
+.fitur-list-head-text{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:.78rem;font-weight:800;color:var(--gold);
+  letter-spacing:1.2px;text-transform:uppercase;
+}
+.fitur-list-count{
+  margin-left:auto;
+  font-size:10px;font-weight:700;color:var(--text2);
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--border);
+  border-radius:999px;padding:3px 9px;
+  letter-spacing:.3px;
+}
+.fitur-chip-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:8px;position:relative;
+}
+.fitur-chip{
+  display:flex;align-items:center;gap:8px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.07);
+  background:rgba(255,255,255,.03);
+  padding:9px 11px;
+  transition:border-color var(--t-fast) var(--ease),background var(--t-fast) var(--ease);
+}
+.fitur-chip:hover{
+  border-color:rgba(245,200,66,.35);
+  background:rgba(245,200,66,.05);
+}
+/* ── POSTER PREVIEW (3:2, dibawah List Fitur, mode special) ── */
+.poster-preview-wrap{
+  margin-top:12px;
+  border-radius:var(--radius-md);
+  border:1.5px solid var(--border-strong);
+  background:var(--card2);
+  overflow:hidden;
+  position:relative;
+}
+.poster-preview-frame{
+  width:100%;
+  aspect-ratio:16/9;
+  overflow:hidden;
+  background:#000;
+}
+.poster-preview-frame img{
+  width:100%;height:100%;
+  object-fit:cover;
+  display:block;
+}
+.fitur-chip-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--gold);flex-shrink:0;
+  box-shadow:0 0 6px rgba(245,200,66,.6);
+}
+.fitur-chip-label{
+  font-size:.78rem;font-weight:700;color:var(--text);
+  letter-spacing:.3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+
+/* ── MODAL FOOTER ── */
+.modal-footer{
+  padding:16px 20px 28px;
+  background:#07101f;
+  flex-shrink:0;
+  border-top:1px solid rgba(255,255,255,.04);
+}
+.modal-selected-summary{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;padding:10px 14px;
+  border-radius:10px;background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.05);
+}
+.modal-summary-label{font-size:10px;color:var(--text2);letter-spacing:.5px;}
+.modal-summary-val{
+  font-family:'Space Grotesk',sans-serif;font-size:.85rem;font-weight:700;
+  color:var(--cyan);
+}
+.modal-cta{
+  width:100%;border:none;border-radius:var(--radius-sm);padding:13px 20px;
+  background:linear-gradient(135deg,#1db954,#22c55e);
+  color:#fff;
+  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.85rem;
+  letter-spacing:.3px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  position:relative;overflow:hidden;
+  transition:filter var(--t-fast) var(--ease-soft),transform var(--t-fast) var(--ease-out),box-shadow var(--t-fast) var(--ease-soft);
+  box-shadow:0 4px 20px rgba(29,185,84,.2);
+  -webkit-tap-highlight-color:transparent;
+  outline:none;
+  -webkit-appearance:none;
+  appearance:none;
+}
+.modal-cta:hover{filter:brightness(1.08);transform:translate3d(0,-2px,0);box-shadow:0 8px 26px rgba(29,185,84,.3);}
+.modal-cta:active{transform:translate3d(0,0,0) scale(.98);filter:brightness(.95);transition-duration:.1s;}
+.modal-cta-icon{font-size:1.1rem;}
+
+/* BUTTON */
+.js-icon{display:inline-flex;align-items:center;justify-content:center;line-height:0;}
+.js-icon svg{display:block;}
+.buy-btn{
+  width:100%;border:none;border-radius:var(--radius-sm);padding:9px;
+  background:linear-gradient(135deg,#1a5fd4,#3c88f5);
+  color:#fff;
+  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:11px;letter-spacing:.4px;
+  cursor:pointer;position:relative;overflow:hidden;z-index:1;
+  margin-top:auto;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:filter var(--t-fast) var(--ease-soft),transform var(--t-fast) var(--ease-out);
+  will-change:transform;
+  -webkit-tap-highlight-color:transparent;
+  outline:none;
+  -webkit-appearance:none;
+  appearance:none;
+}
+.buy-btn:hover{filter:brightness(1.12);transform:translate3d(0,-2px,0);}
+.buy-btn:active{transform:translate3d(0,0,0) scale(.97);filter:brightness(.95);transition-duration:.1s;}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:24px;left:50%;
+  transform:translate3d(-50%,70px,0);
+  background:rgba(8,13,26,.98);
+  border:1px solid rgba(29,110,245,.28);
+  border-radius:12px;padding:11px 20px;
+  font-size:13px;font-weight:600;color:var(--text);
+  z-index:9999;
+  transition:transform var(--t-mid) var(--ease-out),opacity var(--t-mid) var(--ease-soft);
+  white-space:nowrap;pointer-events:none;
+  will-change:transform;opacity:0;
+}
+.toast.show{transform:translate3d(-50%,0,0);opacity:1;}
+.toast.error{border-color:rgba(245,80,80,.35);color:#ff6060;}
+.toast.success{border-color:rgba(0,229,160,.35);color:var(--green);}
+
+/* ── SOCIAL MEDIA ── */
+.social-section{
+  padding:36px 6% 28px;
+  text-align:center;
+  border-top:1px solid var(--border);
+  position:relative;
+}
+.social-section::before{
+  content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:160px;height:1px;
+  background:linear-gradient(90deg,transparent,var(--blue),transparent);
+}
+.social-title{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:.78rem;font-weight:700;letter-spacing:3px;
+  color:var(--text2);text-transform:uppercase;
+  margin-bottom:18px;
+}
+.social-links{
+  display:flex;justify-content:center;flex-wrap:wrap;gap:12px;
+}
+.social-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:46px;height:46px;border-radius:12px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.03);
+  color:var(--text2);
+  text-decoration:none;
+  transition:background var(--t-fast),border-color var(--t-fast),color var(--t-fast),transform var(--t-fast);
+  cursor:pointer;
+  /* fix: hapus highlight segi empat saat diklik */
+  -webkit-tap-highlight-color:transparent;
+  outline:none;
+}
+.social-btn:hover{
+  background:rgba(255,255,255,.07);
+  border-color:rgba(255,255,255,.18);
+  color:#fff;
+  transform:translate3d(0,-2px,0);
+}
+.social-btn.whatsapp:hover{border-color:rgba(37,211,102,.45);background:rgba(37,211,102,.07);color:#25d366;}
+.social-btn.tiktok:hover{border-color:rgba(254,44,85,.45);background:rgba(254,44,85,.06);color:#fe2c55;}
+.social-btn.telegram:hover{border-color:rgba(41,182,246,.45);background:rgba(41,182,246,.07);color:#29b6f6;}
+.social-btn.youtube:hover{border-color:rgba(255,0,0,.45);background:rgba(255,0,0,.07);color:#ff0000;}
+.social-btn.github:hover{border-color:rgba(200,200,200,.45);background:rgba(200,200,200,.07);color:#e0e0e0;}
+.social-btn.discord:hover{border-color:rgba(88,101,242,.55);background:rgba(88,101,242,.1);color:#5865f2;}
+.social-btn-icon{
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;width:18px;height:18px;flex-shrink:0;
+}
+.social-btn-icon svg{width:20px;height:20px;}
+.social-btn.disabled{
+  opacity:.35;cursor:not-allowed;pointer-events:none;
+}
+@media(max-width:640px){
+  .social-links{gap:8px;}
+  .social-btn{width:42px;height:42px;}
+}
+
+/* ── FOOTER ── */
+footer{
+  padding:20px 6%;text-align:center;
+  border-top:1px solid var(--border);
+  color:var(--text2);font-size:12px;position:relative;
+}
+footer::before{
+  content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:160px;height:1px;
+  background:linear-gradient(90deg,transparent,var(--blue),transparent);
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{
+  from{opacity:0;transform:translate3d(0,14px,0);}
+  to{opacity:1;transform:translate3d(0,0,0);}
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:rgba(29,110,245,.5);border-radius:99px;}
+
+/* ── MOBILE ── */
+@media(max-width:640px){
+  header{padding:13px 4%;}
+  .logo-name{font-size:1.15rem;}
+  .hero{padding:28px 4% 36px;}
+  .hero h2{font-size:1.9rem;}
+  .stats{gap:20px;}
+  .stat-num{font-size:1.25rem;}
+  .products,.tabs-wrap{padding-left:4%;padding-right:4%;}
+  .product-grid{gap:8px;grid-template-columns:repeat(3,1fr);}
+  .product-image{height:86px;}
+  .card{padding:8px;border-radius:12px;}
+  .card h4{font-size:.7rem;min-height:2.4em;}
+  .card>p{font-size:10.5px;}
+  .buy-btn{font-size:10px;padding:7px 6px;}
+  .modal-sheet{border-radius:22px 22px 0 0;}
+  .modal-header{padding:14px 16px 13px;gap:12px;}
+  .modal-header-icon{width:42px;height:42px;font-size:1.2rem;border-radius:12px;}
+  .modal-product-name{font-size:.85rem;}
+  .modal-scroll{padding:16px 16px 0;}
+  .modal-footer{padding:14px 16px 24px;}
+  .price-grid{grid-template-columns:repeat(2,1fr);gap:7px;}
+  .price-opt{padding:12px 11px;}
+  .price-opt-amount{font-size:.78rem;}
+  .tab-btn{padding:10px 14px;font-size:.76rem;letter-spacing:.2px;}
+  .tab-btn .tab-icon{font-size:.82rem;}
+  .tab-count{display:none;}
+  .tab-header{margin-bottom:16px;}
+  .tab-header-title{font-size:.92rem;}
+  .tab-header-icon{width:36px;height:36px;font-size:1rem;}
+  .status-pill{padding:6px 11px;font-size:10px;}
+}
+
+/* ── REDUCED MOTION ── */
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms!important;transition-duration:.001ms!important;animation-iteration-count:1!important;}
+}
+
+/* ── FOCUS VISIBLE — aksesibilitas keyboard ── */
+:focus{outline:none;}
+:focus-visible{
+  outline:2px solid var(--cyan);
+  outline-offset:3px;
+  border-radius:4px;
+}
+.tab-btn:focus-visible,
+.buy-btn:focus-visible,
+.modal-close:focus-visible,
+.modal-cta:focus-visible,
+.banner-dot:focus-visible,
+.social-btn:focus-visible{
+  outline:2px solid var(--cyan);
+  outline-offset:2px;
+}
+
+/* ── SKIP TO CONTENT — aksesibilitas ── */
+.skip-link{
+  position:absolute;top:-100%;left:6px;
+  background:var(--blue);color:#fff;
+  padding:8px 16px;border-radius:0 0 8px 8px;
+  font-size:14px;font-weight:700;z-index:9999;
+  text-decoration:none;transition:top .2s;
+}
+.skip-link:focus{top:0;}
+
+/* ── DESKTOP ENHANCEMENTS (≥1024px) ── */
+@media(min-width:1024px){
+  .banner-slider{max-width:1100px;}
+  .products{padding:0 8% 80px;}
+  .tabs-wrap{margin:0 8% 36px;}
+  .product-grid{grid-template-columns:repeat(4,1fr);gap:16px;}
+  .product-image{height:130px;}
+  .card h4{font-size:.88rem;}
+  header{padding:16px 8%;}
+  .stats{gap:48px;}
+}
+
+/* ── WIDE DESKTOP (≥1400px) ── */
+@media(min-width:1400px){
+  .product-grid{grid-template-columns:repeat(5,1fr);}
+  .banner-slide img{max-height:560px;}
+}
+
+/* ══════════════════════════════════════════
+   KEY SYSTEM MODAL — panel akses VIP, gaya "console" senyap & presisi
+   ══════════════════════════════════════════ */
+.key-overlay{
+  position:fixed;inset:0;z-index:1000;
+  background:rgba(2,4,10,.92);
+  /* backdrop-filter:blur() dihapus: berat di HP, dan browser mobile terus
+     repaint blur ini tiap frame saat keyboard muncul/hilang -> kerasa lag/patah.
+     Diganti overlay solid lebih gelap, visual tetap kontras tanpa beban GPU. */
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity var(--t-mid) var(--ease);
+  padding:20px;
+}
+.key-overlay.open{opacity:1;pointer-events:auto;}
+
+.key-box{
+  width:100%;max-width:380px;
+  background:linear-gradient(180deg,#0a0f1e 0%,#080c17 100%);
+  border:1px solid rgba(0,212,255,.14);
+  border-radius:16px;
+  padding:0;
+  transform:scale(.96) translate3d(0,8px,0);
+  transition:transform var(--t-slow) var(--ease-out);
+  overflow:hidden;
+  box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 0 1px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.03);
+  position:relative;
+  max-height:88vh;max-height:88svh;
+  display:flex;flex-direction:column;
+}
+.key-box .key-body{overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.key-overlay.open .key-box{transform:scale(1) translate3d(0,0,0);}
+
+
+.key-head{
+  padding:30px 26px 18px;
+  text-align:center;
+  position:relative;
+}
+.key-eyebrow{
+  font-family:'Space Mono','Space Grotesk',monospace;
+  font-size:9.5px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--cyan);opacity:.75;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  margin-bottom:16px;
+}
+.key-eyebrow::before{content:'';width:14px;height:1px;background:rgba(0,212,255,.35);order:1;}
+.key-eyebrow::after{content:'';width:14px;height:1px;background:rgba(0,212,255,.35);order:5;}
+.key-eyebrow .dot{width:4px;height:4px;border-radius:50%;background:var(--cyan);flex-shrink:0;box-shadow:0 0 6px rgba(0,212,255,.8);order:2;}
+.key-eyebrow .eyebrow-text{order:3;}
+.key-eyebrow .dot-end{width:4px;height:4px;border-radius:50%;background:var(--cyan);flex-shrink:0;box-shadow:0 0 6px rgba(0,212,255,.8);order:4;}
+
+.key-close{
+  position:absolute;top:14px;right:14px;
+  width:28px;height:28px;border-radius:7px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.02);
+  color:var(--text2);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:background var(--t-fast),color var(--t-fast),border-color var(--t-fast);
+  -webkit-tap-highlight-color:transparent;
+}
+.key-close:hover{background:rgba(255,80,80,.1);border-color:rgba(255,80,80,.3);color:#ff7070;}
+
+.key-icon-badge{
+  width:52px;height:52px;margin:0 auto 16px;
+  border-radius:13px;
+  background:rgba(0,212,255,.07);
+  border:1px solid rgba(0,212,255,.24);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--cyan);
+  position:relative;
+}
+.key-icon-badge svg{width:24px;height:24px;}
+
+.key-title{
+  font-size:1.08rem;font-weight:700;color:#fff;letter-spacing:.2px;margin-bottom:6px;
+}
+.key-sub{
+  font-size:12px;color:var(--text2);line-height:1.55;padding:0 10px;
+}
+.key-sub b{color:var(--cyan);font-weight:700;}
+
+.key-body{padding:2px 26px 26px;}
+
+.key-input-wrap{
+  position:relative;margin-bottom:12px;
+}
+.key-input-label{
+  font-family:'Space Mono','Space Grotesk',monospace;
+  font-size:9.5px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;
+  color:var(--text2);margin-bottom:7px;display:block;
+}
+.key-input{
+  width:100%;
+  background:rgba(0,0,0,.35);
+  border:1.5px solid rgba(255,255,255,.09);
+  border-radius:10px;
+  padding:14px 46px 14px 16px;
+  font-family:'Space Mono','Space Grotesk',monospace;
+  font-size:.95rem;letter-spacing:2px;
+  color:var(--text);
+  transition:border-color var(--t-fast) var(--ease),background var(--t-fast);
+  outline:none;
+  -webkit-appearance:none;appearance:none;
+  display:block;
+}
+.key-input::placeholder{color:rgba(138,155,191,.55);letter-spacing:.5px;font-family:'Space Grotesk',sans-serif;}
+.key-input:focus{border-color:var(--cyan);background:rgba(0,212,255,.04);box-shadow:0 0 0 3px rgba(0,212,255,.08);}
+.key-input.shake{animation:key-shake .38s var(--ease);border-color:#ff6060;}
+@keyframes key-shake{
+  0%,100%{transform:translate3d(0,0,0);}
+  20%{transform:translate3d(-6px,0,0);}
+  40%{transform:translate3d(5px,0,0);}
+  60%{transform:translate3d(-4px,0,0);}
+  80%{transform:translate3d(3px,0,0);}
+}
+.key-toggle-eye{
+  position:absolute;right:6px;top:50%;
+  transform:translateY(-50%);
+  width:32px;height:32px;border-radius:8px;border:none;background:transparent;
+  color:var(--text2);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:color var(--t-fast),background var(--t-fast);
+  -webkit-tap-highlight-color:transparent;
+}
+.key-toggle-eye:hover{color:var(--cyan);background:rgba(255,255,255,.05);}
+.key-toggle-eye svg{width:18px;height:18px;}
+
+.key-error-msg{
+  font-family:'Space Mono','Space Grotesk',monospace;
+  font-size:11px;color:#ff6b6b;font-weight:600;letter-spacing:.2px;
+  display:flex;align-items:center;gap:6px;
+  margin:-2px 0 12px;min-height:14px;
+  opacity:0;transform:translate3d(0,-4px,0);
+  transition:opacity var(--t-fast),transform var(--t-fast);
+}
+.key-error-msg.show{opacity:1;transform:translate3d(0,0,0);}
+.key-error-msg::before{content:'✕';font-size:10px;opacity:.8;}
+
+.key-btn-login{
+  width:100%;border:none;border-radius:10px;padding:15px;
+  background:var(--cyan);
+  color:#02131c;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.85rem;
+  letter-spacing:1px;text-transform:uppercase;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 6px 24px rgba(0,212,255,.22);
+  transition:filter var(--t-fast) var(--ease-soft),transform var(--t-fast) var(--ease-out);
+  -webkit-tap-highlight-color:transparent;
+  outline:none;-webkit-appearance:none;appearance:none;
+  margin-bottom:10px;
+  position:relative;overflow:hidden;
+}
+.key-btn-login:hover{filter:brightness(1.08);transform:translate3d(0,-2px,0);}
+.key-btn-login:active{transform:translate3d(0,0,0) scale(.97);filter:brightness(.94);transition-duration:.1s;}
+.key-btn-login.loading{pointer-events:none;}
+.key-btn-login svg{width:16px;height:16px;flex-shrink:0;}
+
+.key-spinner{
+  width:15px;height:15px;border-radius:50%;
+  border:2px solid rgba(2,19,28,.3);
+  border-top-color:#02131c;
+  animation:key-spin .6s linear infinite;
+  display:none;
+}
+.key-btn-login.loading .key-spinner{display:inline-block;}
+.key-btn-login.loading .key-btn-label{display:none;}
+@keyframes key-spin{to{transform:rotate(360deg);}}
+
+.key-divider{
+  display:flex;align-items:center;gap:10px;
+  margin:16px 0 16px;
+}
+.key-divider::before,.key-divider::after{
+  content:'';flex:1;height:1px;background:rgba(255,255,255,.07);
+}
+.key-divider span{font-family:'Space Mono','Space Grotesk',monospace;font-size:9.5px;color:var(--text2);letter-spacing:1.8px;text-transform:uppercase;font-weight:600;}
+
+.key-success-wrap{
+  display:none;
+  text-align:center;padding:10px 0 4px;
+}
+.key-success-wrap.show{display:block;}
+.key-success-icon{
+  width:54px;height:54px;margin:0 auto 16px;border-radius:13px;
+  background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.3);
+  display:flex;align-items:center;justify-content:center;color:var(--green);
+  animation:key-pop .38s var(--ease);
+}
+@keyframes key-pop{0%{transform:scale(.5);opacity:0;}100%{transform:scale(1);opacity:1;}}
+.key-success-icon svg{width:24px;height:24px;}
+.key-success-title{font-size:.98rem;font-weight:700;color:#fff;margin-bottom:5px;}
+.key-success-sub{font-size:11.5px;color:var(--text2);line-height:1.5;padding:0 8px;}
+
+.key-form{display:block;}
+.key-form.hide{display:none;}
+#keyDownloadAgainBtn.hide{display:none;}
+
+/* ── VIP GATE (ajakan beli / masukkan key) ── */
+.key-btn-vipbuy{
+  width:100%;border:none;border-radius:10px;padding:15px;
+  background:linear-gradient(135deg,#22c55e,#16a34a);
+  color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.85rem;
+  letter-spacing:.4px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 6px 22px rgba(34,197,94,.22);
+  transition:filter var(--t-fast) var(--ease-soft),transform var(--t-fast) var(--ease-out);
+  -webkit-tap-highlight-color:transparent;
+  outline:none;-webkit-appearance:none;appearance:none;
+  margin-bottom:10px;
+}
+.key-btn-vipbuy:hover{filter:brightness(1.06);transform:translate3d(0,-2px,0);}
+.key-btn-vipbuy:active{transform:translate3d(0,0,0) scale(.97);filter:brightness(.94);transition-duration:.1s;}
+.key-btn-vipbuy svg{width:16px;height:16px;flex-shrink:0;}
+
+.key-btn-vipbuy-wa{
+  background:linear-gradient(135deg,#25d366,#1da851);
+  box-shadow:0 6px 22px rgba(37,211,102,.22);
+  margin-bottom:0;
+}
+
+.key-btn-vipkey{
+  width:100%;border:1.5px solid rgba(255,255,255,.1);border-radius:10px;padding:13.5px;
+  background:rgba(255,255,255,.02);
+  color:var(--text);font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.83rem;
+  letter-spacing:.3px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:background var(--t-fast),border-color var(--t-fast),transform var(--t-fast);
+  -webkit-tap-highlight-color:transparent;
+  outline:none;-webkit-appearance:none;appearance:none;
+}
+.key-btn-vipkey:hover{background:rgba(0,212,255,.06);border-color:rgba(0,212,255,.3);color:var(--cyan);transform:translate3d(0,-1px,0);}
+.key-btn-vipkey:active{transform:translate3d(0,1px,0);}
+.key-btn-vipkey svg{width:15px;height:15px;flex-shrink:0;}
+
+.key-icon-badge.vip-gold{
+  background:rgba(245,200,66,.07);
+  border-color:rgba(245,200,66,.26);
+  color:var(--gold);
+}
+
+.vip-gate-body{display:block;}
+.vip-gate-body.hide{display:none;}
+.vip-keyform-body{display:none;}
+.vip-keyform-body.show{display:block;}
+.vip-back-link{
+  display:block;width:100%;text-align:center;
+  font-size:11.5px;color:var(--text2);font-weight:600;letter-spacing:.3px;
+  background:none;border:none;cursor:pointer;padding:10px 0 0;
+  -webkit-tap-highlight-color:transparent;
+}
+.vip-back-link:hover{color:var(--cyan);}
+
+.vip-qris-download-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  width:100%;border:1.5px solid rgba(0,212,255,.25);border-radius:10px;
+  padding:11px;background:rgba(0,212,255,.05);
+  color:var(--cyan);font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.78rem;
+  letter-spacing:.3px;cursor:pointer;margin-bottom:10px;
+  transition:background var(--t-fast),border-color var(--t-fast),transform var(--t-fast);
+  -webkit-tap-highlight-color:transparent;outline:none;-webkit-appearance:none;appearance:none;
+}
+.vip-qris-download-btn:hover{background:rgba(0,212,255,.1);border-color:rgba(0,212,255,.4);}
+.vip-qris-download-btn:active{transform:scale(.97);}
+.vip-qris-download-btn svg{width:14px;height:14px;flex-shrink:0;}
+
+/* ══════════════════════════════════════════
+   QRIS PAYMENT CARD — tampilan pembayaran baru, lebih rapi & jelas
+   ══════════════════════════════════════════ */
+.qris-pay-wrap{text-align:center;}
+
+.qris-amount-row{
+  display:flex;align-items:baseline;justify-content:center;gap:6px;
+  margin-bottom:2px;
+}
+.qris-amount-label{
+  font-family:'Space Mono','Space Grotesk',monospace;
+  font-size:9px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;
+  color:var(--text2);
+}
+.qris-amount-value{
+  font-size:1.5rem;font-weight:700;color:#fff;letter-spacing:.2px;
+  font-variant-numeric:tabular-nums;
+}
+.qris-order-id{
+  font-family:'Space Mono','Space Grotesk',monospace;
+  font-size:10px;color:var(--text2);letter-spacing:.5px;
+  margin:2px 0 16px;opacity:.75;
+}
+
+.qris-code-frame{
+  position:relative;
+  width:212px;height:212px;
+  margin:0 auto 14px;
+  padding:14px;
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 12px 32px rgba(0,0,0,.35),0 0 0 1px rgba(0,212,255,.12);
+}
+.qris-code-frame img{width:100%;height:100%;display:block;border-radius:4px;}
+.qris-code-frame::before,.qris-code-frame::after,
+.qris-code-corner-a,.qris-code-corner-b{
+  content:'';position:absolute;width:20px;height:20px;
+  border-color:var(--cyan);pointer-events:none;
+}
+.qris-code-frame::before{top:-6px;left:-6px;border-top:2.5px solid var(--cyan);border-left:2.5px solid var(--cyan);border-radius:6px 0 0 0;}
+.qris-code-frame::after{bottom:-6px;right:-6px;border-bottom:2.5px solid var(--cyan);border-right:2.5px solid var(--cyan);border-radius:0 0 6px 0;}
+.qris-code-corner-a{top:-6px;right:-6px;border-top:2.5px solid var(--cyan);border-right:2.5px solid var(--cyan);border-radius:0 6px 0 0;}
+.qris-code-corner-b{bottom:-6px;left:-6px;border-bottom:2.5px solid var(--cyan);border-left:2.5px solid var(--cyan);border-radius:0 0 0 6px;}
+
+.qris-logo-badge{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:38px;height:38px;border-radius:9px;
+  background:#fff;border:2px solid #f2f2f2;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px rgba(0,0,0,.15);
+  overflow:hidden;
+}
+.qris-logo-badge img{width:100%;height:100%;object-fit:cover;}
+
+.qris-timer-row{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-bottom:16px;
+}
+.qris-timer-row svg{width:13px;height:13px;color:var(--gold);flex-shrink:0;}
+.qris-timer-text{
+  font-family:'Space Mono','Space Grotesk',monospace;
+  font-size:12px;font-weight:700;color:var(--gold);letter-spacing:.5px;
+  font-variant-numeric:tabular-nums;
+}
+.qris-timer-row.urgent .qris-timer-text,.qris-timer-row.urgent svg{color:#ff6b6b;}
+
+.qris-status-card{
+  display:flex;align-items:center;gap:11px;
+  background:rgba(255,255,255,.02);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:12px;
+  padding:13px 14px;
+  margin-bottom:16px;
+  text-align:left;
+}
+.qris-status-spinner{
+  width:18px;height:18px;border-radius:50%;flex-shrink:0;
+  border:2.5px solid rgba(0,212,255,.18);
+  border-top-color:var(--cyan);
+  animation:key-spin .7s linear infinite;
+}
+.qris-status-card.ok .qris-status-spinner{
+  border:none;width:22px;height:22px;
+  background:rgba(0,229,160,.14);
+  display:flex;align-items:center;justify-content:center;
+  animation:none;
+}
+.qris-status-card.error .qris-status-spinner{
+  border:none;width:22px;height:22px;
+  background:rgba(255,107,107,.14);
+  display:flex;align-items:center;justify-content:center;
+  animation:none;
+}
+.qris-status-text{flex:1;min-width:0;}
+.qris-status-title{font-size:12.5px;font-weight:700;color:var(--text);line-height:1.3;}
+.qris-status-sub{font-size:10.5px;color:var(--text2);line-height:1.4;margin-top:2px;}
+
+.qris-steps{
+  text-align:left;
+  background:rgba(255,255,255,.015);
+  border:1px solid rgba(255,255,255,.05);
+  border-radius:12px;
+  padding:13px 14px;
+  margin-bottom:16px;
+}
+.qris-steps-title{
+  font-family:'Space Mono','Space Grotesk',monospace;
+  font-size:9px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;
+  color:var(--text2);margin-bottom:9px;
+}
+.qris-step{
+  display:flex;align-items:flex-start;gap:9px;
+  font-size:11.5px;color:var(--text2);line-height:1.5;
+}
+.qris-step+.qris-step{margin-top:7px;}
+.qris-step-num{
+  flex-shrink:0;width:16px;height:16px;border-radius:50%;
+  background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.25);
+  color:var(--cyan);font-size:9px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Space Mono',monospace;margin-top:1px;
+}
+
+.qris-action-row{display:flex;gap:8px;margin-bottom:8px;}
+.qris-action-row .vip-qris-download-btn{margin-bottom:0;}
+
+@media(max-width:380px){
+  .key-head{padding:26px 20px 16px;}
+  .key-body{padding:2px 20px 22px;}
+}
+
+/* ══════════════════════════════════════════
+   PERFORMANCE: matikan efek :hover di layar sentuh murni.
+   Di HP, :hover bisa "nyangkut" aktif setelah tap, memicu transition
+   (transform/box-shadow) yang tidak perlu dan bikin scroll/pindah-tab
+   terasa patah-patah. Aturan ini taruh paling akhir supaya menang urutan.
+   ══════════════════════════════════════════ */
+@media(hover:none),(pointer:coarse){
+  a:hover,button:hover,.tab-btn:hover,.stat:hover .stat-num,
+  .buy-btn:hover,.modal-cta:hover,.key-btn-login:hover,
+  .feature-item:hover,.faq-item:hover{
+    filter:none!important;
+    box-shadow:inherit;
+  }
+}
+
+/* ══════════════════════════════════════════
+   PERFORMANCE: batasi jumlah composited layer.
+   will-change dipakai di banyak elemen sekaligus (header, dots, indicator,
+   cards, modal) — ini memaksa GPU membuat banyak layer terpisah yang justru
+   memperlambat compositing di device low/mid-end. Kita cabut will-change
+   dari elemen yang statis diam (tidak sedang animasi) dan hanya
+   pertahankan di elemen yang benar-benar sering berubah (modal, indicator).
+   ══════════════════════════════════════════ */
+.banner-dot{will-change:auto;}
+.stat-num{will-change:auto;}
+</style>
+</head>
+<body>
+<a href="#main-content" class="skip-link">Lewati ke konten utama</a>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<div class="wrapper">
+
+<!-- HEADER -->
+<header role="banner">
+  <div class="logo">
+    <div class="logo-icon">
+      <img src="tarz.jpg" alt="Tarz Store Logo" width="44" height="44" loading="eager" decoding="async" onerror="this.classList.add('img-error')">
+    </div>
+    <div>
+      <div class="logo-name" aria-label="Tarz Store">TARZ STORE</div>
+    </div>
+  </div>
+  <div class="status-pill" role="status" aria-live="polite">
+    <div class="dot" aria-hidden="true"></div>
+    <span>ONLINE</span>
+  </div>
+</header>
+
+<!-- BANNER SLIDESHOW -->
+<section class="hero" aria-label="Banner promosi">
+  <div class="banner-slider" id="bannerSlider" role="region" aria-label="Slideshow banner" aria-roledescription="carousel">
+    <div class="banner-slider-track" id="bannerTrack" aria-live="off">
+      <div class="banner-slide" role="group" aria-roledescription="slide" aria-label="Slide 1 dari 3">
+        <img src="Thamnel1.jpg" alt="Banner promosi Tarz Store" width="1280" height="480" loading="eager" fetchpriority="high" decoding="sync" onerror="this.style.minHeight='200px';this.style.background='#111'">
+      </div>
+      <div class="banner-slide" role="group" aria-roledescription="slide" aria-label="Slide 2 dari 3">
+        <img src="Thamnel2.jpg" alt="Banner promosi 2" width="1280" height="480" loading="lazy" decoding="async" onerror="this.style.minHeight='200px';this.style.background='#111'">
+      </div>
+      <div class="banner-slide" role="group" aria-roledescription="slide" aria-label="Slide 3 dari 3">
+        <img src="Thamnel3.jpg" alt="Banner promosi 3" width="1280" height="480" loading="lazy" decoding="async" onerror="this.style.minHeight='200px';this.style.background='#111'">
+      </div>
+    </div>
+    <!-- Dots -->
+    <div class="banner-dots" id="bannerDots" role="tablist" aria-label="Kontrol slideshow">
+      <button class="banner-dot active" data-idx="0" role="tab" aria-selected="true" aria-label="Slide 1"></button>
+      <button class="banner-dot" data-idx="1" role="tab" aria-selected="false" aria-label="Slide 2"></button>
+      <button class="banner-dot" data-idx="2" role="tab" aria-selected="false" aria-label="Slide 3"></button>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- TABS -->
+<div class="tabs-wrap" role="navigation" aria-label="Kategori produk">
+  <div class="tabs" id="tabsContainer" role="tablist">
+    <div class="tab-indicator" id="tabIndicator" aria-hidden="true"></div>
+    <button class="tab-btn active" id="tab-cheat" data-tab="cheat" role="tab" aria-selected="true" aria-controls="cheat">
+      <span>FREE FIRE</span><span class="tab-count" aria-label="12 produk">12</span>
+    </button>
+    <button class="tab-btn" id="tab-file" data-tab="file" role="tab" aria-selected="false" aria-controls="file">
+      <span>FILE HS</span><span class="tab-count" aria-label="3 produk">3</span>
+    </button>
+    <button class="tab-btn" id="tab-allgame" data-tab="allgame" role="tab" aria-selected="false" aria-controls="allgame">
+      <span>ALL GAME</span><span class="tab-count" aria-label="3 produk">3</span>
+    </button>
+  </div>
+</div>
+
+<!-- PRODUCTS -->
+<section class="products" id="main-content" aria-label="Daftar produk">
+
+  <!-- CHEAT TAB -->
+  <div class="tab-content active" id="cheat" role="tabpanel" aria-labelledby="tab-cheat">
+    <div class="tab-header">
+      <div class="vip-header">
+        <div class="vip-header-body">
+          <span class="vip-header-title" id="vipHeaderTitle">VIP <span>Rp10.000</span></span>
+          <span class="vip-header-desc" id="vipHeaderDesc">dapat akses <b>semua cheat</b> di bawah</span>
+        </div>
+      </div>
+    </div>
+    <div class="product-grid">
+        
+      <!--  FAKE LAG -->
+      <div class="card"
+        data-special="aincrad-nokey"
+        data-img="csr.jpg" data-label="BKL SENSI"
+        data-icon="" data-platform="android"
+        data-fitur='["FRIZEE","TELEPORT","GHOST","VPN"]'
+        data-poster="">
+        <div class="product-image" data-label="KURAMA MODS">
+          <img src="ping.jpg" alt="Vextu Proxy" onerror="this.classList.add('img-error')" loading="lazy" decoding="async" width="300" height="200">
+        </div>
+        <h4>FAKE LAG V2</h4>        <button class="buy-btn" onclick="openModal(this)" style="display:flex;align-items:center;justify-content:center;gap:6px;"><span class="js-icon" data-icon-key="installBtn"></span>INSTALL</button>
+      </div>
+      
+      <!--  KURAMA MODS -->
+      <div class="card"
+        data-special="aincrad-nokey"
+        data-img="csr.jpg" data-label="BKL SENSI"
+        data-icon="" data-platform="android"
+        data-fitur='["85% HS","UNLOCK SENSI","HOLOGRAM","ATHENA"]'
+        data-poster="">
+        <div class="product-image" data-label="KURAMA MODS">
+          <img src="ku.jpg" alt="Vextu Proxy" onerror="this.classList.add('img-error')" loading="lazy" decoding="async" width="300" height="200">
+        </div>
+        <h4>KURAMA MODS</h4>        <button class="buy-btn" onclick="openModal(this)" style="display:flex;align-items:center;justify-content:center;gap:6px;"><span class="js-icon" data-icon-key="installBtn"></span>INSTALL</button>
+      </div>
+      
+      <!-- MUSK MODS -->
+      <div class="card"
+        data-special="aincrad-nokey"
+        data-img="csr.jpg" data-label="BKL SENSI"
+        data-icon="" data-platform="android"
+        data-fitur='["AIM LOCK","ESP LINE","ATHENA","SKELETON","AIM LINE","DISTANCE"]'
+        data-poster="">
+        <div class="product-image" data-label="VEXTU PROXY">
+          <img src="mu.jpg" alt="Vextu Proxy" onerror="this.classList.add('img-error')" loading="lazy" decoding="async" width="300" height="200">
+        </div>
+        <h4>MUSK MODS</h4>        <button class="buy-btn" onclick="openModal(this)" style="display:flex;align-items:center;justify-content:center;gap:6px;"><span class="js-icon" data-icon-key="installBtn"></span>Install</button>
+      </div>
+        
+      
+      <!--  FAKE LAG -->
+      <div class="card"
+        data-special="aincrad-nokey"
+        data-img="csr.jpg" data-label="BKL SENSI"
+        data-icon="" data-platform="android"
+        data-fitur='["FRIZEE","VPN"]'
+        data-poster="">
+        <div class="product-image" data-label="KURAMA MODS">
+          <img src="fag.jpg" alt="Vextu Proxy" onerror="this.classList.add('img-error')" loading="lazy" decoding="async" width="300" height="200">
+        </div>
+        <h4>FAKE LAG MODS</h4>        <button class="buy-btn" onclick="openModal(this)" style="display:flex;align-items:center;justify-content:center;gap:6px;"><span class="js-icon" data-icon-key="installBtn"></span>INSTALL</button>
+      </div>
+      
+      <!-- VEXTU PROXY -->
+      <div class="card"
+        data-special="aincrad-nokey"
+        data-img="csr.jpg" data-label="BKL SENSI"
+        data-icon="" data-platform="android"
+        data-fitur='["BODY HS","MAGIC BULLET","ATHENA","AIM CHEST"]'
+        data-poster="">
+        <div class="product-image" data-label="VEXTU PROXY">
+          <img src="vtu.jpg" alt="Vextu Proxy" onerror="this.classList.add('img-error')" loading="lazy" decoding="async" width="300" height="200">
+        </div>
+        <h4>VEXTU PROXY V8</h4>        <button class="buy-btn" onclick="openModal(this)" style="display:flex;align-items:center;justify-content:center;gap:6px;"><span class="js-icon" data-icon-key="installBtn"></span>Install</button>
+      </div>
+      
+      <!-- AINCRAD CLIENT -->
+      <div class="card"
+        data-special="aincrad"
+        data-img="csr.jpg" data-label="AINCRAD"
+        data-icon="" data-platform="pc"
+        data-fitur='["AIM SILENT","SILENT TARGET","GHOST HACK","SPEED TIMER","ESP LINE","ESP BOX","ESP NAME","ESP FOV"]'
+        data-poster="">
+        <div class="product-image" data-label="AINCRAD">
+          <img src="ac.jpg" alt="Aincrad Client" onerror="this.classList.add('img-error')" loading="lazy" decoding="async" width="300" height="200">
+        </div>
+        <h4>AINCRAD MODS</h4>        <button class="buy-btn" onclick="openModal(this)" style="display:flex;align-items:center;justify-content:center;gap:6px;"><span class="js-icon" data-icon-key="installBtn"></span>Install</button>
+      </div>
+
+      <!-- BKL SENSI -->
+      <div class="card"
+        data-special="aincrad-nokey"
+        data-img="csr.jpg" data-label="BKL SENSI"
+        data-icon="" data-platform="pc"
+        data-fitur='["AIM BOT","AIM SILENT","SILENT TARGET","GHOST HACK","SPEED TIMER","TELE KILL","ESP LINE","ESP BOX","ESP NAME","ESP FOV"]'
+        data-poster="">
+        <div class="product-image" data-label="BKL SENSI">
+          <img src="bkl.jpg" alt="BKL Sensi" onerror="this.classList.add('img-error')" loading="lazy" decoding="async" width="300" height="200">
+        </div>
+        <h4>BKL SENSI</h4>        <button class="buy-btn" onclick="openModal(this)" style="display:flex;align-items:center;justify-content:center;gap:6px;"><span class="js-icon" data-icon-key="installBtn"></span>Install</button>
+      </div>
+      
+      <!-- MTH PROXY -->
+      <div class="card"
+        data-special="aincrad-nokey"
+        data-img="csr.jpg" data-label="MTH PROXY"
+        data-icon="" data-platform="android"
+        data-fitur='["BODY HS","LEHER HS","DADA HS","ATHENA","BACK JUMP","SENSI UNLOCK"]'
+        data-poster="">
+        <div class="product-image" data-label="VEXTU PROXY">
+          <img src="mth.jpg" alt="MTH PROXY" onerror="this.classList.add('img-error')" loading="lazy" decoding="async" width="300" height="200">
+        </div>
+        <h4>MTH PROXY V16</h4>        <button class="buy-btn" onclick="openModal(this)" style="display:flex;align-items:center;justify-content:center;gap:6px;"><span class="js-icon" data-icon-key="installBtn"></span>Install</button>
+      </div>
+      
+      <!-- VEXTU PROXY -->
+      <div class="card"
+        data-special="aincrad-nokey"
+        data-img="csr.jpg" data-label="BKL SENSI"
+        data-icon="" data-platform="android"
+        data-fitur='["BODY HS","MAGIC BULLET","ATHENA","AIM CHEST"]'
+        data-poster="">
+        <div class="product-image" data-label="VEXTU PROXY">
+          <img src="v9.jpg" alt="Vextu Proxy" onerror="this.classList.add('img-error')" loading="lazy" decoding="async" width="300" height="200">
+        </div>
+        <h4>VEXTU PROXY V9</h4>        <button class="buy-btn" onclick="openModal(this)" style="display:flex;align-items:center;justify-content:center;gap:6px;"><span class="js-icon" data-icon-key="installBtn"></span>Install</button>
+      </div>
+      
+      <!-- XITEXE PROXY -->
+      <div class="card"
+        data-special="aincrad-nokey"
+        data-img="csr.jpg" data-label="BKL SENSI"
+        data-icon="" data-platform="android"
+        data-fitur='["BODY HS","SPEED TIMER"]'
+        data-poster="">
+        <div class="product-image" data-label="XITEXE PROXY">
+          <img src="xit.jpg" alt="Xitexe Proxy" onerror="this.classList.add('img-error')" loading="lazy" decoding="async" width="300" height="200">
+        </div>
+        <h4>XITEXE PROXY</h4>        <button class="buy-btn" onclick="openModal(this)" style="display:flex;align-items:center;justify-content:center;gap:6px;"><span class="js-icon" data-icon-key="installBtn"></span>Install</button>
+      </div>
+        
+      <div class="card"
+        data-img="" data-label="DRIP"
+        data-icon="" data-platform="android"
+        data-packages='[{"name":"1 Hari","price":"Rp 17.000"}]'>
+        <div class="product-image" data-label="DRIP">
+          <img src="drip.jpg" alt="Drip Client" onerror="this.classList.add('img-error')" loading="lazy" decoding="async" width="300" height="200">
+        </div>
+        <h4>DRIP CLIENT</h4>        <button class="buy-btn" onclick="openModal(this)" style="display:flex;align-items:center;justify-content:center;gap:6px;"><span class="js-icon" data-icon-key="installBtn"></span>Install</button>
+      </div>
+
+      <div class="card"
+        data-img="" data-label="BR MODS"
+        data-icon="" data-platform="pc"
+        data-packages='[{"name":"1 Hari","price":"Rp 15.000"}]'>
+        <div class="product-image" data-label="BR MODS">
+          <img src="br.jpg" alt="BR Mods" onerror="this.classList.add('img-error')" loading="lazy" decoding="async" width="300" height="200">
+        </div>
+        <h4>BR MODS</h4>        <button class="buy-btn" onclick="openModal(this)" style="display:flex;align-items:center;justify-content:center;gap:6px;"><span class="js-icon" data-icon-key="installBtn"></span>Install</button>
+      </div>
+
+      <div class="card"
+        data-img="" data-label="FLUORITE"
+        data-icon="" data-platform="ios"
+        data-packages='[{"name":"1 Hari","price":"Rp 50.000"}]'>
+        <div class="product-image" data-label="FLO">
+          <img src="flo.jpg" alt="Fluorite" onerror="this.classList.add('img-error')" loading="lazy" decoding="async" width="300" height="200">
+        </div>
+        <h4>FLUORITE IOS</h4>        <button class="buy-btn" onclick="openModal(this)" style="display:flex;align-items:center;justify-content:center;gap:6px;"><span class="js-icon" data-icon-key="installBtn"></span>Install</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILE TAB -->
+  <div class="tab-content" id="file" role="tabpanel" aria-labelledby="tab-file">
+    <div class="tab-header">
+      <div class="vip-header">
+        <div class="vip-header-body">
+          <span class="vip-header-title" id="vipHeaderTitleFile">VIP <span>Rp10.000</span></span>
+          <span class="vip-header-desc" id="vipHeaderDescFile">dapat akses <b>semua file HS</b> di bawah</span>
+        </div>
+      </div>
+    </div>
+    <div class="product-grid">
+
+  <!-- FILE HS -->
+      <div class="card file-card"
+        data-img="" data-label="APK 1"
+        data-icon="" data-platform="android">
+        <div class="file-card-top">
+          <div class="product-image" data-label="APK 1">
+            <img src="sh.jpg" alt="Nama Produk 1" onerror="this.classList.add('img-error')" loading="lazy" decoding="async" width="200" height="200">
+          </div>
+          <div class="file-card-info">
+            <h4>FILE DRAG HS + ATHENA</h4>
+            <div class="file-card-tags">
+              <span class="file-tag">FREE FIRE BIASA</span>
+              <span class="file-tag">NO ROOT</span>
+            </div>
+          </div>
+          <div class="file-card-actions">
+            <button class="buy-btn" onclick="openKeyModal('FILE DRAG HS + ATHENA', getDownloadLink('FILE DRAG HS + ATHENA'), 'file')" style="display:flex;align-items:center;justify-content:center;gap:6px;"><span class="js-icon" data-icon-key="installBtn"></span>Download</button>
+            <button class="join-vip-btn" onclick="openVipPaymentDirect()">JOIN VIP</button>
+          </div>
+        </div>
+      </div>
+      
+  <!-- FILE HS -->
+      <div class="card file-card"
+        data-img="" data-label="APK 1"
+        data-icon="" data-platform="android">
+        <div class="file-card-top">
+          <div class="product-image" data-label="APK 2">
+            <img src="sh.jpg" alt="Nama Produk 1" onerror="this.classList.add('img-error')" loading="lazy" decoding="async" width="200" height="200">
+          </div>
+          <div class="file-card-info">
+            <h4>FILE MOD MENU FF</h4>
+            <div class="file-card-tags">
+              <span class="file-tag">FREE FIRE BIASA</span>
+              <span class="file-tag">NO ROOT</span>
+            </div>
+          </div>
+          <div class="file-card-actions">
+            <button class="buy-btn" onclick="openKeyModal('FILE MOD MENU FF', getDownloadLink('FILE MOD MENU FF'), 'file')" style="display:flex;align-items:center;justify-content:center;gap:6px;"><span class="js-icon" data-icon-key="installBtn"></span>Download</button>
+            <button class="join-vip-btn" onclick="openVipPaymentDirect()">JOIN VIP</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ALL GAME TAB -->
+  <div class="tab-content" id="allgame" role="tabpanel" aria-labelledby="tab-allgame">
+    <div class="tab-header">
+      <div class="vip-header">
+        <div class="vip-header-body">
+          <span class="vip-header-title" id="vipHeaderTitleAllgame">VIP <span>Rp10.000</span></span>
+          <span class="vip-header-desc" id="vipHeaderDescAllgame">dapat akses <b>semua cheat</b> di bawah</span>
+        </div>
+      </div>
+    </div>
+    <div class="product-grid">
+
+      <!-- 8 BALL POOL-->
+      <div class="card"
+        data-special="bloodstrike"
+        data-img="pool.jpg" data-label="BLOOD STRIKE"
+        data-icon="" data-platform="android"
+        data-fitur='["AUTO PLAY","DRAW LINES","DRAW POCKETS","LINE THICKNESS"]'
+        data-poster="">
+        <div class="product-image" data-label="BLOOD STRIKE">
+          <img src="pool.jpg" alt="Blood Strike" onerror="this.classList.add('img-error')" loading="lazy" decoding="async" width="300" height="200">
+        </div>
+        <h4>8 BALL POOL</h4>        <button class="buy-btn" onclick="openModal(this)" style="display:flex;align-items:center;justify-content:center;gap:6px;"><span class="js-icon" data-icon-key="installBtn"></span>Install</button>
+      </div>
+      
+      <!-- BLOOD STRIKE V2-->
+      <div class="card"
+        data-special="bloodstrike"
+        data-img="bs.jpg" data-label="BLOOD STRIKE"
+        data-icon="" data-platform="android"
+        data-fitur='["UNLOCK ALL SKIN","AIM BOT","ESP LINE","AUTO HEADSHOT","UNLOCK 120 FPS","BYPASS"]'
+        data-poster="v22.jpg">
+        <div class="product-image" data-label="BLOOD STRIKE">
+          <img src="v2.jpg" alt="Blood Strike" onerror="this.classList.add('img-error')" loading="lazy" decoding="async" width="300" height="200">
+        </div>
+        <h4>BLOOD STRIKE V2</h4>        <button class="buy-btn" onclick="openModal(this)" style="display:flex;align-items:center;justify-content:center;gap:6px;"><span class="js-icon" data-icon-key="installBtn"></span>Install</button>
+      </div>
+      
+      <!-- BLOOD STRIKE V1 -->
+      <div class="card"
+        data-special="bloodstrike"
+        data-img="bs.jpg" data-label="BLOOD STRIKE"
+        data-icon="" data-platform="android"
+        data-fitur='["UNLOCK ALL SKIN","AIM BOT","ESP LINE","AUTO HEADSHOT","UNLOCK 120 FPS","BYPASS"]'
+        data-poster="str.jpg">
+        <div class="product-image" data-label="BLOOD STRIKE">
+          <img src="v1.jpg" alt="Blood Strike" onerror="this.classList.add('img-error')" loading="lazy" decoding="async" width="300" height="200">
+        </div>
+        <h4>BLOOD STRIKE V1</h4>        <button class="buy-btn" onclick="openModal(this)" style="display:flex;align-items:center;justify-content:center;gap:6px;"><span class="js-icon" data-icon-key="installBtn"></span>Install</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL MEDIA -->
+<section class="social-section" aria-label="Media sosial">
+  <div class="social-title">Ikuti &amp; Hubungi Kami</div>
+  <div class="social-links">
+
+<a class="social-btn whatsapp" href="https://whatsapp.com/channel/0029Vb6ISqrFSAt3MD3Goa0z" target="_blank" rel="noopener noreferrer" aria-label="Hubungi via WhatsApp (buka tab baru)">
+  <span class="social-btn-icon" aria-hidden="true">
+    <span class="js-icon" data-icon-key="socialWhatsapp"></span>
+  </span>
+</a>
+
+    <!-- TikTok -->
+    <a class="social-btn tiktok" href="https://www.tiktok.com/@tarz_1230?_r=1&_t=ZS-98eyCN8afC8" target="_blank" rel="noopener noreferrer" aria-label="Ikuti di TikTok (buka tab baru)">
+      <span class="social-btn-icon" aria-hidden="true"><span class="js-icon" data-icon-key="socialTiktok"></span></span>
+    </a>
+
+    <!-- Telegram -->
+    <a class="social-btn telegram" href="https://t.me/Tarz_026" target="_blank" rel="noopener noreferrer" aria-label="Bergabung di Telegram (buka tab baru)">
+      <span class="social-btn-icon" aria-hidden="true">
+        <span class="js-icon" data-icon-key="socialTelegram"></span>
+      </span>
+    </a>
+
+    <!-- YouTube (belum ada) -->
+    <span class="social-btn youtube" aria-label="YouTube — segera hadir" aria-disabled="true">
+      <span class="social-btn-icon" aria-hidden="true"><span class="js-icon" data-icon-key="socialYoutube"></span></span>
+    </span>
+
+  </div>
+</section>
+
+<footer>
+  © 2026 <strong style="color:var(--blue2)">Tarz Store</strong> — All Rights Reserved
+</footer>
+
+</div><!-- /wrapper -->
+
+<!-- CHECKOUT MODAL -->
+<div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalProductName" aria-hidden="true" onclick="handleOverlayClick(event)">
+  <div class="modal-sheet" id="modalSheet">
+
+    <div class="modal-handle"></div>
+
+    <!-- Header: icon + product info + close -->
+    <div class="modal-header">
+      <div class="modal-header-icon" id="modalIcon"></div>
+      <div class="modal-header-text">
+        <div class="modal-product-name" id="modalProductName">Nama Produk</div>
+        <div class="modal-badges" id="modalBadges"></div>
+        <div class="modal-product-desc" id="modalProductDesc">Deskripsi produk akan muncul di sini.</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()" aria-label="Tutup">
+        <span class="js-icon" data-icon-key="modalClose">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </span>
+      </button>
+    </div>
+
+    <!-- Scrollable price list / feature list -->
+    <div class="modal-scroll">
+      <div class="modal-section-label" id="modalSectionLabel">Pilih Paket Harga</div>
+      <div class="price-grid" id="priceOptions"></div>
+      <div class="feature-grid" id="featureOptions" style="display:none;"></div>
+    </div>
+
+    <!-- Footer: CTA (produk dengan paket harga) -->
+    <div class="modal-footer" id="modalFooter">
+      <button class="modal-cta" id="modalCta" onclick="buyNow()" style="gap:8px;"><span class="js-icon" data-icon-key="buyBtn"></span>Buy</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     VIP GATE MODAL — semua produk terkunci di balik 1 key VIP
+     ══════════════════════════════════════════ -->
+<div class="key-overlay" id="keyOverlay" role="dialog" aria-modal="true" aria-labelledby="keyTitle" aria-hidden="true" onclick="handleKeyOverlayClick(event)">
+  <div class="key-box" id="keyBox">
+
+    <div class="key-head">
+      <button class="key-close" onclick="closeKeyModal()" aria-label="Tutup">
+        <span class="js-icon" data-icon-key="modalClose">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </span>
+        <span class="key-close-dot"></span>
+      </button>
+      <div class="key-eyebrow"><span class="dot"></span><span class="eyebrow-text">ACCESS TERKUNCI</span><span class="dot-end"></span></div>
+      <div class="key-icon-badge vip-gold" id="keyIconBadge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <div class="key-title" id="keyTitle">Khusus Member VIP</div>
+      <div class="key-sub" id="keySub">Buka <b id="keyProductName">produk ini</b> &amp; <b>semua produk lainnya</b> dengan 1x VIP</div>
+    </div>
+
+    <div class="key-body">
+
+      <!-- STATE 1: GATE — belum VIP, masukkan key -->
+      <div class="vip-gate-body" id="vipGateBody">
+        <button type="button" class="key-btn-vipkey" onclick="showVipKeyForm()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          MASUKKAN KEY VIP
+        </button>
+        <!-- Hanya tampil untuk produk tab CHEAT (lihat showVipGate()) -->
+        <button type="button" class="key-btn-vipbuy" id="keyBtnJoinVip" onclick="startVipPayment()" style="display:none;margin-top:10px;margin-bottom:0;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 8h18M7 15h3"/></svg>
+          BUY VIP VIA QRIS
+        </button>
+        <button type="button" class="key-btn-vipbuy key-btn-vipbuy-wa" id="keyBtnJoinVipWa" onclick="openVipWhatsApp()" style="display:none;margin-top:10px;margin-bottom:0;">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.986.579 3.836 1.578 5.392L2 22l4.735-1.55A9.955 9.955 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18.13c-1.775 0-3.42-.522-4.804-1.42l-.345-.213-3.155 1.034 1.048-3.075-.226-.353A8.096 8.096 0 0 1 3.87 12c0-4.487 3.643-8.13 8.13-8.13 4.487 0 8.13 3.643 8.13 8.13 0 4.487-3.643 8.13-8.13 8.13z"/></svg>
+          BUY VIP VIA WHATSAPP
+        </button>
+      </div>
+
+      <!-- STATE 2: FORM INPUT KEY VIP -->
+      <div class="vip-keyform-body" id="vipKeyFormBody">
+        <label class="key-input-label" for="keyInput">Key Akses</label>
+        <div class="key-input-wrap">
+          <input type="password" id="keyInput" class="key-input" placeholder="••••••••••" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter'){event.preventDefault();keyLogin();}">
+          <button type="button" class="key-toggle-eye" onclick="toggleKeyEye()" aria-label="Tampilkan key" id="keyEyeBtn">
+            <svg id="keyEyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="key-error-msg" id="keyErrorMsg">Key salah, coba lagi.</div>
+
+        <button class="key-btn-login" id="keyLoginBtn" onclick="keyLogin()">
+          <span class="key-spinner"></span>
+          <span class="key-btn-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
+          </span>
+          <span class="key-btn-label-text">VERIFIKASI KEY</span>
+        </button>
+
+        <button type="button" class="vip-back-link" onclick="showVipGate()">← kembali</button>
+      </div>
+
+      <!-- STATE 3: SUCCESS -->
+      <div class="key-success-wrap" id="keySuccessWrap">
+        <div class="key-success-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="key-success-title" id="keySuccessTitle">Key VIP Benar!</div>
+        <div class="key-success-sub" id="keySuccessSub">Semua produk kini terbuka. Mengalihkan ke download...</div>
+        <button type="button" class="key-btn-login hide" id="keyDownloadAgainBtn" onclick="downloadUnlockedProduct()" style="margin-top:16px;">
+          DOWNLOAD
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ── TAB INDICATOR ── */
+function updateIndicator(btn){
+  const ind = document.getElementById('tabIndicator');
+  const container = document.getElementById('tabsContainer');
+  const r = btn.getBoundingClientRect();
+  const cr = container.getBoundingClientRect();
+  ind.style.left = (r.left - cr.left) + 'px';
+  ind.style.width = r.width + 'px';
+}
+requestAnimationFrame(()=>{
+  const active = document.querySelector('.tab-btn.active');
+  if(active) updateIndicator(active);
+});
+
+/* ── TABS — with ARIA & keyboard support ── */
+const tabBtns = document.querySelectorAll('.tab-btn');
+tabBtns.forEach((btn, idx)=>{
+  btn.addEventListener('click', ()=>{
+    if(btn.classList.contains('active')) return;
+    const prevBtn = document.querySelector('.tab-btn.active');
+    if(prevBtn){ prevBtn.classList.remove('active'); prevBtn.setAttribute('aria-selected','false'); }
+    const prevActive = document.querySelector('.tab-content.active');
+    if(prevActive) prevActive.classList.remove('active');
+    btn.classList.add('active');
+    btn.setAttribute('aria-selected','true');
+    const target = document.getElementById(btn.dataset.tab);
+    target.classList.add('active');
+    /* Kartu langsung ditampilkan tanpa animasi per-kartu —
+       satu animasi ringan pada container (.tab-content.active) sudah cukup
+       dan jauh lebih smooth tanpa delay bertumpuk. */
+    target.querySelectorAll('.card').forEach(c=>{
+      c.style.animationDelay = '';
+      c.classList.add('visible');
+      io.unobserve(c);
+    });
+    /* updateIndicator dipindah ke rAF: memisahkan "baca layout"
+       (getBoundingClientRect) dari perubahan class di atas supaya browser
+       tidak dipaksa melakukan forced synchronous layout/reflow di frame
+       yang sama — ini penyebab tersendat saat pindah tab. */
+    requestAnimationFrame(()=>updateIndicator(btn));
+  });
+  /* keyboard: arrow kiri/kanan untuk navigasi antar tab */
+  btn.addEventListener('keydown', e=>{
+    if(e.key==='ArrowRight'||e.key==='ArrowLeft'){
+      e.preventDefault();
+      const dir = e.key==='ArrowRight' ? 1 : -1;
+      const next = tabBtns[(idx + dir + tabBtns.length) % tabBtns.length];
+      next.focus();
+      next.click();
+    }
+  });
+});
+
+let _rt;
+window.addEventListener('resize', ()=>{
+  clearTimeout(_rt);
+  _rt = setTimeout(()=>{ const a = document.querySelector('.tab-btn.active'); if(a) updateIndicator(a); }, 150);
+}, {passive:true});
+
+/* ── INTERSECTION OBSERVER ── */
+const io = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(!e.isIntersecting) return;
+    e.target.classList.add('visible');
+    io.unobserve(e.target);
+  });
+}, {threshold:.04, rootMargin:'0px 0px 60px 0px'});
+// Pre-calculate delay once at setup, not on each intersection
+document.querySelectorAll('.card').forEach((c,i)=>{
+  c.style.animationDelay = ((i % 6) * .025) + 's';
+  io.observe(c);
+});
+
+/* Observer kedua khusus untuk on/off animasi ribbon (shine sweep) berdasar
+   visibilitas — supaya CPU/GPU tidak terus dipakai animasi ribbon yang
+   sedang tidak terlihat sama sekali (mis. saat scroll cepat / tab belakang). */
+const ribbonIO = new IntersectionObserver(entries=>{
+  entries.forEach(e=> e.target.classList.toggle('in-view', e.isIntersecting));
+}, {threshold:0, rootMargin:'200px 0px 200px 0px'});
+document.querySelectorAll('.card').forEach(c=> ribbonIO.observe(c));
+
+/* ── STAT COUNTER ── */
+function countUp(el){
+  const target = +el.dataset.count, suffix = el.dataset.suffix||'', dur=1000, t0=performance.now();
+  (function tick(now){
+    const p=Math.min((now-t0)/dur,1), ease=1-Math.pow(1-p,3);
+    el.textContent=Math.round(ease*target)+suffix;
+    if(p<1) requestAnimationFrame(tick);
+  })(t0);
+}
+const statIO = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(!e.isIntersecting) return;
+    const el = e.target;
+    statIO.unobserve(el);
+    (window.requestIdleCallback || requestAnimationFrame)(()=>countUp(el));
+  });
+},{threshold:.5});
+document.querySelectorAll('[data-count]').forEach(el=>statIO.observe(el));
+
+/* ── TOAST — no reflow ── */
+let _toastTimer = null;
+function showToast(msg, type=''){
+  const toast = document.getElementById('toast');
+  if(!toast) return;
+  toast.textContent = msg;
+  toast.className = 'toast show' + (type ? ' ' + type : '');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(()=>{ toast.classList.remove('show'); }, 2600);
+}
+
+/* ── MODAL STATE ── */
+let _currentProduct = '';
+let _selectedPackage = null;
+let _isClosed = false;
+let _specialMode = null;
+
+/* ── CONFIG.JSON (link download) ──
+   Semua link MediaFire kini disimpan di config.json, bukan di index.html.
+   Untuk mengganti link, cukup edit config.json (key = nama produk / <h4>). */
+let _appConfig = null;
+let _configLoadFailed = false;
+
+async function loadConfig(){
+  try{
+    const res = await fetch('config.json', {cache:'no-store'});
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if(!data || typeof data.downloads !== 'object'){
+      throw new Error('Format config.json tidak valid (field "downloads" tidak ditemukan)');
+    }
+    _appConfig = data;
+    _configLoadFailed = false;
+  }catch(err){
+    _configLoadFailed = true;
+    console.error('Gagal memuat config.json:', err);
+  }
+}
+
+/* Ambil link download untuk sebuah produk dari config.json (fallback ke '#' jika tidak ada) */
+function getDownloadLink(productName){
+  if(_configLoadFailed){
+    console.error('config.json gagal dimuat, link download tidak tersedia.');
+    return '#';
+  }
+  if(!_appConfig || !_appConfig.downloads){
+    console.error('Data link download belum siap.');
+    return '#';
+  }
+  const link = _appConfig.downloads[productName];
+  if(!link){
+    console.error('Link download untuk produk "' + productName + '" belum tersedia di config.json.');
+    return '#';
+  }
+  return link;
+}
+
+
+/* Ambil "copy key" (kode proxy/config) untuk sebuah produk dari config.json (null jika tidak ada) */
+function getProductCopyKey(productName){
+  if(_configLoadFailed || !_appConfig || !_appConfig.copyKeys) return null;
+  return _appConfig.copyKeys[productName] || null;
+}
+
+/* Ambil info akun (username/password) untuk sebuah produk dari config.json (null jika tidak ada) */
+function getProductAccountInfo(productName){
+  if(_configLoadFailed || !_appConfig || !_appConfig.accountInfo) return null;
+  return _appConfig.accountInfo[productName] || null;
+}
+
+/* ── LABEL PRODUK (OPEN / CLOSE / UPDATE) ──
+   Diatur lewat config.json → "productStatus": { "NAMA PRODUK": "close" | "update" | "open" }.
+   - close  : label CLOSE, tombol install/buy dinonaktifkan.
+   - update : label UPDATE, tombol tetap aktif (produk masih bisa diinstall).
+   - open   : tanpa label (default jika tidak diset di config.json). */
+function getProductStatus(productName){
+  if(_configLoadFailed || !_appConfig || !_appConfig.productStatus) return null;
+  return _appConfig.productStatus[productName] || null;
+}
+
+function renderProductStatuses(){
+  document.querySelectorAll('#cheat .card').forEach(card=>{
+    const h4 = card.querySelector('h4');
+    if(!h4) return;
+    const productName = h4.textContent.trim();
+    const status = getProductStatus(productName);
+
+    if(!status || status === 'open'){
+      card.removeAttribute('data-status');
+      const label = card.querySelector('.platform-label, .price-label');
+      if(label) label.remove();
+      return;
+    }
+
+    card.dataset.status = status;
+
+    let label = card.querySelector('.platform-label');
+    if(!label){
+      const imgWrap = card.querySelector('.product-image');
+      if(!imgWrap) return;
+      label = document.createElement('span');
+      imgWrap.insertBefore(label, imgWrap.firstChild);
+    }
+    label.className = 'platform-label ' + (card.dataset.platform || '');
+    label.textContent = status === 'close' ? 'CLOSE' : 'UPDATE';
+  });
+}
+
+/* Salin copy-key produk ke clipboard + tampilkan feedback pada tombol/toast */
+function copyProductKeyInline(productName, btnEl){
+  const key = getProductCopyKey(productName);
+  if(!key) return;
+  copyTextInline(key, btnEl);
+}
+
+/* Salin teks generik ke clipboard + tampilkan feedback pada tombol/toast */
+function copyTextInline(text, btnEl){
+  const done = () => {
+    showToast('Berhasil disalin!','success');
+    if(btnEl){
+      const label = btnEl.querySelector('.copykey-btn-text');
+      if(label){
+        const original = label.textContent;
+        label.textContent = 'Tersalin!';
+        setTimeout(()=>{ label.textContent = original; }, 1800);
+      }
+    }
+  };
+
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>{
+      showToast('Gagal menyalin.','error');
+    });
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try{ document.execCommand('copy'); done(); }
+    catch(e){ showToast('Gagal menyalin.','error'); }
+    document.body.removeChild(ta);
+  }
+}
+
+/* Ambil icon SVG dari config.json (key = "downloadApk" / "buyKey"), fallback ke emoji jika belum siap */
+function getIcon(iconKey, fallbackEmoji){
+  if(_configLoadFailed || !_appConfig || !_appConfig.icons || !_appConfig.icons[iconKey]){
+    return fallbackEmoji || '';
+  }
+  return _appConfig.icons[iconKey];
+}
+
+/* Isi semua placeholder <span class="js-icon" data-icon-key="..."> di HTML statis dengan SVG dari config.json */
+function renderStaticIcons(){
+  document.querySelectorAll('.js-icon[data-icon-key]').forEach(el => {
+    const key = el.getAttribute('data-icon-key');
+    el.innerHTML = getIcon(key, '');
+  });
+}
+
+/* Muat config.json sesegera mungkin saat halaman dibuka, lalu render semua icon statis */
+loadConfig().then(()=>{ renderStaticIcons(); renderProductStatuses(); });
+
+const platformLabel = {android:'Android · No Root', ios:'iOS', pc:'Android · Root'};
+const platformClass = {android:'android', ios:'ios', pc:'pc'};
+
+function openModal(btn){
+  const card = btn.closest('.card');
+  const d = card.dataset;
+  const productName = card.querySelector('h4').textContent.trim();
+  let packages;
+  try { packages = JSON.parse(d.packages || '[]'); } catch(e){ packages=[]; }
+
+  _currentProduct = productName;
+  _selectedPackage = packages[0] || null;
+  _isClosed = d.status === 'close';
+  _specialMode = d.special || null;
+
+  const iconEl = document.getElementById('modalIcon');
+  if(d.img){
+    iconEl.innerHTML = `<img src="${d.img}" alt="${productName}" loading="lazy" decoding="async" onerror="this.style.display='none';this.parentElement.textContent='${(d.icon||'').replace(/'/g,"\\'")}'" >`;
+  } else {
+    iconEl.textContent = d.icon || '';
+  }
+  document.getElementById('modalProductName').textContent = productName;
+  document.getElementById('modalProductDesc').textContent = d.desc || '';
+
+  const badgeWrap = document.getElementById('modalBadges');
+  badgeWrap.innerHTML = '';
+  if(d.platform && platformLabel[d.platform]){
+    const b = document.createElement('span');
+    b.className = 'modal-badge ' + platformClass[d.platform];
+    b.textContent = platformLabel[d.platform];
+    badgeWrap.appendChild(b);
+  }
+  if(d.status && d.status !== 'open'){
+    const s = document.createElement('span');
+    s.className = 'modal-badge status-' + d.status;
+    s.textContent = d.status === 'close' ? 'CLOSE' : 'UPDATE';
+    badgeWrap.appendChild(s);
+  }
+
+  const grid = document.getElementById('priceOptions');
+  const featureGrid = document.getElementById('featureOptions');
+  const sectionLabel = document.getElementById('modalSectionLabel');
+  const footer = document.getElementById('modalFooter');
+  grid.innerHTML = '';
+  featureGrid.innerHTML = '';
+
+  if(_specialMode === 'bloodstrike'){
+    /* ── MODE SPESIAL: 2 fitur (APK Mediafire + Buy Key WA), bukan paket harga ── */
+    grid.style.display = 'none';
+    featureGrid.style.display = 'flex';
+    sectionLabel.textContent = 'Pilih Layanan';
+    footer.style.display = 'none';
+
+    const apkOpt = document.createElement('div');
+    apkOpt.className = 'feature-opt';
+    apkOpt.setAttribute('role','button');
+    apkOpt.setAttribute('tabindex','0');
+    apkOpt.innerHTML = `
+      <div class="feature-icon">${getIcon('downloadApk','')}</div>
+      <div class="feature-text">
+        <div class="feature-title">APK CHEAT</div>
+        <div class="feature-desc">DOWNLOAD APLIKASI CHEAT</div>
+      </div>
+      <span class="feature-arrow">${getIcon('featureArrow','')}</span>
+    `;
+    const goOpenKeyBs = () => openKeyModal(productName, getDownloadLink(productName), 'cheat');
+    apkOpt.addEventListener('click', goOpenKeyBs);
+    apkOpt.addEventListener('keydown', e=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); goOpenKeyBs(); } });
+    featureGrid.appendChild(apkOpt);
+
+    /* ── SALIN KEY (khusus produk yang punya copyKey di config.json, tampil di bawah APK CHEAT) ── */
+    const copyKeyBs = getProductCopyKey(productName);
+    if(copyKeyBs){
+      const copyKeyWrapBs = document.createElement('div');
+      copyKeyWrapBs.className = 'inline-copykey-wrap';
+      copyKeyWrapBs.innerHTML = `
+        <div class="inline-copykey-label">Key</div>
+        <div class="inline-copykey-row">
+          <span class="inline-copykey-value">${String(copyKeyBs).replace(/</g,'&lt;')}</span>
+          <button type="button" class="inline-copykey-btn" aria-label="Salin Key">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span class="copykey-btn-text">Salin</span>
+          </button>
+        </div>
+      `;
+      copyKeyWrapBs.querySelector('.inline-copykey-btn').addEventListener('click', (e) => {
+        copyProductKeyInline(productName, e.currentTarget);
+      });
+      featureGrid.appendChild(copyKeyWrapBs);
+    }
+
+    /* ── AKUN (username/password) khusus produk yang punya accountInfo, tampil di bawah APK CHEAT ── */
+    const accountBs = getProductAccountInfo(productName);
+    if(accountBs){
+      const accountWrapBs = document.createElement('div');
+      accountWrapBs.className = 'inline-copykey-wrap';
+      accountWrapBs.innerHTML = `
+        <div class="inline-copykey-label">Username</div>
+        <div class="inline-copykey-row" style="margin-bottom:12px;">
+          <span class="inline-copykey-value">${String(accountBs.username||'').replace(/</g,'&lt;')}</span>
+          <button type="button" class="inline-copykey-btn" data-field="username" aria-label="Salin Username">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span class="copykey-btn-text">Salin</span>
+          </button>
+        </div>
+        <div class="inline-copykey-label">Password</div>
+        <div class="inline-copykey-row">
+          <span class="inline-copykey-value">${String(accountBs.password||'').replace(/</g,'&lt;')}</span>
+          <button type="button" class="inline-copykey-btn" data-field="password" aria-label="Salin Password">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span class="copykey-btn-text">Salin</span>
+          </button>
+        </div>
+      `;
+      accountWrapBs.querySelectorAll('.inline-copykey-btn').forEach(btn=>{
+        btn.addEventListener('click', (e) => {
+          const field = e.currentTarget.getAttribute('data-field');
+          copyTextInline(accountBs[field] || '', e.currentTarget);
+        });
+      });
+      featureGrid.appendChild(accountWrapBs);
+    }
+
+    /* ── LIST FITUR (khusus mode special, tampil di bawah Buy Key) ── */
+    let fiturList = [];
+    try { fiturList = JSON.parse(d.fitur || '[]'); } catch(e){ fiturList = []; }
+    if(fiturList.length){
+      const fiturWrap = document.createElement('div');
+      fiturWrap.className = 'fitur-list-wrap';
+      const chips = fiturList.map(f => `
+        <div class="fitur-chip">
+          <span class="fitur-chip-dot" aria-hidden="true"></span>
+          <span class="fitur-chip-label">${String(f).replace(/</g,'&lt;')}</span>
+        </div>
+      `).join('');
+      fiturWrap.innerHTML = `
+        <div class="fitur-list-head">
+          <div class="fitur-list-head-icon"><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M13.8 22H5c-1.7 0-3-1.3-3-3v-1h11.1c-.1.3-.1.7-.1 1c0 1.1.3 2.1.8 3m0-6H5V5c0-1.7 1.3-3 3-3h11c1.7 0 3 1.3 3 3v1h-2V5c0-.6-.4-1-1-1s-1 .4-1 1v8.1c-1.8.3-3.3 1.4-4.2 2.9M8 8h7V6H8zm0 4h6v-2H8zm9 4v6l5-3z"/></svg></div>
+          <div class="fitur-list-head-text">List Fitur</div>
+          <div class="fitur-list-count">${fiturList.length} Fitur</div>
+        </div>
+        <div class="fitur-chip-grid">${chips}</div>
+      `;
+      featureGrid.appendChild(fiturWrap);
+    }
+
+    /* ── POSTER PREVIEW 3:2 (khusus mode special, tampil di bawah List Fitur) ── */
+    if(d.poster){
+      const posterWrap = document.createElement('div');
+      posterWrap.className = 'poster-preview-wrap';
+      posterWrap.innerHTML = `
+        <div class="poster-preview-frame">
+          <img src="${d.poster}" alt="Preview ${productName}" loading="lazy" decoding="async" onerror="this.closest('.poster-preview-wrap').style.display='none'">
+        </div>
+      `;
+      featureGrid.appendChild(posterWrap);
+    }
+
+  } else if(_specialMode === 'aincrad'){
+    /* ── MODE SPESIAL AINCRAD: 3 fitur (APK Client + Get Key eksternal + Get Password WA) ── */
+    grid.style.display = 'none';
+    featureGrid.style.display = 'flex';
+    sectionLabel.textContent = 'Pilih Layanan';
+    footer.style.display = 'none';
+
+    const apkOpt = document.createElement('div');
+    apkOpt.className = 'feature-opt';
+    apkOpt.setAttribute('role','button');
+    apkOpt.setAttribute('tabindex','0');
+    apkOpt.innerHTML = `
+      <div class="feature-icon">${getIcon('downloadApk','')}</div>
+      <div class="feature-text">
+        <div class="feature-title">APK CHEAT</div>
+        <div class="feature-desc">DOWNLOAD APLIKASI CHEAT</div>
+      </div>
+      <span class="feature-arrow">${getIcon('featureArrow','')}</span>
+    `;
+    const goOpenKeyAc = () => openKeyModal(productName, getDownloadLink(productName), 'cheat');
+    apkOpt.addEventListener('click', goOpenKeyAc);
+    apkOpt.addEventListener('keydown', e=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); goOpenKeyAc(); } });
+    featureGrid.appendChild(apkOpt);
+
+    const getKeyOpt = document.createElement('a');
+    getKeyOpt.className = 'feature-opt';
+    getKeyOpt.href = 'https://aincradmods.com/getkey';
+    getKeyOpt.target = '_blank';
+    getKeyOpt.rel = 'noopener noreferrer';
+    getKeyOpt.innerHTML = `
+      <div class="feature-icon">${getIcon('buyKey','')}</div>
+      <div class="feature-text">
+        <div class="feature-title">GET KEY</div>
+        <div class="feature-desc">AMBIL KEY UNTUK MEMBUKA CHEAT</div>
+      </div>
+      <span class="feature-arrow">${getIcon('featureArrow','')}</span>
+    `;
+    featureGrid.appendChild(getKeyOpt);
+
+    /* ── LIST FITUR (khusus mode special, tampil di bawah fitur layanan) ── */
+    let fiturListAc = [];
+    try { fiturListAc = JSON.parse(d.fitur || '[]'); } catch(e){ fiturListAc = []; }
+    if(fiturListAc.length){
+      const fiturWrap = document.createElement('div');
+      fiturWrap.className = 'fitur-list-wrap';
+      const chips = fiturListAc.map(f => `
+        <div class="fitur-chip">
+          <span class="fitur-chip-dot" aria-hidden="true"></span>
+          <span class="fitur-chip-label">${String(f).replace(/</g,'&lt;')}</span>
+        </div>
+      `).join('');
+      fiturWrap.innerHTML = `
+        <div class="fitur-list-head">
+          <div class="fitur-list-head-icon"><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M13.8 22H5c-1.7 0-3-1.3-3-3v-1h11.1c-.1.3-.1.7-.1 1c0 1.1.3 2.1.8 3m0-6H5V5c0-1.7 1.3-3 3-3h11c1.7 0 3 1.3 3 3v1h-2V5c0-.6-.4-1-1-1s-1 .4-1 1v8.1c-1.8.3-3.3 1.4-4.2 2.9M8 8h7V6H8zm0 4h6v-2H8zm9 4v6l5-3z"/></svg></div>
+          <div class="fitur-list-head-text">List Fitur</div>
+        </div>
+        <div class="fitur-chip-grid">${chips}</div>
+      `;
+      featureGrid.appendChild(fiturWrap);
+    }
+
+    /* ── POSTER PREVIEW 3:2 (khusus mode special, tampil di bawah List Fitur) ── */
+    if(d.poster){
+      const posterWrap = document.createElement('div');
+      posterWrap.className = 'poster-preview-wrap';
+      posterWrap.innerHTML = `
+        <div class="poster-preview-frame">
+          <img src="${d.poster}" alt="Preview ${productName}" loading="lazy" decoding="async" onerror="this.closest('.poster-preview-wrap').style.display='none'">
+        </div>
+      `;
+      featureGrid.appendChild(posterWrap);
+    }
+
+  } else if(_specialMode === 'aincrad-nokey'){
+    /* ── MODE SPESIAL AINCRAD TANPA GET KEY: 2 fitur (APK Client + Get Password WA) ── */
+    grid.style.display = 'none';
+    featureGrid.style.display = 'flex';
+    sectionLabel.textContent = 'Pilih Layanan';
+    footer.style.display = 'none';
+
+    const apkOptNk = document.createElement('div');
+    apkOptNk.className = 'feature-opt';
+    apkOptNk.setAttribute('role','button');
+    apkOptNk.setAttribute('tabindex','0');
+    apkOptNk.innerHTML = `
+      <div class="feature-icon">${getIcon('downloadApk','')}</div>
+      <div class="feature-text">
+        <div class="feature-title">APK CHEAT</div>
+        <div class="feature-desc">DOWNLOAD APLIKASI CHEAT</div>
+      </div>
+      <span class="feature-arrow">${getIcon('featureArrow','')}</span>
+    `;
+    const goOpenKeyNk = () => openKeyModal(productName, getDownloadLink(productName), 'cheat');
+    apkOptNk.addEventListener('click', goOpenKeyNk);
+    apkOptNk.addEventListener('keydown', e=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); goOpenKeyNk(); } });
+    featureGrid.appendChild(apkOptNk);
+
+    /* ── SALIN KEY (khusus produk yang punya copyKey di config.json, tampil di bawah APK CHEAT) ── */
+    const copyKeyNk = getProductCopyKey(productName);
+    if(copyKeyNk){
+      const copyKeyWrapNk = document.createElement('div');
+      copyKeyWrapNk.className = 'inline-copykey-wrap';
+      copyKeyWrapNk.innerHTML = `
+        <div class="inline-copykey-label">Key</div>
+        <div class="inline-copykey-row">
+          <span class="inline-copykey-value">${String(copyKeyNk).replace(/</g,'&lt;')}</span>
+          <button type="button" class="inline-copykey-btn" aria-label="Salin Key">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span class="copykey-btn-text">Salin</span>
+          </button>
+        </div>
+      `;
+      copyKeyWrapNk.querySelector('.inline-copykey-btn').addEventListener('click', (e) => {
+        copyProductKeyInline(productName, e.currentTarget);
+      });
+      featureGrid.appendChild(copyKeyWrapNk);
+    }
+
+    /* ── LIST FITUR (khusus mode special, tampil di bawah fitur layanan) ── */
+    let fiturListAcNk = [];
+    try { fiturListAcNk = JSON.parse(d.fitur || '[]'); } catch(e){ fiturListAcNk = []; }
+    if(fiturListAcNk.length){
+      const fiturWrapNk = document.createElement('div');
+      fiturWrapNk.className = 'fitur-list-wrap';
+      const chipsNk = fiturListAcNk.map(f => `
+        <div class="fitur-chip">
+          <span class="fitur-chip-dot" aria-hidden="true"></span>
+          <span class="fitur-chip-label">${String(f).replace(/</g,'&lt;')}</span>
+        </div>
+      `).join('');
+      fiturWrapNk.innerHTML = `
+        <div class="fitur-list-head">
+          <div class="fitur-list-head-icon"><svg width="15" height="15" viewBox="0 0 24 24"><path fill="currentColor" d="M13.8 22H5c-1.7 0-3-1.3-3-3v-1h11.1c-.1.3-.1.7-.1 1c0 1.1.3 2.1.8 3m0-6H5V5c0-1.7 1.3-3 3-3h11c1.7 0 3 1.3 3 3v1h-2V5c0-.6-.4-1-1-1s-1 .4-1 1v8.1c-1.8.3-3.3 1.4-4.2 2.9M8 8h7V6H8zm0 4h6v-2H8zm9 4v6l5-3z"/></svg></div>
+          <div class="fitur-list-head-text">List Fitur</div>
+        </div>
+        <div class="fitur-chip-grid">${chipsNk}</div>
+      `;
+      featureGrid.appendChild(fiturWrapNk);
+    }
+
+    /* ── POSTER PREVIEW 3:2 (khusus mode special, tampil di bawah List Fitur) ── */
+    if(d.poster){
+      const posterWrapNk = document.createElement('div');
+      posterWrapNk.className = 'poster-preview-wrap';
+      posterWrapNk.innerHTML = `
+        <div class="poster-preview-frame">
+          <img src="${d.poster}" alt="Preview ${productName}" loading="lazy" decoding="async" onerror="this.closest('.poster-preview-wrap').style.display='none'">
+        </div>
+      `;
+      featureGrid.appendChild(posterWrapNk);
+    }
+
+  } else {
+    /* ── MODE NORMAL: pilihan paket harga ── */
+    grid.style.display = 'grid';
+    featureGrid.style.display = 'none';
+    sectionLabel.textContent = 'Pilih Paket Harga';
+    footer.style.display = 'flex';
+    grid.style.gridTemplateColumns = packages.length === 1 ? '1fr' : 'repeat(2,1fr)';
+
+    packages.forEach((pkg, i) => {
+      const el = document.createElement('div');
+      el.className = 'price-opt' + (i === 0 ? ' selected' : '');
+      el.setAttribute('role','button');
+      el.setAttribute('tabindex','0');
+      el.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
+      el.setAttribute('aria-label', pkg.name + ' — ' + pkg.price);
+      el.innerHTML = `
+        <div class="price-opt-check" aria-hidden="true">${getIcon('checkmark','')}</div>
+        <div class="price-opt-duration">${pkg.name}</div>
+        <div class="price-opt-amount">${pkg.price}</div>
+      `;
+      const selectPkg = () => {
+        grid.querySelectorAll('.price-opt').forEach(o => {
+          o.classList.remove('selected');
+          o.setAttribute('aria-pressed','false');
+        });
+        el.classList.add('selected');
+        el.setAttribute('aria-pressed','true');
+        _selectedPackage = pkg;
+        updateSummary();
+      };
+      el.addEventListener('click', selectPkg);
+      el.addEventListener('keydown', e=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); selectPkg(); } });
+      grid.appendChild(el);
+    });
+
+    updateSummary();
+
+    const cta = document.getElementById('modalCta');
+    if(_isClosed){
+      cta.disabled = true;
+      cta.setAttribute('aria-disabled','true');
+      cta.style.cssText = 'opacity:.35;cursor:not-allowed;pointer-events:none;background:rgba(60,60,80,.6);box-shadow:none;';
+      cta.innerHTML = 'Produk Sedang CLOSE';
+    } else {
+      cta.disabled = false;
+      cta.removeAttribute('aria-disabled');
+      cta.style.cssText = '';
+      cta.innerHTML = getIcon('buyBtn','') + ' Beli Sekarang';
+    }
+  }
+
+  const overlay = document.getElementById('modalOverlay');
+  overlay.classList.add('open');
+  overlay.setAttribute('aria-hidden','false');
+  document.body.style.overflow = 'hidden';
+  /* focus trap — fokus ke tombol close */
+  setTimeout(()=>{ document.querySelector('.modal-close')?.focus(); }, 50);
+}
+
+function updateSummary(){
+  const val = document.getElementById('modalSummaryVal');
+  if(val){ val.textContent = _selectedPackage ? _selectedPackage.name + ' — ' + _selectedPackage.price : '—'; }
+}
+
+function closeModal(){
+  const overlay = document.getElementById('modalOverlay');
+  overlay.classList.remove('open');
+  overlay.setAttribute('aria-hidden','true');
+  document.body.style.overflow = '';
+}
+
+function handleOverlayClick(e){
+  if(e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+function buyNow(){
+  if(_isClosed){ showToast('Produk ini sedang CLOSE!','error'); return; }
+  if(!_selectedPackage){ showToast('Pilih paket terlebih dahulu!','error'); return; }
+  showToast('Mengalihkan ke WhatsApp...','success');
+  const msg = `Halo Tarz Store! Saya mau order:\n\n*Produk:* ${_currentProduct}\n*Paket:* ${_selectedPackage.name} — ${_selectedPackage.price}\n\nMohon diproses ya, terima kasih`;
+  setTimeout(()=>{ closeModal(); window.open('https://wa.me/6281918665183?text='+encodeURIComponent(msg),'_blank','noopener,noreferrer'); }, 550);
+}
+
+/* ══════════════════════════════════════════
+   VIP SYSTEM — 1 key VIP membuka SEMUA produk selamanya di device ini.
+   Key bersifat sekali pakai secara global (divalidasi & "dihanguskan"
+   oleh backend Google Apps Script begitu terpakai).
+   ══════════════════════════════════════════ */
+let _keyProduct = '';
+let _keyDownloadLink = '#';
+let _keySourceTab = null;
+
+const VIP_WA_NUMBER = '6281918665183';
+const VIP_PRICE_TEXT = 'Rp10.000';
+
+/* cek apakah device ini sudah VIP (berlaku untuk SEMUA produk).
+   Ada 2 mode: permanen (tarz_vip='true', tanpa batas waktu) dan
+   trial (tarz_vip_expiry=timestamp, otomatis terkunci lagi setelah lewat). */
+function isVipUnlocked(){
+  try {
+    if(localStorage.getItem('tarz_vip') === 'true') return true;
+
+    const expiry = localStorage.getItem('tarz_vip_expiry');
+    if(expiry){
+      if(Date.now() < Number(expiry)){
+        return true;
+      } else {
+        /* trial habis -> bersihkan supaya kembali terkunci */
+        localStorage.removeItem('tarz_vip_expiry');
+        return false;
+      }
+    }
+    return false;
+  } catch(e){ return false; }
+}
+
+/* akses permanen (key VIP biasa) */
+function markVipUnlocked(){
+  try {
+    localStorage.setItem('tarz_vip', 'true');
+    localStorage.removeItem('tarz_vip_expiry');
+  } catch(e){ /* localStorage tidak tersedia, abaikan */ }
+}
+
+/* akses trial: berlaku sampai waktu tertentu (expiryTimestampMs), lalu otomatis terkunci lagi */
+function markVipUnlockedTrial(expiryTimestampMs){
+  try {
+    localStorage.setItem('tarz_vip_expiry', String(expiryTimestampMs));
+  } catch(e){ /* localStorage tidak tersedia, abaikan */ }
+}
+
+let _vipHeaderInterval = null;
+
+/* format sisa waktu jadi teks singkat: "3j 12m", "45m 10d", "8d" dst */
+function formatCountdown(ms){
+  if(ms <= 0) return '0d';
+  const totalSec = Math.floor(ms / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  if(h > 0) return h + 'j ' + m + 'm';
+  if(m > 0) return m + 'm ' + s + 'd';
+  return s + 'd';
+}
+
+/* update badge "VIP Rp10.000" di atas grid produk cheat sesuai status device saat ini:
+   - belum VIP        -> tampilan normal "VIP Rp10.000"
+   - VIP permanen      -> "VIP UNLOCK" / "kamu bisa akses semua cheat sekarang"
+   - VIP trial aktif   -> "TRIAL VIP 2j 30m" (real-time countdown) / "kamu bisa akses semua cheat sekarang"
+   - trial baru habis  -> otomatis balik ke tampilan normal */
+function refreshVipHeaderBadge(){
+  const pairs = [
+    { titleEl: document.getElementById('vipHeaderTitle'), descEl: document.getElementById('vipHeaderDesc'), scope: 'cheat' },
+    { titleEl: document.getElementById('vipHeaderTitleFile'), descEl: document.getElementById('vipHeaderDescFile'), scope: 'file' },
+    { titleEl: document.getElementById('vipHeaderTitleAllgame'), descEl: document.getElementById('vipHeaderDescAllgame'), scope: 'allgame' }
+  ].filter(p => p.titleEl && p.descEl);
+  if(!pairs.length) return;
+
+  if(_vipHeaderInterval){ clearInterval(_vipHeaderInterval); _vipHeaderInterval = null; }
+
+  let isPermanent = false;
+  let expiry = null;
+  try {
+    isPermanent = localStorage.getItem('tarz_vip') === 'true';
+    const expiryRaw = localStorage.getItem('tarz_vip_expiry');
+    expiry = expiryRaw ? Number(expiryRaw) : null;
+  } catch(e){}
+
+  const descFor = (scope) => scope === 'file' ? 'KAMU BISA AKSES SEMUA FILE HS SEKARANG' : 'KAMU BISA AKSES SEMUA CHEAT SEKARANG';
+  const defaultDescFor = (scope) => scope === 'file' ? 'JOIN <b>VIP</b> AGAR BISA AKSES SEMUA CHEAT' : 'JOIN <b>VIP</b> AGAR BISA AKSES SEMUA CHEAT';
+
+  if(isPermanent){
+    pairs.forEach(p => {
+      p.titleEl.innerHTML = 'MEMBER VIP';
+      p.descEl.innerHTML = descFor(p.scope);
+    });
+    return;
+  }
+
+  if(expiry && Date.now() < expiry){
+    /* Set desc & wrapper span sekali saja (innerHTML mahal jika diulang tiap detik).
+       Countdown-nya sendiri lalu di-update tiap detik lewat textContent pada satu
+       <span> kecil saja -> jauh lebih ringan daripada innerHTML seluruh judul tiap tick. */
+    pairs.forEach(p => {
+      p.titleEl.innerHTML = 'TRIAL VIP <span class="vip-countdown"></span>';
+      p.descEl.innerHTML = descFor(p.scope);
+    });
+    const countdownEls = pairs.map(p => p.titleEl.querySelector('.vip-countdown'));
+
+    const tick = () => {
+      const remain = expiry - Date.now();
+      if(remain <= 0){
+        /* trial baru saja habis -> otomatis kembali normal, tanpa perlu reload halaman */
+        clearInterval(_vipHeaderInterval);
+        _vipHeaderInterval = null;
+        try { localStorage.removeItem('tarz_vip_expiry'); } catch(e){}
+        refreshVipHeaderBadge();
+        return;
+      }
+      const label = formatCountdown(remain);
+      countdownEls.forEach(el => { if(el) el.textContent = label; });
+    };
+    tick();
+    /* Jangan tick saat tab tidak aktif (background tab) -> hemat CPU/baterai,
+       lanjut update begitu tab dibuka lagi supaya angka tetap akurat. */
+    _vipHeaderInterval = setInterval(() => {
+      if(document.hidden) return;
+      tick();
+    }, 1000);
+    document.addEventListener('visibilitychange', () => {
+      if(!document.hidden && _vipHeaderInterval) tick();
+    });
+    return;
+  }
+
+  /* default: belum VIP sama sekali (atau trial sudah lama habis) */
+  pairs.forEach(p => {
+    p.titleEl.innerHTML = 'VIP <span>' + VIP_PRICE_TEXT + '</span>';
+    p.descEl.innerHTML = defaultDescFor(p.scope);
+  });
+}
+
+function downloadUnlockedProduct(){
+  closeKeyModal();
+  if(_keyDownloadLink && !_keyDownloadLink.endsWith('#')){
+    window.open(_keyDownloadLink,'_blank','noopener,noreferrer');
+    showToast('Download dimulai...','success');
+  } else {
+    showToast('Link download belum tersedia.','error');
+  }
+}
+
+/* dipanggil dari tombol download tiap produk.
+   kalau device sudah VIP -> langsung download, tanpa modal/key sama sekali.
+   kalau belum VIP -> tampilkan modal ajakan join VIP. */
+function openKeyModal(productName, downloadLink, sourceTab){
+  _keyProduct = productName;
+  _keyDownloadLink = downloadLink;
+  _keySourceTab = sourceTab || null;
+
+  if(isVipUnlocked()){
+    closeModal();
+    if(downloadLink && !downloadLink.endsWith('#')){
+      window.open(downloadLink,'_blank','noopener,noreferrer');
+      showToast('Download dimulai...','success');
+    } else {
+      showToast('Link download belum tersedia.','error');
+    }
+    return;
+  }
+
+  closeModal();
+
+  showToast('ANDA BELUM VIP','error');
+
+  const overlay = document.getElementById('keyOverlay');
+  overlay.classList.add('open');
+  overlay.setAttribute('aria-hidden','false');
+  document.body.style.overflow = 'hidden';
+
+  showVipGate();
+}
+
+function showVipGate(){
+  document.getElementById('vipGateBody').classList.remove('hide');
+  document.getElementById('vipKeyFormBody').classList.remove('show');
+  document.getElementById('keySuccessWrap').classList.remove('show');
+  document.getElementById('keyTitle').textContent = 'VIP RP 10.000';
+  setKeyHeadDecorHidden(false);
+
+  const productLabel = escapeHtml(_keyProduct || 'produk ini');
+  document.getElementById('keySub').innerHTML = 'Silahkan <b>' + '</b> <b>JOIN VIP</b> agar bisa akses semua cheat';
+
+  const joinVipBtn = document.getElementById('keyBtnJoinVip');
+  if(joinVipBtn){
+    joinVipBtn.style.display = (_keySourceTab === 'cheat' || _keySourceTab === 'file') ? 'flex' : 'none';
+  }
+  const joinVipWaBtn = document.getElementById('keyBtnJoinVipWa');
+  if(joinVipWaBtn){
+    joinVipWaBtn.style.display = (_keySourceTab === 'cheat' || _keySourceTab === 'file') ? 'flex' : 'none';
+  }
+}
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+/* markup asli form input key VIP — dipakai untuk restore jika sebelumnya body ini
+   ditimpa oleh tampilan QRIS (showVipQrisLoading/renderVipQris) */
+const VIP_KEYFORM_MARKUP = `
+  <label class="key-input-label" for="keyInput">Key Akses</label>
+  <div class="key-input-wrap">
+    <input type="password" id="keyInput" class="key-input" placeholder="••••••••••" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter'){event.preventDefault();keyLogin();}">
+    <button type="button" class="key-toggle-eye" onclick="toggleKeyEye()" aria-label="Tampilkan key" id="keyEyeBtn">
+      <svg id="keyEyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+    </button>
+  </div>
+  <div class="key-error-msg" id="keyErrorMsg">Key salah, coba lagi.</div>
+
+  <button class="key-btn-login" id="keyLoginBtn" onclick="keyLogin()">
+    <span class="key-spinner"></span>
+    <span class="key-btn-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
+    </span>
+    <span class="key-btn-label-text">VERIFIKASI KEY</span>
+  </button>
+
+  <button type="button" class="vip-back-link" onclick="showVipGate()">← kembali</button>
+`;
+
+function showVipKeyForm(){
+  document.getElementById('vipGateBody').classList.add('hide');
+  document.getElementById('vipKeyFormBody').classList.add('show');
+  document.getElementById('keySuccessWrap').classList.remove('show');
+  document.getElementById('keyTitle').textContent = 'Masukkan Key VIP';
+  document.getElementById('keySub').textContent = 'Key hanya berlaku 1x pakai dan langsung hangus setelah digunakan';
+  setKeyHeadDecorHidden(false);
+
+  /* hentikan proses QRIS yang mungkin masih berjalan di background, lalu
+     kembalikan HTML form key ke aslinya (bisa saja sebelumnya ditimpa QRIS) */
+  clearInterval(_qrisPollTimer);
+  clearInterval(_qrisCountdownTimer);
+  _vipQrisImageUrl = null;
+  _qrisExpiresAt = null;
+  document.getElementById('vipKeyFormBody').innerHTML = VIP_KEYFORM_MARKUP;
+
+  const input = document.getElementById('keyInput');
+  const errMsg = document.getElementById('keyErrorMsg');
+  const loginBtn = document.getElementById('keyLoginBtn');
+  input.value = '';
+  input.classList.remove('shake');
+  input.type = 'password';
+  errMsg.classList.remove('show');
+  loginBtn.classList.remove('loading');
+  setTimeout(()=>{ input.focus(); }, 150);
+}
+
+function closeKeyModal(){
+  const overlay = document.getElementById('keyOverlay');
+  overlay.classList.remove('open');
+  overlay.setAttribute('aria-hidden','true');
+  document.body.style.overflow = '';
+  clearInterval(_qrisPollTimer);
+  clearInterval(_qrisCountdownTimer);
+}
+
+function handleKeyOverlayClick(e){
+  if(e.target === document.getElementById('keyOverlay')) closeKeyModal();
+}
+
+function toggleKeyEye(){
+  const input = document.getElementById('keyInput');
+  const icon = document.getElementById('keyEyeIcon');
+  const isHidden = input.type === 'password';
+  input.type = isHidden ? 'text' : 'password';
+  icon.innerHTML = isHidden
+    ? '<path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a20.3 20.3 0 0 1 4.22-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a20.4 20.4 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
+    : '<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/>';
+}
+
+/* URL SheetDB — validasi key VIP sekali pakai via Google Sheets
+   (kolom: key, Produk, Status, Tipe, WaktuPakai).
+   - Tipe "Permanen": sekali dipakai (Status="Sudah") -> akses terbuka SELAMANYA di device itu.
+   - Tipe "Trial" atau "Trial <jam>" (contoh "Trial 1", "Trial 7", "Trial 24"): sekali dipakai
+     (Status="Sudah", WaktuPakai=sekarang) -> akses terbuka SELAMA <jam> JAM saja di device itu,
+     lalu otomatis terkunci lagi. Kalau angka jam tidak ditulis (cuma "Trial"), default 24 jam.
+     Key itu sendiri tetap hangus permanen di server begitu dipakai (tidak bisa dipakai
+     device/orang lain sama sekali, terlepas dari tipe permanen/trial). */
+const KEY_API_URL = 'https://script.google.com/macros/s/AKfycbw4bx5UZtkoCrr3JalSeYlxrdZ50lJmRt1XHlqkXc1BrnUR362ezDur6mPfApeii8ht/exec';
+const DEFAULT_TRIAL_HOURS = 24;
+
+function keyLogin(){
+  const input = document.getElementById('keyInput');
+  const errMsg = document.getElementById('keyErrorMsg');
+  const loginBtn = document.getElementById('keyLoginBtn');
+  const entered = input.value.trim();
+
+  if(!entered){
+    errMsg.textContent = 'Key tidak boleh kosong.';
+    errMsg.classList.add('show');
+    input.classList.remove('shake');
+    void input.offsetWidth;
+    input.classList.add('shake');
+    return;
+  }
+
+  loginBtn.classList.add('loading');
+  errMsg.classList.remove('show');
+
+  function fail(msg){
+    loginBtn.classList.remove('loading');
+    errMsg.textContent = msg;
+    errMsg.classList.add('show');
+    input.classList.remove('shake');
+    void input.offsetWidth;
+    input.classList.add('shake');
+    input.select();
+  }
+
+  function success(isTrial, trialHours){
+    if(isTrial){
+      markVipUnlockedTrial(Date.now() + trialHours * 60 * 60 * 1000);
+    } else {
+      markVipUnlocked();
+    }
+    refreshVipHeaderBadge();
+    const trialLabel = trialHours === 1 ? '1 jam' : trialHours + ' jam';
+    document.getElementById('vipGateBody').classList.add('hide');
+    document.getElementById('vipKeyFormBody').classList.remove('show');
+    document.getElementById('keySuccessTitle').textContent = isTrial ? 'Key Trial Aktif!' : 'Key VIP Benar!';
+    document.getElementById('keySuccessSub').textContent = isTrial
+      ? 'Semua produk terbuka selama ' + trialLabel + '. Mengalihkan ke download...'
+      : 'Semua produk kini terbuka. Mengalihkan ke download...';
+    document.getElementById('keyDownloadAgainBtn').classList.add('hide');
+    document.getElementById('keySuccessWrap').classList.add('show');
+    setTimeout(()=>{
+      closeKeyModal();
+      if(_keyDownloadLink && !_keyDownloadLink.endsWith('#')){
+        window.open(_keyDownloadLink,'_blank','noopener,noreferrer');
+        showToast(isTrial ? 'Key trial aktif! Berlaku ' + trialLabel + '.' : 'Key VIP valid! Semua produk terbuka.','success');
+      } else {
+        showToast('Link download belum tersedia.','error');
+      }
+    }, 900);
+  }
+
+  /* Redeem key lewat Apps Script (satu request: cari + validasi + hanguskan key).
+     LockService di server mencegah key yang sama dipakai 2 device sekaligus. */
+  fetch(KEY_API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // hindari CORS preflight di Apps Script
+    body: JSON.stringify({ action: 'redeemKey', key: entered })
+  })
+  .then(res => {
+    if(!res.ok) throw new Error('http-' + res.status);
+    return res.json();
+  })
+  .then(result => {
+    if(!result || !result.ok){
+      fail((result && result.error) || 'Key salah, coba lagi.');
+      return;
+    }
+    const trialHours = result.trialHours || DEFAULT_TRIAL_HOURS;
+    success(!!result.isTrial, trialHours);
+  })
+  .catch(err => fail('Gagal menghubungi server. Cek koneksi internet kamu.'));
+}
+
+/* tombol "BELI VIP" (di dalam modal, konteks produk tertentu) -> WhatsApp */
+function keyGetPassword(){
+  showToast('Mengalihkan ke WhatsApp...','success');
+  const msg = `Halo Tarz Store! Saya mau join VIP (${VIP_PRICE_TEXT}) untuk akses semua cheat.\n\n\Mohon diproses ya, terima kasih`;
+  setTimeout(()=>{ closeKeyModal(); window.open('https://wa.me/'+VIP_WA_NUMBER+'?text='+encodeURIComponent(msg),'_blank','noopener,noreferrer'); }, 420);
+}
+
+
+
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeKeyModal(); } });
+
+/* ── PAUSE ANIMASI SAAT TAB TIDAK AKTIF ──
+   Browser tetap menjalankan CSS animation & timer di background tab (throttled,
+   tapi tidak nol), jadi begitu user kembali sering terasa "kejang" sesaat.
+   Dengan pause eksplisit lewat class, tidak ada kerja yang menumpuk di background. */
+document.addEventListener('visibilitychange', () => {
+  document.body.classList.toggle('tab-hidden', document.hidden);
+});
+
+/* ── BANNER SLIDESHOW with touch/swipe support ── */
+(function(){
+  const track = document.getElementById('bannerTrack');
+  const dotsEl = document.querySelectorAll('#bannerDots .banner-dot');
+  const total = 3;
+  let current = 0;
+  let autoTimer = null;
+
+  function goTo(idx){
+    current = ((idx % total) + total) % total;
+    track.style.transform = 'translate3d(-' + (current * 100) + '%,0,0)';
+    dotsEl.forEach((d,i) => {
+      d.classList.toggle('active', i === current);
+      d.setAttribute('aria-selected', i === current ? 'true' : 'false');
+    });
+    /* update slide visibility for screen readers */
+    track.querySelectorAll('.banner-slide').forEach((s,i)=>{
+      s.setAttribute('aria-hidden', i !== current ? 'true' : 'false');
+    });
+  }
+
+  function startAuto(){
+    clearInterval(autoTimer);
+    autoTimer = setInterval(() => {
+      if(document.hidden) return; /* skip tick saat tab di background */
+      goTo(current + 1);
+    }, 5000);
+  }
+
+  /* pause auto on tab focus */
+  track.addEventListener('focusin', ()=>clearInterval(autoTimer));
+  track.addEventListener('focusout', ()=>startAuto());
+
+  /* Dot click */
+  dotsEl.forEach((dot, i) => {
+    dot.addEventListener('click', () => { goTo(i); startAuto(); });
+  });
+
+  /* Touch swipe */
+  let tsX = 0, tsDiff = 0, isDragging = false;
+  track.addEventListener('touchstart', e => {
+    tsX = e.touches[0].clientX;
+    isDragging = true;
+    clearInterval(autoTimer);
+  }, {passive:true});
+  track.addEventListener('touchmove', e => {
+    if(!isDragging) return;
+    tsDiff = e.touches[0].clientX - tsX;
+  }, {passive:true});
+  track.addEventListener('touchend', () => {
+    if(!isDragging) return;
+    isDragging = false;
+    if(Math.abs(tsDiff) > 40){
+      goTo(tsDiff < 0 ? current + 1 : current - 1);
+    }
+    tsDiff = 0;
+    startAuto();
+  }, {passive:true});
+
+  /* init hidden state */
+  goTo(0);
+  startAuto();
+})();
+
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeModal(); } });
+
+/* ══════════════════════════════════════════
+   VIP AUTO-PAYMENT (BuatQris) — QRIS otomatis, tanpa chat admin
+   ══════════════════════════════════════════ */
+
+/* verifikasi ke server apakah token VIP di browser ini masih sah
+   (menggantikan cek localStorage-saja, supaya tidak bisa dipalsukan lewat DevTools) */
+async function isVipUnlockedAsync(){
+  const token = localStorage.getItem('tarz_vip_token');
+  if(!token) return false;
+  try{
+    const res = await fetch('/api/verify-vip?token=' + encodeURIComponent(token));
+    const data = await res.json();
+    if(data.vip === true) return true;
+    if(data.vip === false){ localStorage.removeItem('tarz_vip_token'); return false; }
+    return true; // data.vip === null -> server error, jangan kunci akses yang sudah ada
+  }catch(e){
+    return true; // offline/error -> jangan kunci user yang sudah pernah verify
+  }
+}
+
+let _qrisPollTimer = null;
+let _vipQrisImageUrl = null;
+
+/* dipanggil dari tombol "JOIN VIP - Rp10.000" di dalam key modal (yang sudah terbuka) */
+async function startVipPayment(){
+  showVipQrisLoading();
+  try{
+    const res = await fetch('/api/create-payment', { method: 'POST' });
+    const data = await res.json();
+    if(!data.ok){
+      showToast(data.error || 'Gagal membuat QRIS.', 'error');
+      showVipGate();
+      return;
+    }
+    renderVipQris(data);
+    pollVipPayment(data.orderId);
+  }catch(e){
+    showToast('Gagal terhubung ke server pembayaran.', 'error');
+    showVipGate();
+  }
+}
+
+/* dipanggil dari tombol "BUY VIP VIA WHATSAPP" di dalam key modal — langsung
+   arahkan ke WhatsApp admin dengan pesan siap kirim, tanpa lewat QRIS */
+function openVipWhatsApp(){
+  showToast('Mengalihkan ke WhatsApp...','success');
+  const msg = `Halo Tarz Store! Saya mau join VIP (${VIP_PRICE_TEXT}) untuk akses semua cheat.\n\nMohon diproses ya, terima kasih`;
+  setTimeout(()=>{
+    window.open('https://wa.me/'+VIP_WA_NUMBER+'?text='+encodeURIComponent(msg),'_blank','noopener,noreferrer');
+  }, 350);
+}
+
+/* dipanggil dari tombol "JOIN VIP" di file card (tab FILE HS) — key modal belum terbuka,
+   jadi buka dulu overlay-nya baru langsung mulai proses pembayaran */
+function openVipPaymentDirect(){
+  _keyProduct = 'VIP Access';
+  _keyDownloadLink = '#';
+  _keySourceTab = 'file';
+
+  const overlay = document.getElementById('keyOverlay');
+  overlay.classList.add('open');
+  overlay.setAttribute('aria-hidden','false');
+  document.body.style.overflow = 'hidden';
+
+  startVipPayment();
+}
+
+function showVipQrisLoading(){
+  document.getElementById('vipGateBody').classList.add('hide');
+  document.getElementById('vipKeyFormBody').classList.remove('show');
+  document.getElementById('keySuccessWrap').classList.remove('show');
+  document.getElementById('keyTitle').textContent = 'Menyiapkan QRIS...';
+  document.getElementById('keySub').textContent = 'Mohon tunggu sebentar';
+  setKeyHeadDecorHidden(true);
+
+  const body = document.getElementById('vipKeyFormBody');
+  body.classList.add('show');
+  body.innerHTML = `
+    <div class="qris-status-card" style="justify-content:center;">
+      <div class="qris-status-spinner"></div>
+      <div class="qris-status-text">
+        <div class="qris-status-title">Menghubungkan ke server pembayaran</div>
+        <div class="qris-status-sub">Mohon tunggu sebentar...</div>
+      </div>
+    </div>
+  `;
+}
+
+/* sembunyikan/tampilkan eyebrow "ACCESS TERKUNCI" & icon gembok saat state pembayaran QRIS aktif */
+function setKeyHeadDecorHidden(hidden){
+  const eyebrow = document.querySelector('#keyBox .key-eyebrow');
+  const badge = document.getElementById('keyIconBadge');
+  if(eyebrow) eyebrow.style.display = hidden ? 'none' : '';
+  if(badge) badge.style.display = hidden ? 'none' : '';
+}
+
+let _qrisExpiresAt = null;
+let _qrisCountdownTimer = null;
+
+function renderVipQris(data){
+  document.getElementById('keyTitle').textContent = 'Scan & Bayar VIP';
+  document.getElementById('keySub').innerHTML = 'Selesaikan pembayaran untuk membuka akses';
+  setKeyHeadDecorHidden(true);
+
+  _vipQrisImageUrl = data.qrImageUrl;
+  _qrisExpiresAt = Date.now() + 15 * 60 * 1000;
+
+  const body = document.getElementById('vipKeyFormBody');
+  body.classList.add('show');
+  body.innerHTML = `
+    <div class="qris-pay-wrap">
+      <div class="qris-amount-row">
+        <span class="qris-amount-label">Rp</span>
+        <span class="qris-amount-value">${data.amount.toLocaleString('id-ID')}</span>
+      </div>
+      ${data.orderId ? `<div class="qris-order-id">Order #${data.orderId}</div>` : `<div style="margin-bottom:12px;"></div>`}
+
+      <div class="qris-code-frame">
+        <span class="qris-code-corner-a"></span>
+        <span class="qris-code-corner-b"></span>
+        <img src="${data.qrImageUrl}" alt="QRIS VIP Tarz Store">
+        <div class="qris-logo-badge"><img src="tarz.jpg" alt="Tarz"></div>
+      </div>
+
+      <div class="qris-timer-row" id="qrisTimerRow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        <span class="qris-timer-text" id="qrisTimerText">15:00</span>
+      </div>
+
+      <div class="qris-action-row">
+        <button type="button" class="vip-qris-download-btn" onclick="downloadVipQris()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
+          DOWNLOAD QRIS
+        </button>
+      </div>
+
+      <div class="qris-status-card" id="qrisStatusCard">
+        <div class="qris-status-spinner"></div>
+        <div class="qris-status-text">
+          <div class="qris-status-title" id="vipPayStatus">Menunggu pembayaran...</div>
+          <div class="qris-status-sub">Status akan terupdate otomatis</div>
+        </div>
+      </div>
+
+      <div class="qris-steps">
+        <div class="qris-steps-title">Cara Bayar</div>
+        <div class="qris-step"><span class="qris-step-num">1</span><span>Buka aplikasi e-wallet atau m-banking apa saja</span></div>
+        <div class="qris-step"><span class="qris-step-num">2</span><span>Pilih menu <b style="color:var(--text)">Scan QRIS</b> lalu arahkan ke kode di atas</span></div>
+        <div class="qris-step"><span class="qris-step-num">3</span><span>Periksa nominal, lalu selesaikan pembayaran</span></div>
+      </div>
+
+      <button type="button" class="vip-back-link" onclick="cancelVipPayment()">← batal pembayaran</button>
+    </div>
+  `;
+
+  startQrisCountdown();
+}
+
+function startQrisCountdown(){
+  clearInterval(_qrisCountdownTimer);
+  const tick = () => {
+    const remainMs = _qrisExpiresAt - Date.now();
+    const timerText = document.getElementById('qrisTimerText');
+    const timerRow = document.getElementById('qrisTimerRow');
+    if(!timerText || !timerRow) { clearInterval(_qrisCountdownTimer); return; }
+    if(remainMs <= 0){
+      timerText.textContent = '00:00';
+      timerRow.classList.add('urgent');
+      clearInterval(_qrisCountdownTimer);
+      return;
+    }
+    const totalSec = Math.floor(remainMs / 1000);
+    const m = Math.floor(totalSec / 60);
+    const s = totalSec % 60;
+    timerText.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    if(totalSec <= 120) timerRow.classList.add('urgent');
+  };
+  tick();
+  _qrisCountdownTimer = setInterval(tick, 1000);
+}
+
+/* unduh gambar QRIS sebagai file .png ke perangkat user (bukan sekadar buka tab baru) */
+async function downloadVipQris(){
+  if(!_vipQrisImageUrl) return;
+  try{
+    const res = await fetch(_vipQrisImageUrl);
+    const blob = await res.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = 'QRIS-VIP-TarzStore.png';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(blobUrl), 4000);
+    showToast('QRIS berhasil diunduh.', 'success');
+  }catch(e){
+    /* fallback kalau gagal fetch (mis. CORS) -> buka di tab baru supaya user bisa save manual */
+    window.open(_vipQrisImageUrl, '_blank', 'noopener,noreferrer');
+    showToast('Gagal unduh langsung, membuka gambar di tab baru.', 'error');
+  }
+}
+
+function setQrisStatus(state, title, sub){
+  const card = document.getElementById('qrisStatusCard');
+  const titleEl = document.getElementById('vipPayStatus');
+  if(!card || !titleEl) return;
+  card.classList.remove('ok','error');
+  let iconHtml = '';
+  if(state === 'ok'){
+    card.classList.add('ok');
+    iconHtml = '<svg viewBox="0 0 24 24" fill="none" stroke="#00e5a0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;"><polyline points="20 6 9 17 4 12"/></svg>';
+    card.querySelector('.qris-status-spinner').innerHTML = iconHtml;
+  } else if(state === 'error'){
+    card.classList.add('error');
+    iconHtml = '<svg viewBox="0 0 24 24" fill="none" stroke="#ff6b6b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+    card.querySelector('.qris-status-spinner').innerHTML = iconHtml;
+  }
+  titleEl.textContent = title;
+  const subEl = card.querySelector('.qris-status-sub');
+  if(subEl) subEl.textContent = sub || '';
+}
+
+async function pollVipPayment(orderId){
+  clearInterval(_qrisPollTimer);
+  let elapsed = 0;
+  _qrisPollTimer = setInterval(async () => {
+    elapsed += 3;
+    if(elapsed > 900){ // 15 menit
+      clearInterval(_qrisPollTimer);
+      clearInterval(_qrisCountdownTimer);
+      setQrisStatus('error', 'QRIS kedaluwarsa', 'Silakan buat ulang pembayaran.');
+      return;
+    }
+    try{
+      const res = await fetch('/api/check-status?orderId=' + encodeURIComponent(orderId));
+      const data = await res.json();
+      if(data.status === 'success'){
+        clearInterval(_qrisPollTimer);
+        clearInterval(_qrisCountdownTimer);
+        setQrisStatus('ok', 'Pembayaran diterima!', 'Membuka akses VIP...');
+        localStorage.setItem('tarz_vip_token', data.vipToken);
+        markVipUnlocked();
+        refreshVipHeaderBadge();
+        setTimeout(showVipPaymentSuccess, 600);
+      } else if(data.status === 'expired' || data.status === 'failed'){
+        clearInterval(_qrisPollTimer);
+        clearInterval(_qrisCountdownTimer);
+        setQrisStatus('error', data.status === 'expired' ? 'Pembayaran kedaluwarsa' : 'Pembayaran gagal', 'Silakan coba lagi.');
+      }
+    }catch(e){ /* diamkan, coba lagi di tick berikutnya */ }
+  }, 3000);
+}
+
+function cancelVipPayment(){
+  clearInterval(_qrisPollTimer);
+  clearInterval(_qrisCountdownTimer);
+  _vipQrisImageUrl = null;
+  _qrisExpiresAt = null;
+  showVipGate();
+}
+
+function showVipPaymentSuccess(){
+  _vipQrisImageUrl = null;
+  document.getElementById('vipKeyFormBody').classList.remove('show');
+  document.getElementById('keySuccessWrap').classList.add('show');
+  document.getElementById('keySuccessTitle').textContent = 'Pembayaran Berhasil!';
+  document.getElementById('keySuccessSub').textContent = 'Kamu sekarang VIP Semua produk terbuka.';
+  const dlAgainBtn = document.getElementById('keyDownloadAgainBtn');
+  if(_keyDownloadLink && !_keyDownloadLink.endsWith('#')){
+    dlAgainBtn.classList.remove('hide');
+  }
+  setTimeout(()=>{
+    if(_keyDownloadLink && !_keyDownloadLink.endsWith('#')){
+      window.open(_keyDownloadLink,'_blank','noopener,noreferrer');
+    }
+    showToast('VIP aktif! Semua produk terbuka.', 'success');
+  }, 900);
+}
+
+/* tampilkan status VIP/trial yang benar di badge atas grid produk, begitu halaman dibuka */
+isVipUnlockedAsync().then(vip => { if(vip) markVipUnlocked(); refreshVipHeaderBadge(); });
+
+</script>
+
+</body>
+</html>
