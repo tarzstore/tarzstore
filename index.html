@@ -1872,6 +1872,19 @@ footer::before{
         <h4>FAKE LAG V2</h4>        <button class="buy-btn" onclick="openModal(this)" style="display:flex;align-items:center;justify-content:center;gap:6px;"><span class="js-icon" data-icon-key="installBtn"></span>INSTALL</button>
       </div>
       
+      <!--  S3 HACK -->
+      <div class="card"
+        data-special="aincrad"
+        data-img="csr.jpg" data-label="BKL SENSI"
+        data-icon="" data-platform="android"
+        data-fitur='["DRAG HS","ATHENA"]'
+        data-poster="">
+        <div class="product-image" data-label="KURAMA MODS">
+          <img src="s3.jpg" alt="Vextu Proxy" onerror="this.classList.add('img-error')" loading="lazy" decoding="async" width="300" height="200">
+        </div>
+        <h4>S3 HACK PROXY</h4>        <button class="buy-btn" onclick="openModal(this)" style="display:flex;align-items:center;justify-content:center;gap:6px;"><span class="js-icon" data-icon-key="installBtn"></span>INSTALL</button>
+      </div>
+      
       <!--  KURAMA MODS -->
       <div class="card"
         data-special="aincrad-nokey"
@@ -2453,6 +2466,12 @@ function getProductCopyKey(productName){
   return _appConfig.copyKeys[productName] || null;
 }
 
+/* Ambil link GET KEY eksternal untuk sebuah produk dari config.json (null jika tidak ada) */
+function getProductKeyLink(productName){
+  if(_configLoadFailed || !_appConfig || !_appConfig.getKeyLinks) return null;
+  return _appConfig.getKeyLinks[productName] || null;
+}
+
 /* Ambil info akun (username/password) untuk sebuah produk dari config.json (null jika tidak ada) */
 function getProductAccountInfo(productName){
   if(_configLoadFailed || !_appConfig || !_appConfig.accountInfo) return null;
@@ -2738,18 +2757,21 @@ function openModal(btn){
 
     const getKeyOpt = document.createElement('a');
     getKeyOpt.className = 'feature-opt';
-    getKeyOpt.href = 'https://aincradmods.com/getkey';
-    getKeyOpt.target = '_blank';
-    getKeyOpt.rel = 'noopener noreferrer';
-    getKeyOpt.innerHTML = `
-      <div class="feature-icon">${getIcon('buyKey','')}</div>
-      <div class="feature-text">
-        <div class="feature-title">GET KEY</div>
-        <div class="feature-desc">AMBIL KEY UNTUK MEMBUKA CHEAT</div>
-      </div>
-      <span class="feature-arrow">${getIcon('featureArrow','')}</span>
-    `;
-    featureGrid.appendChild(getKeyOpt);
+    const keyLinkAc = getProductKeyLink(productName);
+    if(keyLinkAc){
+      getKeyOpt.href = keyLinkAc;
+      getKeyOpt.target = '_blank';
+      getKeyOpt.rel = 'noopener noreferrer';
+      getKeyOpt.innerHTML = `
+        <div class="feature-icon">${getIcon('buyKey','')}</div>
+        <div class="feature-text">
+          <div class="feature-title">GET KEY</div>
+          <div class="feature-desc">AMBIL KEY UNTUK MEMBUKA CHEAT</div>
+        </div>
+        <span class="feature-arrow">${getIcon('featureArrow','')}</span>
+      `;
+      featureGrid.appendChild(getKeyOpt);
+    }
 
     /* ── LIST FITUR (khusus mode special, tampil di bawah fitur layanan) ── */
     let fiturListAc = [];
