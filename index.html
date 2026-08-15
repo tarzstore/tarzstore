@@ -63,6 +63,123 @@ img,video{
   --ease-soft:cubic-bezier(.25,.46,.45,.94);
 }
 
+/* ── TEMA PREMIUM: "SKY BLUE" ──
+   Diaktifkan lewat class body.theme-sky (toggle via sidebar > Ubah Tema).
+   Override variabel warna inti + tambahan efek premium (glow, shimmer, glass). */
+body.theme-sky{
+  --bg:#040810;
+  --surface:#071022;
+  --card:#0a1830;
+  --card2:#0f213e;
+  --blue:#6fc3ff;
+  --blue2:#3d8fe0;
+  --cyan:#c9ecff;
+  --text:#eef7ff;
+  --text2:#8fb0d6;
+  --green:#5fd8ff;
+  --gold:#bfe6ff;
+  --border:rgba(111,195,255,.18);
+  --border-strong:rgba(111,195,255,.4);
+}
+
+/* Background: gradient langit statis — dihitung sekali, tidak ada animasi
+   berjalan terus supaya ringan di HP (hindari repaint tiap frame). */
+body.theme-sky{
+  background:
+    radial-gradient(ellipse 90% 60% at 50% -10%,rgba(60,150,255,.16),transparent 60%),
+    radial-gradient(ellipse 70% 50% at 90% 10%,rgba(120,200,255,.08),transparent 55%),
+    var(--bg);
+}
+body.theme-sky::before{
+  content:"";
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse at top,rgba(111,195,255,.1),transparent 60%),
+    linear-gradient(180deg,transparent 0%,rgba(6,16,32,.4) 100%);
+}
+
+/* Logo & judul: warna gradient statis, senada tema premium (tanpa animasi berjalan) */
+body.theme-sky .logo-name{
+  background:linear-gradient(120deg,#eef7ff 0%,#8fd4ff 45%,#4aa8ff 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+
+/* Card: border glow lebih tegas + glass sheen saat hover */
+body.theme-sky .card{
+  border-color:var(--border);
+  box-shadow:0 0 0 1px rgba(111,195,255,.06) inset;
+}
+body.theme-sky .card::before{
+  background:radial-gradient(circle at 50% 0%,rgba(111,195,255,.22),transparent 65%);
+}
+body.theme-sky .card:hover{
+  border-color:var(--border-strong);
+  box-shadow:0 16px 38px rgba(0,0,0,.5),0 0 24px rgba(111,195,255,.18);
+}
+
+/* Banner video: frame bercahaya premium + sentuhan tint biru langit di garis tepi saja */
+body.theme-sky .banner-slider{
+  border-color:rgba(111,195,255,.3);
+}
+body.theme-sky .banner-video{
+  box-shadow:0 0 50px rgba(111,195,255,.22),0 0 0 1px rgba(111,195,255,.15);
+}
+body.theme-sky .banner-slider::after{
+  content:"";
+  position:absolute;inset:0;
+  pointer-events:none;
+  border-radius:inherit;
+  box-shadow:inset 0 0 0 .5px rgba(111,195,255,.35),inset 0 0 8px rgba(111,195,255,.08);
+}
+
+/* Tombol INSTALL/DOWNLOAD/BELI: biru langit, senada tema */
+body.theme-sky .buy-btn{
+  border-color:rgba(111,195,255,.5);
+  background:linear-gradient(135deg,#0a3a66,#1f7fd6);
+  color:#d6efff;
+}
+body.theme-sky .buy-btn:hover{
+  background:linear-gradient(135deg,#1f7fd6,#6fc3ff);
+  color:#fff;
+  box-shadow:0 8px 26px rgba(31,127,214,.35);
+}
+
+/* Header: glass biru gelap, senada tema */
+body.theme-sky header{
+  background:rgba(4,10,20,.92);
+  border-bottom-color:rgba(111,195,255,.16);
+  box-shadow:0 4px 30px rgba(4,20,40,.4);
+}
+@supports (backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px)){
+  @media(min-width:900px) and (pointer:fine){
+    body.theme-sky header{
+      background:rgba(6,14,28,.72);
+    }
+  }
+}
+
+/* Tab bar "Dynamic Island": glass biru senada tema, tanpa efek cahaya berlebih */
+body.theme-sky .tabs{
+  background:rgba(8,18,34,.94);
+  border-color:rgba(111,195,255,.22);
+  box-shadow:0 8px 32px rgba(0,0,0,.45),0 1px 0 rgba(255,255,255,.06) inset,0 0 0 1px rgba(0,0,0,.2);
+}
+@supports (backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px)){
+  @media(min-width:900px) and (pointer:fine){
+    body.theme-sky .tabs{
+      background:rgba(10,22,42,.72);
+    }
+  }
+}
+body.theme-sky .tab-indicator{
+  background:rgba(111,195,255,.16);
+  border-color:rgba(111,195,255,.3);
+  box-shadow:0 2px 10px rgba(0,0,0,.3),0 1px 0 rgba(255,255,255,.08) inset;
+}
+body.theme-sky .tab-btn.active{color:#fff;}
+body.theme-sky .tab-count{background:rgba(111,195,255,.14);}
+body.theme-sky .tab-btn.active .tab-count{background:rgba(255,255,255,.18);}
+
 html{scroll-behavior:smooth;overscroll-behavior-y:none;}
 /* Hormati preferensi reduced-motion + jadi fallback aman kalau device lemot */
 @media (prefers-reduced-motion: reduce){
@@ -78,6 +195,8 @@ body{
   min-height:100vh;
   touch-action:pan-y;
   -webkit-overflow-scrolling:touch;
+  /* transisi halus saat ganti tema (cuma warna, murah buat GPU) */
+  transition:background-color var(--t-slow) var(--ease-soft),color var(--t-slow) var(--ease-soft);
   /* CSS-only ambient — zero JS, zero repaint */
   background-image:
     radial-gradient(ellipse 70% 50% at 20% 20%,rgba(230,230,238,.06) 0%,transparent 60%),
@@ -108,6 +227,7 @@ header{
   box-shadow:0 4px 30px rgba(0,0,0,.25);
   transform:translateZ(0);
   contain:layout paint;
+  transition:background-color var(--t-slow) var(--ease-soft),border-color var(--t-slow) var(--ease-soft);
 }
 @supports (backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px)){
   @media(min-width:900px) and (pointer:fine){
@@ -246,7 +366,7 @@ body.side-menu-open .tabs-wrap .tabs{
   scrollbar-width:none;
   pointer-events:auto;
   box-shadow:0 8px 32px rgba(0,0,0,.45),0 1px 0 rgba(255,255,255,.06) inset,0 0 0 1px rgba(0,0,0,.2);
-  transition:transform var(--t-mid) var(--ease-soft),opacity .32s var(--ease-soft);
+  transition:transform var(--t-mid) var(--ease-soft),opacity .32s var(--ease-soft),background-color var(--t-slow) var(--ease-soft),border-color var(--t-slow) var(--ease-soft);
 }
 @supports (backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px)){
   @media(min-width:900px) and (pointer:fine){
@@ -1718,6 +1838,47 @@ footer::before{
    ══════════════════════════════════════════ */
 .stat-num{will-change:auto;}
 
+/* ══════════════════════════════════════════
+   THEME SWITCH — cross-fade satu layer, bukan transisi warna
+   di puluhan elemen sekaligus.
+   Sebelumnya: toggle class .theme-sky di <body> memicu transition
+   background-color/border-color di body, header, .tabs, .card,
+   .buy-btn, dll SECARA BERSAMAAN → banyak repaint dalam 1 frame →
+   patah-patah di HP budget/mid.
+   Sekarang: satu overlay fullscreen fixed (murah, cuma 1 composited
+   layer, cuma opacity yang notabene GPU-only) fade-in menutupi
+   transisi warna yang sebenarnya terjadi instan di baliknya. Hasil
+   akhir terlihat "smooth cross-fade" tanpa beban repaint berulang
+   di banyak elemen sekaligus.
+   ══════════════════════════════════════════ */
+#themeFadeOverlay{
+  position:fixed;inset:0;
+  z-index:9999;
+  pointer-events:none;
+  opacity:0;
+  background:var(--bg);
+  transform:translateZ(0);
+  will-change:opacity;
+}
+#themeFadeOverlay.active{
+  opacity:1;
+  transition:opacity .26s var(--ease-soft);
+}
+#themeFadeOverlay.fade-out{
+  opacity:0;
+  transition:opacity .3s var(--ease-soft);
+}
+/* Selama cross-fade berlangsung, matikan SEMUA transition warna turunan
+   supaya tiap elemen berubah instan di balik overlay (bukan ikut
+   bertransisi sendiri-sendiri = beban repaint ganda).
+   PENTING: overlay sendiri (#themeFadeOverlay) DIKECUALIKAN dari aturan
+   ini via :not() — kalau ikut ke-override transition:none, opacity-nya
+   loncat instan tanpa transitionend pernah fire, dan layar nyangkut
+   hitam/opaque permanen. */
+body.theme-switching :not(#themeFadeOverlay){
+  transition:none!important;
+}
+
 /* ── HAMBURGER BUTTON ── */
 .hamburger-btn{
   display:flex;
@@ -1971,6 +2132,7 @@ body.side-menu-open{overflow:hidden;}
 </style>
 </head>
 <body>
+<div id="themeFadeOverlay" aria-hidden="true"></div>
 <a href="#main-content" class="skip-link">Lewati ke konten utama</a>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 <div class="wrapper">
@@ -2016,6 +2178,10 @@ body.side-menu-open{overflow:hidden;}
     <li><a href="#" onclick="openMusicModal();closeSideMenu();">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
       <span>Playlist Musik</span>
+    </a></li>
+    <li><a href="#" id="themeToggleBtn" onclick="toggleTheme();closeSideMenu();">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      <span id="themeToggleLabel">Ubah Tema</span>
     </a></li>
     <li><a href="#" onclick="switchTabFromSideMenu('tab-cheat');">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
@@ -2536,6 +2702,135 @@ body.side-menu-open{overflow:hidden;}
 
 <script>
 'use strict';
+
+/* ── UBAH TEMA (Neon Noir ↔ Sky Blue) ──
+   Toggle class body.theme-sky + ganti sumber video banner & poster-nya.
+   Pilihan disimpan di localStorage supaya tetap kepakai saat reload. */
+var THEME_ASSETS = {
+  dark: {
+    video: 'https://xxaenbqyeliyhrulyjuz.supabase.co/storage/v1/object/public/Videos/Thamnel.mp4',
+    poster: 'https://xxaenbqyeliyhrulyjuz.supabase.co/storage/v1/object/public/Videos/my.jpg'
+  },
+  sky: {
+    video: 'https://xxaenbqyeliyhrulyjuz.supabase.co/storage/v1/object/public/Videos/ThamnelSky.mp4',
+    poster: 'https://xxaenbqyeliyhrulyjuz.supabase.co/storage/v1/object/public/Videos/mySky.jpg'
+  }
+};
+
+function setBannerAssets(mode){
+  const video = document.querySelector('.banner-video');
+  if(!video) return;
+  const assets = THEME_ASSETS[mode] || THEME_ASSETS.dark;
+
+  if(video.getAttribute('src') !== assets.video){
+    video.setAttribute('src', assets.video);
+    video.setAttribute('poster', assets.poster);
+    video.load();
+    video.play().catch(function(){ /* autoplay bisa diblokir browser, abaikan */ });
+  }
+}
+
+function updateThemeToggleLabel(mode){
+  const label = document.getElementById('themeToggleLabel');
+  if(label) label.textContent = mode === 'sky' ? 'Tema Premium' : 'Ubah Tema';
+}
+
+/* Ganti warna body sesuai tema DI BAWAH overlay, dipakai supaya
+   background-color body ikut cocok dengan overlay saat fade-out
+   (kalau tidak, sekilas ada "flash" warna lama di balik overlay). */
+function setThemeVars(mode){
+  document.documentElement.style.setProperty(
+    '--bg', mode === 'sky' ? '#040810' : '#050505'
+  );
+}
+
+function applyTheme(mode, opts){
+  opts = opts || {};
+  const body = document.body;
+  const overlay = document.getElementById('themeFadeOverlay');
+  const doSwitch = () => {
+    body.classList.toggle('theme-sky', mode === 'sky');
+    setBannerAssets(mode);
+    updateThemeToggleLabel(mode);
+    try{ localStorage.setItem('tarz_theme', mode); }catch(e){ /* localStorage tidak tersedia, abaikan */ }
+  };
+
+  /* Saat load pertama (initTheme) tidak perlu cross-fade sama sekali —
+     langsung terapkan tema tanpa animasi supaya tidak ada kedipan
+     saat halaman baru dibuka. */
+  if(opts.silent || !overlay){
+    doSwitch();
+    return;
+  }
+
+  /* ── Cross-fade: 1 layer opacity, bukan repaint puluhan elemen ──
+     1. Matikan semua transition warna turunan (theme-switching).
+     2. Overlay warna tema LAMA fade-in menutupi layar.
+     3. Begitu overlay full opaque, ganti class tema (instan, di balik
+        overlay, tidak terlihat) + ganti --bg ke warna tema baru.
+     4. Overlay fade-out, memperlihatkan tema baru yang sudah "jadi".
+     5. Lepas theme-switching supaya transisi hover/interaksi normal
+        tetap jalan seperti biasa.
+     Pakai setTimeout (bukan transitionend) buat penjadwalan supaya
+     tidak nyangkut permanen kalau event transitionend gagal fire
+     (misal transisi diinterupsi, tab di-background, dsb). */
+  const FADE_IN_MS = 260, FADE_OUT_MS = 300;
+  const prevBg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+  overlay.style.background = prevBg || (mode === 'sky' ? '#050505' : '#040810');
+  body.classList.add('theme-switching');
+  void overlay.offsetHeight; // paksa reflow supaya class 'active' benar-benar animasi dari 0
+  overlay.classList.add('active');
+
+  setTimeout(()=>{
+    doSwitch();
+    setThemeVars(mode);
+    overlay.style.background = 'var(--bg)';
+    requestAnimationFrame(()=>{
+      overlay.classList.remove('active');
+      overlay.classList.add('fade-out');
+      setTimeout(()=>{
+        overlay.classList.remove('fade-out');
+        body.classList.remove('theme-switching');
+      }, FADE_OUT_MS);
+    });
+  }, FADE_IN_MS);
+}
+
+function toggleTheme(){
+  const isSky = document.body.classList.contains('theme-sky');
+  applyTheme(isSky ? 'dark' : 'sky');
+}
+
+function initTheme(){
+  let saved = 'dark';
+  try{ saved = localStorage.getItem('tarz_theme') || 'dark'; }catch(e){}
+  applyTheme(saved, { silent:true });
+}
+
+/* Toast kecil buat notifikasi ganti tema; no-op elegan kalau container tidak ada */
+function showToast(msg){
+  try{
+    let toast = document.getElementById('tarzToast');
+    if(!toast){
+      toast = document.createElement('div');
+      toast.id = 'tarzToast';
+      toast.style.cssText = 'position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);background:var(--card,#161616);color:var(--text,#f2f2f5);border:1px solid var(--border-strong,rgba(255,255,255,.1));padding:10px 18px;border-radius:999px;font-size:.85rem;font-family:inherit;z-index:99999;opacity:0;transition:opacity .3s ease,transform .3s ease;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.4);';
+      document.body.appendChild(toast);
+    }
+    toast.textContent = msg;
+    requestAnimationFrame(function(){
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateX(-50%) translateY(0)';
+    });
+    clearTimeout(toast._hideTimer);
+    toast._hideTimer = setTimeout(function(){
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateX(-50%) translateY(20px)';
+    }, 2200);
+  }catch(e){}
+}
+
+document.addEventListener('DOMContentLoaded', initTheme);
 
 /* ── SIDE MENU (HAMBURGER) ── */
 function toggleSideMenu(){
@@ -4065,6 +4360,7 @@ document.addEventListener('dragstart', function(e){
    title, artist, duration -> label (duration otomatis dikoreksi saat file termuat) */
 const PLAYLIST = [
   { title:'ILLUSIONARY DAYTIME', artist:'', src:'https://xxaenbqyeliyhrulyjuz.supabase.co/storage/v1/object/public/Videos/illunasionary.mp3', duration:'2:27' },
+  { title:'DJ URUS URUS X BODY PATA PATA', artist:'', src:'https://xxaenbqyeliyhrulyjuz.supabase.co/storage/v1/object/public/Videos/Urus.mp3', duration:'5:08' },
   { title:'DJ IH ABANG JAHAT', artist:'', src:'https://xxaenbqyeliyhrulyjuz.supabase.co/storage/v1/object/public/Videos/Dj%20ih%20abg%20jahat.mp3', duration:'5:08' },
   { title:'THE ONE THAT GOT AWAY', artist:'', src:'https://xxaenbqyeliyhrulyjuz.supabase.co/storage/v1/object/public/Videos/The%20one.mp3', duration:'3:48' }
 ];
