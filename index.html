@@ -16,9 +16,9 @@
 <link rel="dns-prefetch" href="https://wa.me">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"></noscript>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Space+Mono:wght@400;700&family=Rajdhani:wght@600;700&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Space+Mono:wght@400;700&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Space+Mono:wght@400;700&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet"></noscript>
 <style>
 /* ── RESET & ROOT ── */
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -2131,6 +2131,126 @@ body.side-menu-open{overflow:hidden;}
 .music-modal-btn-play:active{transform:scale(.88);}
 .music-modal-btn-play svg{width:15px;height:15px;}
 
+/* ── LOBBY FF MODAL ── */
+.lobbyff-modal-overlay{
+  position:fixed;inset:0;z-index:9998;
+  background:rgba(0,0,0,.72);
+  display:flex;align-items:center;justify-content:center;
+  padding:16px;
+  opacity:0;visibility:hidden;
+  transition:opacity var(--t-mid) var(--ease-soft),visibility var(--t-mid) var(--ease-soft);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+}
+.lobbyff-modal-overlay.show{opacity:1;visibility:visible;}
+.lobbyff-modal{
+  position:relative;
+  width:100%;max-width:300px;
+  background:linear-gradient(165deg,var(--card2),var(--card));
+  border:1px solid var(--border-strong);
+  border-radius:var(--radius-lg);
+  padding:16px 14px 14px;
+  box-shadow:0 24px 60px rgba(0,0,0,.55);
+  transform:scale(.94) translateY(10px);
+  transition:transform var(--t-mid) var(--ease-soft);
+  max-height:92vh;overflow-y:auto;
+}
+.lobbyff-modal-overlay.show .lobbyff-modal{transform:scale(1) translateY(0);}
+.lobbyff-modal-close{
+  position:absolute;top:10px;right:10px;
+  width:26px;height:26px;border-radius:50%;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);
+  color:var(--text);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;padding:0;z-index:2;
+  -webkit-tap-highlight-color:transparent;
+}
+.lobbyff-modal-close svg{width:14px;height:14px;}
+.lobbyff-modal-title{
+  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.90rem;
+  letter-spacing:.03em;text-align:center;color:var(--text);padding-left:0px;
+}
+.lobbyff-modal-sub{
+  text-align:center;font-size:.66rem;color:var(--text2);margin-top:2px;margin-bottom:12px;
+}
+.lobbyff-canvas-wrap{
+  position:relative;width:100%;
+  max-width:190px;margin:0 auto;
+  border-radius:var(--radius-md);overflow:hidden;
+  background:#0a0a0a;
+  aspect-ratio:9/16;
+  border:1px solid var(--border);
+}
+.lobbyff-canvas-wrap canvas{
+  width:100%;height:100%;display:block;object-fit:cover;
+}
+.lobbyff-loading{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  color:var(--text2);font-size:.7rem;font-family:'Space Mono',monospace;
+  background:#0a0a0a;
+  text-align:center;padding:8px;
+}
+.lobbyff-loading.hide{display:none;}
+.lobbyff-photo-row{
+  display:flex;gap:6px;justify-content:center;
+  margin-top:12px;
+}
+.lobbyff-photo-btn{
+  flex:1;max-width:70px;
+  padding:7px 4px;
+  border-radius:var(--radius-sm);
+  border:1px solid var(--border-strong);
+  background:rgba(255,255,255,.05);
+  color:var(--text2);
+  font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.68rem;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:transform var(--t-fast) var(--ease-soft),background var(--t-fast) var(--ease-soft),color var(--t-fast) var(--ease-soft),border-color var(--t-fast) var(--ease-soft);
+}
+.lobbyff-photo-btn:active{transform:scale(.95);}
+.lobbyff-photo-btn.active{
+  background:linear-gradient(135deg,#1a1a1a,#2a2a2a);
+  color:var(--text);border-color:var(--border-strong);
+}
+body.theme-sky .lobbyff-photo-btn.active{
+  background:linear-gradient(135deg,#0a3a66,#1f7fd6);
+  color:#d6efff;border-color:rgba(111,195,255,.5);
+}
+.lobbyff-input-row{margin-top:12px;}
+.lobbyff-input{
+  width:100%;padding:9px 12px;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--border-strong);
+  border-radius:var(--radius-sm);
+  color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:.78rem;
+  outline:none;
+  transition:border-color var(--t-fast) var(--ease-soft),background var(--t-fast) var(--ease-soft);
+}
+.lobbyff-input::placeholder{color:var(--text2);}
+.lobbyff-input:focus{border-color:var(--blue);background:rgba(255,255,255,.08);}
+.lobbyff-actions{margin-top:10px;}
+.lobbyff-btn{
+  width:100%;padding:10px 14px;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  border-radius:var(--radius-sm);border:1px solid var(--border-strong);
+  font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.78rem;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:transform var(--t-fast) var(--ease-soft),background var(--t-fast) var(--ease-soft),box-shadow var(--t-fast) var(--ease-soft);
+}
+.lobbyff-btn:active{transform:scale(.97);}
+.lobbyff-btn-download{
+  background:linear-gradient(135deg,#1a1a1a,#2a2a2a);
+  color:var(--text);
+}
+.lobbyff-btn-download:hover{
+  background:linear-gradient(135deg,#242424,#343434);
+  box-shadow:0 8px 22px rgba(0,0,0,.35);
+}
+body.theme-sky .lobbyff-btn-download{
+  background:linear-gradient(135deg,#0a3a66,#1f7fd6);
+  color:#d6efff;border-color:rgba(111,195,255,.5);
+}
+body.theme-sky .lobbyff-btn-download:hover{
+  background:linear-gradient(135deg,#1f7fd6,#6fc3ff);color:#fff;
+}
+
 </style>
 </head>
 <body>
@@ -2193,6 +2313,10 @@ body.side-menu-open{overflow:hidden;}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
       <span id="themeToggleLabel">Ubah Tema</span>
     </a></li>
+    <li><a href="#" onclick="openLobbyFFModal();closeSideMenu();">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+      <span>Loby FF Generate</span>
+    </a></li>
   </ul>
 
   <div class="side-menu-footer">© 2026 Tarz Store</div>
@@ -2231,6 +2355,40 @@ body.side-menu-open{overflow:hidden;}
     </div>
 
     <audio id="musicModalAudio" preload="metadata"></audio>
+  </div>
+</div>
+
+<!-- LOBBY FF MODAL (foto lobby Free Fire + nama custom, bisa diunduh) -->
+<div class="lobbyff-modal-overlay" id="lobbyffModalOverlay">
+  <div class="lobbyff-modal" id="lobbyffModalCard" role="dialog" aria-modal="true" aria-label="Lobby Free Fire dengan nama sendiri">
+    <button class="lobbyff-modal-close" aria-label="Tutup" onclick="closeLobbyFFModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <div class="lobbyff-modal-title">LOBY FREE FIRE GENERATE</div>
+    <div class="lobbyff-modal-sub">Masukkan nama, langsung tampil di lobby</div>
+
+    <div class="lobbyff-canvas-wrap">
+      <canvas id="lobbyffCanvas" width="720" height="1280" aria-label="Preview lobby Free Fire dengan nama">
+      <div class="lobbyff-loading" id="lobbyffLoading">Memuat gambar...</div>
+    </div>
+
+    <div class="lobbyff-photo-row" id="lobbyffPhotoRow">
+      <button type="button" class="lobbyff-photo-btn active" data-photo="1" onclick="selectLobbyFFPhoto(1)">Foto 1</button>
+      <button type="button" class="lobbyff-photo-btn" data-photo="2" onclick="selectLobbyFFPhoto(2)">Foto 2</button>
+      <button type="button" class="lobbyff-photo-btn" data-photo="3" onclick="selectLobbyFFPhoto(3)">Foto 3</button>
+    </div>
+
+    <div class="lobbyff-input-row">
+      <input type="text" id="lobbyffNameInput" class="lobbyff-input" placeholder="Ketik nama Free Fire kamu..." maxlength="20" autocomplete="off">
+    </div>
+
+    <div class="lobbyff-actions">
+      <button class="lobbyff-btn lobbyff-btn-download" id="lobbyffDownloadBtn" onclick="downloadLobbyFF()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Simpan Gambar
+      </button>
+    </div>
   </div>
 </div>
 
@@ -2744,7 +2902,7 @@ function setBannerAssets(mode){
 
 function updateThemeToggleLabel(mode){
   const label = document.getElementById('themeToggleLabel');
-  if(label) label.textContent = mode === 'sky' ? 'Tema Premium' : 'Ubah Tema';
+  if(label) label.textContent = mode === 'sky' ? 'Ubah Tampilan' : 'Ubah Tampilan';
 }
 
 /* Ganti warna body sesuai tema DI BAWAH overlay, dipakai supaya
@@ -4541,6 +4699,197 @@ const PLAYLIST = [
   });
 })();
 
+</script>
+
+<!-- ═══════════════════════════════════════════════════
+     LOBBY FF: foto lobby Free Fire + nama custom via canvas.
+     User ketik nama -> langsung ditulis di atas foto -> bisa disimpan
+     sebagai gambar (PNG) lewat tombol "Simpan Gambar".
+     ═══════════════════════════════════════════════════ -->
+<script>
+(function(){
+  // Sementara ketiga slot foto memakai URL yang sama; tinggal ganti URL
+  // masing-masing di bawah ini kalau nanti ada foto lobby FF lain.
+  const LOBBYFF_IMG_URL = '';
+  const LOBBYFF_PHOTOS = {
+    1: 'https://bvblcdnmbzncoqeoqkoc.supabase.co/storage/v1/object/public/Tarz/Loby2.jpg',
+    2: 'https://bvblcdnmbzncoqeoqkoc.supabase.co/storage/v1/object/public/Tarz/Loby1.jpg',
+    3: 'https://bvblcdnmbzncoqeoqkoc.supabase.co/storage/v1/object/public/Tarz/Loby3.jpg'
+  };
+
+  const overlay = document.getElementById('lobbyffModalOverlay');
+  const canvas = document.getElementById('lobbyffCanvas');
+  const loadingEl = document.getElementById('lobbyffLoading');
+  const nameInput = document.getElementById('lobbyffNameInput');
+  const photoRow = document.getElementById('lobbyffPhotoRow');
+  if(!overlay || !canvas || !nameInput) return;
+
+  const ctx = canvas.getContext('2d');
+  let bgImage = null;
+  let imgLoaded = false;
+  let imgError = false;
+  let currentPhoto = 1;
+  const imgCache = {}; // { photoId: {img, loaded, error} }
+
+  function loadImage(photoId){
+    const id = photoId || currentPhoto;
+    const cached = imgCache[id];
+    if(cached && cached.loaded){
+      bgImage = cached.img;
+      imgLoaded = true; imgError = false;
+      if(loadingEl) loadingEl.classList.add('hide');
+      drawCanvas();
+      return;
+    }
+    if(cached && cached.error){
+      bgImage = null;
+      imgLoaded = false; imgError = true;
+      if(loadingEl){ loadingEl.textContent = 'Gagal memuat gambar lobby.'; loadingEl.classList.remove('hide'); }
+      drawCanvas();
+      return;
+    }
+    bgImage = null; imgLoaded = false; imgError = false;
+    if(loadingEl){ loadingEl.textContent = 'Memuat gambar...'; loadingEl.classList.remove('hide'); }
+    drawCanvas();
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = function(){
+      imgCache[id] = { img, loaded:true, error:false };
+      if(id === currentPhoto){
+        bgImage = img;
+        imgLoaded = true;
+        if(loadingEl) loadingEl.classList.add('hide');
+        drawCanvas();
+      }
+    };
+    img.onerror = function(){
+      imgCache[id] = { img:null, loaded:false, error:true };
+      if(id === currentPhoto){
+        imgError = true;
+        if(loadingEl){ loadingEl.textContent = 'Gagal memuat gambar lobby.'; loadingEl.classList.remove('hide'); }
+        drawCanvas();
+      }
+    };
+    img.src = LOBBYFF_PHOTOS[id] || LOBBYFF_IMG_URL;
+  }
+
+  window.selectLobbyFFPhoto = function(photoId){
+    if(photoId === currentPhoto) return;
+    currentPhoto = photoId;
+    if(photoRow){
+      photoRow.querySelectorAll('.lobbyff-photo-btn').forEach(btn=>{
+        btn.classList.toggle('active', Number(btn.dataset.photo) === photoId);
+      });
+    }
+    loadImage(photoId);
+  };
+
+  function drawCanvas(){
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+
+    if(bgImage){
+      // cover-fit gambar ke canvas
+      const imgRatio = bgImage.width / bgImage.height;
+      const canvasRatio = w / h;
+      let dw, dh, dx, dy;
+      if(imgRatio > canvasRatio){
+        dh = h; dw = h * imgRatio; dx = (w - dw) / 2; dy = 0;
+      } else {
+        dw = w; dh = w / imgRatio; dx = 0; dy = (h - dh) / 2;
+      }
+      ctx.drawImage(bgImage, dx, dy, dw, dh);
+    } else {
+      ctx.fillStyle = '#0a0a0a';
+      ctx.fillRect(0, 0, w, h);
+    }
+
+    const name = (nameInput.value || '').trim();
+    if(name){
+      // Posisi diukur langsung dari pixel foto 72137.webp (1200x2135, rasio ~9:16,
+      // sama dengan canvas 720x1280): kotak kosong gelap di DALAM bar bendera+rank,
+      // di antara ikon bendera (kiri) dan badge rank "V8" (kanan). Teks di-center
+      // di tengah kotak kosong itu (bukan rapat ke kiri) supaya jarak ke bendera
+      // dan ke badge rank seimbang — mengikuti gaya asli UI Free Fire.
+      let fontSize = Math.round(w * 0.038);
+      ctx.font = `700 ${fontSize}px Arial, Helvetica, sans-serif`;
+      const maxTextW = w * 0.32;
+      while(ctx.measureText(name).width > maxTextW && fontSize > 10){
+        fontSize -= 1;
+        ctx.font = `700 ${fontSize}px Arial, Helvetica, sans-serif`;
+      }
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const textX = w * 0.5208;
+      const textY = h * 0.798;
+
+      // bayangan halus di bawah nickname (drop shadow tipis, bukan outline)
+      ctx.save();
+      ctx.shadowColor = 'rgba(0,0,0,.55)';
+      ctx.shadowBlur = fontSize * 0.12;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = fontSize * 0.09;
+
+      ctx.lineWidth = Math.max(1, fontSize * 0.06);
+      ctx.strokeStyle = 'rgba(15,10,5,.95)';
+      ctx.lineJoin = 'round';
+      ctx.strokeText(name, textX, textY);
+      ctx.restore();
+
+      // warna emas-oranye khas teks in-game Free Fire (gradient vertikal tipis,
+      // highlight kecil di atas lalu turun ke oranye tua, tanpa terlalu putih)
+      const textGrad = ctx.createLinearGradient(0, textY - fontSize * 0.6, 0, textY + fontSize * 0.6);
+      textGrad.addColorStop(0, '#fff5d0');
+      textGrad.addColorStop(0.18, '#ffe08a');
+      textGrad.addColorStop(0.6, '#f4bd4a');
+      textGrad.addColorStop(1, '#e0a83a');
+      ctx.fillStyle = textGrad;
+      ctx.fillText(name, textX, textY);
+    }
+  }
+
+  let drawScheduled = false;
+  function scheduleDraw(){
+    if(drawScheduled) return;
+    drawScheduled = true;
+    requestAnimationFrame(()=>{ drawScheduled = false; drawCanvas(); });
+  }
+
+  nameInput.addEventListener('input', scheduleDraw);
+
+  window.openLobbyFFModal = function(){
+    void overlay.offsetHeight;
+    overlay.classList.add('show');
+    document.body.style.overflow = 'hidden';
+    loadImage(currentPhoto);
+  };
+  window.closeLobbyFFModal = function(){
+    overlay.classList.remove('show');
+    document.body.style.overflow = '';
+  };
+  document.addEventListener('keydown', e=>{
+    if(e.key === 'Escape' && overlay.classList.contains('show')) closeLobbyFFModal();
+  });
+
+  window.downloadLobbyFF = function(){
+    if(!imgLoaded){
+      if(typeof showToast === 'function') showToast('Gambar belum selesai dimuat, coba lagi sebentar.', 'error');
+      return;
+    }
+    try{
+      const link = document.createElement('a');
+      const name = (nameInput.value || '').trim();
+      const fileSafeName = name ? name.replace(/[^a-z0-9]+/gi, '_') : 'lobby';
+      link.download = `FreeFire-${fileSafeName}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      if(typeof showToast === 'function') showToast('Gambar berhasil disimpan!', 'success');
+    } catch(err){
+      if(typeof showToast === 'function') showToast('Gagal menyimpan gambar. Coba screenshot manual.', 'error');
+    }
+  };
+})();
 </script>
 
 <!-- ═══════════════════════════════════════════════════
