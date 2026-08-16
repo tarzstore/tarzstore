@@ -3252,6 +3252,24 @@ function getProductCopyKey(productName){
   return _appConfig.copyKeys[productName] || null;
 }
 
+/* Ambil label tampilan custom untuk "Key" (fallback ke "Key" kalau tidak diisi) */
+function getProductKeyLabel(productName){
+  if(_appConfig && _appConfig.keyLabels && _appConfig.keyLabels[productName]) return _appConfig.keyLabels[productName];
+  return 'Key';
+}
+
+/* Ambil "user" (opsional, terpisah dari Key) untuk sebuah produk (Supabase) */
+function getProductUserField(productName){
+  if(!_appConfig || !_appConfig.userFields) return null;
+  return _appConfig.userFields[productName] || null;
+}
+
+/* Ambil label tampilan custom untuk "User" (fallback ke "User" kalau tidak diisi) */
+function getProductUserLabel(productName){
+  if(_appConfig && _appConfig.userLabels && _appConfig.userLabels[productName]) return _appConfig.userLabels[productName];
+  return 'User';
+}
+
 /* Ambil link GET KEY eksternal untuk sebuah produk (config.json ATAU Supabase) */
 function getProductKeyLink(productName){
   if(!_appConfig || !_appConfig.getKeyLinks) return null;
@@ -3262,6 +3280,12 @@ function getProductKeyLink(productName){
 function getProductAccountInfo(productName){
   if(_configLoadFailed || !_appConfig || !_appConfig.accountInfo) return null;
   return _appConfig.accountInfo[productName] || null;
+}
+
+/* Ambil link Mediafire kedua "APK FREE FIRE" untuk sebuah produk (Supabase, opsional) */
+function getProductFreefireLink(productName){
+  if(!_appConfig || !_appConfig.freefireLinks) return null;
+  return _appConfig.freefireLinks[productName] || null;
 }
 
 /* ── LABEL PRODUK (OPEN / CLOSE / UPDATE) ──
@@ -3434,11 +3458,12 @@ function openModal(btn){
     if(copyKeyBs){
       const copyKeyWrapBs = document.createElement('div');
       copyKeyWrapBs.className = 'inline-copykey-wrap';
+      const keyLabelBs = getProductKeyLabel(productName);
       copyKeyWrapBs.innerHTML = `
-        <div class="inline-copykey-label">Key</div>
+        <div class="inline-copykey-label">${String(keyLabelBs).replace(/</g,'&lt;')}</div>
         <div class="inline-copykey-row">
           <span class="inline-copykey-value">${String(copyKeyBs).replace(/</g,'&lt;')}</span>
-          <button type="button" class="inline-copykey-btn" aria-label="Salin Key">
+          <button type="button" class="inline-copykey-btn" aria-label="Salin ${String(keyLabelBs).replace(/"/g,'&quot;')}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             <span class="copykey-btn-text">Salin</span>
           </button>
@@ -3448,6 +3473,28 @@ function openModal(btn){
         copyProductKeyInline(productName, e.currentTarget);
       });
       featureGrid.appendChild(copyKeyWrapBs);
+    }
+
+    /* ── USER (opsional, terpisah dari Key, tampil di bawah Key) ── */
+    const userFieldBs = getProductUserField(productName);
+    if(userFieldBs){
+      const userWrapBs = document.createElement('div');
+      userWrapBs.className = 'inline-copykey-wrap';
+      const userLabelBs = getProductUserLabel(productName);
+      userWrapBs.innerHTML = `
+        <div class="inline-copykey-label">${String(userLabelBs).replace(/</g,'&lt;')}</div>
+        <div class="inline-copykey-row">
+          <span class="inline-copykey-value">${String(userFieldBs).replace(/</g,'&lt;')}</span>
+          <button type="button" class="inline-copykey-btn" aria-label="Salin ${String(userLabelBs).replace(/"/g,'&quot;')}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span class="copykey-btn-text">Salin</span>
+          </button>
+        </div>
+      `;
+      userWrapBs.querySelector('.inline-copykey-btn').addEventListener('click', (e) => {
+        copyTextInline(userFieldBs, e.currentTarget);
+      });
+      featureGrid.appendChild(userWrapBs);
     }
 
     /* ── AKUN (username/password) khusus produk yang punya accountInfo, tampil di bawah APK CHEAT ── */
@@ -3541,6 +3588,27 @@ function openModal(btn){
     apkOpt.addEventListener('keydown', e=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); goOpenKeyAc(); } });
     featureGrid.appendChild(apkOpt);
 
+    /* ── APK FREE FIRE (link Mediafire kedua, opsional, tampil tepat di bawah APK CHEAT) ── */
+    const ffLinkAc = getProductFreefireLink(productName);
+    if(ffLinkAc){
+      const ffOptAc = document.createElement('div');
+      ffOptAc.className = 'feature-opt';
+      ffOptAc.setAttribute('role','button');
+      ffOptAc.setAttribute('tabindex','0');
+      ffOptAc.innerHTML = `
+        <div class="feature-icon">${getIcon('downloadApk','')}</div>
+        <div class="feature-text">
+          <div class="feature-title">APK FREE FIRE</div>
+          <div class="feature-desc">DOWNLOAD APLIKASI FREE FIRE</div>
+        </div>
+        <span class="feature-arrow">${getIcon('featureArrow','')}</span>
+      `;
+      const goOpenFfAc = () => openKeyModal(productName, ffLinkAc, 'cheat');
+      ffOptAc.addEventListener('click', goOpenFfAc);
+      ffOptAc.addEventListener('keydown', e=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); goOpenFfAc(); } });
+      featureGrid.appendChild(ffOptAc);
+    }
+
     const getKeyOpt = document.createElement('a');
     getKeyOpt.className = 'feature-opt';
     const keyLinkAc = getProductKeyLink(productName);
@@ -3564,11 +3632,12 @@ function openModal(btn){
     if(copyKeyAc){
       const copyKeyWrapAc = document.createElement('div');
       copyKeyWrapAc.className = 'inline-copykey-wrap';
+      const keyLabelAc = getProductKeyLabel(productName);
       copyKeyWrapAc.innerHTML = `
-        <div class="inline-copykey-label">Key</div>
+        <div class="inline-copykey-label">${String(keyLabelAc).replace(/</g,'&lt;')}</div>
         <div class="inline-copykey-row">
           <span class="inline-copykey-value">${String(copyKeyAc).replace(/</g,'&lt;')}</span>
-          <button type="button" class="inline-copykey-btn" aria-label="Salin Key">
+          <button type="button" class="inline-copykey-btn" aria-label="Salin ${String(keyLabelAc).replace(/"/g,'&quot;')}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             <span class="copykey-btn-text">Salin</span>
           </button>
@@ -3578,6 +3647,28 @@ function openModal(btn){
         copyProductKeyInline(productName, e.currentTarget);
       });
       featureGrid.appendChild(copyKeyWrapAc);
+    }
+
+    /* ── USER (opsional, terpisah dari Key, tampil di bawah Key) ── */
+    const userFieldAc = getProductUserField(productName);
+    if(userFieldAc){
+      const userWrapAc = document.createElement('div');
+      userWrapAc.className = 'inline-copykey-wrap';
+      const userLabelAc = getProductUserLabel(productName);
+      userWrapAc.innerHTML = `
+        <div class="inline-copykey-label">${String(userLabelAc).replace(/</g,'&lt;')}</div>
+        <div class="inline-copykey-row">
+          <span class="inline-copykey-value">${String(userFieldAc).replace(/</g,'&lt;')}</span>
+          <button type="button" class="inline-copykey-btn" aria-label="Salin ${String(userLabelAc).replace(/"/g,'&quot;')}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span class="copykey-btn-text">Salin</span>
+          </button>
+        </div>
+      `;
+      userWrapAc.querySelector('.inline-copykey-btn').addEventListener('click', (e) => {
+        copyTextInline(userFieldAc, e.currentTarget);
+      });
+      featureGrid.appendChild(userWrapAc);
     }
 
     /* ── LIST FITUR (khusus mode special, tampil di bawah fitur layanan) ── */
@@ -3638,16 +3729,38 @@ function openModal(btn){
     apkOptNk.addEventListener('keydown', e=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); goOpenKeyNk(); } });
     featureGrid.appendChild(apkOptNk);
 
+    /* ── APK FREE FIRE (link Mediafire kedua, opsional, tampil tepat di bawah APK CHEAT) ── */
+    const ffLinkNk = getProductFreefireLink(productName);
+    if(ffLinkNk){
+      const ffOptNk = document.createElement('div');
+      ffOptNk.className = 'feature-opt';
+      ffOptNk.setAttribute('role','button');
+      ffOptNk.setAttribute('tabindex','0');
+      ffOptNk.innerHTML = `
+        <div class="feature-icon">${getIcon('downloadApk','')}</div>
+        <div class="feature-text">
+          <div class="feature-title">APK FREE FIRE</div>
+          <div class="feature-desc">DOWNLOAD APLIKASI FREE FIRE</div>
+        </div>
+        <span class="feature-arrow">${getIcon('featureArrow','')}</span>
+      `;
+      const goOpenFfNk = () => openKeyModal(productName, ffLinkNk, 'cheat');
+      ffOptNk.addEventListener('click', goOpenFfNk);
+      ffOptNk.addEventListener('keydown', e=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); goOpenFfNk(); } });
+      featureGrid.appendChild(ffOptNk);
+    }
+
     /* ── SALIN KEY (khusus produk yang punya copyKey di config.json, tampil di bawah APK CHEAT) ── */
     const copyKeyNk = getProductCopyKey(productName);
     if(copyKeyNk){
       const copyKeyWrapNk = document.createElement('div');
       copyKeyWrapNk.className = 'inline-copykey-wrap';
+      const keyLabelNk = getProductKeyLabel(productName);
       copyKeyWrapNk.innerHTML = `
-        <div class="inline-copykey-label">Key</div>
+        <div class="inline-copykey-label">${String(keyLabelNk).replace(/</g,'&lt;')}</div>
         <div class="inline-copykey-row">
           <span class="inline-copykey-value">${String(copyKeyNk).replace(/</g,'&lt;')}</span>
-          <button type="button" class="inline-copykey-btn" aria-label="Salin Key">
+          <button type="button" class="inline-copykey-btn" aria-label="Salin ${String(keyLabelNk).replace(/"/g,'&quot;')}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             <span class="copykey-btn-text">Salin</span>
           </button>
@@ -3657,6 +3770,28 @@ function openModal(btn){
         copyProductKeyInline(productName, e.currentTarget);
       });
       featureGrid.appendChild(copyKeyWrapNk);
+    }
+
+    /* ── USER (opsional, terpisah dari Key, tampil di bawah Key) ── */
+    const userFieldNk = getProductUserField(productName);
+    if(userFieldNk){
+      const userWrapNk = document.createElement('div');
+      userWrapNk.className = 'inline-copykey-wrap';
+      const userLabelNk = getProductUserLabel(productName);
+      userWrapNk.innerHTML = `
+        <div class="inline-copykey-label">${String(userLabelNk).replace(/</g,'&lt;')}</div>
+        <div class="inline-copykey-row">
+          <span class="inline-copykey-value">${String(userFieldNk).replace(/</g,'&lt;')}</span>
+          <button type="button" class="inline-copykey-btn" aria-label="Salin ${String(userLabelNk).replace(/"/g,'&quot;')}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span class="copykey-btn-text">Salin</span>
+          </button>
+        </div>
+      `;
+      userWrapNk.querySelector('.inline-copykey-btn').addEventListener('click', (e) => {
+        copyTextInline(userFieldNk, e.currentTarget);
+      });
+      featureGrid.appendChild(userWrapNk);
     }
 
     /* ── LIST FITUR (khusus mode special, tampil di bawah fitur layanan) ── */
@@ -4943,6 +5078,10 @@ const PLAYLIST = [
     if(!_appConfig.downloads) _appConfig.downloads = {};
     if(!_appConfig.copyKeys) _appConfig.copyKeys = {};
     if(!_appConfig.getKeyLinks) _appConfig.getKeyLinks = {};
+    if(!_appConfig.freefireLinks) _appConfig.freefireLinks = {};
+    if(!_appConfig.userFields) _appConfig.userFields = {};
+    if(!_appConfig.keyLabels) _appConfig.keyLabels = {};
+    if(!_appConfig.userLabels) _appConfig.userLabels = {};
     /* Jangan paksa _configLoadFailed = false di sini: kalau config.json memang gagal
        dimuat, produk LAMA (yang link-nya cuma ada di config.json) tetap harus
        menampilkan error, bukan diam-diam dianggap berhasil. Produk Supabase sendiri
@@ -4955,6 +5094,10 @@ const PLAYLIST = [
       if(p.download_link) _appConfig.downloads[name] = p.download_link;
       if(p.copy_key) _appConfig.copyKeys[name] = p.copy_key;
       if(p.get_key_link) _appConfig.getKeyLinks[name] = p.get_key_link;
+      if(p.download_link_2) _appConfig.freefireLinks[name] = p.download_link_2;
+      if(p.user_field) _appConfig.userFields[name] = p.user_field;
+      if(p.key_label) _appConfig.keyLabels[name] = p.key_label;
+      if(p.user_label) _appConfig.userLabels[name] = p.user_label;
     });
 
     let cheatHtml = '';

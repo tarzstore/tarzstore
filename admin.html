@@ -243,6 +243,94 @@
   .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(5,23,15,.25);border-top-color:#05170f;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;}
   @keyframes spin{to{transform:rotate(360deg);}}
 
+  /* ── QUICK ADD FAB ── */
+  .fab{
+    position:fixed;right:18px;bottom:22px;z-index:90;
+    width:56px;height:56px;border-radius:50%;
+    background:linear-gradient(135deg,#00e5a0,#00c98c);color:#05170f;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 8px 24px rgba(0,229,160,.4),0 2px 8px rgba(0,0,0,.3);
+    border:none;cursor:pointer;will-change:transform,opacity;
+    transition:transform var(--t-mid) var(--ease-soft),box-shadow var(--t-mid) var(--ease-soft),opacity var(--t-mid) var(--ease-soft);
+  }
+  .fab:hover{transform:scale(1.06) translateY(-1px);box-shadow:0 12px 32px rgba(0,229,160,.5);}
+  .fab:active{transform:scale(.97);}
+  .fab svg{width:24px;height:24px;}
+  .fab.hidden{transform:scale(0);opacity:0;pointer-events:none;}
+
+  /* ── FORM CARD (collapsible) ── */
+  .form-card{display:none;}
+  .form-card.open{display:block;animation:fadeIn var(--t-mid) var(--ease-out);}
+  .form-card-header{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:18px;
+  }
+  .form-card-close{
+    width:30px;height:30px;border-radius:9px;background:var(--card3);border:1px solid var(--border);
+    color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;
+    padding:0;line-height:0;
+    transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease);
+  }
+  .form-card-close:hover{background:#202020;color:var(--text);border-color:var(--border-strong);}
+  .form-card-close svg{width:15px;height:15px;flex-shrink:0;display:block;}
+
+  /* ── PROGRESS STEPPER ── */
+  .steps{display:flex;align-items:center;gap:6px;margin-bottom:22px;}
+  .step-item{display:flex;align-items:center;gap:8px;flex:1;}
+  .step-dot{
+    width:24px;height:24px;border-radius:50%;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px;font-weight:700;font-family:'Space Mono',monospace;
+    background:var(--card3);border:1px solid var(--border);color:var(--text3);
+    transition:all var(--t-mid) var(--ease-soft);
+  }
+  .step-label{font-size:11.5px;font-weight:600;color:var(--text3);white-space:nowrap;transition:color var(--t-mid) var(--ease);}
+  .step-line{flex:1;height:1px;background:var(--border);transition:background var(--t-mid) var(--ease);}
+  .step-item.active .step-dot{background:var(--green);border-color:var(--green);color:#05170f;box-shadow:0 0 0 4px rgba(0,229,160,.12);}
+  .step-item.active .step-label{color:var(--text);}
+  .step-item.done .step-dot{background:rgba(0,229,160,.15);border-color:var(--green);color:var(--green);}
+  .step-item.done .step-dot::after{content:'✓';}
+  .step-item.done .step-label{color:var(--text2);}
+  .step-item.done ~ .step-line, .step-item.active ~ .step-line{background:var(--border);}
+
+  /* ── STEP PANELS ── */
+  .step-panel{
+    display:none;
+  }
+  .step-panel.active{
+    display:block;
+    animation:stepIn var(--t-mid) var(--ease-out);
+  }
+  @keyframes stepIn{
+    from{opacity:0;transform:translateX(8px);}
+    to{opacity:1;transform:translateX(0);}
+  }
+
+  /* ── ADVANCED TOGGLE (accordion di step 2) ── */
+  .adv-toggle{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    width:100%;background:var(--card3);border:1px solid var(--border);border-radius:var(--radius-sm);
+    padding:12px 14px;cursor:pointer;color:var(--text);font-size:13px;font-weight:600;font-family:inherit;
+    margin-bottom:0;transition:border-color var(--t-fast) var(--ease),background var(--t-fast) var(--ease);
+  }
+  .adv-toggle:hover{border-color:var(--border-strong);}
+  .adv-toggle-left{display:flex;align-items:center;gap:9px;}
+  .adv-toggle-left svg{width:16px;height:16px;color:var(--text2);flex-shrink:0;}
+  .adv-toggle .hint{display:block;font-weight:400;color:var(--text3);margin-top:2px;}
+  .adv-chevron{width:16px;height:16px;color:var(--text3);flex-shrink:0;transition:transform var(--t-mid) var(--ease-soft);}
+  .adv-toggle.open .adv-chevron{transform:rotate(180deg);}
+  .adv-body{
+    max-height:0;overflow:hidden;will-change:max-height;
+    transition:max-height var(--t-mid) var(--ease-soft);
+  }
+  .adv-body-inner-pad{padding-top:16px;opacity:0;transform:translateY(-4px);transition:opacity var(--t-fast) var(--ease),transform var(--t-fast) var(--ease);}
+  .adv-body.open .adv-body-inner-pad{opacity:1;transform:translateY(0);transition-delay:.08s;}
+
+  .step-nav{display:flex;gap:10px;margin-top:22px;}
+  .step-nav button{margin-top:0;}
+  .step-nav .btn-ghost{flex:0 0 auto;padding-left:20px;padding-right:20px;}
+  .step-nav .btn-primary{flex:1;}
+
   .status-pill{
     display:inline-flex;align-items:center;gap:7px;
     background:rgba(0,229,160,.06);border:1px solid rgba(0,229,160,.18);
@@ -263,35 +351,41 @@
     min-height:100vh;display:flex;align-items:center;justify-content:center;
     padding:24px;position:relative;
     width:100vw;margin-left:calc(50% - 50vw);
-  }
-  /* ambient glow orbs — statis, tanpa animasi berat, cukup halus bergerak lambat */
-  .login-screen::before,.login-screen::after{
-    content:'';position:fixed;border-radius:50%;pointer-events:none;filter:blur(60px);
-    opacity:.5;z-index:0;
+    background:
+      linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+    background-size:38px 38px;
+    background-position:center;
   }
   .login-screen::before{
-    width:340px;height:340px;background:radial-gradient(circle,rgba(0,229,160,.25),transparent 70%);
-    top:-80px;left:-80px;animation:orb-float-1 9s ease-in-out infinite;
+    content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:radial-gradient(ellipse 60% 50% at 50% 40%,rgba(0,0,0,0) 0%,var(--bg) 90%);
   }
-  .login-screen::after{
-    width:300px;height:300px;background:radial-gradient(circle,rgba(0,229,160,.15),transparent 70%);
-    bottom:-60px;right:-60px;animation:orb-float-2 11s ease-in-out infinite;
+  /* ambient glow orbs — halus bergerak lambat */
+  .login-orb{position:fixed;border-radius:50%;pointer-events:none;filter:blur(70px);z-index:0;}
+  .login-orb-1{
+    width:380px;height:380px;background:radial-gradient(circle,rgba(0,229,160,.22),transparent 70%);
+    top:-100px;left:-100px;animation:orb-float-1 10s ease-in-out infinite;
+  }
+  .login-orb-2{
+    width:320px;height:320px;background:radial-gradient(circle,rgba(0,229,160,.13),transparent 70%);
+    bottom:-80px;right:-80px;animation:orb-float-2 12s ease-in-out infinite;
   }
   @keyframes orb-float-1{0%,100%{transform:translate(0,0);}50%{transform:translate(30px,20px);}}
   @keyframes orb-float-2{0%,100%{transform:translate(0,0);}50%{transform:translate(-25px,-25px);}}
   @media (prefers-reduced-motion: reduce){
-    .login-screen::before,.login-screen::after{animation:none;}
+    .login-orb-1,.login-orb-2{animation:none;}
   }
 
   .login-box{position:relative;z-index:1;width:100%;max-width:380px;}
 
-  .login-logo-wrap{display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:28px;}
+  .login-logo-wrap{display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:32px;}
   .login-logo-ring{
-    width:76px;height:76px;border-radius:20px;overflow:hidden;
+    width:84px;height:84px;border-radius:22px;overflow:hidden;
     display:flex;align-items:center;justify-content:center;margin-bottom:18px;
     background:linear-gradient(160deg,var(--card),var(--card2));
     border:1px solid rgba(0,229,160,.25);
-    box-shadow:0 0 0 1px rgba(0,229,160,.08),0 8px 32px rgba(0,229,160,.18),0 0 40px rgba(0,229,160,.1);
+    box-shadow:0 0 0 1px rgba(0,229,160,.08),0 10px 36px rgba(0,229,160,.18),0 0 50px rgba(0,229,160,.1);
     position:relative;
   }
   .login-logo-ring::after{
@@ -300,53 +394,102 @@
     animation:ring-spin 4s linear infinite;z-index:-1;opacity:.8;
   }
   @keyframes ring-spin{to{transform:rotate(360deg);}}
-  .login-logo-ring img{width:100%;height:100%;object-fit:cover;border-radius:19px;position:relative;z-index:1;}
+  .login-logo-ring img{width:100%;height:100%;object-fit:cover;border-radius:21px;position:relative;z-index:1;}
 
-  .login-brand-name{font-size:1.3rem;font-weight:700;letter-spacing:.8px;color:var(--text);margin-bottom:4px;}
+  .login-brand-name{font-size:1.42rem;font-weight:700;letter-spacing:.6px;color:var(--text);margin-bottom:5px;}
   .login-brand-sub{font-size:10px;letter-spacing:3px;color:var(--green);text-transform:uppercase;font-weight:700;}
 
   .login-card{
-    background:linear-gradient(160deg,rgba(17,17,17,.9),rgba(22,22,22,.9));
-    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-    border:1px solid var(--border-strong);border-radius:22px;
-    padding:28px 26px;
-    box-shadow:0 1px 0 rgba(255,255,255,.05) inset,0 30px 60px -20px rgba(0,0,0,.6);
+    background:linear-gradient(160deg,rgba(18,18,18,.94),rgba(23,23,23,.94));
+    backdrop-filter:blur(28px) saturate(150%);-webkit-backdrop-filter:blur(28px) saturate(150%);
+    border:1px solid var(--border-strong);border-radius:26px;
+    padding:32px 28px 30px;
+    position:relative;overflow:hidden;
+    box-shadow:0 1px 0 rgba(255,255,255,.07) inset,0 40px 80px -24px rgba(0,0,0,.7);
+    animation:cardRise var(--t-slow) var(--ease-out);
   }
-  .login-title{font-size:19px;font-weight:700;margin-bottom:4px;}
-  .login-subtitle{color:var(--text2);font-size:13px;margin-bottom:22px;}
+  @keyframes cardRise{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+  .login-card::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(0,229,160,.6) 50%,transparent);
+  }
 
-  /* input dengan icon di kiri */
+  .login-title{font-size:21px;font-weight:700;margin-bottom:5px;letter-spacing:.1px;}
+  .login-subtitle{color:var(--text2);font-size:13px;margin-bottom:26px;}
+
+  /* input dengan icon di kiri + floating label */
+  .field-floating{position:relative;margin-bottom:16px;}
+  .field-floating:last-of-type{margin-bottom:0;}
   .input-icon-wrap{position:relative;}
   .input-icon-wrap svg{
-    position:absolute;left:13px;top:50%;transform:translateY(-50%);
+    position:absolute;left:14px;top:50%;transform:translateY(-50%);
     width:17px;height:17px;color:var(--text3);pointer-events:none;
     transition:color var(--t-fast) var(--ease);
+    z-index:1;
   }
-  .input-icon-wrap input{padding-left:40px;}
+  .input-icon-wrap input{
+    padding-left:41px;padding-top:16px;padding-bottom:8px;height:54px;
+    font-size:14.5px;
+  }
   .input-icon-wrap:focus-within svg{color:var(--green);}
-  .input-icon-wrap:has(.toggle-pw) input,input.has-toggle{padding-right:44px;}
+  .input-icon-wrap:has(.toggle-pw) input{padding-right:44px;}
+  .floating-label{
+    position:absolute;left:41px;top:50%;transform:translateY(-50%);
+    font-size:14.5px;color:var(--text3);pointer-events:none;
+    margin:0;font-weight:500;letter-spacing:.2px;
+    transition:all var(--t-fast) var(--ease-soft);
+    z-index:1;
+  }
+  .input-icon-wrap input:focus ~ .floating-label,
+  .input-icon-wrap input:not(:placeholder-shown) ~ .floating-label{
+    top:16px;font-size:10.5px;font-weight:600;letter-spacing:.03em;
+    color:var(--green);text-transform:uppercase;
+  }
   .toggle-pw{
     position:absolute;right:8px;top:50%;transform:translateY(-50%);
-    background:none;border:none;width:28px;height:28px;color:var(--text3);cursor:pointer;
-    display:flex;align-items:center;justify-content:center;border-radius:7px;
-    z-index:1;
+    background:none;border:none;width:30px;height:30px;color:var(--text3);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;border-radius:8px;
+    z-index:2;transition:color var(--t-fast) var(--ease),background var(--t-fast) var(--ease);
   }
   .toggle-pw svg{width:16px;height:16px;}
   .toggle-pw:hover{color:var(--text2);background:rgba(255,255,255,.06);}
 
+  .login-options{
+    display:flex;align-items:center;justify-content:space-between;
+    margin:18px 0 24px;font-size:12.5px;
+  }
+  .remember-check{display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--text2);user-select:none;}
+  .remember-check input{
+    appearance:none;-webkit-appearance:none;width:16px;height:16px;border-radius:5px;
+    border:1.5px solid var(--border-strong);background:var(--surface);cursor:pointer;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;padding:0;
+    transition:background var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease);
+  }
+  .remember-check input:checked{background:var(--green);border-color:var(--green);}
+  .remember-check input:checked::after{
+    content:'';width:4px;height:8px;border:solid #05170f;border-width:0 2px 2px 0;
+    transform:rotate(45deg) translate(-1px,-1px);
+  }
+  .remember-check:hover input:not(:checked){border-color:var(--border-strong);background:#151515;}
+  .forgot-link{color:var(--text3);text-decoration:none;font-weight:500;transition:color var(--t-fast) var(--ease);}
+  .forgot-link:hover{color:var(--green);}
+
   .login-btn{
-    position:relative;overflow:hidden;
+    position:relative;overflow:hidden;margin-top:0;
   }
   .login-btn::after{
     content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;
     background:linear-gradient(120deg,transparent,rgba(255,255,255,.35),transparent);
     transform:skewX(-20deg);
-    animation:btn-shine 3.2s ease-in-out infinite;
+    animation:btn-shine 3.5s ease-in-out infinite;
   }
   @keyframes btn-shine{0%{left:-60%;}50%{left:130%;}100%{left:130%;}}
 
-  .login-footer{text-align:center;margin-top:22px;font-size:11.5px;color:var(--text3);letter-spacing:.3px;}
-  .login-footer .footer-dot{color:var(--green);margin:0 6px;}
+  .login-footer{
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    text-align:center;margin-top:26px;font-size:11.5px;color:var(--text3);letter-spacing:.3px;
+  }
+  .login-footer svg{width:12px;height:12px;color:var(--text3);flex-shrink:0;}
 </style>
 </head>
 <body>
@@ -354,46 +497,64 @@
   <!-- ═══ LOGIN VIEW ═══ -->
   <div id="loginView" class="show">
   <div class="login-screen">
+    <div class="login-orb login-orb-1"></div>
+    <div class="login-orb login-orb-2"></div>
     <div class="login-box">
       <div class="login-logo-wrap">
         <div class="login-logo-ring">
-          <img src="https://bvblcdnmbzncoqeoqkoc.supabase.co/storage/v1/object/public/Tarz/logo.jpg" alt="Tarz Store Logo" width="76" height="76" loading="eager" onerror="this.style.display='none'">
+          <img src="https://bvblcdnmbzncoqeoqkoc.supabase.co/storage/v1/object/public/Tarz/logo.jpg" alt="Tarz Store Logo" width="84" height="84" loading="eager" onerror="this.style.display='none'">
         </div>
         <div class="login-brand-name">TARZ STORE</div>
         <div class="login-brand-sub">Admin Panel</div>
       </div>
 
       <div class="login-card">
-        <div class="login-title">Selamat Datang</div>
-        <div class="login-subtitle">Masuk untuk mengelola produk</div>
+        <div class="login-title">Selamat Datang Kembali</div>
+        <div class="login-subtitle">Masuk untuk mengelola produk toko</div>
 
         <div id="loginMsg" class="msg error"></div>
 
-        <label>Email</label>
-        <div class="input-icon-wrap">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6l-10 7L2 6"/><path d="M2 6h20v12H2z"/></svg>
-          <input type="email" id="loginEmail" placeholder="admin@tarzstore.com" autocomplete="username">
+        <div class="field-floating">
+          <div class="input-icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6l-10 7L2 6"/><path d="M2 6h20v12H2z"/></svg>
+            <input type="email" id="loginEmail" placeholder=" " autocomplete="username">
+            <label class="floating-label" for="loginEmail">Email</label>
+          </div>
         </div>
 
-        <label>Password</label>
-        <div class="input-icon-wrap">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          <input type="password" id="loginPassword" class="has-toggle" placeholder="••••••••" autocomplete="current-password">
-          <button type="button" class="toggle-pw" id="togglePwBtn" onclick="togglePasswordVisibility()" aria-label="Tampilkan password">
-            <svg id="toggleEyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
+        <div class="field-floating">
+          <div class="input-icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input type="password" id="loginPassword" class="has-toggle" placeholder=" " autocomplete="current-password">
+            <label class="floating-label" for="loginPassword">Password</label>
+            <button type="button" class="toggle-pw" id="togglePwBtn" onclick="togglePasswordVisibility()" aria-label="Tampilkan password">
+              <svg id="toggleEyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="login-options">
+          <label class="remember-check">
+            <input type="checkbox" id="rememberMe">
+            Ingat saya
+          </label>
         </div>
 
         <button class="btn-primary login-btn" id="loginBtn" onclick="doLogin()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-          Masuk
+          Masuk ke Dashboard
         </button>
       </div>
 
-      <div class="login-footer">Tarz Store<span class="footer-dot">•</span>Secured Access</div>
+      <div class="login-footer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Akses Admin Tarz Store
+      </div>
     </div>
   </div>
   </div>
+
+
 
   <!-- ═══ ADMIN VIEW ═══ -->
   <div id="adminView">
@@ -440,18 +601,33 @@
 
     <div id="formMsg" class="msg"></div>
 
-    <div class="card">
-      <div id="formTitle" style="font-weight:700;font-size:16px;margin-bottom:18px;">Tambah Produk Baru</div>
+    <!-- ═══ FORM PRODUK — collapsible 2-step wizard ═══ -->
+    <div class="card form-card" id="formCard">
+      <div class="form-card-header">
+        <div id="formTitle" style="font-weight:700;font-size:16px;">Tambah Produk Baru</div>
+        <button type="button" class="form-card-close" onclick="closeForm()" title="Tutup form" aria-label="Tutup form">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
       <input type="hidden" id="editId" value="">
 
-      <div class="field-group">
-        <div class="group-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h.01M9 15h6M9 12h6"/></svg>
-          Info Produk
+      <!-- stepper -->
+      <div class="steps">
+        <div class="step-item active" id="stepDot1">
+          <div class="step-dot">1</div>
+          <div class="step-label">Dasar</div>
         </div>
+        <div class="step-line"></div>
+        <div class="step-item" id="stepDot2">
+          <div class="step-dot">2</div>
+          <div class="step-label">Link & Akses</div>
+        </div>
+      </div>
 
+      <!-- STEP 1: info dasar (yang selalu dibutuhkan) -->
+      <div class="step-panel active" id="stepPanel1">
         <label>Nama Produk</label>
-        <input type="text" id="fName" placeholder="Contoh: KURAMA MODS">
+        <input type="text" id="fName" placeholder="">
 
         <label>Tab</label>
         <select id="fTab">
@@ -459,50 +635,76 @@
           <option value="allgame">All Game</option>
         </select>
 
-        <label>List Fitur <span class="hint">— satu baris per fitur</span></label>
-        <textarea id="fFeatures" placeholder="Satu fitur per baris, contoh:&#10;AIM BOT&#10;ESP LINE&#10;ATHENA"></textarea>
-      </div>
-
-      <div class="field-group">
-        <div class="group-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-          Media
-        </div>
-
         <label>URL Foto</label>
-        <input type="text" id="fImageUrl" placeholder="https://... (link gambar produk)" oninput="onImageUrlInput()">
+        <input type="text" id="fImageUrl" placeholder="" oninput="onImageUrlInput()">
         <img id="fImagePreview" class="preview-thumb">
+
+        <label>List Fitur <span class="hint"></span></label>
+        <textarea id="fFeatures" placeholder=""></textarea>
+
+        <div class="step-nav">
+          <button class="btn-primary" onclick="goStep(2)">
+            Lanjut
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </div>
       </div>
 
-      <div class="field-group">
-        <div class="group-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          Akses & Download
+      <!-- STEP 2: link & akses -->
+      <div class="step-panel" id="stepPanel2">
+        <label>Link Mediafire</label>
+        <input type="text" id="fDownloadLink" placeholder="">
+
+        <label>Get Key <span class="hint"></span></label>
+        <input type="text" id="fGetKeyLink" placeholder="">
+
+        <!-- opsional, disembunyikan biar form simple -->
+        <button type="button" class="adv-toggle" id="advToggle" onclick="toggleAdvanced()" style="margin-top:20px;">
+          <span class="adv-toggle-left">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>
+              Pengaturan Lanjutan
+              <span class="hint"></span>
+            </span>
+          </span>
+          <svg class="adv-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+
+        <div class="adv-body" id="advBody">
+          <div class="adv-body-inner-pad">
+            <label>Platform</label>
+            <select id="fPlatform">
+              <option value="android">Android</option>
+              <option value="pc">PC</option>
+              <option value="ios">iOS</option>
+            </select>
+
+            <label>Link Mediafire FREE FIRE<span class="hint"></span></label>
+            <input type="text" id="fDownloadLink2" placeholder="">
+
+            <label>Key</label>
+            <input type="text" id="fCopyKey" placeholder="">
+
+            <label>Label Key <span class="hint">(ganti nama tampilan "Key" di website)</span></label>
+            <input type="text" id="fKeyLabel" placeholder="Default: Key">
+
+            <label>User</label>
+            <input type="text" id="fUserField" placeholder="">
+
+            <label>Label User <span class="hint">(ganti nama tampilan "User" di website)</span></label>
+            <input type="text" id="fUserLabel" placeholder="Default: User">
+          </div>
         </div>
 
-        <label>Link Mediafire</label>
-        <input type="text" id="fDownloadLink" placeholder="https://www.mediafire.com/...">
-
-        <label>Platform</label>
-        <select id="fPlatform">
-          <option value="android">Android</option>
-          <option value="pc">PC</option>
-          <option value="ios">iOS</option>
-        </select>
-
-        <label>Key <span class="hint">(opsional)</span></label>
-        <input type="text" id="fCopyKey" placeholder="Contoh: kurama-proxy-XVHND66NBX">
-
-        <label>Get Key <span class="hint">(opsional, link eksternal untuk ambil key)</span></label>
-        <input type="text" id="fGetKeyLink" placeholder="https://...">
-      </div>
-
-      <div class="row" style="margin-top:22px;">
-        <button class="btn-ghost" id="cancelEditBtn" onclick="resetForm()" style="display:none;">Batal Edit</button>
-        <button class="btn-primary" id="saveBtn" onclick="saveProduct()" style="margin-top:0;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-          Simpan Produk
-        </button>
+        <div class="step-nav">
+          <button class="btn-ghost" onclick="goStep(1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          </button>
+          <button class="btn-primary" id="saveBtn" onclick="saveProduct()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Simpan Produk
+          </button>
+        </div>
       </div>
     </div>
 
@@ -512,6 +714,11 @@
     </div>
     <div id="productList"></div>
   </div>
+
+  <!-- FAB untuk buka form tambah produk -->
+  <button class="fab" id="addFab" onclick="openForm()" title="Tambah produk" aria-label="Tambah produk baru">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
 
 </div>
 
@@ -555,6 +762,8 @@ async function doLogin(){
   const password = document.getElementById('loginPassword').value;
   const msg = document.getElementById('loginMsg');
   const btn = document.getElementById('loginBtn');
+  const remember = document.getElementById('rememberMe').checked;
+  const originalBtnHtml = btn.innerHTML;
 
   msg.classList.remove('show');
   if(!email || !password){
@@ -569,7 +778,7 @@ async function doLogin(){
   const { data, error } = await db.auth.signInWithPassword({ email, password });
 
   btn.disabled = false;
-  btn.textContent = 'Masuk';
+  btn.innerHTML = originalBtnHtml;
 
   if(error){
     msg.textContent = 'Login gagal: ' + (error.message === 'Invalid login credentials' ? 'Email atau password salah.' : error.message);
@@ -577,8 +786,26 @@ async function doLogin(){
     return;
   }
 
+  try{
+    if(remember){
+      localStorage.setItem('tarz_admin_email', email);
+    } else {
+      localStorage.removeItem('tarz_admin_email');
+    }
+  } catch(e){ /* localStorage tidak tersedia, lewati saja */ }
+
   showAdminView(data.user.email);
 }
+
+/* isi otomatis email yang diingat, kalau ada */
+try{
+  const savedEmail = localStorage.getItem('tarz_admin_email');
+  if(savedEmail){
+    document.getElementById('loginEmail').value = savedEmail;
+    document.getElementById('rememberMe').checked = true;
+  }
+} catch(e){ /* localStorage tidak tersedia, lewati saja */ }
+
 
 async function doLogout(){
   await db.auth.signOut();
@@ -596,6 +823,56 @@ function togglePasswordVisibility(){
   icon.innerHTML = isHidden
     ? '<path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a20.6 20.6 0 0 1 5.06-6.06M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a20.7 20.7 0 0 1-2.61 3.94M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
     : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+}
+
+/* ═══════════════════════════════════════════════════
+   FORM: BUKA/TUTUP, STEP WIZARD, ADVANCED ACCORDION
+   ═══════════════════════════════════════════════════ */
+function openForm(){
+  document.getElementById('formCard').classList.add('open');
+  document.getElementById('addFab').classList.add('hidden');
+  goStep(1);
+  setTimeout(()=> document.getElementById('fName').focus(), 250);
+  document.getElementById('formCard').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function closeForm(){
+  document.getElementById('formCard').classList.remove('open');
+  document.getElementById('addFab').classList.remove('hidden');
+  resetForm();
+}
+
+function goStep(n){
+  document.getElementById('stepPanel1').classList.toggle('active', n===1);
+  document.getElementById('stepPanel2').classList.toggle('active', n===2);
+
+  const dot1 = document.getElementById('stepDot1');
+  const dot2 = document.getElementById('stepDot2');
+  dot1.classList.toggle('active', n===1);
+  dot1.classList.toggle('done', n===2);
+  dot2.classList.toggle('active', n===2);
+  dot2.classList.remove('done');
+}
+
+function toggleAdvanced(){
+  const toggle = document.getElementById('advToggle');
+  const body = document.getElementById('advBody');
+  const inner = body.querySelector('.adv-body-inner-pad');
+  const isOpen = !body.classList.contains('open');
+
+  if(isOpen){
+    body.classList.add('open');
+    toggle.classList.add('open');
+    body.style.maxHeight = inner.scrollHeight + 'px';
+  } else {
+    // set eksplisit dulu dari tinggi saat ini biar transisi ke 0 mulus, bukan loncat
+    body.style.maxHeight = inner.scrollHeight + 'px';
+    requestAnimationFrame(()=>{
+      body.classList.remove('open');
+      toggle.classList.remove('open');
+      body.style.maxHeight = '0px';
+    });
+  }
 }
 
 /* ═══════════════════════════════════════════════════
@@ -634,8 +911,12 @@ async function saveProduct(){
   const image_url = document.getElementById('fImageUrl').value.trim();
   const features = parseFeatures(document.getElementById('fFeatures').value);
   const download_link = document.getElementById('fDownloadLink').value.trim();
+  const download_link_2 = document.getElementById('fDownloadLink2').value.trim();
   const platform = document.getElementById('fPlatform').value;
   const copy_key = document.getElementById('fCopyKey').value.trim();
+  const key_label = document.getElementById('fKeyLabel').value.trim();
+  const user_field = document.getElementById('fUserField').value.trim();
+  const user_label = document.getElementById('fUserLabel').value.trim();
   const get_key_link = document.getElementById('fGetKeyLink').value.trim();
   const editId = document.getElementById('editId').value;
 
@@ -654,8 +935,12 @@ async function saveProduct(){
       image_url: image_url || null,
       features,
       download_link,
+      download_link_2: download_link_2 || null,
       platform,
       copy_key: copy_key || null,
+      key_label: key_label || null,
+      user_field: user_field || null,
+      user_label: user_label || null,
       get_key_link: get_key_link || null,
       // price tetap diisi (kolom lama wajib not-null di database), tidak ditampilkan di form
       price: ''
@@ -671,7 +956,7 @@ async function saveProduct(){
     if(error) throw new Error(error.message);
 
     showFormMsg(editId ? 'Produk berhasil diperbarui.' : 'Produk berhasil ditambahkan.', 'success');
-    resetForm();
+    closeForm();
     loadProducts();
   } catch(err){
     showFormMsg(err.message, 'error');
@@ -688,12 +973,19 @@ function resetForm(){
   document.getElementById('fImageUrl').value = '';
   document.getElementById('fFeatures').value = '';
   document.getElementById('fDownloadLink').value = '';
+  document.getElementById('fDownloadLink2').value = '';
   document.getElementById('fPlatform').value = 'android';
   document.getElementById('fCopyKey').value = '';
+  document.getElementById('fKeyLabel').value = '';
+  document.getElementById('fUserField').value = '';
+  document.getElementById('fUserLabel').value = '';
   document.getElementById('fGetKeyLink').value = '';
   document.getElementById('fImagePreview').style.display = 'none';
   document.getElementById('formTitle').textContent = 'Tambah Produk Baru';
-  document.getElementById('cancelEditBtn').style.display = 'none';
+  document.getElementById('advBody').classList.remove('open');
+  document.getElementById('advToggle').classList.remove('open');
+  document.getElementById('advBody').style.maxHeight = '0px';
+  goStep(1);
 }
 
 async function loadProducts(){
@@ -756,8 +1048,12 @@ function editProduct(id){
   document.getElementById('fImageUrl').value = p.image_url || '';
   document.getElementById('fFeatures').value = Array.isArray(p.features) ? p.features.join('\n') : '';
   document.getElementById('fDownloadLink').value = p.download_link || '';
+  document.getElementById('fDownloadLink2').value = p.download_link_2 || '';
   document.getElementById('fPlatform').value = p.platform || 'android';
   document.getElementById('fCopyKey').value = p.copy_key || '';
+  document.getElementById('fKeyLabel').value = p.key_label || '';
+  document.getElementById('fUserField').value = p.user_field || '';
+  document.getElementById('fUserLabel').value = p.user_label || '';
   document.getElementById('fGetKeyLink').value = p.get_key_link || '';
   const preview = document.getElementById('fImagePreview');
   if(p.image_url){
@@ -767,8 +1063,28 @@ function editProduct(id){
     preview.style.display = 'none';
   }
   document.getElementById('formTitle').textContent = 'Edit Produk: ' + p.name;
-  document.getElementById('cancelEditBtn').style.display = 'block';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  document.getElementById('formCard').classList.add('open');
+  document.getElementById('addFab').classList.add('hidden');
+  goStep(1);
+  document.getElementById('formCard').scrollIntoView({ behavior:'smooth', block:'start' });
+
+  // buka accordion lanjutan otomatis kalau ada data yang terisi di sana (selain platform default)
+  const advBody = document.getElementById('advBody');
+  const advToggle = document.getElementById('advToggle');
+  const hasAdvData = (p.platform && p.platform !== 'android') || p.download_link_2 || p.copy_key || p.key_label || p.user_field || p.user_label;
+  if(hasAdvData){
+    advBody.classList.add('open');
+    advToggle.classList.add('open');
+    requestAnimationFrame(()=>{
+      const inner = advBody.querySelector('.adv-body-inner-pad');
+      advBody.style.maxHeight = inner.scrollHeight + 'px';
+    });
+  } else {
+    advBody.classList.remove('open');
+    advToggle.classList.remove('open');
+    advBody.style.maxHeight = '0px';
+  }
 }
 
 async function deleteProduct(id){
