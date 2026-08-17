@@ -5909,27 +5909,21 @@ const PLAYLIST = [
     statusBox.classList.add('show');
     fetchBtn.disabled = true;
 
-    const targetUrl = 'https://api.nexadev.my.id/api/aio?url=' + encodeURIComponent(url);
-    // API pihak ketiga ini kadang memblokir akses langsung dari browser (CORS),
-    // jadi dicoba langsung dulu, lalu jatuh ke proxy publik kalau gagal.
-    const attempts = [
-      targetUrl,
-      'https://corsproxy.io/?url=' + encodeURIComponent(targetUrl),
-      'https://api.allorigins.win/raw?url=' + encodeURIComponent(targetUrl)
-    ];
+    // Fetch lewat serverless function sendiri (/api/ttdl) supaya tidak kena
+    // masalah CORS/blokir saat request langsung dari browser ke API pihak ketiga.
+    const targetUrl = '/api/ttdl?url=' + encodeURIComponent(url);
 
     try{
       let data = null;
 
-      for(const attemptUrl of attempts){
-        try{
-          const res = await fetch(attemptUrl);
-          if(!res.ok) continue;
+      try{
+        const res = await fetch(targetUrl);
+        if(res.ok){
           const json = await res.json();
-          if(json){ data = json; break; }
-        } catch(innerErr){
-          continue;
+          if(json) data = json;
         }
+      } catch(innerErr){
+        // biarkan data tetap null, ditangani di bawah
       }
 
       if(!data){
@@ -6051,27 +6045,21 @@ const PLAYLIST = [
     statusBox.classList.add('show');
     fetchBtn.disabled = true;
 
-    const targetUrl = 'https://api.nexadev.my.id/api/ff?id=' + encodeURIComponent(id);
-    // API pihak ketiga ini kadang memblokir akses langsung dari browser (CORS),
-    // jadi dicoba langsung dulu, lalu jatuh ke proxy publik kalau gagal.
-    const attempts = [
-      targetUrl,
-      'https://corsproxy.io/?url=' + encodeURIComponent(targetUrl),
-      'https://api.allorigins.win/raw?url=' + encodeURIComponent(targetUrl)
-    ];
+    // Fetch lewat serverless function sendiri (/api/ff) supaya tidak kena
+    // masalah CORS/blokir saat request langsung dari browser ke API pihak ketiga.
+    const targetUrl = '/api/ff?id=' + encodeURIComponent(id);
 
     try{
       let data = null;
 
-      for(const attemptUrl of attempts){
-        try{
-          const res = await fetch(attemptUrl);
-          if(!res.ok) continue;
+      try{
+        const res = await fetch(targetUrl);
+        if(res.ok){
           const json = await res.json();
-          if(json){ data = json; break; }
-        } catch(innerErr){
-          continue;
+          if(json) data = json;
         }
+      } catch(innerErr){
+        // biarkan data tetap null, ditangani di bawah
       }
 
       if(!data){
@@ -6189,27 +6177,21 @@ const PLAYLIST = [
     statusBox.classList.add('show');
     fetchBtn.disabled = true;
 
-    const targetUrl = 'https://api.nexadev.my.id/api/tiktokstalker?username=' + encodeURIComponent(rawUsername);
-    // API pihak ketiga ini kadang memblokir akses langsung dari browser (CORS),
-    // jadi dicoba langsung dulu, lalu jatuh ke proxy publik kalau gagal.
-    const attempts = [
-      targetUrl,
-      'https://corsproxy.io/?url=' + encodeURIComponent(targetUrl),
-      'https://api.allorigins.win/raw?url=' + encodeURIComponent(targetUrl)
-    ];
+    // Fetch lewat serverless function sendiri (/api/tiktokstalker) supaya tidak
+    // kena masalah CORS/blokir saat request langsung dari browser ke API pihak ketiga.
+    const targetUrl = '/api/tiktokstalker?username=' + encodeURIComponent(rawUsername);
 
     try{
       let data = null;
 
-      for(const attemptUrl of attempts){
-        try{
-          const res = await fetch(attemptUrl);
-          if(!res.ok) continue;
+      try{
+        const res = await fetch(targetUrl);
+        if(res.ok){
           const json = await res.json();
-          if(json){ data = json; break; }
-        } catch(innerErr){
-          continue;
+          if(json) data = json;
         }
+      } catch(innerErr){
+        // biarkan data tetap null, ditangani di bawah
       }
 
       if(!data){
