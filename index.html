@@ -3143,7 +3143,7 @@ body.theme-sky .tts-verified-badge{background:#6fc3ff;color:#040810;}
 </nav>
 
 <!-- MUSIC MODAL (mengambang di tengah, versi kecil) -->
-<div class="music-modal-overlay" id="musicModalOverlay" onclick="if(event.target===this) closeMusicModal();">
+<div class="music-modal-overlay" id="musicModalOverlay">
   <div class="music-modal" id="musicModalCard" role="dialog" aria-modal="true" aria-label="Pemutar musik">
     <button class="music-modal-close" aria-label="Tutup" onclick="closeMusicModal()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -3878,7 +3878,7 @@ body.theme-sky .tts-verified-badge{background:#6fc3ff;color:#040810;}
   </div>
 </div>
 
-<!-- VIP CELEBRATION OVERLAY — muncul setelah pembayaran QRIS terdeteksi sukses -->
+<!-- VIP CELEBRATION OVERLAY — muncul setelah pembayaran QRIS / key VIP sukses -->
 <div class="vip-celebrate-overlay" id="vipCelebrateOverlay" aria-hidden="true">
   <div class="vip-celebrate-confetti" id="vipCelebrateConfetti"></div>
   <div class="vip-celebrate-card">
@@ -3886,8 +3886,8 @@ body.theme-sky .tts-verified-badge{background:#6fc3ff;color:#040810;}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
     </div>
     <div class="vip-celebrate-eyebrow">Tarz Store · Membership</div>
-    <div class="vip-celebrate-title">SELAMAT KAMU SEKARANG VIP</div>
-    <div class="vip-celebrate-sub">Kamu sekarang bisa akses semua produk</div>
+    <div class="vip-celebrate-title" id="vipCelebrateTitle">WELCOME TO VIP</div>
+    <div class="vip-celebrate-sub" id="vipCelebrateSub">Kamu sekarang bisa akses semua cheat</div>
     <button type="button" class="vip-celebrate-ok" id="vipCelebrateOkBtn" onclick="closeVipCelebration()">OKE</button>
   </div>
 </div>
@@ -4984,7 +4984,7 @@ function closeModal(){
 }
 
 function handleOverlayClick(e){
-  if(e.target === document.getElementById('modalOverlay')) closeModal();
+  /* Klik area luar modal produk sengaja tidak menutup modal -- hanya tombol X yang boleh. */
 }
 
 function buyNow(){
@@ -5259,8 +5259,7 @@ function closeKeyModal(){
 }
 
 function handleKeyOverlayClick(e){
-  if(_qrisPaymentActive) return; // saat QRIS aktif, hanya tombol X yang boleh menutup modal
-  if(e.target === document.getElementById('keyOverlay')) closeKeyModal();
+  /* Klik area luar modal key/VIP sengaja tidak menutup modal -- hanya tombol X yang boleh. */
 }
 
 function toggleKeyEye(){
@@ -5321,21 +5320,11 @@ function keyLogin(){
     refreshVipHeaderBadge();
     const trialLabel = trialHours === 1 ? '1 jam' : trialHours + ' jam';
     document.getElementById('vipGateBody').classList.add('hide');
-    document.getElementById('vipKeyFormBody').classList.remove('show');
-    document.getElementById('keySuccessTitle').textContent = isTrial ? 'Key Trial Aktif!' : 'Key VIP Benar!';
-    document.getElementById('keySuccessSub').textContent = isTrial
-      ? 'Semua produk terbuka selama ' + trialLabel + '. Mengalihkan ke download...'
-      : 'Semua produk kini terbuka. Mengalihkan ke download...';
-    document.getElementById('keyDownloadAgainBtn').classList.add('hide');
-    document.getElementById('keySuccessWrap').classList.add('show');
-    setTimeout(()=>{
-      closeKeyModal();
-      if(_keyDownloadLink && !_keyDownloadLink.endsWith('#')){
-        window.open(_keyDownloadLink,'_blank','noopener,noreferrer');
-      } else {
-        showToast('Link download belum tersedia.','error');
-      }
-    }, 900);
+    const celebTitle = isTrial ? 'KEY TRIAL AKTIF!' : 'WELCOME TO VIP';
+    const celebSub = isTrial
+      ? 'Semua produk terbuka selama ' + trialLabel + '.'
+      : 'Kamu sekarang bisa akses semua produk.';
+    showVipCelebration(celebTitle, celebSub);
   }
 
   /* Redeem key lewat Apps Script (satu request: cari + validasi + hanguskan key).
@@ -5368,7 +5357,7 @@ function keyGetPassword(){
 
 
 
-document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !_qrisPaymentActive){ closeKeyModal(); } });
+/* Escape sengaja tidak menutup modal key/VIP -- hanya tombol X yang boleh. */
 
 /* ── PAUSE ANIMASI SAAT TAB TIDAK AKTIF ──
    Browser tetap menjalankan CSS animation & timer di background tab (throttled,
@@ -5378,7 +5367,7 @@ document.addEventListener('visibilitychange', () => {
   document.body.classList.toggle('tab-hidden', document.hidden);
 });
 
-document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeModal(); } });
+/* Escape sengaja tidak menutup modal produk -- hanya tombol X yang boleh. */
 
 /* ══════════════════════════════════════════
    VIP AUTO-PAYMENT (BuatQris) — QRIS otomatis, tanpa chat admin
@@ -5745,13 +5734,17 @@ function cancelVipPayment(){
   showVipGate();
 }
 
-/* Notifikasi meriah setelah pembayaran QRIS terdeteksi sukses.
+/* Notifikasi meriah setelah pembayaran QRIS ATAU key VIP terdeteksi sukses.
    Tidak lagi auto-redirect ke link download (mediafire dsb) -- cukup tampilkan
    kartu selamat + confetti, lalu tombol OKE menutup modal key sepenuhnya dan
    user kembali ke tampilan awal halaman. */
-function showVipCelebration(){
+function showVipCelebration(title, sub){
   _vipQrisImageUrl = null;
   closeKeyModal();
+  const titleEl = document.getElementById('vipCelebrateTitle');
+  const subEl = document.getElementById('vipCelebrateSub');
+  if(titleEl) titleEl.textContent = title || 'WELCOME TO VIP';
+  if(subEl) subEl.textContent = sub || 'Kamu sekarang bisa akses semua cheat';
   spawnVipConfetti();
   const overlay = document.getElementById('vipCelebrateOverlay');
   overlay.classList.add('show');
@@ -5796,10 +5789,7 @@ function spawnVipConfetti(){
   }
 }
 
-document.getElementById('vipCelebrateOverlay').addEventListener('click', (e)=>{
-  if(e.target.id === 'vipCelebrateOverlay') closeVipCelebration();
-});
-document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeVipCelebration(); } });
+/* Klik area luar & tombol Escape sengaja tidak menutup notifikasi VIP -- hanya tombol OKE yang boleh. */
 
 /* tampilkan status VIP/trial yang benar di badge atas grid produk, begitu halaman dibuka */
 isVipUnlockedAsync().then(vip => { if(vip) markVipUnlocked(); refreshVipHeaderBadge(); });
@@ -5947,9 +5937,7 @@ const PLAYLIST = [
     overlay.classList.remove('show');
     document.body.style.overflow = '';
   };
-  document.addEventListener('keydown', e=>{
-    if(e.key === 'Escape' && overlay.classList.contains('show')) closeMusicModal();
-  });
+  /* Escape sengaja tidak menutup modal musik -- hanya tombol X yang boleh. */
 })();
 
 </script>
@@ -6044,9 +6032,7 @@ const PLAYLIST = [
     overlay.classList.remove('show');
     document.body.style.overflow = '';
   };
-  document.addEventListener('keydown', e=>{
-    if(e.key === 'Escape' && overlay.classList.contains('show')) closeLobbyFFModal();
-  });
+  /* Escape sengaja tidak menutup modal Lobby FF -- hanya tombol X yang boleh. */
 
   window.downloadLobbyFF = function(){
     if(!imgLoaded){
@@ -6164,9 +6150,7 @@ const PLAYLIST = [
     overlay.classList.remove('show');
     document.body.style.overflow = '';
   };
-  document.addEventListener('keydown', e=>{
-    if(e.key === 'Escape' && overlay.classList.contains('show')) closeTtdlModal();
-  });
+  /* Escape sengaja tidak menutup modal TikTok Downloader -- hanya tombol X yang boleh. */
 
   window.pasteTtdlUrl = async function(){
     const pasteBtn = document.getElementById('ttdlPasteBtn');
@@ -6372,9 +6356,7 @@ const PLAYLIST = [
     overlay.classList.remove('show');
     document.body.style.overflow = '';
   };
-  document.addEventListener('keydown', e=>{
-    if(e.key === 'Escape' && overlay.classList.contains('show')) closeSffModal();
-  });
+  /* Escape sengaja tidak menutup modal Free Fire Stalker -- hanya tombol X yang boleh. */
 
   window.pasteSffId = async function(){
     const pasteBtn = document.getElementById('sffPasteBtn');
@@ -6499,9 +6481,7 @@ const PLAYLIST = [
     overlay.classList.remove('show');
     document.body.style.overflow = '';
   };
-  document.addEventListener('keydown', e=>{
-    if(e.key === 'Escape' && overlay.classList.contains('show')) closeTtsModal();
-  });
+  /* Escape sengaja tidak menutup modal TikTok Stalker -- hanya tombol X yang boleh. */
 
   window.pasteTtsUsername = async function(){
     const pasteBtn = document.getElementById('ttsPasteBtn');
@@ -6610,11 +6590,13 @@ const PLAYLIST = [
      memakai kartu & sistem VIP/key modal yang SAMA PERSIS dengan produk lama
      (mode 'aincrad-nokey': tombol INSTALL -> openModal -> APK + Key opsional + List Fitur).
      ═══════════════════════════════════════════════════ -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer onload="window.dispatchEvent(new Event('npSupabaseReady'))"></script>
 <script>
 (function(){
   const NP_SUPABASE_URL = 'https://bvblcdnmbzncoqeoqkoc.supabase.co';
   const NP_SUPABASE_KEY = 'sb_publishable_II7ZGSsImxo10OqzRy3U4A_JWQ4rg46';
+
+  function npInit(){
   const npClient = window.supabase.createClient(NP_SUPABASE_URL, NP_SUPABASE_KEY);
 
   function npEscape(str){
@@ -6734,6 +6716,22 @@ const PLAYLIST = [
   }
 
   loadDbProducts();
+  } // end npInit
+
+  // Script Supabase pakai `defer`, jadi baru siap setelah HTML selesai di-parse.
+  // Jalankan npInit begitu window.supabase tersedia (event onload di tag <script>,
+  // dgn fallback polling kalau event kelewat karena race condition).
+  if(window.supabase){
+    npInit();
+  } else {
+    window.addEventListener('npSupabaseReady', npInit, {once:true});
+    let tries = 0;
+    const poll = setInterval(()=>{
+      tries++;
+      if(window.supabase){ clearInterval(poll); npInit(); }
+      else if(tries > 100){ clearInterval(poll); }
+    }, 100);
+  }
 })();
 </script>
 
