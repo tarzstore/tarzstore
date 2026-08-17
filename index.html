@@ -6721,14 +6721,27 @@ const PLAYLIST = [
   // Script Supabase pakai `defer`, jadi baru siap setelah HTML selesai di-parse.
   // Jalankan npInit begitu window.supabase tersedia (event onload di tag <script>,
   // dgn fallback polling kalau event kelewat karena race condition).
-  if(window.supabase){
+  // PENTING: pakai guard `npInitCalled` supaya npInit() (dan loadDbProducts() di
+  // dalamnya) TIDAK PERNAH terpanggil dua kali. Tanpa guard ini, kalau
+  // window.supabase sudah tersedia tepat saat polling jalan sebelum event
+  // 'npSupabaseReady' sempat ditangkap, kedua jalur (listener + polling) bisa
+  // sama-sama memanggil npInit(), sehingga loadDbProducts() meng-insert kartu
+  // produk Supabase ke grid dua kali (produk tampil dobel).
+  let npInitCalled = false;
+  function npInitOnce(){
+    if(npInitCalled) return;
+    npInitCalled = true;
     npInit();
+  }
+
+  if(window.supabase){
+    npInitOnce();
   } else {
-    window.addEventListener('npSupabaseReady', npInit, {once:true});
+    window.addEventListener('npSupabaseReady', npInitOnce, {once:true});
     let tries = 0;
     const poll = setInterval(()=>{
       tries++;
-      if(window.supabase){ clearInterval(poll); npInit(); }
+      if(window.supabase){ clearInterval(poll); npInitOnce(); }
       else if(tries > 100){ clearInterval(poll); }
     }, 100);
   }
