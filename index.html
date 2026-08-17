@@ -5913,10 +5913,9 @@ const PLAYLIST = [
     // API pihak ketiga ini kadang memblokir akses langsung dari browser (CORS),
     // jadi dicoba langsung dulu, lalu jatuh ke proxy publik kalau gagal.
     const attempts = [
-      targetUrl,
-      'https://api.allorigins.win/raw?url=' + encodeURIComponent(targetUrl),
-      'https://corsproxy.io/?url=' + encodeURIComponent(targetUrl),
-      'https://thingproxy.freeboard.io/fetch/' + targetUrl
+      'https://api.allorigins.win/get?url=' + encodeURIComponent(targetUrl),
+      'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(targetUrl),
+      targetUrl
     ];
 
     try{
@@ -5927,7 +5926,7 @@ const PLAYLIST = [
           const res = await fetch(attemptUrl);
           if(!res.ok){ console.warn('Percobaan gagal (' + res.status + '):', attemptUrl); continue; }
           let json = await res.json();
-          // allorigins.win/raw kadang membungkus hasil sebagai string di dalam field "contents"
+          // allorigins.win/get membungkus hasil sebagai string di dalam field "contents"
           if(json && typeof json.contents === 'string'){
             try{ json = JSON.parse(json.contents); } catch(parseErr){ /* biarkan apa adanya */ }
           }
@@ -6061,10 +6060,9 @@ const PLAYLIST = [
     // API pihak ketiga ini kadang memblokir akses langsung dari browser (CORS),
     // jadi dicoba langsung dulu, lalu jatuh ke proxy publik kalau gagal.
     const attempts = [
-      targetUrl,
-      'https://api.allorigins.win/raw?url=' + encodeURIComponent(targetUrl),
-      'https://corsproxy.io/?url=' + encodeURIComponent(targetUrl),
-      'https://thingproxy.freeboard.io/fetch/' + targetUrl
+      'https://api.allorigins.win/get?url=' + encodeURIComponent(targetUrl),
+      'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(targetUrl),
+      targetUrl
     ];
 
     try{
@@ -6075,7 +6073,7 @@ const PLAYLIST = [
           const res = await fetch(attemptUrl);
           if(!res.ok){ console.warn('Percobaan gagal (' + res.status + '):', attemptUrl); continue; }
           let json = await res.json();
-          // allorigins.win/raw kadang membungkus hasil sebagai string di dalam field "contents"
+          // allorigins.win/get membungkus hasil sebagai string di dalam field "contents"
           if(json && typeof json.contents === 'string'){
             try{ json = JSON.parse(json.contents); } catch(parseErr){ /* biarkan apa adanya */ }
           }
@@ -6205,10 +6203,9 @@ const PLAYLIST = [
     // API pihak ketiga ini kadang memblokir akses langsung dari browser (CORS),
     // jadi dicoba langsung dulu, lalu jatuh ke proxy publik kalau gagal.
     const attempts = [
-      targetUrl,
-      'https://api.allorigins.win/raw?url=' + encodeURIComponent(targetUrl),
-      'https://corsproxy.io/?url=' + encodeURIComponent(targetUrl),
-      'https://thingproxy.freeboard.io/fetch/' + targetUrl
+      'https://api.allorigins.win/get?url=' + encodeURIComponent(targetUrl),
+      'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(targetUrl),
+      targetUrl
     ];
 
     try{
@@ -6219,7 +6216,7 @@ const PLAYLIST = [
           const res = await fetch(attemptUrl);
           if(!res.ok){ console.warn('Percobaan gagal (' + res.status + '):', attemptUrl); continue; }
           let json = await res.json();
-          // allorigins.win/raw kadang membungkus hasil sebagai string di dalam field "contents"
+          // allorigins.win/get membungkus hasil sebagai string di dalam field "contents"
           if(json && typeof json.contents === 'string'){
             try{ json = JSON.parse(json.contents); } catch(parseErr){ /* biarkan apa adanya */ }
           }
