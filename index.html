@@ -1990,6 +1990,39 @@ body.theme-switching :not(#themeFadeOverlay){
 .side-menu-list a:active{background:rgba(255,255,255,.07);padding-left:16px;}
 .side-menu-list a:hover{color:var(--text);background:rgba(255,255,255,.045);padding-left:16px;}
 
+/* Dropdown submenu (contoh: "Upload Produk" -> Upload Produk + Key Generate) */
+.side-menu-dropdown-toggle{
+  width:100%;background:none;border:none;cursor:pointer;
+  font-family:inherit;text-align:left;
+  -webkit-tap-highlight-color:transparent;
+  display:flex;align-items:center;gap:11px;
+  padding:11px 12px;border-radius:var(--radius-sm);
+  color:var(--text2);font-size:.88rem;font-weight:600;letter-spacing:.2px;
+  transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease),padding-left var(--t-fast) var(--ease);
+}
+.side-menu-dropdown-toggle:hover,.side-menu-dropdown-toggle:active{
+  color:var(--text);background:rgba(255,255,255,.045);padding-left:16px;
+}
+.side-menu-dropdown-toggle > svg:first-child{width:17px;height:17px;flex-shrink:0;opacity:.85;}
+.side-menu-dropdown-toggle .dropdown-chevron{
+  margin-left:auto;width:15px;height:15px;flex-shrink:0;opacity:.7;
+  transition:transform var(--t-fast) var(--ease-soft);
+}
+.side-menu-dropdown-toggle.open .dropdown-chevron{transform:rotate(180deg);}
+.side-menu-submenu{
+  list-style:none;
+  max-height:0;overflow:hidden;
+  transition:max-height var(--t-mid) var(--ease-soft);
+}
+.side-menu-submenu.open{max-height:160px;}
+.side-menu-submenu li{padding-left:0;}
+.side-menu-submenu a{
+  padding:9px 12px 9px 40px;
+  font-size:.82rem;font-weight:600;
+}
+.side-menu-submenu a svg{width:14px;height:14px;flex-shrink:0;opacity:.85;}
+.side-menu-submenu a:hover,.side-menu-submenu a:active{padding-left:44px;}
+
 .side-menu-footer{
   padding:14px 16px;
   border-top:1px solid var(--border);
@@ -2189,30 +2222,6 @@ body.side-menu-open{overflow:hidden;}
   text-align:center;padding:8px;
 }
 .lobbyff-loading.hide{display:none;}
-.lobbyff-photo-row{
-  display:flex;gap:6px;justify-content:center;
-  margin-top:12px;
-}
-.lobbyff-photo-btn{
-  flex:1;max-width:70px;
-  padding:7px 4px;
-  border-radius:var(--radius-sm);
-  border:1px solid var(--border-strong);
-  background:rgba(255,255,255,.05);
-  color:var(--text2);
-  font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.68rem;
-  cursor:pointer;-webkit-tap-highlight-color:transparent;
-  transition:transform var(--t-fast) var(--ease-soft),background var(--t-fast) var(--ease-soft),color var(--t-fast) var(--ease-soft),border-color var(--t-fast) var(--ease-soft);
-}
-.lobbyff-photo-btn:active{transform:scale(.95);}
-.lobbyff-photo-btn.active{
-  background:linear-gradient(135deg,#1a1a1a,#2a2a2a);
-  color:var(--text);border-color:var(--border-strong);
-}
-body.theme-sky .lobbyff-photo-btn.active{
-  background:linear-gradient(135deg,#0a3a66,#1f7fd6);
-  color:#d6efff;border-color:rgba(111,195,255,.5);
-}
 .lobbyff-input-row{margin-top:12px;}
 .lobbyff-input{
   width:100%;padding:9px 12px;
@@ -2225,7 +2234,8 @@ body.theme-sky .lobbyff-photo-btn.active{
 }
 .lobbyff-input::placeholder{color:var(--text2);}
 .lobbyff-input:focus{border-color:var(--blue);background:rgba(255,255,255,.08);}
-.lobbyff-actions{margin-top:10px;}
+.lobbyff-actions{margin-top:10px;display:flex;gap:8px;}
+.lobbyff-actions .lobbyff-btn{flex:1;}
 .lobbyff-btn{
   width:100%;padding:10px 14px;
   display:flex;align-items:center;justify-content:center;gap:7px;
@@ -2249,6 +2259,536 @@ body.theme-sky .lobbyff-btn-download{
 }
 body.theme-sky .lobbyff-btn-download:hover{
   background:linear-gradient(135deg,#1f7fd6,#6fc3ff);color:#fff;
+}
+
+/* ── TIKTOK DOWNLOADER MODAL ──
+   Sama persis polanya dengan modal Lobby FF (overlay + card + tombol),
+   supaya menyatu dengan tema situs tanpa terasa seperti tempelan. */
+.ttdl-modal-overlay{
+  position:fixed;inset:0;z-index:9998;
+  background:rgba(0,0,0,.72);
+  display:flex;align-items:center;justify-content:center;
+  padding:16px;
+  opacity:0;visibility:hidden;
+  transition:opacity .38s cubic-bezier(.22,1,.36,1),visibility .38s cubic-bezier(.22,1,.36,1),backdrop-filter .38s cubic-bezier(.22,1,.36,1);
+  -webkit-backdrop-filter:blur(0px);backdrop-filter:blur(0px);
+}
+.ttdl-modal-overlay.show{
+  opacity:1;visibility:visible;
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+}
+.ttdl-modal{
+  position:relative;
+  width:100%;max-width:320px;
+  background:linear-gradient(165deg,var(--card2),var(--card));
+  border:1px solid var(--border-strong);
+  border-radius:var(--radius-lg);
+  padding:16px 14px 14px;
+  box-shadow:0 24px 60px rgba(0,0,0,.55);
+  transform:scale(.9) translateY(22px);
+  opacity:0;
+  transition:transform .4s cubic-bezier(.22,1,.36,1),opacity .4s cubic-bezier(.22,1,.36,1);
+  max-height:92vh;overflow-y:auto;
+}
+.ttdl-modal-overlay.show .ttdl-modal{transform:scale(1) translateY(0);opacity:1;}
+.ttdl-modal-close{
+  position:absolute;top:10px;right:10px;
+  width:26px;height:26px;border-radius:50%;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);
+  color:var(--text);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;padding:0;z-index:2;
+  -webkit-tap-highlight-color:transparent;
+}
+.ttdl-modal-close svg{width:14px;height:14px;}
+.ttdl-modal-title{
+  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.90rem;
+  letter-spacing:.03em;text-align:center;color:var(--text);padding-left:0px;
+}
+.ttdl-modal-sub{
+  text-align:center;font-size:.66rem;color:var(--text2);margin-top:2px;margin-bottom:12px;
+}
+.ttdl-input-row{margin-top:4px;display:flex;gap:6px;align-items:stretch;}
+.ttdl-input{
+  flex:1;min-width:0;padding:9px 12px;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--border-strong);
+  border-radius:var(--radius-sm);
+  color:var(--text);font-family:'Space Mono',monospace;font-size:.74rem;
+  outline:none;
+  transition:border-color var(--t-fast) var(--ease-soft),background var(--t-fast) var(--ease-soft);
+}
+.ttdl-input::placeholder{color:var(--text2);}
+.ttdl-input:focus{border-color:var(--blue);background:rgba(255,255,255,.08);}
+.ttdl-paste-btn{
+  flex-shrink:0;width:36px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--border-strong);
+  border-radius:var(--radius-sm);
+  color:var(--text2);cursor:pointer;padding:0;
+  -webkit-tap-highlight-color:transparent;
+  transition:background var(--t-fast) var(--ease-soft),color var(--t-fast) var(--ease-soft),transform var(--t-fast) var(--ease-soft);
+}
+.ttdl-paste-btn:active{transform:scale(.92);}
+.ttdl-paste-btn:hover{background:rgba(255,255,255,.09);color:var(--text);}
+.ttdl-paste-btn.pasted{color:var(--blue);border-color:var(--blue);}
+body.theme-sky .ttdl-paste-btn.pasted{color:#6fc3ff;border-color:#6fc3ff;}
+.ttdl-actions{margin-top:10px;}
+.ttdl-btn{
+  width:100%;padding:10px 14px;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  border-radius:var(--radius-sm);border:1px solid var(--border-strong);
+  font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.78rem;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:transform var(--t-fast) var(--ease-soft),background var(--t-fast) var(--ease-soft),box-shadow var(--t-fast) var(--ease-soft);
+}
+.ttdl-btn:active{transform:scale(.97);}
+.ttdl-btn:disabled{opacity:.5;cursor:not-allowed;}
+.ttdl-btn-fetch{
+  background:linear-gradient(135deg,#1a1a1a,#2a2a2a);
+  color:var(--text);
+}
+.ttdl-btn-fetch:hover{
+  background:linear-gradient(135deg,#242424,#343434);
+  box-shadow:0 8px 22px rgba(0,0,0,.35);
+}
+body.theme-sky .ttdl-btn-fetch{
+  background:linear-gradient(135deg,#0a3a66,#1f7fd6);
+  color:#d6efff;border-color:rgba(111,195,255,.5);
+}
+body.theme-sky .ttdl-btn-fetch:hover{
+  background:linear-gradient(135deg,#1f7fd6,#6fc3ff);color:#fff;
+}
+.ttdl-status{
+  display:none;align-items:center;gap:8px;
+  margin-top:10px;font-family:'Space Mono',monospace;font-size:.68rem;color:var(--text2);
+}
+.ttdl-status.show{display:flex;}
+.ttdl-spinner{
+  width:12px;height:12px;border-radius:50%;
+  border:2px solid var(--border-strong);border-top-color:var(--blue);
+  animation:ttdl-spin .7s linear infinite;flex-shrink:0;
+}
+@keyframes ttdl-spin{to{transform:rotate(360deg);}}
+.ttdl-error{
+  display:none;margin-top:10px;padding:9px 10px;
+  border:1px solid rgba(255,90,90,.4);border-radius:var(--radius-sm);
+  background:rgba(255,90,90,.08);
+  font-family:'Space Mono',monospace;font-size:.66rem;color:#ff9a9a;
+}
+.ttdl-error.show{display:block;}
+.ttdl-result{display:none;margin-top:14px;}
+.ttdl-result.show{display:block;animation:ttdl-rise .35s var(--ease-soft);}
+@keyframes ttdl-rise{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.ttdl-preview-wrap{
+  position:relative;width:100%;max-width:170px;margin:0 auto;
+  border-radius:var(--radius-md);overflow:hidden;
+  background:#0a0a0a;aspect-ratio:9/16;border:1px solid var(--border);
+}
+.ttdl-preview-wrap video{width:100%;height:100%;object-fit:cover;display:block;}
+.ttdl-dl-row{margin-top:10px;display:flex;flex-direction:column;gap:8px;}
+
+/* video/foto preview toggle */
+.ttdl-preview-wrap{display:none;}
+.ttdl-preview-wrap.active{display:block;}
+.ttdl-dl-row#ttdlVideoActions{display:none;}
+.ttdl-dl-row#ttdlVideoActions.active{display:flex;}
+.ttdl-photo-block{display:none;}
+.ttdl-photo-block.active{display:block;}
+
+/* carousel foto: geser horizontal, snap per foto */
+.ttdl-carousel-wrap{
+  width:100%;max-width:190px;margin:0 auto;
+  border-radius:var(--radius-md);overflow:hidden;
+  background:#0a0a0a;border:1px solid var(--border);
+}
+.ttdl-carousel-track{
+  display:flex;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.ttdl-carousel-track::-webkit-scrollbar{display:none;}
+.ttdl-carousel-slide{
+  flex:0 0 100%;
+  scroll-snap-align:center;
+  aspect-ratio:9/16;
+  display:flex;align-items:center;justify-content:center;
+  background:#0a0a0a;
+}
+.ttdl-carousel-slide img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  -webkit-user-select:none;user-select:none;-webkit-user-drag:none;
+}
+.ttdl-carousel-dots{
+  display:flex;gap:5px;justify-content:center;
+  margin-top:9px;flex-wrap:wrap;
+}
+.ttdl-carousel-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--border-strong);border:none;padding:0;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:background var(--t-fast) var(--ease-soft),transform var(--t-fast) var(--ease-soft);
+}
+.ttdl-carousel-dot.active{
+  background:var(--blue);transform:scale(1.3);
+}
+body.theme-sky .ttdl-carousel-dot.active{background:#6fc3ff;}
+.ttdl-dl-btn{
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  padding:9px 12px;border-radius:var(--radius-sm);
+  border:1px solid var(--border-strong);
+  font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.74rem;
+  text-decoration:none;color:var(--text);
+  background:rgba(255,255,255,.05);
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:transform var(--t-fast) var(--ease-soft),background var(--t-fast) var(--ease-soft);
+}
+.ttdl-dl-btn:active{transform:scale(.97);}
+.ttdl-dl-btn.primary{
+  background:linear-gradient(135deg,#1a1a1a,#2a2a2a);
+}
+.ttdl-dl-btn.primary:hover{background:linear-gradient(135deg,#242424,#343434);}
+body.theme-sky .ttdl-dl-btn.primary{
+  background:linear-gradient(135deg,#0a3a66,#1f7fd6);
+  color:#d6efff;border-color:rgba(111,195,255,.5);
+}
+body.theme-sky .ttdl-dl-btn.primary:hover{background:linear-gradient(135deg,#1f7fd6,#6fc3ff);color:#fff;}
+
+/* ── STALKER FREE FIRE MODAL ──
+   Sama persis polanya dengan modal TikTok Downloader (overlay + card + tombol),
+   supaya menyatu dengan tema situs. Cek Nickname/IGN akun FF berdasarkan User ID. */
+.sff-modal-overlay{
+  position:fixed;inset:0;z-index:9998;
+  background:rgba(0,0,0,.72);
+  display:flex;align-items:center;justify-content:center;
+  padding:16px;
+  opacity:0;visibility:hidden;
+  transition:opacity .38s cubic-bezier(.22,1,.36,1),visibility .38s cubic-bezier(.22,1,.36,1),backdrop-filter .38s cubic-bezier(.22,1,.36,1);
+  -webkit-backdrop-filter:blur(0px);backdrop-filter:blur(0px);
+}
+.sff-modal-overlay.show{
+  opacity:1;visibility:visible;
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+}
+.sff-modal{
+  position:relative;
+  width:100%;max-width:320px;
+  background:linear-gradient(165deg,var(--card2),var(--card));
+  border:1px solid var(--border-strong);
+  border-radius:var(--radius-lg);
+  padding:16px 14px 14px;
+  box-shadow:0 24px 60px rgba(0,0,0,.55);
+  transform:scale(.9) translateY(22px);
+  opacity:0;
+  transition:transform .4s cubic-bezier(.22,1,.36,1),opacity .4s cubic-bezier(.22,1,.36,1);
+  max-height:92vh;overflow-y:auto;
+}
+.sff-modal-overlay.show .sff-modal{transform:scale(1) translateY(0);opacity:1;}
+.sff-modal-close{
+  position:absolute;top:10px;right:10px;
+  width:26px;height:26px;border-radius:50%;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);
+  color:var(--text);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;padding:0;z-index:2;
+  -webkit-tap-highlight-color:transparent;
+}
+.sff-modal-close svg{width:14px;height:14px;}
+.sff-modal-title{
+  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.90rem;
+  letter-spacing:.03em;text-align:center;color:var(--text);padding-left:0px;
+}
+.sff-modal-sub{
+  text-align:center;font-size:.66rem;color:var(--text2);margin-top:2px;margin-bottom:12px;
+}
+.sff-input-row{margin-top:4px;display:flex;gap:6px;align-items:stretch;}
+.sff-input{
+  flex:1;min-width:0;padding:9px 12px;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--border-strong);
+  border-radius:var(--radius-sm);
+  color:var(--text);font-family:'Space Mono',monospace;font-size:.74rem;
+  outline:none;
+  transition:border-color var(--t-fast) var(--ease-soft),background var(--t-fast) var(--ease-soft);
+}
+.sff-input::placeholder{color:var(--text2);}
+.sff-input:focus{border-color:var(--blue);background:rgba(255,255,255,.08);}
+.sff-paste-btn{
+  flex-shrink:0;width:36px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--border-strong);
+  border-radius:var(--radius-sm);
+  color:var(--text2);cursor:pointer;padding:0;
+  -webkit-tap-highlight-color:transparent;
+  transition:background var(--t-fast) var(--ease-soft),color var(--t-fast) var(--ease-soft),transform var(--t-fast) var(--ease-soft);
+}
+.sff-paste-btn:active{transform:scale(.92);}
+.sff-paste-btn:hover{background:rgba(255,255,255,.09);color:var(--text);}
+.sff-paste-btn.pasted{color:var(--blue);border-color:var(--blue);}
+body.theme-sky .sff-paste-btn.pasted{color:#6fc3ff;border-color:#6fc3ff;}
+.sff-actions{margin-top:10px;}
+.sff-btn{
+  width:100%;padding:10px 14px;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  border-radius:var(--radius-sm);border:1px solid var(--border-strong);
+  font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.78rem;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:transform var(--t-fast) var(--ease-soft),background var(--t-fast) var(--ease-soft),box-shadow var(--t-fast) var(--ease-soft);
+}
+.sff-btn:active{transform:scale(.97);}
+.sff-btn:disabled{opacity:.5;cursor:not-allowed;}
+.sff-btn-fetch{
+  background:linear-gradient(135deg,#1a1a1a,#2a2a2a);
+  color:var(--text);
+}
+.sff-btn-fetch:hover{
+  background:linear-gradient(135deg,#242424,#343434);
+  box-shadow:0 8px 22px rgba(0,0,0,.35);
+}
+body.theme-sky .sff-btn-fetch{
+  background:linear-gradient(135deg,#0a3a66,#1f7fd6);
+  color:#d6efff;border-color:rgba(111,195,255,.5);
+}
+body.theme-sky .sff-btn-fetch:hover{
+  background:linear-gradient(135deg,#1f7fd6,#6fc3ff);color:#fff;
+}
+.sff-status{
+  display:none;align-items:center;gap:8px;
+  margin-top:10px;font-family:'Space Mono',monospace;font-size:.68rem;color:var(--text2);
+}
+.sff-status.show{display:flex;}
+.sff-spinner{
+  width:12px;height:12px;border-radius:50%;
+  border:2px solid var(--border-strong);border-top-color:var(--blue);
+  animation:sff-spin .7s linear infinite;flex-shrink:0;
+}
+@keyframes sff-spin{to{transform:rotate(360deg);}}
+.sff-error{
+  display:none;margin-top:10px;padding:9px 10px;
+  border:1px solid rgba(255,90,90,.4);border-radius:var(--radius-sm);
+  background:rgba(255,90,90,.08);
+  font-family:'Space Mono',monospace;font-size:.66rem;color:#ff9a9a;
+}
+.sff-error.show{display:block;}
+.sff-result{display:none;margin-top:14px;}
+.sff-result.show{display:block;animation:sff-rise .35s var(--ease-soft);}
+@keyframes sff-rise{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.sff-result-card{
+  display:flex;align-items:center;gap:12px;
+  padding:14px;border-radius:var(--radius-md);
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+}
+.sff-result-avatar{
+  flex-shrink:0;width:44px;height:44px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#1a1a1a,#2a2a2a);
+  border:1px solid var(--border-strong);color:var(--text2);
+}
+body.theme-sky .sff-result-avatar{
+  background:linear-gradient(135deg,#0a3a66,#1f7fd6);color:#d6efff;
+}
+.sff-result-avatar svg{width:20px;height:20px;}
+.sff-result-info{flex:1;min-width:0;}
+.sff-result-label{
+  font-family:'Space Mono',monospace;font-size:.6rem;color:var(--text2);
+  text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;
+}
+.sff-result-name{
+  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.92rem;
+  color:var(--text);word-break:break-word;
+}
+.sff-result-id{
+  margin-top:6px;font-family:'Space Mono',monospace;font-size:.62rem;color:var(--text2);
+}
+
+/* ── TIKTOK STALKER MODAL ──
+   Sama polanya dengan modal Stalker FF, tapi kartu hasil lebih lengkap:
+   foto profil, nama, username, verified badge, bio, dan grid statistik. */
+.tts-modal-overlay{
+  position:fixed;inset:0;z-index:9998;
+  background:rgba(0,0,0,.72);
+  display:flex;align-items:center;justify-content:center;
+  padding:16px;
+  opacity:0;visibility:hidden;
+  transition:opacity .38s cubic-bezier(.22,1,.36,1),visibility .38s cubic-bezier(.22,1,.36,1),backdrop-filter .38s cubic-bezier(.22,1,.36,1);
+  -webkit-backdrop-filter:blur(0px);backdrop-filter:blur(0px);
+}
+.tts-modal-overlay.show{
+  opacity:1;visibility:visible;
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+}
+.tts-modal{
+  position:relative;
+  width:100%;max-width:320px;
+  background:linear-gradient(165deg,var(--card2),var(--card));
+  border:1px solid var(--border-strong);
+  border-radius:var(--radius-lg);
+  padding:16px 14px 14px;
+  box-shadow:0 24px 60px rgba(0,0,0,.55);
+  transform:scale(.9) translateY(22px);
+  opacity:0;
+  transition:transform .4s cubic-bezier(.22,1,.36,1),opacity .4s cubic-bezier(.22,1,.36,1);
+  max-height:92vh;overflow-y:auto;
+}
+.tts-modal-overlay.show .tts-modal{transform:scale(1) translateY(0);opacity:1;}
+.tts-modal-close{
+  position:absolute;top:10px;right:10px;
+  width:26px;height:26px;border-radius:50%;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);
+  color:var(--text);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;padding:0;z-index:2;
+  -webkit-tap-highlight-color:transparent;
+}
+.tts-modal-close svg{width:14px;height:14px;}
+.tts-modal-title{
+  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.90rem;
+  letter-spacing:.03em;text-align:center;color:var(--text);padding-left:0px;
+}
+.tts-modal-sub{
+  text-align:center;font-size:.66rem;color:var(--text2);margin-top:2px;margin-bottom:12px;
+}
+.tts-input-row{margin-top:4px;display:flex;gap:6px;align-items:stretch;}
+.tts-input{
+  flex:1;min-width:0;padding:9px 12px;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--border-strong);
+  border-radius:var(--radius-sm);
+  color:var(--text);font-family:'Space Mono',monospace;font-size:.74rem;
+  outline:none;
+  transition:border-color var(--t-fast) var(--ease-soft),background var(--t-fast) var(--ease-soft);
+}
+.tts-input::placeholder{color:var(--text2);}
+.tts-input:focus{border-color:var(--blue);background:rgba(255,255,255,.08);}
+.tts-paste-btn{
+  flex-shrink:0;width:36px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--border-strong);
+  border-radius:var(--radius-sm);
+  color:var(--text2);cursor:pointer;padding:0;
+  -webkit-tap-highlight-color:transparent;
+  transition:background var(--t-fast) var(--ease-soft),color var(--t-fast) var(--ease-soft),transform var(--t-fast) var(--ease-soft);
+}
+.tts-paste-btn:active{transform:scale(.92);}
+.tts-paste-btn:hover{background:rgba(255,255,255,.09);color:var(--text);}
+.tts-paste-btn.pasted{color:var(--blue);border-color:var(--blue);}
+body.theme-sky .tts-paste-btn.pasted{color:#6fc3ff;border-color:#6fc3ff;}
+.tts-actions{margin-top:10px;}
+.tts-btn{
+  width:100%;padding:10px 14px;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  border-radius:var(--radius-sm);border:1px solid var(--border-strong);
+  font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.78rem;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:transform var(--t-fast) var(--ease-soft),background var(--t-fast) var(--ease-soft),box-shadow var(--t-fast) var(--ease-soft);
+}
+.tts-btn:active{transform:scale(.97);}
+.tts-btn:disabled{opacity:.5;cursor:not-allowed;}
+.tts-btn-fetch{
+  background:linear-gradient(135deg,#1a1a1a,#2a2a2a);
+  color:var(--text);
+}
+.tts-btn-fetch:hover{
+  background:linear-gradient(135deg,#242424,#343434);
+  box-shadow:0 8px 22px rgba(0,0,0,.35);
+}
+body.theme-sky .tts-btn-fetch{
+  background:linear-gradient(135deg,#0a3a66,#1f7fd6);
+  color:#d6efff;border-color:rgba(111,195,255,.5);
+}
+body.theme-sky .tts-btn-fetch:hover{
+  background:linear-gradient(135deg,#1f7fd6,#6fc3ff);color:#fff;
+}
+.tts-status{
+  display:none;align-items:center;gap:8px;
+  margin-top:10px;font-family:'Space Mono',monospace;font-size:.68rem;color:var(--text2);
+}
+.tts-status.show{display:flex;}
+.tts-spinner{
+  width:12px;height:12px;border-radius:50%;
+  border:2px solid var(--border-strong);border-top-color:var(--blue);
+  animation:tts-spin .7s linear infinite;flex-shrink:0;
+}
+@keyframes tts-spin{to{transform:rotate(360deg);}}
+.tts-error{
+  display:none;margin-top:10px;padding:9px 10px;
+  border:1px solid rgba(255,90,90,.4);border-radius:var(--radius-sm);
+  background:rgba(255,90,90,.08);
+  font-family:'Space Mono',monospace;font-size:.66rem;color:#ff9a9a;
+}
+.tts-error.show{display:block;}
+.tts-result{display:none;margin-top:14px;}
+.tts-result.show{display:block;animation:tts-rise .35s var(--ease-soft);}
+@keyframes tts-rise{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* Header profil: foto + nama + username + badge verified */
+.tts-profile-head{
+  display:flex;align-items:center;gap:12px;
+  padding:14px;border-radius:var(--radius-md);
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+}
+.tts-avatar{
+  flex-shrink:0;width:56px;height:56px;border-radius:50%;
+  overflow:hidden;background:#0a0a0a;
+  border:1px solid var(--border-strong);
+  display:flex;align-items:center;justify-content:center;
+}
+.tts-avatar img{width:100%;height:100%;object-fit:cover;display:block;}
+.tts-avatar-fallback{color:var(--text2);}
+.tts-avatar-fallback svg{width:24px;height:24px;}
+.tts-profile-info{flex:1;min-width:0;}
+.tts-profile-name-row{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.tts-profile-name{
+  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.9rem;
+  color:var(--text);word-break:break-word;
+}
+.tts-verified-badge{
+  flex-shrink:0;width:14px;height:14px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--blue);color:var(--bg);
+}
+.tts-verified-badge svg{width:9px;height:9px;stroke-width:3;}
+body.theme-sky .tts-verified-badge{background:#6fc3ff;color:#040810;}
+.tts-profile-username{
+  margin-top:2px;font-family:'Space Mono',monospace;font-size:.68rem;color:var(--text2);
+}
+.tts-private-tag{
+  display:inline-block;margin-top:5px;padding:2px 7px;
+  border-radius:20px;border:1px solid var(--border-strong);
+  font-family:'Space Mono',monospace;font-size:.58rem;color:var(--text2);
+  text-transform:uppercase;letter-spacing:.04em;
+}
+
+/* Bio */
+.tts-bio{
+  margin-top:10px;padding:10px 12px;border-radius:var(--radius-sm);
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  font-family:'Space Grotesk',sans-serif;font-size:.72rem;color:var(--text2);
+  line-height:1.5;white-space:pre-wrap;word-break:break-word;
+}
+
+/* Grid statistik: postingan / followers / following / suka */
+.tts-stats-grid{
+  margin-top:10px;display:grid;grid-template-columns:repeat(2,1fr);gap:8px;
+}
+.tts-stat-box{
+  padding:10px;border-radius:var(--radius-sm);
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  text-align:center;
+}
+.tts-stat-value{
+  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.86rem;
+  color:var(--text);
+}
+.tts-stat-label{
+  margin-top:2px;font-family:'Space Mono',monospace;font-size:.58rem;color:var(--text2);
+  text-transform:uppercase;letter-spacing:.04em;
+}
+.tts-result-id{
+  margin-top:8px;text-align:center;
+  font-family:'Space Mono',monospace;font-size:.6rem;color:var(--text2);
 }
 
 </style>
@@ -2297,14 +2837,23 @@ body.theme-sky .lobbyff-btn-download:hover{
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       <span>Beranda</span>
     </a></li>
-    <li><a href="admin.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-      <span>Admin Panel</span>
-    </a></li>
-    <li><a href="https://tarzxkey.vercel.app/" target="_blank" rel="noopener noreferrer">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6M15.5 7.5l3 3L22 7l-3-3"/></svg>
-      <span>Key Generate</span>
-    </a></li>
+    <li>
+      <button type="button" class="side-menu-dropdown-toggle" id="uploadDropdownToggle" onclick="toggleSideMenuDropdown('uploadDropdown', this)" aria-expanded="false" aria-controls="uploadDropdown">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Admin Panel</span>
+        <svg class="dropdown-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <ul class="side-menu-submenu" id="uploadDropdown">
+        <li><a href="admin.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span>Upload Produk</span>
+        </a></li>
+        <li><a href="https://tarzxkey.vercel.app/" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6M15.5 7.5l3 3L22 7l-3-3"/></svg>
+          <span>Key Generate</span>
+        </a></li>
+      </ul>
+    </li>
     <li><a href="#" onclick="openMusicModal();closeSideMenu();">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
       <span>Playlist Musik</span>
@@ -2316,6 +2865,18 @@ body.theme-sky .lobbyff-btn-download:hover{
     <li><a href="#" onclick="openLobbyFFModal();closeSideMenu();">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
       <span>Loby FF Generate</span>
+    </a></li>
+    <li><a href="#" onclick="openTtdlModal();closeSideMenu();">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+      <span>TikTok Downloader</span>
+    </a></li>
+    <li><a href="#" onclick="openSffModal();closeSideMenu();">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><circle cx="11" cy="9" r="2.2"/><path d="M7.2 15.2a4 4 0 0 1 7.6 0"/></svg>
+      <span>Free Fire Stalker</span>
+    </a></li>
+    <li><a href="#" onclick="openTtsModal();closeSideMenu();">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/><circle cx="17" cy="7" r="1"/></svg>
+      <span>TikTok Stalker</span>
     </a></li>
   </ul>
 
@@ -2366,17 +2927,11 @@ body.theme-sky .lobbyff-btn-download:hover{
     </button>
 
     <div class="lobbyff-modal-title">LOBY FREE FIRE GENERATE</div>
-    <div class="lobbyff-modal-sub">Masukkan nama, langsung tampil di lobby</div>
+    <div class="lobbyff-modal-sub">Foto loby free fire dengan nama costum</div>
 
     <div class="lobbyff-canvas-wrap">
-      <canvas id="lobbyffCanvas" width="720" height="1280" aria-label="Preview lobby Free Fire dengan nama">
-      <div class="lobbyff-loading" id="lobbyffLoading">Memuat gambar...</div>
-    </div>
-
-    <div class="lobbyff-photo-row" id="lobbyffPhotoRow">
-      <button type="button" class="lobbyff-photo-btn active" data-photo="1" onclick="selectLobbyFFPhoto(1)">Foto 1</button>
-      <button type="button" class="lobbyff-photo-btn" data-photo="2" onclick="selectLobbyFFPhoto(2)">Foto 2</button>
-      <button type="button" class="lobbyff-photo-btn" data-photo="3" onclick="selectLobbyFFPhoto(3)">Foto 3</button>
+      <img id="lobbyffResultImg" alt="Preview lobby Free Fire dengan nama" style="display:none;width:100%;height:100%;object-fit:contain;">
+      <div class="lobbyff-loading" id="lobbyffLoading">Masukkan nama lalu tekan Generate</div>
     </div>
 
     <div class="lobbyff-input-row">
@@ -2384,16 +2939,210 @@ body.theme-sky .lobbyff-btn-download:hover{
     </div>
 
     <div class="lobbyff-actions">
+      <button class="lobbyff-btn lobbyff-btn-download" id="lobbyffGenerateBtn" onclick="generateLobbyFF()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Generate
+      </button>
       <button class="lobbyff-btn lobbyff-btn-download" id="lobbyffDownloadBtn" onclick="downloadLobbyFF()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Simpan Gambar
+        Download
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- TIKTOK DOWNLOADER MODAL (tempel link TikTok, dapat video tanpa watermark + audio) -->
+<div class="ttdl-modal-overlay" id="ttdlModalOverlay">
+  <div class="ttdl-modal" id="ttdlModalCard" role="dialog" aria-modal="true" aria-label="Unduh video TikTok tanpa watermark">
+    <button class="ttdl-modal-close" aria-label="Tutup" onclick="closeTtdlModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <div class="ttdl-modal-title">TIKTOK DOWNLOADER</div>
+    <div class="ttdl-modal-sub">Tempel link, unduh tanpa watermark</div>
+
+    <div class="ttdl-input-row">
+      <input type="text" id="ttdlUrlInput" class="ttdl-input" placeholder="https://vt.tiktok.com/xxxxx/" autocomplete="off" spellcheck="false">
+      <button type="button" class="ttdl-paste-btn" id="ttdlPasteBtn" onclick="pasteTtdlUrl()" aria-label="Tempel dari clipboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+      </button>
+    </div>
+
+    <div class="ttdl-actions">
+      <button class="ttdl-btn ttdl-btn-fetch" id="ttdlFetchBtn" onclick="fetchTtdl()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Ambil Video
+      </button>
+    </div>
+
+    <div class="ttdl-status" id="ttdlStatus">
+      <span class="ttdl-spinner"></span>
+      <span>Mengambil data video…</span>
+    </div>
+
+    <div class="ttdl-error" id="ttdlError"></div>
+
+    <div class="ttdl-result" id="ttdlResult">
+      <div class="ttdl-preview-wrap" id="ttdlVideoPreview">
+        <video id="ttdlPreviewVideo" muted loop playsinline controls></video>
+      </div>
+      <div class="ttdl-dl-row" id="ttdlVideoActions">
+        <a class="ttdl-dl-btn primary" id="ttdlVideoLink" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download Video
+        </a>
+        <a class="ttdl-dl-btn" id="ttdlAudioLink" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+          Unduh Audio
+        </a>
+      </div>
+
+      <div class="ttdl-photo-block" id="ttdlPhotoBlock">
+        <div class="ttdl-carousel-wrap">
+          <div class="ttdl-carousel-track" id="ttdlCarouselTrack"></div>
+        </div>
+        <div class="ttdl-carousel-dots" id="ttdlCarouselDots"></div>
+        <div class="ttdl-dl-row">
+          <a class="ttdl-dl-btn primary" id="ttdlPhotoLink" target="_blank" rel="noopener" download>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span id="ttdlPhotoLinkLabel">Unduh Foto Ini</span>
+          </a>
+          <a class="ttdl-dl-btn" id="ttdlPhotoAudioLink" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            Unduh Audio
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STALKER FREE FIRE MODAL (cek Nickname/IGN akun FF berdasarkan User ID) -->
+<div class="sff-modal-overlay" id="sffModalOverlay">
+  <div class="sff-modal" id="sffModalCard" role="dialog" aria-modal="true" aria-label="Cek Nickname Free Fire berdasarkan User ID">
+    <button class="sff-modal-close" aria-label="Tutup" onclick="closeSffModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <div class="sff-modal-title">FREE FIRE STALKER</div>
+    <div class="sff-modal-sub">Masukkan User ID, cek Nickname akunnya</div>
+
+    <div class="sff-input-row">
+      <input type="text" id="sffIdInput" class="sff-input" placeholder="Contoh: 468380338" inputmode="numeric" autocomplete="off" spellcheck="false">
+      <button type="button" class="sff-paste-btn" id="sffPasteBtn" onclick="pasteSffId()" aria-label="Tempel dari clipboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+      </button>
+    </div>
+
+    <div class="sff-actions">
+      <button class="sff-btn sff-btn-fetch" id="sffFetchBtn" onclick="fetchSff()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Cek Nickname
+      </button>
+    </div>
+
+    <div class="sff-status" id="sffStatus">
+      <span class="sff-spinner"></span>
+      <span>Mengambil data akun…</span>
+    </div>
+
+    <div class="sff-error" id="sffError"></div>
+
+    <div class="sff-result" id="sffResult">
+      <div class="sff-result-card">
+        <div class="sff-result-avatar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="sff-result-info">
+          <div class="sff-result-label">Nickname</div>
+          <div class="sff-result-name" id="sffResultName">—</div>
+          <div class="sff-result-id" id="sffResultId"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TIKTOK STALKER MODAL (cek profil TikTok lengkap berdasarkan username) -->
+<div class="tts-modal-overlay" id="ttsModalOverlay">
+  <div class="tts-modal" id="ttsModalCard" role="dialog" aria-modal="true" aria-label="Cek profil TikTok berdasarkan username">
+    <button class="tts-modal-close" aria-label="Tutup" onclick="closeTtsModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <div class="tts-modal-title">TIKTOK STALKER</div>
+    <div class="tts-modal-sub">Masukkan username, cek profil lengkapnya</div>
+
+    <div class="tts-input-row">
+      <input type="text" id="ttsUsernameInput" class="tts-input" placeholder="Contoh: tarz_026" autocomplete="off" spellcheck="false">
+      <button type="button" class="tts-paste-btn" id="ttsPasteBtn" onclick="pasteTtsUsername()" aria-label="Tempel dari clipboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+      </button>
+    </div>
+
+    <div class="tts-actions">
+      <button class="tts-btn tts-btn-fetch" id="ttsFetchBtn" onclick="fetchTts()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Cek Profil
+      </button>
+    </div>
+
+    <div class="tts-status" id="ttsStatus">
+      <span class="tts-spinner"></span>
+      <span>Mengambil data profil…</span>
+    </div>
+
+    <div class="tts-error" id="ttsError"></div>
+
+    <div class="tts-result" id="ttsResult">
+      <div class="tts-profile-head">
+        <div class="tts-avatar" id="ttsAvatar">
+          <span class="tts-avatar-fallback" id="ttsAvatarFallback">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </span>
+          <img id="ttsAvatarImg" alt="Foto profil" style="display:none;">
+        </div>
+        <div class="tts-profile-info">
+          <div class="tts-profile-name-row">
+            <span class="tts-profile-name" id="ttsName">—</span>
+            <span class="tts-verified-badge" id="ttsVerifiedBadge" style="display:none;" aria-label="Terverifikasi">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+          </div>
+          <div class="tts-profile-username" id="ttsUsername">@—</div>
+          <span class="tts-private-tag" id="ttsPrivateTag" style="display:none;">Akun Privat</span>
+        </div>
+      </div>
+
+      <div class="tts-bio" id="ttsBio" style="display:none;"></div>
+
+      <div class="tts-stats-grid">
+        <div class="tts-stat-box">
+          <div class="tts-stat-value" id="ttsPosts">—</div>
+          <div class="tts-stat-label">Postingan</div>
+        </div>
+        <div class="tts-stat-box">
+          <div class="tts-stat-value" id="ttsFollowers">—</div>
+          <div class="tts-stat-label">Followers</div>
+        </div>
+        <div class="tts-stat-box">
+          <div class="tts-stat-value" id="ttsFollowing">—</div>
+          <div class="tts-stat-label">Following</div>
+        </div>
+        <div class="tts-stat-box">
+          <div class="tts-stat-value" id="ttsLikes">—</div>
+          <div class="tts-stat-label">Total Suka</div>
+        </div>
+      </div>
+
+      <div class="tts-result-id" id="ttsResultId"></div>
     </div>
   </div>
 </div>
 
 <!-- BANNER VIDEO -->
 <section class="hero" aria-label="Banner promosi">
+
   <div class="banner-slider" id="bannerSlider" role="region" aria-label="Banner promosi">
     <video class="banner-video" src="https://xxaenbqyeliyhrulyjuz.supabase.co/storage/v1/object/public/Videos/Thamnel.mp4" poster="https://xxaenbqyeliyhrulyjuz.supabase.co/storage/v1/object/public/Videos/my.jpg" width="1280" height="720" autoplay muted loop playsinline preload="metadata" aria-label="Banner promosi Tarz Store" controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false"></video>
   </div>
@@ -3033,6 +3782,15 @@ function closeSideMenu(){
 document.addEventListener('keydown', function(e){
   if(e.key === 'Escape') closeSideMenu();
 });
+
+/* ── DROPDOWN SUBMENU DI SIDEBAR (mis: "Upload Produk" -> Upload Produk + Key Generate) ── */
+function toggleSideMenuDropdown(submenuId, toggleBtn){
+  const submenu = document.getElementById(submenuId);
+  if(!submenu || !toggleBtn) return;
+  const isOpen = submenu.classList.toggle('open');
+  toggleBtn.classList.toggle('open', isOpen);
+  toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+}
 
 /* ── TAB INDICATOR ── */
 function updateIndicator(btn){
@@ -4837,167 +5595,90 @@ const PLAYLIST = [
 </script>
 
 <!-- ═══════════════════════════════════════════════════
-     LOBBY FF: foto lobby Free Fire + nama custom via canvas.
-     User ketik nama -> langsung ditulis di atas foto -> bisa disimpan
-     sebagai gambar (PNG) lewat tombol "Simpan Gambar".
+     LOBBY FF: generate lobby Free Fire lewat API eksternal.
+     User ketik nama -> tekan Generate -> gambar diambil dari
+     https://apii.nexadev.my.id/fakeff?usn=<nama>, digambar penuh
+     (tanpa crop) ke canvas tersembunyi supaya preview & hasil
+     unduhan sama persis -> bisa disimpan lewat "Simpan Gambar".
      ═══════════════════════════════════════════════════ -->
 <script>
 (function(){
-  // Sementara ketiga slot foto memakai URL yang sama; tinggal ganti URL
-  // masing-masing di bawah ini kalau nanti ada foto lobby FF lain.
-  const LOBBYFF_IMG_URL = '';
-  const LOBBYFF_PHOTOS = {
-    1: 'https://bvblcdnmbzncoqeoqkoc.supabase.co/storage/v1/object/public/Tarz/Loby2.jpg',
-    2: 'https://bvblcdnmbzncoqeoqkoc.supabase.co/storage/v1/object/public/Tarz/Loby1.jpg',
-    3: 'https://bvblcdnmbzncoqeoqkoc.supabase.co/storage/v1/object/public/Tarz/Loby3.jpg'
-  };
+  const LOBBYFF_API_BASE = 'https://apii.nexadev.my.id/fakeff';
 
   const overlay = document.getElementById('lobbyffModalOverlay');
-  const canvas = document.getElementById('lobbyffCanvas');
+  const resultImg = document.getElementById('lobbyffResultImg');
   const loadingEl = document.getElementById('lobbyffLoading');
   const nameInput = document.getElementById('lobbyffNameInput');
-  const photoRow = document.getElementById('lobbyffPhotoRow');
-  if(!overlay || !canvas || !nameInput) return;
+  const generateBtn = document.getElementById('lobbyffGenerateBtn');
+  if(!overlay || !resultImg || !nameInput) return;
 
-  const ctx = canvas.getContext('2d');
-  let bgImage = null;
+  // canvas tersembunyi, dipakai untuk menggambar ulang gambar hasil API
+  // (bukan lewat CSS) supaya file yang diunduh identik dengan preview
+  // dan supaya bisa diekspor sebagai PNG lewat toDataURL.
+  const hiddenCanvas = document.createElement('canvas');
+  const hiddenCtx = hiddenCanvas.getContext('2d');
+
   let imgLoaded = false;
-  let imgError = false;
-  let currentPhoto = 1;
-  const imgCache = {}; // { photoId: {img, loaded, error} }
+  let currentUrl = '';
+  let canvasReady = false; // false kalau gambar cross-origin "menodai" canvas
 
-  function loadImage(photoId){
-    const id = photoId || currentPhoto;
-    const cached = imgCache[id];
-    if(cached && cached.loaded){
-      bgImage = cached.img;
-      imgLoaded = true; imgError = false;
-      if(loadingEl) loadingEl.classList.add('hide');
-      drawCanvas();
+  function setLoading(msg){
+    imgLoaded = false;
+    resultImg.style.display = 'none';
+    if(loadingEl){ loadingEl.textContent = msg; loadingEl.classList.remove('hide'); }
+  }
+
+  window.generateLobbyFF = function(){
+    const name = (nameInput.value || '').trim();
+    if(!name){
+      if(typeof showToast === 'function') showToast('Ketik nama Free Fire kamu dulu.', 'error');
       return;
     }
-    if(cached && cached.error){
-      bgImage = null;
-      imgLoaded = false; imgError = true;
-      if(loadingEl){ loadingEl.textContent = 'Gagal memuat gambar lobby.'; loadingEl.classList.remove('hide'); }
-      drawCanvas();
-      return;
-    }
-    bgImage = null; imgLoaded = false; imgError = false;
-    if(loadingEl){ loadingEl.textContent = 'Memuat gambar...'; loadingEl.classList.remove('hide'); }
-    drawCanvas();
+    if(generateBtn) generateBtn.disabled = true;
+    setLoading('Membuat lobby...');
+
+    const url = `${LOBBYFF_API_BASE}?usn=${encodeURIComponent(name)}&t=${Date.now()}`;
+    currentUrl = url;
 
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = function(){
-      imgCache[id] = { img, loaded:true, error:false };
-      if(id === currentPhoto){
-        bgImage = img;
-        imgLoaded = true;
-        if(loadingEl) loadingEl.classList.add('hide');
-        drawCanvas();
+      if(url !== currentUrl) return; // hasil generate lama, abaikan
+
+      // gambar apa adanya (ukuran asli) ke canvas tersembunyi
+      hiddenCanvas.width = img.naturalWidth;
+      hiddenCanvas.height = img.naturalHeight;
+      hiddenCtx.clearRect(0, 0, hiddenCanvas.width, hiddenCanvas.height);
+      hiddenCtx.drawImage(img, 0, 0);
+
+      try{
+        // cek apakah canvas masih "bersih" (server mengizinkan CORS)
+        hiddenCanvas.toDataURL('image/png');
+        canvasReady = true;
+      } catch(e){
+        canvasReady = false; // canvas ternoda, fallback ke URL langsung saat unduh
       }
+
+      // preview pakai object-fit:contain supaya persis sama seperti hasil unduhan
+      resultImg.src = img.src;
+      resultImg.style.display = 'block';
+      if(loadingEl) loadingEl.classList.add('hide');
+      imgLoaded = true;
+      if(generateBtn) generateBtn.disabled = false;
     };
     img.onerror = function(){
-      imgCache[id] = { img:null, loaded:false, error:true };
-      if(id === currentPhoto){
-        imgError = true;
-        if(loadingEl){ loadingEl.textContent = 'Gagal memuat gambar lobby.'; loadingEl.classList.remove('hide'); }
-        drawCanvas();
-      }
+      if(url !== currentUrl) return;
+      setLoading('Gagal membuat lobby. Coba lagi.');
+      if(generateBtn) generateBtn.disabled = false;
+      if(typeof showToast === 'function') showToast('Gagal membuat lobby, coba lagi.', 'error');
     };
-    img.src = LOBBYFF_PHOTOS[id] || LOBBYFF_IMG_URL;
-  }
-
-  window.selectLobbyFFPhoto = function(photoId){
-    if(photoId === currentPhoto) return;
-    currentPhoto = photoId;
-    if(photoRow){
-      photoRow.querySelectorAll('.lobbyff-photo-btn').forEach(btn=>{
-        btn.classList.toggle('active', Number(btn.dataset.photo) === photoId);
-      });
-    }
-    loadImage(photoId);
+    img.src = url;
   };
-
-  function drawCanvas(){
-    const w = canvas.width, h = canvas.height;
-    ctx.clearRect(0, 0, w, h);
-
-    if(bgImage){
-      // cover-fit gambar ke canvas
-      const imgRatio = bgImage.width / bgImage.height;
-      const canvasRatio = w / h;
-      let dw, dh, dx, dy;
-      if(imgRatio > canvasRatio){
-        dh = h; dw = h * imgRatio; dx = (w - dw) / 2; dy = 0;
-      } else {
-        dw = w; dh = w / imgRatio; dx = 0; dy = (h - dh) / 2;
-      }
-      ctx.drawImage(bgImage, dx, dy, dw, dh);
-    } else {
-      ctx.fillStyle = '#0a0a0a';
-      ctx.fillRect(0, 0, w, h);
-    }
-
-    const name = (nameInput.value || '').trim();
-    if(name){
-      // Posisi diukur langsung dari pixel foto 72137.webp (1200x2135, rasio ~9:16,
-      // sama dengan canvas 720x1280): kotak kosong gelap di DALAM bar bendera+rank,
-      // di antara ikon bendera (kiri) dan badge rank "V8" (kanan). Teks di-center
-      // di tengah kotak kosong itu (bukan rapat ke kiri) supaya jarak ke bendera
-      // dan ke badge rank seimbang — mengikuti gaya asli UI Free Fire.
-      let fontSize = Math.round(w * 0.038);
-      ctx.font = `700 ${fontSize}px Arial, Helvetica, sans-serif`;
-      const maxTextW = w * 0.32;
-      while(ctx.measureText(name).width > maxTextW && fontSize > 10){
-        fontSize -= 1;
-        ctx.font = `700 ${fontSize}px Arial, Helvetica, sans-serif`;
-      }
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      const textX = w * 0.5208;
-      const textY = h * 0.798;
-
-      // bayangan halus di bawah nickname (drop shadow tipis, bukan outline)
-      ctx.save();
-      ctx.shadowColor = 'rgba(0,0,0,.55)';
-      ctx.shadowBlur = fontSize * 0.12;
-      ctx.shadowOffsetX = 0;
-      ctx.shadowOffsetY = fontSize * 0.09;
-
-      ctx.lineWidth = Math.max(1, fontSize * 0.06);
-      ctx.strokeStyle = 'rgba(15,10,5,.95)';
-      ctx.lineJoin = 'round';
-      ctx.strokeText(name, textX, textY);
-      ctx.restore();
-
-      // warna emas-oranye khas teks in-game Free Fire (gradient vertikal tipis,
-      // highlight kecil di atas lalu turun ke oranye tua, tanpa terlalu putih)
-      const textGrad = ctx.createLinearGradient(0, textY - fontSize * 0.6, 0, textY + fontSize * 0.6);
-      textGrad.addColorStop(0, '#fff5d0');
-      textGrad.addColorStop(0.18, '#ffe08a');
-      textGrad.addColorStop(0.6, '#f4bd4a');
-      textGrad.addColorStop(1, '#e0a83a');
-      ctx.fillStyle = textGrad;
-      ctx.fillText(name, textX, textY);
-    }
-  }
-
-  let drawScheduled = false;
-  function scheduleDraw(){
-    if(drawScheduled) return;
-    drawScheduled = true;
-    requestAnimationFrame(()=>{ drawScheduled = false; drawCanvas(); });
-  }
-
-  nameInput.addEventListener('input', scheduleDraw);
 
   window.openLobbyFFModal = function(){
     void overlay.offsetHeight;
     overlay.classList.add('show');
     document.body.style.overflow = 'hidden';
-    loadImage(currentPhoto);
   };
   window.closeLobbyFFModal = function(){
     overlay.classList.remove('show');
@@ -5009,21 +5690,575 @@ const PLAYLIST = [
 
   window.downloadLobbyFF = function(){
     if(!imgLoaded){
-      if(typeof showToast === 'function') showToast('Gambar belum selesai dimuat, coba lagi sebentar.', 'error');
+      if(typeof showToast === 'function') showToast('Generate dulu gambarnya sebelum disimpan.', 'error');
       return;
     }
+    const name = (nameInput.value || '').trim();
+    const fileSafeName = name ? name.replace(/[^a-z0-9]+/gi, '_') : 'lobby';
+    const fileName = `FreeFire-${fileSafeName}.png`;
+
+    // jalur utama: canvas bersih -> ekspor PNG asli lewat blob (paling andal
+    // untuk memicu download beneran, termasuk di browser mobile).
+    if(canvasReady){
+      hiddenCanvas.toBlob(function(blob){
+        if(!blob){
+          downloadViaFetch(fileName);
+          return;
+        }
+        const blobUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(()=> URL.revokeObjectURL(blobUrl), 4000);
+        if(typeof showToast === 'function') showToast('Gambar berhasil disimpan!', 'success');
+      }, 'image/png');
+      return;
+    }
+
+    // fallback: canvas ternoda (server tidak kirim header CORS) -> fetch
+    // manual jadi blob. Kalau ini juga gagal (mis. server blokir fetch lintas
+    // origin sepenuhnya), baru buka tab baru sebagai jalan terakhir.
+    downloadViaFetch(fileName);
+  };
+
+  function downloadViaFetch(fileName){
+    fetch(currentUrl, { mode: 'cors' })
+      .then(res => {
+        if(!res.ok) throw new Error('Gagal mengambil gambar');
+        return res.blob();
+      })
+      .then(blob => {
+        const blobUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(()=> URL.revokeObjectURL(blobUrl), 4000);
+        if(typeof showToast === 'function') showToast('Gambar berhasil disimpan!', 'success');
+      })
+      .catch(() => {
+        // jalan terakhir: buka gambar di tab baru, user simpan manual
+        window.open(currentUrl, '_blank', 'noopener,noreferrer');
+        if(typeof showToast === 'function') showToast('Gambar dibuka di tab baru, tekan lama untuk menyimpan.', 'error');
+      });
+  }
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════
+     TIKTOK DOWNLOADER (modal, tanpa watermark)
+     ═══════════════════════════════════════════════════ -->
+<script>
+(function(){
+  const overlay = document.getElementById('ttdlModalOverlay');
+  const urlInput = document.getElementById('ttdlUrlInput');
+  const fetchBtn = document.getElementById('ttdlFetchBtn');
+  const statusBox = document.getElementById('ttdlStatus');
+  const errorBox = document.getElementById('ttdlError');
+  const resultBox = document.getElementById('ttdlResult');
+  const previewVideo = document.getElementById('ttdlPreviewVideo');
+  const videoPreviewWrap = document.getElementById('ttdlVideoPreview');
+  const videoActions = document.getElementById('ttdlVideoActions');
+  const videoLink = document.getElementById('ttdlVideoLink');
+  const audioLink = document.getElementById('ttdlAudioLink');
+  const photoBlock = document.getElementById('ttdlPhotoBlock');
+  const carouselTrack = document.getElementById('ttdlCarouselTrack');
+  const carouselDots = document.getElementById('ttdlCarouselDots');
+  const photoLink = document.getElementById('ttdlPhotoLink');
+  const photoLinkLabel = document.getElementById('ttdlPhotoLinkLabel');
+  const photoAudioLink = document.getElementById('ttdlPhotoAudioLink');
+
+  let photoUrls = [];
+  let activePhotoIndex = 0;
+
+  function resetTtdlUI(){
+    errorBox.classList.remove('show');
+    errorBox.textContent = '';
+    resultBox.classList.remove('show');
+    videoPreviewWrap.classList.remove('active');
+    videoActions.classList.remove('active');
+    photoBlock.classList.remove('active');
+    carouselTrack.innerHTML = '';
+    carouselDots.innerHTML = '';
+    photoUrls = [];
+    activePhotoIndex = 0;
+  }
+
+  function showTtdlError(msg){
+    errorBox.textContent = msg;
+    errorBox.classList.add('show');
+  }
+
+  window.openTtdlModal = function(){
+    overlay.style.display = 'flex';
+    void overlay.offsetHeight;
+    overlay.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  };
+  window.closeTtdlModal = function(){
+    overlay.classList.remove('show');
+    document.body.style.overflow = '';
+  };
+  document.addEventListener('keydown', e=>{
+    if(e.key === 'Escape' && overlay.classList.contains('show')) closeTtdlModal();
+  });
+
+  window.pasteTtdlUrl = async function(){
+    const pasteBtn = document.getElementById('ttdlPasteBtn');
     try{
-      const link = document.createElement('a');
-      const name = (nameInput.value || '').trim();
-      const fileSafeName = name ? name.replace(/[^a-z0-9]+/gi, '_') : 'lobby';
-      link.download = `FreeFire-${fileSafeName}.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-      if(typeof showToast === 'function') showToast('Gambar berhasil disimpan!', 'success');
+      const text = await navigator.clipboard.readText();
+      if(text){
+        urlInput.value = text.trim();
+        pasteBtn.classList.add('pasted');
+        setTimeout(()=>pasteBtn.classList.remove('pasted'), 900);
+      }
     } catch(err){
-      if(typeof showToast === 'function') showToast('Gagal menyimpan gambar. Coba screenshot manual.', 'error');
+      urlInput.focus();
     }
   };
+
+  // Mencoba beberapa kemungkinan bentuk field foto dari API, karena
+  // bentuk persisnya bisa berbeda untuk konten carousel vs video.
+  function extractPhotoUrls(info){
+    if(Array.isArray(info.photo) && info.photo.length){
+      return info.photo.filter(u => typeof u === 'string');
+    }
+    if(Array.isArray(info.images) && info.images.length){
+      return info.images.filter(u => typeof u === 'string');
+    }
+    if(Array.isArray(info.photos) && info.photos.length){
+      return info.photos.filter(u => typeof u === 'string');
+    }
+    if(Array.isArray(info.slides) && info.slides.length){
+      return info.slides.filter(u => typeof u === 'string');
+    }
+    return [];
+  }
+
+  function renderCarousel(urls){
+    carouselTrack.innerHTML = '';
+    carouselDots.innerHTML = '';
+
+    urls.forEach((src, i) => {
+      const slide = document.createElement('div');
+      slide.className = 'ttdl-carousel-slide';
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = 'Foto ' + (i + 1);
+      img.loading = i === 0 ? 'eager' : 'lazy';
+      slide.appendChild(img);
+      carouselTrack.appendChild(slide);
+
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'ttdl-carousel-dot' + (i === 0 ? ' active' : '');
+      dot.setAttribute('aria-label', 'Foto ' + (i + 1));
+      dot.addEventListener('click', () => {
+        const slideEl = carouselTrack.children[i];
+        if(slideEl) slideEl.scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
+      });
+      carouselDots.appendChild(dot);
+    });
+
+    updateActivePhotoUI(0);
+  }
+
+  function updateActivePhotoUI(index){
+    activePhotoIndex = index;
+    [...carouselDots.children].forEach((dot, i) => {
+      dot.classList.toggle('active', i === index);
+    });
+    const total = photoUrls.length;
+    photoLinkLabel.textContent = total > 1
+      ? 'Unduh Foto Ini (' + (index + 1) + '/' + total + ')'
+      : 'Unduh Foto Ini';
+    const src = photoUrls[index];
+    if(src){
+      photoLink.href = src;
+      const safeIndex = String(index + 1).padStart(2, '0');
+      photoLink.setAttribute('download', 'TikTokPhoto-' + safeIndex + '.jpg');
+    }
+  }
+
+  // Deteksi foto aktif berdasarkan posisi scroll carousel (untuk swipe manual).
+  let scrollRaf = null;
+  carouselTrack.addEventListener('scroll', () => {
+    if(scrollRaf) cancelAnimationFrame(scrollRaf);
+    scrollRaf = requestAnimationFrame(() => {
+      const trackWidth = carouselTrack.clientWidth;
+      if(!trackWidth) return;
+      const index = Math.round(carouselTrack.scrollLeft / trackWidth);
+      const clamped = Math.max(0, Math.min(index, photoUrls.length - 1));
+      if(clamped !== activePhotoIndex) updateActivePhotoUI(clamped);
+    });
+  }, { passive:true });
+
+  window.fetchTtdl = async function(){
+    const url = (urlInput.value || '').trim();
+    if(!url){
+      showTtdlError('Tempel tautan TikTok dulu, ya.');
+      return;
+    }
+
+    resetTtdlUI();
+    statusBox.classList.add('show');
+    fetchBtn.disabled = true;
+
+    const targetUrl = 'https://api.nexadev.my.id/api/aio?url=' + encodeURIComponent(url);
+    // API pihak ketiga ini kadang memblokir akses langsung dari browser (CORS),
+    // jadi dicoba langsung dulu, lalu jatuh ke proxy publik kalau gagal.
+    const attempts = [
+      targetUrl,
+      'https://corsproxy.io/?url=' + encodeURIComponent(targetUrl),
+      'https://api.allorigins.win/raw?url=' + encodeURIComponent(targetUrl)
+    ];
+
+    try{
+      let data = null;
+
+      for(const attemptUrl of attempts){
+        try{
+          const res = await fetch(attemptUrl);
+          if(!res.ok) continue;
+          const json = await res.json();
+          if(json){ data = json; break; }
+        } catch(innerErr){
+          continue;
+        }
+      }
+
+      if(!data){
+        throw new Error('Tidak bisa menjangkau server pengambil video. Coba lagi sebentar lagi.');
+      }
+      if(!data.status || !data.data){
+        throw new Error('Tautan tidak bisa diproses. Pastikan tautannya benar dan videonya publik.');
+      }
+
+      const info = data.data;
+      const isPhotoPost = info.photo === true || (Array.isArray(info.photo) && info.photo.length > 0);
+      const urls = isPhotoPost ? extractPhotoUrls(info) : [];
+
+      if(isPhotoPost && urls.length){
+        photoUrls = urls;
+        renderCarousel(urls);
+        photoBlock.classList.add('active');
+        if(info.audio){
+          photoAudioLink.href = info.audio;
+          photoAudioLink.style.display = 'flex';
+        } else {
+          photoAudioLink.style.display = 'none';
+        }
+      } else if(info.video){
+        previewVideo.src = info.videoWM || info.video;
+        videoLink.href = info.video;
+        if(info.audio){
+          audioLink.href = info.audio;
+          audioLink.style.display = 'flex';
+        } else {
+          audioLink.style.display = 'none';
+        }
+        videoPreviewWrap.classList.add('active');
+        videoActions.classList.add('active');
+      } else {
+        throw new Error('Video maupun foto tidak ditemukan untuk tautan ini.');
+      }
+
+      resultBox.classList.add('show');
+    } catch(err){
+      showTtdlError(err.message || 'Terjadi kesalahan. Coba lagi sebentar lagi.');
+    } finally{
+      statusBox.classList.remove('show');
+      fetchBtn.disabled = false;
+    }
+  };
+
+  urlInput.addEventListener('keydown', e=>{
+    if(e.key === 'Enter'){ e.preventDefault(); fetchTtdl(); }
+  });
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════
+     STALKER FREE FIRE (modal, cek Nickname/IGN via User ID)
+     ═══════════════════════════════════════════════════ -->
+<script>
+(function(){
+  const overlay = document.getElementById('sffModalOverlay');
+  const idInput = document.getElementById('sffIdInput');
+  const fetchBtn = document.getElementById('sffFetchBtn');
+  const statusBox = document.getElementById('sffStatus');
+  const errorBox = document.getElementById('sffError');
+  const resultBox = document.getElementById('sffResult');
+  const resultName = document.getElementById('sffResultName');
+  const resultId = document.getElementById('sffResultId');
+
+  function resetSffUI(){
+    errorBox.classList.remove('show');
+    errorBox.textContent = '';
+    resultBox.classList.remove('show');
+  }
+
+  function showSffError(msg){
+    errorBox.textContent = msg;
+    errorBox.classList.add('show');
+  }
+
+  window.openSffModal = function(){
+    overlay.style.display = 'flex';
+    void overlay.offsetHeight;
+    overlay.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  };
+  window.closeSffModal = function(){
+    overlay.classList.remove('show');
+    document.body.style.overflow = '';
+  };
+  document.addEventListener('keydown', e=>{
+    if(e.key === 'Escape' && overlay.classList.contains('show')) closeSffModal();
+  });
+
+  window.pasteSffId = async function(){
+    const pasteBtn = document.getElementById('sffPasteBtn');
+    try{
+      const text = await navigator.clipboard.readText();
+      if(text){
+        idInput.value = text.trim();
+        pasteBtn.classList.add('pasted');
+        setTimeout(()=>pasteBtn.classList.remove('pasted'), 900);
+      }
+    } catch(err){
+      idInput.focus();
+    }
+  };
+
+  window.fetchSff = async function(){
+    const id = (idInput.value || '').trim();
+    if(!id){
+      showSffError('Masukkan User ID Free Fire dulu, ya.');
+      return;
+    }
+    if(!/^\d+$/.test(id)){
+      showSffError('User ID hanya berupa angka.');
+      return;
+    }
+
+    resetSffUI();
+    statusBox.classList.add('show');
+    fetchBtn.disabled = true;
+
+    const targetUrl = 'https://api.nexadev.my.id/api/ff?id=' + encodeURIComponent(id);
+    // API pihak ketiga ini kadang memblokir akses langsung dari browser (CORS),
+    // jadi dicoba langsung dulu, lalu jatuh ke proxy publik kalau gagal.
+    const attempts = [
+      targetUrl,
+      'https://corsproxy.io/?url=' + encodeURIComponent(targetUrl),
+      'https://api.allorigins.win/raw?url=' + encodeURIComponent(targetUrl)
+    ];
+
+    try{
+      let data = null;
+
+      for(const attemptUrl of attempts){
+        try{
+          const res = await fetch(attemptUrl);
+          if(!res.ok) continue;
+          const json = await res.json();
+          if(json){ data = json; break; }
+        } catch(innerErr){
+          continue;
+        }
+      }
+
+      if(!data){
+        throw new Error('Tidak bisa menjangkau server. Coba lagi sebentar lagi.');
+      }
+      if(!data.status || !data.data || !data.data.username){
+        throw new Error('User ID tidak ditemukan. Pastikan ID-nya benar.');
+      }
+
+      resultName.textContent = data.data.username;
+      resultId.textContent = 'ID: ' + id;
+      resultBox.classList.add('show');
+    } catch(err){
+      showSffError(err.message || 'Terjadi kesalahan. Coba lagi sebentar lagi.');
+    } finally{
+      statusBox.classList.remove('show');
+      fetchBtn.disabled = false;
+    }
+  };
+
+  idInput.addEventListener('keydown', e=>{
+    if(e.key === 'Enter'){ e.preventDefault(); fetchSff(); }
+  });
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════
+     TIKTOK STALKER (modal, cek profil TikTok via username)
+     ═══════════════════════════════════════════════════ -->
+<script>
+(function(){
+  const overlay = document.getElementById('ttsModalOverlay');
+  const usernameInput = document.getElementById('ttsUsernameInput');
+  const fetchBtn = document.getElementById('ttsFetchBtn');
+  const statusBox = document.getElementById('ttsStatus');
+  const errorBox = document.getElementById('ttsError');
+  const resultBox = document.getElementById('ttsResult');
+
+  const avatarImg = document.getElementById('ttsAvatarImg');
+  const avatarFallback = document.getElementById('ttsAvatarFallback');
+  const nameEl = document.getElementById('ttsName');
+  const usernameEl = document.getElementById('ttsUsername');
+  const verifiedBadge = document.getElementById('ttsVerifiedBadge');
+  const privateTag = document.getElementById('ttsPrivateTag');
+  const bioEl = document.getElementById('ttsBio');
+  const postsEl = document.getElementById('ttsPosts');
+  const followersEl = document.getElementById('ttsFollowers');
+  const followingEl = document.getElementById('ttsFollowing');
+  const likesEl = document.getElementById('ttsLikes');
+  const resultIdEl = document.getElementById('ttsResultId');
+
+  function resetTtsUI(){
+    errorBox.classList.remove('show');
+    errorBox.textContent = '';
+    resultBox.classList.remove('show');
+    avatarImg.style.display = 'none';
+    avatarImg.src = '';
+    avatarFallback.style.display = 'flex';
+    verifiedBadge.style.display = 'none';
+    privateTag.style.display = 'none';
+    bioEl.style.display = 'none';
+    bioEl.textContent = '';
+  }
+
+  function showTtsError(msg){
+    errorBox.textContent = msg;
+    errorBox.classList.add('show');
+  }
+
+  window.openTtsModal = function(){
+    overlay.style.display = 'flex';
+    void overlay.offsetHeight;
+    overlay.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  };
+  window.closeTtsModal = function(){
+    overlay.classList.remove('show');
+    document.body.style.overflow = '';
+  };
+  document.addEventListener('keydown', e=>{
+    if(e.key === 'Escape' && overlay.classList.contains('show')) closeTtsModal();
+  });
+
+  window.pasteTtsUsername = async function(){
+    const pasteBtn = document.getElementById('ttsPasteBtn');
+    try{
+      const text = await navigator.clipboard.readText();
+      if(text){
+        usernameInput.value = text.trim().replace(/^@/, '');
+        pasteBtn.classList.add('pasted');
+        setTimeout(()=>pasteBtn.classList.remove('pasted'), 900);
+      }
+    } catch(err){
+      usernameInput.focus();
+    }
+  };
+
+  // Format angka besar jadi ringkas (contoh: 5800000 -> 5.8JT, 163800 -> 163.8RB)
+  function formatCount(n){
+    if(typeof n !== 'number' || isNaN(n)) return '0';
+    if(n >= 1000000000) return (n / 1000000000).toFixed(1).replace(/\.0$/, '') + 'M';
+    if(n >= 1000000) return (n / 1000000).toFixed(1).replace(/\.0$/, '') + 'JT';
+    if(n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'RB';
+    return String(n);
+  }
+
+  window.fetchTts = async function(){
+    const rawUsername = (usernameInput.value || '').trim().replace(/^@/, '');
+    if(!rawUsername){
+      showTtsError('Masukkan username TikTok dulu, ya.');
+      return;
+    }
+
+    resetTtsUI();
+    statusBox.classList.add('show');
+    fetchBtn.disabled = true;
+
+    const targetUrl = 'https://api.nexadev.my.id/api/tiktokstalker?username=' + encodeURIComponent(rawUsername);
+    // API pihak ketiga ini kadang memblokir akses langsung dari browser (CORS),
+    // jadi dicoba langsung dulu, lalu jatuh ke proxy publik kalau gagal.
+    const attempts = [
+      targetUrl,
+      'https://corsproxy.io/?url=' + encodeURIComponent(targetUrl),
+      'https://api.allorigins.win/raw?url=' + encodeURIComponent(targetUrl)
+    ];
+
+    try{
+      let data = null;
+
+      for(const attemptUrl of attempts){
+        try{
+          const res = await fetch(attemptUrl);
+          if(!res.ok) continue;
+          const json = await res.json();
+          if(json){ data = json; break; }
+        } catch(innerErr){
+          continue;
+        }
+      }
+
+      if(!data){
+        throw new Error('Tidak bisa menjangkau server. Coba lagi sebentar lagi.');
+      }
+      if(!data.status || !data.data || !data.data.username){
+        throw new Error('Username tidak ditemukan.');
+      }
+
+      const info = data.data;
+
+      if(info.photo){
+        avatarImg.src = info.photo;
+        avatarImg.style.display = 'block';
+        avatarFallback.style.display = 'none';
+        avatarImg.onerror = () => {
+          avatarImg.style.display = 'none';
+          avatarFallback.style.display = 'flex';
+        };
+      }
+
+      nameEl.textContent = info.name || info.username;
+      usernameEl.textContent = '@' + info.username;
+      verifiedBadge.style.display = info.verified ? 'flex' : 'none';
+      privateTag.style.display = info.private ? 'inline-block' : 'none';
+
+      if(info.bio && info.bio.trim()){
+        bioEl.textContent = info.bio;
+        bioEl.style.display = 'block';
+      }
+
+      postsEl.textContent = formatCount(info.posts);
+      followersEl.textContent = formatCount(info.followers);
+      followingEl.textContent = formatCount(info.following);
+      likesEl.textContent = formatCount(info.likes);
+      resultIdEl.textContent = 'ID: ' + info.id;
+
+      resultBox.classList.add('show');
+    } catch(err){
+      showTtsError(err.message || 'Terjadi kesalahan. Coba lagi sebentar lagi.');
+    } finally{
+      statusBox.classList.remove('show');
+      fetchBtn.disabled = false;
+    }
+  };
+
+  usernameInput.addEventListener('keydown', e=>{
+    if(e.key === 'Enter'){ e.preventDefault(); fetchTts(); }
+  });
 })();
 </script>
 
