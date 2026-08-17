@@ -5914,8 +5914,9 @@ const PLAYLIST = [
     // jadi dicoba langsung dulu, lalu jatuh ke proxy publik kalau gagal.
     const attempts = [
       targetUrl,
+      'https://api.allorigins.win/raw?url=' + encodeURIComponent(targetUrl),
       'https://corsproxy.io/?url=' + encodeURIComponent(targetUrl),
-      'https://api.allorigins.win/raw?url=' + encodeURIComponent(targetUrl)
+      'https://thingproxy.freeboard.io/fetch/' + targetUrl
     ];
 
     try{
@@ -5924,10 +5925,15 @@ const PLAYLIST = [
       for(const attemptUrl of attempts){
         try{
           const res = await fetch(attemptUrl);
-          if(!res.ok) continue;
-          const json = await res.json();
+          if(!res.ok){ console.warn('Percobaan gagal (' + res.status + '):', attemptUrl); continue; }
+          let json = await res.json();
+          // allorigins.win/raw kadang membungkus hasil sebagai string di dalam field "contents"
+          if(json && typeof json.contents === 'string'){
+            try{ json = JSON.parse(json.contents); } catch(parseErr){ /* biarkan apa adanya */ }
+          }
           if(json){ data = json; break; }
         } catch(innerErr){
+          console.warn('Percobaan error:', attemptUrl, innerErr);
           continue;
         }
       }
@@ -6056,8 +6062,9 @@ const PLAYLIST = [
     // jadi dicoba langsung dulu, lalu jatuh ke proxy publik kalau gagal.
     const attempts = [
       targetUrl,
+      'https://api.allorigins.win/raw?url=' + encodeURIComponent(targetUrl),
       'https://corsproxy.io/?url=' + encodeURIComponent(targetUrl),
-      'https://api.allorigins.win/raw?url=' + encodeURIComponent(targetUrl)
+      'https://thingproxy.freeboard.io/fetch/' + targetUrl
     ];
 
     try{
@@ -6066,10 +6073,15 @@ const PLAYLIST = [
       for(const attemptUrl of attempts){
         try{
           const res = await fetch(attemptUrl);
-          if(!res.ok) continue;
-          const json = await res.json();
+          if(!res.ok){ console.warn('Percobaan gagal (' + res.status + '):', attemptUrl); continue; }
+          let json = await res.json();
+          // allorigins.win/raw kadang membungkus hasil sebagai string di dalam field "contents"
+          if(json && typeof json.contents === 'string'){
+            try{ json = JSON.parse(json.contents); } catch(parseErr){ /* biarkan apa adanya */ }
+          }
           if(json){ data = json; break; }
         } catch(innerErr){
+          console.warn('Percobaan error:', attemptUrl, innerErr);
           continue;
         }
       }
@@ -6194,8 +6206,9 @@ const PLAYLIST = [
     // jadi dicoba langsung dulu, lalu jatuh ke proxy publik kalau gagal.
     const attempts = [
       targetUrl,
+      'https://api.allorigins.win/raw?url=' + encodeURIComponent(targetUrl),
       'https://corsproxy.io/?url=' + encodeURIComponent(targetUrl),
-      'https://api.allorigins.win/raw?url=' + encodeURIComponent(targetUrl)
+      'https://thingproxy.freeboard.io/fetch/' + targetUrl
     ];
 
     try{
@@ -6204,10 +6217,15 @@ const PLAYLIST = [
       for(const attemptUrl of attempts){
         try{
           const res = await fetch(attemptUrl);
-          if(!res.ok) continue;
-          const json = await res.json();
+          if(!res.ok){ console.warn('Percobaan gagal (' + res.status + '):', attemptUrl); continue; }
+          let json = await res.json();
+          // allorigins.win/raw kadang membungkus hasil sebagai string di dalam field "contents"
+          if(json && typeof json.contents === 'string'){
+            try{ json = JSON.parse(json.contents); } catch(parseErr){ /* biarkan apa adanya */ }
+          }
           if(json){ data = json; break; }
         } catch(innerErr){
+          console.warn('Percobaan error:', attemptUrl, innerErr);
           continue;
         }
       }
