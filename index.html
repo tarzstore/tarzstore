@@ -1295,6 +1295,85 @@ body.side-menu-open .tabs-wrap .tabs{
 .toast.error{border-color:rgba(245,80,80,.35);color:#ff6b6b;}
 .toast.success{border-color:rgba(0,229,160,.35);color:var(--green);}
 
+/* ── VIP CELEBRATION OVERLAY ── */
+.vip-celebrate-overlay{
+  position:fixed;inset:0;z-index:100000;
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;
+  background:radial-gradient(circle at 50% 40%,rgba(0,229,160,.16),rgba(2,4,8,.92) 70%);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  opacity:0;pointer-events:none;
+  transition:opacity .35s var(--ease-soft);
+  overflow:hidden;
+}
+.vip-celebrate-overlay.show{opacity:1;pointer-events:auto;}
+.vip-celebrate-confetti{position:absolute;inset:0;pointer-events:none;}
+.vip-confetti-piece{
+  position:absolute;top:-40px;
+  width:9px;height:14px;border-radius:2px;
+  opacity:.95;
+  animation:vipConfettiFall linear forwards;
+}
+@keyframes vipConfettiFall{
+  0%{transform:translate3d(0,0,0) rotate(0deg);opacity:1;}
+  85%{opacity:1;}
+  100%{transform:translate3d(var(--drift,0px),110vh,0) rotate(var(--spin,540deg));opacity:0;}
+}
+.vip-celebrate-card{
+  position:relative;z-index:2;
+  width:100%;max-width:360px;
+  background:linear-gradient(180deg,var(--card2),var(--card));
+  border:1px solid rgba(0,229,160,.35);
+  border-radius:24px;
+  padding:38px 26px 30px;
+  text-align:center;
+  box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 0 1px rgba(0,229,160,.08),0 0 60px rgba(0,229,160,.15);
+  transform:scale(.82) translateY(24px);
+  opacity:0;
+  transition:transform .5s var(--ease-out),opacity .4s var(--ease-soft);
+}
+.vip-celebrate-overlay.show .vip-celebrate-card{transform:scale(1) translateY(0);opacity:1;}
+.vip-celebrate-badge{
+  width:76px;height:76px;margin:0 auto 20px;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 35% 30%,#00ffc2,#00a878 75%);
+  color:#04140f;
+  box-shadow:0 0 0 6px rgba(0,229,160,.14),0 12px 32px rgba(0,229,160,.35);
+  animation:vipBadgePop .6s var(--ease-out) .1s both,vipBadgePulse 2.2s ease-in-out 1s infinite;
+}
+.vip-celebrate-badge svg{width:36px;height:36px;}
+@keyframes vipBadgePop{
+  0%{transform:scale(0) rotate(-25deg);}
+  60%{transform:scale(1.15) rotate(6deg);}
+  100%{transform:scale(1) rotate(0deg);}
+}
+@keyframes vipBadgePulse{
+  0%,100%{box-shadow:0 0 0 6px rgba(0,229,160,.14),0 12px 32px rgba(0,229,160,.35);}
+  50%{box-shadow:0 0 0 12px rgba(0,229,160,.06),0 12px 42px rgba(0,229,160,.5);}
+}
+.vip-celebrate-title{
+  font-size:1.28rem;font-weight:900;letter-spacing:.02em;
+  color:var(--text);line-height:1.3;
+  margin-bottom:10px;
+  background:linear-gradient(90deg,#00ffc2,#7dffdb 45%,#00e5a0);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+.vip-celebrate-sub{
+  font-size:.92rem;color:var(--text2);line-height:1.5;
+  margin-bottom:26px;
+}
+.vip-celebrate-ok{
+  width:100%;padding:14px 0;border:none;border-radius:14px;
+  font-size:.95rem;font-weight:800;letter-spacing:.03em;cursor:pointer;
+  color:#04140f;
+  background:linear-gradient(135deg,#00ffc2,#00c98a);
+  box-shadow:0 10px 26px rgba(0,229,160,.35);
+  transition:transform .15s var(--ease-out),filter .15s;
+}
+.vip-celebrate-ok:hover{filter:brightness(1.08);transform:translateY(-2px);}
+.vip-celebrate-ok:active{transform:translateY(0) scale(.97);}
+
 /* ── SOCIAL MEDIA ── */
 .social-section{
   padding:36px 6% 28px;
@@ -1965,7 +2044,7 @@ body.theme-switching :not(#themeFadeOverlay){
   position:fixed;
   top:0;left:0;
   height:100%;
-  width:min(64vw,225px);
+  width:min(78vw,270px);
   background:var(--surface);
   border-right:1px solid var(--border-strong);
   border-radius:0 var(--radius-lg) var(--radius-lg) 0;
@@ -1975,99 +2054,187 @@ body.theme-switching :not(#themeFadeOverlay){
   display:flex;
   flex-direction:column;
   overflow-y:auto;
-  box-shadow:8px 0 40px rgba(0,0,0,.45);
+  overflow-x:hidden;
+  box-shadow:14px 0 50px rgba(0,0,0,.55),1px 0 0 rgba(255,255,255,.04) inset;
 }
 .side-menu.show{transform:translateX(0);}
+.side-menu::-webkit-scrollbar{width:0;}
 
 .side-menu-header{
+  position:relative;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:18px 16px;
-  border-bottom:1px solid var(--border);
+  padding:22px 16px 20px;
   flex-shrink:0;
+  overflow:hidden;
 }
-.side-menu-header .logo-icon{width:30px;height:30px;border-radius:9px;}
+.side-menu-header::after{
+  content:"";
+  position:absolute;left:16px;right:16px;bottom:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--border-strong) 20%,var(--border-strong) 80%,transparent);
+}
+.side-menu-header .logo-icon{
+  width:38px;height:38px;border-radius:11px;
+  box-shadow:0 0 0 1px var(--border-strong),0 6px 16px rgba(0,0,0,.35);
+  position:relative;z-index:1;
+}
+.side-menu-header .logo{position:relative;z-index:1;gap:10px;}
 .side-menu-close{
+  position:relative;z-index:1;
   background:rgba(255,255,255,.05);
-  border:none;
+  border:1px solid var(--border);
   color:var(--text2);
   cursor:pointer;
   display:flex;
   align-items:center;
   justify-content:center;
-  width:30px;height:30px;
-  border-radius:var(--radius-sm);
-  transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease);
+  width:32px;height:32px;
+  border-radius:50%;
+  transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease),transform var(--t-fast) var(--ease-soft);
 }
-.side-menu-close:active{background:rgba(255,255,255,.1);color:var(--text);}
+.side-menu-close:active{background:rgba(255,255,255,.12);color:var(--text);transform:scale(.88);}
+
+.side-menu-section-label{
+  padding:16px 20px 6px;
+  font-size:.65rem;
+  font-weight:700;
+  letter-spacing:1.2px;
+  text-transform:uppercase;
+  color:var(--text2);
+  opacity:.55;
+  flex-shrink:0;
+}
 
 .side-menu-list{
   list-style:none;
-  padding:14px 12px;
+  padding:6px 10px 10px;
   display:flex;
   flex-direction:column;
-  gap:3px;
+  gap:2px;
   flex:1;
 }
 .side-menu-list a{
   position:relative;
   display:flex;
   align-items:center;
-  gap:11px;
-  padding:11px 12px;
-  border-radius:var(--radius-sm);
+  gap:12px;
+  padding:10px 12px;
+  border-radius:12px;
   color:var(--text2);
   text-decoration:none;
-  font-size:.88rem;
+  font-size:.86rem;
   font-weight:600;
   letter-spacing:.2px;
-  transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease),padding-left var(--t-fast) var(--ease);
+  transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease);
 }
-.side-menu-list a svg{width:17px;height:17px;flex-shrink:0;opacity:.85;}
-.side-menu-list a:active{background:rgba(255,255,255,.07);padding-left:16px;}
-.side-menu-list a:hover{color:var(--text);background:rgba(255,255,255,.045);padding-left:16px;}
+.side-menu-list a::before{
+  content:"";
+  position:absolute;left:-10px;top:50%;transform:translateY(-50%);
+  width:3px;height:0;
+  border-radius:0 3px 3px 0;
+  background:var(--text);
+  transition:height var(--t-fast) var(--ease-soft);
+}
+.side-menu-list a .side-menu-icon{
+  display:flex;align-items:center;justify-content:center;
+  width:32px;height:32px;flex-shrink:0;
+  border-radius:9px;
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--border);
+  transition:background var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease),color var(--t-fast) var(--ease);
+}
+.side-menu-list a svg{width:16px;height:16px;flex-shrink:0;opacity:.9;}
+.side-menu-list a:active{background:rgba(255,255,255,.08);}
+.side-menu-list a:hover{color:var(--text);background:rgba(255,255,255,.05);}
+.side-menu-list a:hover .side-menu-icon,
+.side-menu-list a:active .side-menu-icon{
+  background:rgba(255,255,255,.09);
+  border-color:var(--border-strong);
+  color:var(--text);
+}
+.side-menu-list a:hover::before,
+.side-menu-list a:active::before{height:18px;}
+.side-menu-list li:not(:has(.side-menu-dropdown-toggle))+li{margin-top:0;}
 
 /* Dropdown submenu (contoh: "Upload Produk" -> Upload Produk + Key Generate) */
 .side-menu-dropdown-toggle{
+  position:relative;
   width:100%;background:none;border:none;cursor:pointer;
   font-family:inherit;text-align:left;
   -webkit-tap-highlight-color:transparent;
-  display:flex;align-items:center;gap:11px;
-  padding:11px 12px;border-radius:var(--radius-sm);
-  color:var(--text2);font-size:.88rem;font-weight:600;letter-spacing:.2px;
-  transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease),padding-left var(--t-fast) var(--ease);
+  display:flex;align-items:center;gap:12px;
+  padding:10px 12px;border-radius:12px;
+  color:var(--text2);font-size:.86rem;font-weight:600;letter-spacing:.2px;
+  transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease);
 }
 .side-menu-dropdown-toggle:hover,.side-menu-dropdown-toggle:active{
-  color:var(--text);background:rgba(255,255,255,.045);padding-left:16px;
+  color:var(--text);background:rgba(255,255,255,.05);
 }
-.side-menu-dropdown-toggle > svg:first-child{width:17px;height:17px;flex-shrink:0;opacity:.85;}
+.side-menu-dropdown-toggle .side-menu-icon{
+  display:flex;align-items:center;justify-content:center;
+  width:32px;height:32px;flex-shrink:0;
+  border-radius:9px;
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--border);
+  transition:background var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease),color var(--t-fast) var(--ease);
+}
+.side-menu-dropdown-toggle:hover .side-menu-icon,
+.side-menu-dropdown-toggle.open .side-menu-icon{
+  background:rgba(255,255,255,.09);
+  border-color:var(--border-strong);
+  color:var(--text);
+}
+.side-menu-dropdown-toggle svg{width:16px;height:16px;flex-shrink:0;opacity:.9;}
 .side-menu-dropdown-toggle .dropdown-chevron{
-  margin-left:auto;width:15px;height:15px;flex-shrink:0;opacity:.7;
+  margin-left:auto;width:14px;height:14px;flex-shrink:0;opacity:.6;
   transition:transform var(--t-fast) var(--ease-soft);
 }
-.side-menu-dropdown-toggle.open .dropdown-chevron{transform:rotate(180deg);}
+.side-menu-dropdown-toggle.open .dropdown-chevron{transform:rotate(180deg);opacity:1;}
 .side-menu-submenu{
+  height:0;
+  overflow:hidden;
+  margin-left:16px;
+  border-left:1px solid var(--border);
+  transition:height var(--t-mid) var(--ease-soft);
+  will-change:height;
+}
+.side-menu-submenu-inner{
   list-style:none;
-  max-height:0;overflow:hidden;
-  transition:max-height var(--t-mid) var(--ease-soft);
 }
-.side-menu-submenu.open{max-height:160px;}
-.side-menu-submenu li{padding-left:0;}
-.side-menu-submenu a{
-  padding:9px 12px 9px 40px;
-  font-size:.82rem;font-weight:600;
+.side-menu-submenu-inner li{padding-left:0;}
+.side-menu-submenu-inner a{
+  padding:9px 12px 9px 16px;
+  font-size:.81rem;font-weight:600;
+  border-radius:0 10px 10px 0;
 }
-.side-menu-submenu a svg{width:14px;height:14px;flex-shrink:0;opacity:.85;}
-.side-menu-submenu a:hover,.side-menu-submenu a:active{padding-left:44px;}
+.side-menu-submenu-inner a .side-menu-icon{
+  width:26px;height:26px;border-radius:7px;
+}
+.side-menu-submenu-inner a svg{width:13px;height:13px;flex-shrink:0;opacity:.9;}
+.side-menu-submenu-inner a::before{display:none;}
 
 .side-menu-footer{
-  padding:14px 16px;
-  border-top:1px solid var(--border);
-  font-size:.7rem;
+  position:relative;
+  padding:16px 20px;
+  margin-top:auto;
+  font-size:.68rem;
   color:var(--text2);
-  opacity:.6;
   letter-spacing:.3px;
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.side-menu-footer::before{
+  content:"";
+  position:absolute;left:20px;right:20px;top:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--border-strong) 20%,var(--border-strong) 80%,transparent);
+}
+.side-menu-footer-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--text2);
+  box-shadow:0 0 6px rgba(255,255,255,.35);
   flex-shrink:0;
 }
 
@@ -2870,55 +3037,66 @@ body.theme-sky .tts-verified-badge{background:#6fc3ff;color:#040810;}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
   </div>
+  <div class="side-menu-section-label">Menu Utama</div>
   <ul class="side-menu-list">
     <li><a href="#main-content" onclick="switchTabFromSideMenu('tab-cheat');">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span class="side-menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
       <span>Beranda</span>
     </a></li>
     <li>
       <button type="button" class="side-menu-dropdown-toggle" id="uploadDropdownToggle" onclick="toggleSideMenuDropdown('uploadDropdown', this)" aria-expanded="false" aria-controls="uploadDropdown">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span class="side-menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
         <span>Admin Panel</span>
         <svg class="dropdown-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
-      <ul class="side-menu-submenu" id="uploadDropdown">
+      <div class="side-menu-submenu" id="uploadDropdown">
+        <ul class="side-menu-submenu-inner">
         <li><a href="admin.html">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span class="side-menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
           <span>Upload Produk</span>
         </a></li>
         <li><a href="https://tarzxkey.vercel.app/" target="_blank" rel="noopener noreferrer">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6M15.5 7.5l3 3L22 7l-3-3"/></svg>
+          <span class="side-menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6M15.5 7.5l3 3L22 7l-3-3"/></svg></span>
           <span>Key Generate</span>
         </a></li>
-      </ul>
+        </ul>
+      </div>
     </li>
+  </ul>
+
+  <div class="side-menu-section-label">Tools &amp; Fitur</div>
+  <ul class="side-menu-list">
     <li><a href="#" onclick="openMusicModal();closeSideMenu();">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      <span class="side-menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>
       <span>Playlist Musik</span>
     </a></li>
-    <li><a href="#" id="themeToggleBtn" onclick="toggleTheme();closeSideMenu();">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-      <span id="themeToggleLabel">Ubah Tema</span>
-    </a></li>
     <li><a href="#" onclick="openLobbyFFModal();closeSideMenu();">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+      <span class="side-menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></span>
       <span>Loby FF Generate</span>
     </a></li>
     <li><a href="#" onclick="openTtdlModal();closeSideMenu();">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+      <span class="side-menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg></span>
       <span>TikTok Downloader</span>
     </a></li>
     <li><a href="#" onclick="openSffModal();closeSideMenu();">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><circle cx="11" cy="9" r="2.2"/><path d="M7.2 15.2a4 4 0 0 1 7.6 0"/></svg>
+      <span class="side-menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><circle cx="11" cy="9" r="2.2"/><path d="M7.2 15.2a4 4 0 0 1 7.6 0"/></svg></span>
       <span>Free Fire Stalker</span>
     </a></li>
     <li><a href="#" onclick="openTtsModal();closeSideMenu();">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/><circle cx="17" cy="7" r="1"/></svg>
+      <span class="side-menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/><circle cx="17" cy="7" r="1"/></svg></span>
       <span>TikTok Stalker</span>
     </a></li>
   </ul>
 
-  <div class="side-menu-footer">© 2026 Tarz Store</div>
+  <div class="side-menu-section-label">Pengaturan</div>
+  <ul class="side-menu-list">
+    <li><a href="#" id="themeToggleBtn" onclick="toggleTheme();closeSideMenu();">
+      <span class="side-menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></span>
+      <span id="themeToggleLabel">Ubah Tema</span>
+    </a></li>
+  </ul>
+
+  <div class="side-menu-footer"><span class="side-menu-footer-dot"></span>© 2026 Tarz Store</div>
 </nav>
 
 <!-- MUSIC MODAL (mengambang di tengah, versi kecil) -->
@@ -3657,6 +3835,19 @@ body.theme-sky .tts-verified-badge{background:#6fc3ff;color:#040810;}
   </div>
 </div>
 
+<!-- VIP CELEBRATION OVERLAY — muncul setelah pembayaran QRIS terdeteksi sukses -->
+<div class="vip-celebrate-overlay" id="vipCelebrateOverlay" aria-hidden="true">
+  <div class="vip-celebrate-confetti" id="vipCelebrateConfetti"></div>
+  <div class="vip-celebrate-card">
+    <div class="vip-celebrate-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div class="vip-celebrate-title">SELAMAT KAMU SEKARANG VIP</div>
+    <div class="vip-celebrate-sub">Kamu sekarang bisa akses semua produk</div>
+    <button type="button" class="vip-celebrate-ok" id="vipCelebrateOkBtn" onclick="closeVipCelebration()">OKE</button>
+  </div>
+</div>
+
 <script>
 'use strict';
 
@@ -3821,13 +4012,41 @@ document.addEventListener('keydown', function(e){
   if(e.key === 'Escape') closeSideMenu();
 });
 
-/* ── DROPDOWN SUBMENU DI SIDEBAR (mis: "Upload Produk" -> Upload Produk + Key Generate) ── */
+/* ── DROPDOWN SUBMENU DI SIDEBAR (mis: "Upload Produk" -> Upload Produk + Key Generate) ──
+   Dianimasikan lewat JS (bukan max-height CSS statis) supaya transisi buka/tutup
+   selalu mulus: height diukur dari scrollHeight konten asli, bukan angka tebakan. */
 function toggleSideMenuDropdown(submenuId, toggleBtn){
   const submenu = document.getElementById(submenuId);
   if(!submenu || !toggleBtn) return;
-  const isOpen = submenu.classList.toggle('open');
-  toggleBtn.classList.toggle('open', isOpen);
-  toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  const isOpen = submenu.classList.contains('open');
+
+  if(isOpen){
+    // Tutup: set height eksplisit ke tinggi saat ini dulu, lalu ke 0 (biar transisi jalan)
+    submenu.style.height = submenu.scrollHeight + 'px';
+    submenu.offsetHeight; // force reflow
+    requestAnimationFrame(()=>{
+      submenu.style.height = '0px';
+    });
+    submenu.classList.remove('open');
+    toggleBtn.classList.remove('open');
+    toggleBtn.setAttribute('aria-expanded','false');
+  } else {
+    // Buka: animasikan dari 0 ke tinggi konten asli
+    submenu.classList.add('open');
+    toggleBtn.classList.add('open');
+    toggleBtn.setAttribute('aria-expanded','true');
+    submenu.style.height = submenu.scrollHeight + 'px';
+  }
+
+  // Setelah transisi selesai membuka, lepas height fixed jadi 'auto'
+  // supaya kalau konten berubah ukuran (mis. resize layar) tetap pas.
+  submenu.addEventListener('transitionend', function onEnd(e){
+    if(e.propertyName !== 'height') return;
+    submenu.removeEventListener('transitionend', onEnd);
+    if(submenu.classList.contains('open')){
+      submenu.style.height = 'auto';
+    }
+  });
 }
 
 /* ── TAB INDICATOR ── */
@@ -4132,7 +4351,6 @@ function copyProductKeyInline(productName, btnEl){
 /* Salin teks generik ke clipboard + tampilkan feedback pada tombol/toast */
 function copyTextInline(text, btnEl){
   const done = () => {
-    showToast('Berhasil disalin!','success');
     if(btnEl){
       const label = btnEl.querySelector('.copykey-btn-text');
       if(label){
@@ -4144,9 +4362,7 @@ function copyTextInline(text, btnEl){
   };
 
   if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(text).then(done).catch(()=>{
-      showToast('Gagal menyalin.','error');
-    });
+    navigator.clipboard.writeText(text).then(done).catch(()=>{});
   } else {
     const ta = document.createElement('textarea');
     ta.value = text;
@@ -4155,7 +4371,7 @@ function copyTextInline(text, btnEl){
     document.body.appendChild(ta);
     ta.select();
     try{ document.execCommand('copy'); done(); }
-    catch(e){ showToast('Gagal menyalin.','error'); }
+    catch(e){}
     document.body.removeChild(ta);
   }
 }
@@ -4728,9 +4944,8 @@ function handleOverlayClick(e){
 }
 
 function buyNow(){
-  if(_isClosed){ showToast('Produk ini sedang CLOSE!','error'); return; }
-  if(!_selectedPackage){ showToast('Pilih paket terlebih dahulu!','error'); return; }
-  showToast('Mengalihkan ke WhatsApp...','success');
+  if(_isClosed){ return; }
+  if(!_selectedPackage){ return; }
   const msg = `Halo Tarz Store! Saya mau order:\n\n*Produk:* ${_currentProduct}\n*Paket:* ${_selectedPackage.name} — ${_selectedPackage.price}\n\nMohon diproses ya, terima kasih`;
   setTimeout(()=>{ closeModal(); window.open('https://wa.me/6281918665183?text='+encodeURIComponent(msg),'_blank','noopener,noreferrer'); }, 550);
 }
@@ -4876,7 +5091,6 @@ function downloadUnlockedProduct(){
   closeKeyModal();
   if(_keyDownloadLink && !_keyDownloadLink.endsWith('#')){
     window.open(_keyDownloadLink,'_blank','noopener,noreferrer');
-    showToast('Download dimulai...','success');
   } else {
     showToast('Link download belum tersedia.','error');
   }
@@ -4894,7 +5108,6 @@ function openKeyModal(productName, downloadLink, sourceTab){
     closeModal();
     if(downloadLink && !downloadLink.endsWith('#')){
       window.open(downloadLink,'_blank','noopener,noreferrer');
-      showToast('Download dimulai...','success');
     } else {
       showToast('Link download belum tersedia.','error');
     }
@@ -5073,7 +5286,6 @@ function keyLogin(){
       closeKeyModal();
       if(_keyDownloadLink && !_keyDownloadLink.endsWith('#')){
         window.open(_keyDownloadLink,'_blank','noopener,noreferrer');
-        showToast(isTrial ? 'Key trial aktif! Berlaku ' + trialLabel + '.' : 'Key VIP valid! Semua produk terbuka.','success');
       } else {
         showToast('Link download belum tersedia.','error');
       }
@@ -5104,7 +5316,6 @@ function keyLogin(){
 
 /* tombol "BELI VIP" (di dalam modal, konteks produk tertentu) -> WhatsApp */
 function keyGetPassword(){
-  showToast('Mengalihkan ke WhatsApp...','success');
   const msg = `Halo Tarz Store! Saya mau join VIP (${VIP_PRICE_TEXT}) untuk akses semua cheat.\n\n\Mohon diproses ya, terima kasih`;
   setTimeout(()=>{ closeKeyModal(); window.open('https://wa.me/'+VIP_WA_NUMBER+'?text='+encodeURIComponent(msg),'_blank','noopener,noreferrer'); }, 420);
 }
@@ -5153,7 +5364,6 @@ async function startVipPayment(){
     const res = await fetch('/api/create-payment', { method: 'POST' });
     const data = await res.json();
     if(!data.ok){
-      showToast(data.error || 'Gagal membuat QRIS.', 'error');
       showVipGate();
       return;
     }
@@ -5168,7 +5378,6 @@ async function startVipPayment(){
 /* dipanggil dari tombol "BUY VIP VIA WHATSAPP" di dalam key modal — langsung
    arahkan ke WhatsApp admin dengan pesan siap kirim, tanpa lewat QRIS */
 function openVipWhatsApp(){
-  showToast('Mengalihkan ke WhatsApp...','success');
   const msg = `Halo Tarz Store! Saya mau join VIP (${VIP_PRICE_TEXT}) untuk akses semua cheat.\n\nMohon diproses ya, terima kasih`;
   setTimeout(()=>{
     window.open('https://wa.me/'+VIP_WA_NUMBER+'?text='+encodeURIComponent(msg),'_blank','noopener,noreferrer');
@@ -5329,7 +5538,6 @@ function downloadVipQris(){
       document.body.appendChild(a);
       a.click();
       a.remove();
-      showToast('QRIS berhasil diunduh.', 'success');
       return;
     }
     // fallback kalau suatu saat qrImageUrl berupa URL http biasa (bukan data URI)
@@ -5344,14 +5552,9 @@ function downloadVipQris(){
         a.click();
         a.remove();
         setTimeout(()=>URL.revokeObjectURL(blobUrl), 4000);
-        showToast('QRIS berhasil diunduh.', 'success');
       })
-      .catch(() => {
-        showToast('Gagal mengunduh QRIS. Screenshot layar sebagai alternatif.', 'error');
-      });
-  }catch(e){
-    showToast('Gagal mengunduh QRIS. Screenshot layar sebagai alternatif.', 'error');
-  }
+      .catch(() => {});
+  }catch(e){}
 }
 
 function setQrisStatus(state, title, sub){
@@ -5400,10 +5603,10 @@ async function pollVipPayment(orderId, silentMode){
         markVipUnlocked();
         refreshVipHeaderBadge();
         if(silentMode){
-          showToast('Pembayaran diterima! VIP aktif.', 'success');
+          showVipCelebration();
         } else {
           setQrisStatus('ok', 'Pembayaran diterima!', 'Membuka akses VIP...');
-          setTimeout(showVipPaymentSuccess, 600);
+          setTimeout(showVipCelebration, 600);
         }
       } else if(data.status === 'expired' || data.status === 'failed'){
         clearInterval(_qrisPollTimer);
@@ -5451,12 +5654,13 @@ async function checkPendingVipOrderNow(){
       localStorage.setItem('tarz_vip_token', data.vipToken);
       markVipUnlocked();
       refreshVipHeaderBadge();
-      showToast('Pembayaran diterima! VIP aktif.', 'success');
       // kalau modal QRIS kebetulan masih terbuka di layar, tampilkan juga layar suksesnya
       const statusCard = document.getElementById('qrisStatusCard');
       if(statusCard){
         setQrisStatus('ok', 'Pembayaran diterima!', 'Membuka akses VIP...');
-        setTimeout(showVipPaymentSuccess, 600);
+        setTimeout(showVipCelebration, 600);
+      } else {
+        showVipCelebration();
       }
     } else if(data.status === 'expired' || data.status === 'failed'){
       clearInterval(_qrisPollTimer);
@@ -5489,23 +5693,60 @@ function cancelVipPayment(){
   showVipGate();
 }
 
-function showVipPaymentSuccess(){
+/* Notifikasi meriah setelah pembayaran QRIS terdeteksi sukses.
+   Tidak lagi auto-redirect ke link download (mediafire dsb) -- cukup tampilkan
+   kartu selamat + confetti, lalu tombol OKE menutup modal key sepenuhnya dan
+   user kembali ke tampilan awal halaman. */
+function showVipCelebration(){
   _vipQrisImageUrl = null;
-  document.getElementById('vipKeyFormBody').classList.remove('show');
-  document.getElementById('keySuccessWrap').classList.add('show');
-  document.getElementById('keySuccessTitle').textContent = 'Pembayaran Berhasil!';
-  document.getElementById('keySuccessSub').textContent = 'Kamu sekarang VIP Semua produk terbuka.';
-  const dlAgainBtn = document.getElementById('keyDownloadAgainBtn');
-  if(_keyDownloadLink && !_keyDownloadLink.endsWith('#')){
-    dlAgainBtn.classList.remove('hide');
-  }
-  setTimeout(()=>{
-    if(_keyDownloadLink && !_keyDownloadLink.endsWith('#')){
-      window.open(_keyDownloadLink,'_blank','noopener,noreferrer');
-    }
-    showToast('VIP aktif! Semua produk terbuka.', 'success');
-  }, 900);
+  closeKeyModal();
+  spawnVipConfetti();
+  const overlay = document.getElementById('vipCelebrateOverlay');
+  overlay.classList.add('show');
+  overlay.setAttribute('aria-hidden','false');
+  document.body.style.overflow = 'hidden';
 }
+
+function closeVipCelebration(){
+  const overlay = document.getElementById('vipCelebrateOverlay');
+  overlay.classList.remove('show');
+  overlay.setAttribute('aria-hidden','true');
+  document.body.style.overflow = '';
+  const confettiWrap = document.getElementById('vipCelebrateConfetti');
+  if(confettiWrap) confettiWrap.innerHTML = '';
+}
+
+function spawnVipConfetti(){
+  const wrap = document.getElementById('vipCelebrateConfetti');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+  const colors = ['#00ffc2','#00e5a0','#7dffdb','#ffd700','#ffffff','#ff6b6b'];
+  const pieceCount = 60;
+  for(let i=0;i<pieceCount;i++){
+    const piece = document.createElement('div');
+    piece.className = 'vip-confetti-piece';
+    const left = Math.random()*100;
+    const drift = (Math.random()*160 - 80) + 'px';
+    const spin = (Math.random()*720 + 360) + 'deg';
+    const duration = (Math.random()*1.6 + 2.2).toFixed(2) + 's';
+    const delay = (Math.random()*0.5).toFixed(2) + 's';
+    const color = colors[Math.floor(Math.random()*colors.length)];
+    const isCircle = Math.random() > 0.5;
+    piece.style.left = left + '%';
+    piece.style.background = color;
+    piece.style.setProperty('--drift', drift);
+    piece.style.setProperty('--spin', spin);
+    piece.style.animationDuration = duration;
+    piece.style.animationDelay = delay;
+    if(isCircle) piece.style.borderRadius = '50%';
+    wrap.appendChild(piece);
+  }
+}
+
+document.getElementById('vipCelebrateOverlay').addEventListener('click', (e)=>{
+  if(e.target.id === 'vipCelebrateOverlay') closeVipCelebration();
+});
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeVipCelebration(); } });
 
 /* tampilkan status VIP/trial yang benar di badge atas grid produk, begitu halaman dibuka */
 isVipUnlockedAsync().then(vip => { if(vip) markVipUnlocked(); refreshVipHeaderBadge(); });
