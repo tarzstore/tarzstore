@@ -1295,83 +1295,126 @@ body.side-menu-open .tabs-wrap .tabs{
 .toast.error{border-color:rgba(245,80,80,.35);color:#ff6b6b;}
 .toast.success{border-color:rgba(0,229,160,.35);color:var(--green);}
 
-/* ── VIP CELEBRATION OVERLAY ── */
+/* ── VIP CELEBRATION OVERLAY — EDISI HITAM PUTIH ── */
 .vip-celebrate-overlay{
   position:fixed;inset:0;z-index:100000;
   display:flex;align-items:center;justify-content:center;
   padding:24px;
-  background:radial-gradient(circle at 50% 40%,rgba(0,229,160,.16),rgba(2,4,8,.92) 70%);
-  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  background:radial-gradient(circle at 50% 32%,rgba(255,255,255,.07),rgba(0,0,0,.96) 68%);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
   opacity:0;pointer-events:none;
-  transition:opacity .35s var(--ease-soft);
+  transition:opacity .4s var(--ease-soft);
   overflow:hidden;
 }
 .vip-celebrate-overlay.show{opacity:1;pointer-events:auto;}
+
+/* garis cahaya diagonal berputar pelan di belakang kartu -- aksen "mahal" tanpa warna */
+.vip-celebrate-overlay::before{
+  content:'';position:absolute;inset:-50%;
+  background:conic-gradient(from 0deg,transparent 0deg,rgba(255,255,255,.05) 40deg,transparent 90deg,transparent 220deg,rgba(255,255,255,.04) 260deg,transparent 310deg);
+  animation:vipSheenSpin 9s linear infinite;
+  opacity:0;transition:opacity .6s ease;
+}
+.vip-celebrate-overlay.show::before{opacity:1;}
+@keyframes vipSheenSpin{to{transform:rotate(360deg);}}
+
 .vip-celebrate-confetti{position:absolute;inset:0;pointer-events:none;}
 .vip-confetti-piece{
   position:absolute;top:-40px;
-  width:9px;height:14px;border-radius:2px;
-  opacity:.95;
+  width:7px;height:16px;
+  background:#fff;
+  opacity:.9;
   animation:vipConfettiFall linear forwards;
 }
 @keyframes vipConfettiFall{
   0%{transform:translate3d(0,0,0) rotate(0deg);opacity:1;}
-  85%{opacity:1;}
+  85%{opacity:.85;}
   100%{transform:translate3d(var(--drift,0px),110vh,0) rotate(var(--spin,540deg));opacity:0;}
 }
+
 .vip-celebrate-card{
   position:relative;z-index:2;
-  width:100%;max-width:360px;
-  background:linear-gradient(180deg,var(--card2),var(--card));
-  border:1px solid rgba(0,229,160,.35);
-  border-radius:24px;
-  padding:38px 26px 30px;
+  width:100%;max-width:370px;
+  background:linear-gradient(165deg,#161616 0%,#0a0a0a 60%,#000 100%);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:22px;
+  padding:42px 28px 32px;
   text-align:center;
-  box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 0 1px rgba(0,229,160,.08),0 0 60px rgba(0,229,160,.15);
+  box-shadow:0 40px 90px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.04),0 0 70px rgba(255,255,255,.06);
   transform:scale(.82) translateY(24px);
   opacity:0;
   transition:transform .5s var(--ease-out),opacity .4s var(--ease-soft);
+  overflow:hidden;
 }
 .vip-celebrate-overlay.show .vip-celebrate-card{transform:scale(1) translateY(0);opacity:1;}
+
+/* garis tipis atas kartu, aksen premium ala VIP card fisik */
+.vip-celebrate-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);
+}
+/* watermark "VIP" raksasa transparan di background kartu */
+.vip-celebrate-card::after{
+  content:'VIP';
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-46%);
+  font-size:7.5rem;font-weight:900;letter-spacing:-.02em;
+  color:rgba(255,255,255,.025);
+  pointer-events:none;z-index:0;
+  white-space:nowrap;
+}
+
 .vip-celebrate-badge{
-  width:76px;height:76px;margin:0 auto 20px;
+  position:relative;z-index:1;
+  width:80px;height:80px;margin:0 auto 22px;
   border-radius:50%;
   display:flex;align-items:center;justify-content:center;
-  background:radial-gradient(circle at 35% 30%,#00ffc2,#00a878 75%);
-  color:#04140f;
-  box-shadow:0 0 0 6px rgba(0,229,160,.14),0 12px 32px rgba(0,229,160,.35);
-  animation:vipBadgePop .6s var(--ease-out) .1s both,vipBadgePulse 2.2s ease-in-out 1s infinite;
+  background:radial-gradient(circle at 32% 28%,#fff,#c9c9c9 60%,#888 100%);
+  color:#000;
+  box-shadow:0 0 0 1px rgba(255,255,255,.5),0 0 0 7px rgba(255,255,255,.08),0 14px 34px rgba(0,0,0,.6);
+  animation:vipBadgePop .65s var(--ease-out) .1s both,vipBadgePulse 2.4s ease-in-out 1.1s infinite;
 }
-.vip-celebrate-badge svg{width:36px;height:36px;}
+.vip-celebrate-badge svg{width:38px;height:38px;stroke-width:3;}
 @keyframes vipBadgePop{
-  0%{transform:scale(0) rotate(-25deg);}
-  60%{transform:scale(1.15) rotate(6deg);}
+  0%{transform:scale(0) rotate(-30deg);}
+  60%{transform:scale(1.18) rotate(8deg);}
   100%{transform:scale(1) rotate(0deg);}
 }
 @keyframes vipBadgePulse{
-  0%,100%{box-shadow:0 0 0 6px rgba(0,229,160,.14),0 12px 32px rgba(0,229,160,.35);}
-  50%{box-shadow:0 0 0 12px rgba(0,229,160,.06),0 12px 42px rgba(0,229,160,.5);}
+  0%,100%{box-shadow:0 0 0 1px rgba(255,255,255,.5),0 0 0 7px rgba(255,255,255,.08),0 14px 34px rgba(0,0,0,.6);}
+  50%{box-shadow:0 0 0 1px rgba(255,255,255,.65),0 0 0 13px rgba(255,255,255,.03),0 14px 44px rgba(0,0,0,.7);}
+}
+
+.vip-celebrate-eyebrow{
+  position:relative;z-index:1;
+  font-size:.68rem;font-weight:800;letter-spacing:.28em;
+  color:rgba(255,255,255,.5);
+  text-transform:uppercase;
+  margin-bottom:10px;
 }
 .vip-celebrate-title{
-  font-size:1.28rem;font-weight:900;letter-spacing:.02em;
-  color:var(--text);line-height:1.3;
-  margin-bottom:10px;
-  background:linear-gradient(90deg,#00ffc2,#7dffdb 45%,#00e5a0);
-  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  position:relative;z-index:1;
+  font-size:1.32rem;font-weight:900;letter-spacing:.01em;
+  line-height:1.32;
+  margin-bottom:12px;
+  color:#fff;
+  text-shadow:0 0 26px rgba(255,255,255,.25);
 }
 .vip-celebrate-sub{
-  font-size:.92rem;color:var(--text2);line-height:1.5;
-  margin-bottom:26px;
+  position:relative;z-index:1;
+  font-size:.92rem;color:rgba(255,255,255,.55);line-height:1.55;
+  margin-bottom:30px;
 }
 .vip-celebrate-ok{
-  width:100%;padding:14px 0;border:none;border-radius:14px;
-  font-size:.95rem;font-weight:800;letter-spacing:.03em;cursor:pointer;
-  color:#04140f;
-  background:linear-gradient(135deg,#00ffc2,#00c98a);
-  box-shadow:0 10px 26px rgba(0,229,160,.35);
-  transition:transform .15s var(--ease-out),filter .15s;
+  position:relative;z-index:1;
+  width:100%;padding:15px 0;border:none;border-radius:13px;
+  font-size:.92rem;font-weight:800;letter-spacing:.08em;cursor:pointer;
+  color:#000;text-transform:uppercase;
+  background:linear-gradient(180deg,#fff,#dedede);
+  box-shadow:0 12px 30px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.4);
+  transition:transform .15s var(--ease-out),filter .15s,box-shadow .15s;
 }
-.vip-celebrate-ok:hover{filter:brightness(1.08);transform:translateY(-2px);}
+.vip-celebrate-ok:hover{filter:brightness(1.05);transform:translateY(-2px);box-shadow:0 16px 36px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.55);}
 .vip-celebrate-ok:active{transform:translateY(0) scale(.97);}
 
 /* ── SOCIAL MEDIA ── */
@@ -3842,6 +3885,7 @@ body.theme-sky .tts-verified-badge{background:#6fc3ff;color:#040810;}
     <div class="vip-celebrate-badge">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
     </div>
+    <div class="vip-celebrate-eyebrow">Tarz Store · Membership</div>
     <div class="vip-celebrate-title">SELAMAT KAMU SEKARANG VIP</div>
     <div class="vip-celebrate-sub">Kamu sekarang bisa akses semua produk</div>
     <button type="button" class="vip-celebrate-ok" id="vipCelebrateOkBtn" onclick="closeVipCelebration()">OKE</button>
@@ -5205,6 +5249,7 @@ function closeKeyModal(){
   overlay.classList.remove('open');
   overlay.setAttribute('aria-hidden','true');
   document.body.style.overflow = '';
+  _qrisPaymentActive = false;
   // PENTING: jangan matikan _qrisPollTimer di sini. Kalau user klik X / klik area luar /
   // tekan Escape SAAT lagi ada pembayaran QRIS pending, polling harus tetap jalan di
   // background supaya VIP tetap otomatis terbuka begitu pembayaran terdeteksi sukses —
@@ -5214,6 +5259,7 @@ function closeKeyModal(){
 }
 
 function handleKeyOverlayClick(e){
+  if(_qrisPaymentActive) return; // saat QRIS aktif, hanya tombol X yang boleh menutup modal
   if(e.target === document.getElementById('keyOverlay')) closeKeyModal();
 }
 
@@ -5322,7 +5368,7 @@ function keyGetPassword(){
 
 
 
-document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeKeyModal(); } });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !_qrisPaymentActive){ closeKeyModal(); } });
 
 /* ── PAUSE ANIMASI SAAT TAB TIDAK AKTIF ──
    Browser tetap menjalankan CSS animation & timer di background tab (throttled,
@@ -5430,6 +5476,7 @@ function setKeyHeadDecorHidden(hidden){
 
 let _qrisExpiresAt = null;
 let _qrisCountdownTimer = null;
+let _qrisPaymentActive = false;
 
 function renderVipQris(data){
   document.getElementById('keyTitle').textContent = 'Scan & Bayar VIP';
@@ -5438,6 +5485,10 @@ function renderVipQris(data){
 
   _vipQrisImageUrl = data.qrImageUrl;
   _qrisExpiresAt = Date.now() + 15 * 60 * 1000;
+  // Selama layar QRIS ini tampil, modal hanya boleh ditutup lewat tombol X --
+  // klik area luar / tekan Escape diabaikan supaya user tidak menutup modal
+  // secara tidak sengaja di tengah proses pembayaran.
+  _qrisPaymentActive = true;
 
   // Simpan order aktif ke localStorage supaya kalau user menutup modal / tutup tab / refresh
   // sebelum status "success" terdeteksi, kita masih bisa lanjut cek statusnya nanti —
@@ -5689,6 +5740,7 @@ function cancelVipPayment(){
   clearInterval(_qrisCountdownTimer);
   _vipQrisImageUrl = null;
   _qrisExpiresAt = null;
+  _qrisPaymentActive = false;
   try{ localStorage.removeItem('tarz_vip_pending_order'); }catch(e){}
   showVipGate();
 }
@@ -5720,7 +5772,7 @@ function spawnVipConfetti(){
   const wrap = document.getElementById('vipCelebrateConfetti');
   if(!wrap) return;
   wrap.innerHTML = '';
-  const colors = ['#00ffc2','#00e5a0','#7dffdb','#ffd700','#ffffff','#ff6b6b'];
+  const shades = ['#ffffff','#e4e4e4','#bdbdbd','#8f8f8f'];
   const pieceCount = 60;
   for(let i=0;i<pieceCount;i++){
     const piece = document.createElement('div');
@@ -5730,15 +5782,16 @@ function spawnVipConfetti(){
     const spin = (Math.random()*720 + 360) + 'deg';
     const duration = (Math.random()*1.6 + 2.2).toFixed(2) + 's';
     const delay = (Math.random()*0.5).toFixed(2) + 's';
-    const color = colors[Math.floor(Math.random()*colors.length)];
-    const isCircle = Math.random() > 0.5;
+    const shade = shades[Math.floor(Math.random()*shades.length)];
+    const isSquare = Math.random() > 0.5;
     piece.style.left = left + '%';
-    piece.style.background = color;
+    piece.style.background = shade;
+    piece.style.opacity = (Math.random()*0.5 + 0.5).toFixed(2);
     piece.style.setProperty('--drift', drift);
     piece.style.setProperty('--spin', spin);
     piece.style.animationDuration = duration;
     piece.style.animationDelay = delay;
-    if(isCircle) piece.style.borderRadius = '50%';
+    piece.style.borderRadius = isSquare ? '1px' : '50%';
     wrap.appendChild(piece);
   }
 }
