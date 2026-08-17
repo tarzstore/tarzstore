@@ -198,9 +198,25 @@
     display:flex;gap:13px;align-items:center;padding:13px;
     border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:10px;
     background:linear-gradient(160deg,var(--card2),var(--card));
-    transition:border-color var(--t-fast) var(--ease),transform var(--t-fast) var(--ease-out);
+    transition:border-color var(--t-fast) var(--ease),transform var(--t-fast) var(--ease-out),box-shadow var(--t-mid) var(--ease-soft),opacity var(--t-fast) var(--ease);
+    touch-action:pan-y;user-select:none;-webkit-user-select:none;
+    position:relative;
   }
   .product-item:hover{border-color:var(--border-strong);transform:translateX(2px);}
+  .product-item.dragging{
+    z-index:50;box-shadow:0 16px 40px -8px rgba(0,0,0,.6);border-color:var(--green);
+    background:linear-gradient(160deg,var(--card3),var(--card2));
+    transform:scale(1.02);opacity:.96;
+  }
+  .product-item.drag-armed{border-color:rgba(0,229,160,.4);}
+  .product-item.drag-placeholder{opacity:.25;}
+  .drag-handle{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+    width:20px;height:44px;flex-shrink:0;color:var(--text3);cursor:grab;
+    touch-action:none;
+  }
+  .drag-handle svg{width:14px;height:14px;pointer-events:none;}
+  body.reorder-active{overflow:hidden;}
   .product-item img{
     width:54px;height:54px;border-radius:var(--radius-xs);object-fit:cover;background:#222;flex-shrink:0;
     border:1px solid var(--border);
@@ -658,6 +674,9 @@
         <label>Get Key <span class="hint"></span></label>
         <input type="text" id="fGetKeyLink" placeholder="">
 
+        <label>Note <span class="hint">(opsional)</span></label>
+        <textarea id="fNote" placeholder=""></textarea>
+
         <!-- opsional, disembunyikan biar form simple -->
         <button type="button" class="adv-toggle" id="advToggle" onclick="toggleAdvanced()" style="margin-top:20px;">
           <span class="adv-toggle-left">
@@ -685,13 +704,13 @@
             <label>Key</label>
             <input type="text" id="fCopyKey" placeholder="">
 
-            <label>Label Key <span class="hint">(ganti nama tampilan "Key" di website)</span></label>
+            <label>Label Key <span class="hint"></span></label>
             <input type="text" id="fKeyLabel" placeholder="Default: Key">
 
             <label>User</label>
             <input type="text" id="fUserField" placeholder="">
 
-            <label>Label User <span class="hint">(ganti nama tampilan "User" di website)</span></label>
+            <label>Label User <span class="hint"></span></label>
             <input type="text" id="fUserLabel" placeholder="Default: User">
           </div>
         </div>
@@ -708,11 +727,13 @@
       </div>
     </div>
 
-    <div class="section-title">
-      Daftar Produk
-      <span class="count-chip" id="productCount">0</span>
+    <div id="productListSection">
+      <div class="section-title">
+        Daftar Produk
+        <span class="count-chip" id="productCount">0</span>
+      </div>
+      <div id="productList"></div>
     </div>
-    <div id="productList"></div>
   </div>
 
   <!-- FAB untuk buka form tambah produk -->
@@ -831,6 +852,7 @@ function togglePasswordVisibility(){
 function openForm(){
   document.getElementById('formCard').classList.add('open');
   document.getElementById('addFab').classList.add('hidden');
+  document.getElementById('productListSection').style.display = 'none';
   goStep(1);
   setTimeout(()=> document.getElementById('fName').focus(), 250);
   document.getElementById('formCard').scrollIntoView({ behavior:'smooth', block:'start' });
@@ -839,6 +861,7 @@ function openForm(){
 function closeForm(){
   document.getElementById('formCard').classList.remove('open');
   document.getElementById('addFab').classList.remove('hidden');
+  document.getElementById('productListSection').style.display = '';
   resetForm();
 }
 
@@ -918,6 +941,7 @@ async function saveProduct(){
   const user_field = document.getElementById('fUserField').value.trim();
   const user_label = document.getElementById('fUserLabel').value.trim();
   const get_key_link = document.getElementById('fGetKeyLink').value.trim();
+  const note = document.getElementById('fNote').value.trim();
   const editId = document.getElementById('editId').value;
 
   if(!name){
@@ -942,6 +966,7 @@ async function saveProduct(){
       user_field: user_field || null,
       user_label: user_label || null,
       get_key_link: get_key_link || null,
+      note: note || null,
       // price tetap diisi (kolom lama wajib not-null di database), tidak ditampilkan di form
       price: ''
     };
@@ -980,6 +1005,7 @@ function resetForm(){
   document.getElementById('fUserField').value = '';
   document.getElementById('fUserLabel').value = '';
   document.getElementById('fGetKeyLink').value = '';
+  document.getElementById('fNote').value = '';
   document.getElementById('fImagePreview').style.display = 'none';
   document.getElementById('formTitle').textContent = 'Tambah Produk Baru';
   document.getElementById('advBody').classList.remove('open');
@@ -995,6 +1021,7 @@ async function loadProducts(){
   const { data, error } = await db
     .from('products')
     .select('*')
+    .order('sort_order', { ascending: false, nullsFirst: false })
     .order('created_at', { ascending: false });
 
   if(error){
@@ -1019,7 +1046,10 @@ async function loadProducts(){
   const platformLabel = { android: 'Android', pc: 'PC', ios: 'iOS' };
 
   listEl.innerHTML = data.map(p => `
-    <div class="product-item">
+    <div class="product-item" data-id="${p.id}">
+      <div class="drag-handle" title="Tahan &amp; geser untuk ubah urutan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="9" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="9" cy="18" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg>
+      </div>
       <img src="${p.image_url || ''}" onerror="this.style.opacity=0">
       <div class="info">
         <h4>${escapeHtml(p.name)}</h4>
@@ -1036,6 +1066,163 @@ async function loadProducts(){
   `).join('');
 
   window._productsCache = data;
+  initReorder();
+}
+
+/* ═══════════════════════════════════════════════════
+   REORDER PRODUK — tahan (long-press) lalu geser untuk
+   pindah urutan. Pakai Pointer Events supaya jalan di
+   mobile (touch) maupun desktop (mouse), dan urutan baru
+   disimpan ke kolom sort_order di Supabase.
+   ═══════════════════════════════════════════════════ */
+const LONG_PRESS_MS = 380;
+let _dragState = null;
+
+function initReorder(){
+  const listEl = document.getElementById('productList');
+  listEl.querySelectorAll('.product-item').forEach(item => {
+    const handle = item.querySelector('.drag-handle');
+    if(!handle) return;
+    handle.addEventListener('pointerdown', (e) => onHandlePointerDown(e, item));
+  });
+}
+
+function onHandlePointerDown(e, item){
+  if(e.button !== undefined && e.button !== 0) return; // hanya klik kiri untuk mouse
+  const listEl = document.getElementById('productList');
+  const startY = e.clientY;
+  let longPressTimer = null;
+  let cancelled = false;
+
+  const cleanupPre = () => {
+    clearTimeout(longPressTimer);
+    document.removeEventListener('pointermove', onPreMove);
+    document.removeEventListener('pointerup', onPreUp);
+    document.removeEventListener('pointercancel', onPreUp);
+  };
+
+  const onPreMove = (ev) => {
+    // kalau jari/mouse geser terlalu jauh sebelum long-press selesai, batalkan (anggap scroll biasa)
+    if(Math.abs(ev.clientY - startY) > 10){
+      cancelled = true;
+      cleanupPre();
+    }
+  };
+  const onPreUp = () => { cancelled = true; cleanupPre(); };
+
+  document.addEventListener('pointermove', onPreMove);
+  document.addEventListener('pointerup', onPreUp);
+  document.addEventListener('pointercancel', onPreUp);
+
+  longPressTimer = setTimeout(() => {
+    if(cancelled) return;
+    cleanupPre();
+    startDrag(e, item, listEl);
+  }, LONG_PRESS_MS);
+}
+
+function startDrag(e, item, listEl){
+  if(navigator.vibrate) navigator.vibrate(12);
+  document.body.classList.add('reorder-active');
+  item.classList.add('dragging');
+
+  const itemRect = item.getBoundingClientRect();
+  const offsetY = e.clientY - itemRect.top;
+
+  // placeholder menjaga tinggi slot asli item saat item aslinya "mengambang"
+  const placeholder = document.createElement('div');
+  placeholder.className = 'drag-placeholder-slot';
+  placeholder.style.height = itemRect.height + 'px';
+  placeholder.style.marginBottom = '10px';
+  item.parentNode.insertBefore(placeholder, item.nextSibling);
+
+  item.style.position = 'fixed';
+  item.style.left = itemRect.left + 'px';
+  item.style.top = itemRect.top + 'px';
+  item.style.width = itemRect.width + 'px';
+  item.style.zIndex = '999';
+  item.style.pointerEvents = 'none';
+
+  _dragState = { item, placeholder, offsetY, listEl };
+
+  document.addEventListener('pointermove', onDragMove);
+  document.addEventListener('pointerup', onDragEnd);
+  document.addEventListener('pointercancel', onDragEnd);
+}
+
+function onDragMove(e){
+  if(!_dragState) return;
+  const { item, offsetY, listEl } = _dragState;
+  const newTop = e.clientY - offsetY;
+  item.style.top = newTop + 'px';
+
+  // auto-scroll halus kalau geser mendekati tepi layar
+  const margin = 70;
+  if(e.clientY < margin) window.scrollBy(0, -14);
+  else if(e.clientY > window.innerHeight - margin) window.scrollBy(0, 14);
+
+  const siblings = Array.from(listEl.querySelectorAll('.product-item:not(.dragging)'));
+  const dragCenter = newTop + item.offsetHeight / 2;
+
+  let target = null;
+  for(const sib of siblings){
+    const r = sib.getBoundingClientRect();
+    if(dragCenter < r.top + r.height / 2){ target = sib; break; }
+  }
+
+  if(target){
+    listEl.insertBefore(_dragState.placeholder, target);
+  } else {
+    listEl.appendChild(_dragState.placeholder);
+  }
+}
+
+async function onDragEnd(){
+  if(!_dragState) return;
+  const { item, placeholder, listEl } = _dragState;
+
+  document.removeEventListener('pointermove', onDragMove);
+  document.removeEventListener('pointerup', onDragEnd);
+  document.removeEventListener('pointercancel', onDragEnd);
+
+  // taruh item asli ke posisi placeholder, lalu bersihkan style inline drag
+  listEl.insertBefore(item, placeholder);
+  placeholder.remove();
+  item.style.position = '';
+  item.style.left = '';
+  item.style.top = '';
+  item.style.width = '';
+  item.style.zIndex = '';
+  item.style.pointerEvents = '';
+  item.classList.remove('dragging');
+  document.body.classList.remove('reorder-active');
+
+  _dragState = null;
+
+  await persistNewOrder(listEl);
+}
+
+async function persistNewOrder(listEl){
+  const ids = Array.from(listEl.querySelectorAll('.product-item')).map(el => el.dataset.id);
+  if(!ids.length) return;
+
+  // sort_order menurun supaya urutan atas->bawah di admin = urutan tampil di website
+  const total = ids.length;
+  const updates = ids.map((id, idx) => ({ id, sort_order: total - idx }));
+
+  // update cache lokal dulu biar UI tetap responsif
+  if(window._productsCache){
+    const map = new Map(updates.map(u => [u.id, u.sort_order]));
+    window._productsCache.forEach(p => { if(map.has(p.id)) p.sort_order = map.get(p.id); });
+  }
+
+  try{
+    await Promise.all(updates.map(u =>
+      db.from('products').update({ sort_order: u.sort_order }).eq('id', u.id)
+    ));
+  } catch(err){
+    showFormMsg('Gagal menyimpan urutan: ' + err.message, 'error');
+  }
 }
 
 function editProduct(id){
@@ -1055,6 +1242,7 @@ function editProduct(id){
   document.getElementById('fUserField').value = p.user_field || '';
   document.getElementById('fUserLabel').value = p.user_label || '';
   document.getElementById('fGetKeyLink').value = p.get_key_link || '';
+  document.getElementById('fNote').value = p.note || '';
   const preview = document.getElementById('fImagePreview');
   if(p.image_url){
     preview.src = p.image_url;
@@ -1066,6 +1254,7 @@ function editProduct(id){
 
   document.getElementById('formCard').classList.add('open');
   document.getElementById('addFab').classList.add('hidden');
+  document.getElementById('productListSection').style.display = 'none';
   goStep(1);
   document.getElementById('formCard').scrollIntoView({ behavior:'smooth', block:'start' });
 

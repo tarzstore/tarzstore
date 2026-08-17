@@ -1151,6 +1151,44 @@ body.side-menu-open .tabs-wrap .tabs{
   border-color:rgba(230,230,238,.35);
   background:rgba(230,230,238,.05);
 }
+/* ── NOTE PRODUK (dibawah List Fitur, opsional) ── */
+.note-wrap{
+  margin-top:12px;
+  border-radius:var(--radius-md);
+  border:1.5px solid rgba(255,196,0,.22);
+  background:rgba(255,196,0,.05);
+  padding:14px 14px 16px;
+  position:relative;
+  overflow:hidden;
+}
+.note-wrap::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 100% 0%,rgba(255,196,0,.08),transparent 65%);
+  pointer-events:none;
+}
+.note-head{
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:9px;position:relative;
+}
+.note-head-icon{
+  width:26px;height:26px;border-radius:8px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  color:#ffc400;
+  background:rgba(255,196,0,.14);
+  border:1px solid rgba(255,196,0,.3);
+}
+.note-head-icon svg{display:block;}
+.note-head-text{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:.78rem;font-weight:800;color:#ffc400;
+  letter-spacing:1.2px;text-transform:uppercase;
+}
+.note-body{
+  font-size:.82rem;font-weight:500;color:var(--text);
+  line-height:1.55;position:relative;
+  white-space:pre-line;
+}
+
 /* ── POSTER PREVIEW (3:2, dibawah List Fitur, mode special) ── */
 .poster-preview-wrap{
   margin-top:12px;
@@ -4451,6 +4489,20 @@ function openModal(btn){
       featureGrid.appendChild(fiturWrap);
     }
 
+    /* ── NOTE (opsional, tampil di bawah List Fitur) ── */
+    if(d.note){
+      const noteWrap = document.createElement('div');
+      noteWrap.className = 'note-wrap';
+      noteWrap.innerHTML = `
+        <div class="note-head">
+          <div class="note-head-icon"><svg width="14" height="14" viewBox="0 0 24 24"><path fill="currentColor" d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8"/></svg></div>
+          <div class="note-head-text">Note</div>
+        </div>
+        <div class="note-body">${String(d.note).replace(/</g,'&lt;')}</div>
+      `;
+      featureGrid.appendChild(noteWrap);
+    }
+
     /* ── POSTER PREVIEW 3:2 (khusus mode special, tampil di bawah List Fitur) ── */
     if(d.poster){
       const posterWrap = document.createElement('div');
@@ -4572,6 +4624,20 @@ function openModal(btn){
         <div class="fitur-chip-grid">${chipsNk}</div>
       `;
       featureGrid.appendChild(fiturWrapNk);
+    }
+
+    /* ── NOTE (opsional, tampil di bawah List Fitur) ── */
+    if(d.note){
+      const noteWrapNk = document.createElement('div');
+      noteWrapNk.className = 'note-wrap';
+      noteWrapNk.innerHTML = `
+        <div class="note-head">
+          <div class="note-head-icon"><svg width="14" height="14" viewBox="0 0 24 24"><path fill="currentColor" d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8"/></svg></div>
+          <div class="note-head-text">Note</div>
+        </div>
+        <div class="note-body">${String(d.note).replace(/</g,'&lt;')}</div>
+      `;
+      featureGrid.appendChild(noteWrapNk);
     }
 
     /* ── POSTER PREVIEW 3:2 (khusus mode special, tampil di bawah List Fitur) ── */
@@ -6276,6 +6342,7 @@ const PLAYLIST = [
     const { data, error } = await npClient
       .from('products')
       .select('*')
+      .order('sort_order', { ascending: false, nullsFirst: false })
       .order('created_at', { ascending: false });
 
     if(error || !data){
@@ -6328,6 +6395,7 @@ const PLAYLIST = [
         try { features = JSON.parse(p.features); } catch(e){ features = []; }
       }
       const fiturAttr = npAttr(JSON.stringify(features));
+      const noteAttr = npAttr(p.note || '');
       const platform = p.platform || 'android';
       const imgUrl = p.image_url || '';
       /* Kalau produk punya Get Key link -> pakai mode "aincrad" (APK + tombol GET KEY + fitur).
@@ -6342,6 +6410,7 @@ const PLAYLIST = [
         data-img="${npAttr(imgUrl)}" data-label="${npAttr(name)}"
         data-icon="" data-platform="${npAttr(platform)}"
         data-fitur='${fiturAttr}'
+        data-note="${noteAttr}"
         data-poster="">
         <div class="product-image" data-label="${npAttr(name)}">
           <img src="${npAttr(imgUrl)}" alt="${npAttr(name)}" onerror="this.classList.add('img-error')" loading="lazy" decoding="async" width="300" height="200">
