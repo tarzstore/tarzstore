@@ -3318,7 +3318,7 @@ body.side-menu-open{overflow:hidden;}
 <section class="hero" aria-label="Banner promosi">
 
   <div class="banner-slider" id="bannerSlider" role="region" aria-label="Banner promosi">
-    <video class="banner-video" src="https://xxaenbqyeliyhrulyjuz.supabase.co/storage/v1/object/public/Videos/Thamnel.mp4" poster="https://xxaenbqyeliyhrulyjuz.supabase.co/storage/v1/object/public/Videos/my.jpg" width="1280" height="720" autoplay muted loop playsinline preload="metadata" aria-label="Banner promosi Tarz Store" controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false"></video>
+    <video class="banner-video" poster="https://xxaenbqyeliyhrulyjuz.supabase.co/storage/v1/object/public/Videos/my.jpg" width="1280" height="720" muted loop playsinline preload="none" aria-label="Banner promosi Tarz Store" controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false"></video>
   </div>
 </section>
 
@@ -3775,14 +3775,25 @@ var BANNER_ASSET = {
 };
 
 function setBannerAssets(){
+  // Video baru di-load & diputar SETELAH halaman selesai render (window 'load'),
+  // supaya poster image (ringan) yang jadi elemen LCP, bukan file video (berat).
+  // Ini mencegah LCP jadi lambat tanpa harus buang fitur video sama sekali.
   const video = document.querySelector('.banner-video');
   if(!video) return;
 
-  if(video.getAttribute('src') !== BANNER_ASSET.video){
+  function loadAndPlayVideo(){
+    if(video.getAttribute('src') === BANNER_ASSET.video) return;
+    video.setAttribute('preload', 'auto');
     video.setAttribute('src', BANNER_ASSET.video);
-    video.setAttribute('poster', BANNER_ASSET.poster);
+    video.setAttribute('autoplay', '');
     video.load();
     video.play().catch(function(){ /* autoplay bisa diblokir browser, abaikan */ });
+  }
+
+  if(document.readyState === 'complete'){
+    loadAndPlayVideo();
+  } else {
+    window.addEventListener('load', loadAndPlayVideo, { once:true });
   }
 }
 
@@ -3997,14 +4008,15 @@ document.querySelectorAll('.card').forEach(c=> io.observe(c));
    Video autoplay+loop yang terus decode di background adalah salah satu
    penyebab terbesar scroll terasa patah-patah/berat di HP, karena GPU/CPU
    tetap sibuk decode frame walau video sudah nggak kelihatan. Pause saat
-   keluar viewport, play lagi saat balik terlihat. */
+   keluar viewport, play lagi saat balik terlihat. Aman dipanggil walau
+   video belum punya src (masih preload="none" sebelum window 'load'). */
 (function(){
   const bv = document.querySelector('.banner-video');
   if(!bv) return;
   const vio = new IntersectionObserver(entries=>{
     entries.forEach(e=>{
       if(e.isIntersecting){
-        bv.play().catch(()=>{});
+        if(bv.getAttribute('src')) bv.play().catch(()=>{});
       } else {
         bv.pause();
       }
@@ -4250,7 +4262,7 @@ function openModal(btn){
   iconEl.style.display = '';
   iconEl.classList.remove('modal-header-icon-lg');
   if(d.img){
-    iconEl.innerHTML = `<img src="${d.img}" alt="${productName}" loading="lazy" decoding="async" onerror="this.style.display='none';this.parentElement.textContent='${(d.icon||'').replace(/'/g,"\\'")}'" >`;
+    iconEl.innerHTML = `<img src="${d.img}" alt="${productName}" width="64" height="64" loading="lazy" decoding="async" onerror="this.style.display='none';this.parentElement.textContent='${(d.icon||'').replace(/'/g,"\\'")}'" >`;
   } else {
     iconEl.textContent = d.icon || '';
   }
