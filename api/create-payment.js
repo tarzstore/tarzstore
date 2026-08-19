@@ -6,7 +6,7 @@
 import { kv } from './_kv.js';
 import { randomUUID } from 'crypto';
 
-const VIP_PRICE = 1000; // Rp10.000 — ubah di sini kalau harga VIP berubah
+const VIP_PRICE = 10000; // Rp10.000 — ubah di sini kalau harga VIP berubah
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
