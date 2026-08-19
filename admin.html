@@ -312,6 +312,44 @@
   .fab-configff svg{width:20px;height:20px;}
   .fab-configff.hidden{transform:scale(0);opacity:0;pointer-events:none;}
 
+  /* ── BOTTOM TAB BAR ── */
+  .bottom-tabbar{
+    position:fixed;left:0;right:0;bottom:0;z-index:90;
+    display:flex;gap:6px;
+    padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+    background:rgba(8,8,9,.92);
+    border-top:1px solid var(--border-strong);
+    box-shadow:0 -8px 30px rgba(0,0,0,.35);
+    transition:transform var(--t-mid) var(--ease-soft),opacity var(--t-mid) var(--ease-soft);
+  }
+  @supports (backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px)){
+    .bottom-tabbar{
+      background:rgba(10,10,12,.78);
+      -webkit-backdrop-filter:blur(14px) saturate(140%);
+      backdrop-filter:blur(14px) saturate(140%);
+    }
+  }
+  .bottom-tabbar.hidden{transform:translateY(100%);opacity:0;pointer-events:none;}
+  .tabbar-btn{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+    padding:9px 4px;border:none;border-radius:var(--radius-sm);cursor:pointer;
+    background:var(--card2);color:var(--text2);border:1px solid var(--border);
+    font-family:inherit;font-size:10px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
+    text-align:center;line-height:1.25;
+    transition:transform var(--t-fast) var(--ease-out),background var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease),color var(--t-fast) var(--ease);
+  }
+  .tabbar-btn svg{width:19px;height:19px;flex-shrink:0;}
+  .tabbar-btn:active{transform:scale(.95);}
+  .tabbar-btn:hover{border-color:var(--border-strong);color:var(--text);}
+  .tabbar-btn.tabbar-produk{color:var(--green);}
+  .tabbar-btn.tabbar-produk:hover{background:rgba(0,229,160,.1);border-color:rgba(0,229,160,.3);}
+  .tabbar-btn.tabbar-foto{color:#6fc3ff;}
+  .tabbar-btn.tabbar-foto:hover{background:rgba(111,195,255,.1);border-color:rgba(111,195,255,.3);}
+  .tabbar-btn.tabbar-configff{color:#ffb84d;}
+  .tabbar-btn.tabbar-configff:hover{background:rgba(255,184,77,.1);border-color:rgba(255,184,77,.3);}
+  /* beri ruang di bawah supaya konten terakhir tidak ketutup tab bar */
+  body:has(#adminView.show){padding-bottom:84px;}
+
   /* ── FORM CARD (collapsible) ── */
   .form-card{display:none;}
   .form-card.open{display:block;animation:fadeIn var(--t-mid) var(--ease-out);}
@@ -834,15 +872,23 @@
     </div>
   </div>
 
-  <!-- FAB untuk buka form tambah produk -->
-  <button class="fab" id="addFab" onclick="openForm()" title="Tambah produk" aria-label="Tambah produk baru">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-  </button>
+  <!-- ═══ TAB BAR BAWAH ═══ -->
+  <nav class="bottom-tabbar" id="bottomTabbar" role="navigation" aria-label="Aksi cepat admin">
+    <button class="tabbar-btn tabbar-produk" onclick="openForm()" title="Tambah produk" aria-label="Tambah produk baru">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span>Upload Produk</span>
+    </button>
 
-  <!-- FAB khusus buka form Config FF -->
-  <button class="fab-configff" id="addFabCf" onclick="openFormCf()" title="Tambah Config FF" aria-label="Tambah Config FF baru">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-  </button>
+    <a class="tabbar-btn tabbar-foto" href="tools.html" title="Upload foto ke Supabase">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+      <span>Upload Foto Dll</span>
+    </a>
+
+    <button class="tabbar-btn tabbar-configff" onclick="openFormCf()" title="Tambah Config FF" aria-label="Tambah Config FF baru">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span>Upload Config FF</span>
+    </button>
+  </nav>
 
 </div>
 
@@ -954,8 +1000,7 @@ function togglePasswordVisibility(){
    ═══════════════════════════════════════════════════ */
 function openForm(){
   document.getElementById('formCard').classList.add('open');
-  document.getElementById('addFab').classList.add('hidden');
-  document.getElementById('addFabCf').classList.add('hidden');
+  document.getElementById('bottomTabbar').classList.add('hidden');
   document.getElementById('productListSection').style.display = 'none';
   goStep(1);
   setTimeout(()=> document.getElementById('fName').focus(), 250);
@@ -964,8 +1009,7 @@ function openForm(){
 
 function closeForm(){
   document.getElementById('formCard').classList.remove('open');
-  document.getElementById('addFab').classList.remove('hidden');
-  document.getElementById('addFabCf').classList.remove('hidden');
+  document.getElementById('bottomTabbar').classList.remove('hidden');
   document.getElementById('productListSection').style.display = '';
   resetForm();
 }
@@ -975,8 +1019,7 @@ function closeForm(){
    ═══════════════════════════════════════════════════ */
 function openFormCf(){
   document.getElementById('formCardCf').classList.add('open');
-  document.getElementById('addFab').classList.add('hidden');
-  document.getElementById('addFabCf').classList.add('hidden');
+  document.getElementById('bottomTabbar').classList.add('hidden');
   document.getElementById('productListSection').style.display = 'none';
   setTimeout(()=> document.getElementById('cfName').focus(), 250);
   document.getElementById('formCardCf').scrollIntoView({ behavior:'smooth', block:'start' });
@@ -984,8 +1027,7 @@ function openFormCf(){
 
 function closeFormCf(){
   document.getElementById('formCardCf').classList.remove('open');
-  document.getElementById('addFab').classList.remove('hidden');
-  document.getElementById('addFabCf').classList.remove('hidden');
+  document.getElementById('bottomTabbar').classList.remove('hidden');
   document.getElementById('productListSection').style.display = '';
   resetFormCf();
 }
@@ -1080,8 +1122,7 @@ function editConfigFf(id){
 
   document.getElementById('formTitleCf').textContent = 'Edit Config FF: ' + p.name;
   document.getElementById('formCardCf').classList.add('open');
-  document.getElementById('addFab').classList.add('hidden');
-  document.getElementById('addFabCf').classList.add('hidden');
+  document.getElementById('bottomTabbar').classList.add('hidden');
   document.getElementById('productListSection').style.display = 'none';
   document.getElementById('formCardCf').scrollIntoView({ behavior:'smooth', block:'start' });
 }
@@ -1504,7 +1545,7 @@ function editProduct(id){
   document.getElementById('formTitle').textContent = 'Edit Produk: ' + p.name;
 
   document.getElementById('formCard').classList.add('open');
-  document.getElementById('addFab').classList.add('hidden');
+  document.getElementById('bottomTabbar').classList.add('hidden');
   document.getElementById('productListSection').style.display = 'none';
   goStep(1);
   document.getElementById('formCard').scrollIntoView({ behavior:'smooth', block:'start' });
