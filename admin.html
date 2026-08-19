@@ -255,6 +255,29 @@
     color:var(--text2);font-size:13px;text-align:center;padding:36px 20px;
     border:1px dashed var(--border-strong);border-radius:var(--radius-md);
   }
+
+  /* ── PEMBATAS ANTAR TAB DI DAFTAR PRODUK ── */
+  .tab-section{margin-bottom:26px;}
+  .tab-section:last-child{margin-bottom:0;}
+  .tab-section-head{
+    display:flex;align-items:center;gap:9px;
+    padding:10px 14px;margin-bottom:12px;
+    background:linear-gradient(160deg,var(--card2),var(--card));
+    border:1px solid var(--border);border-left:3px solid var(--border-strong);
+    border-radius:var(--radius-sm);
+  }
+  .tab-section-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .tab-dot-freefire{background:var(--green);box-shadow:0 0 8px rgba(0,229,160,.6);}
+  .tab-dot-allgame{background:#6fc3ff;box-shadow:0 0 8px rgba(111,195,255,.6);}
+  .tab-dot-configff{background:#ffb84d;box-shadow:0 0 8px rgba(255,184,77,.6);}
+  #tabSectionFreefire .tab-section-head{border-left-color:var(--green);}
+  #tabSectionAllgame .tab-section-head{border-left-color:#6fc3ff;}
+  #tabSectionConfigff .tab-section-head{border-left-color:#ffb84d;}
+  .tab-section-name{
+    font-size:12.5px;font-weight:700;color:var(--text);
+    text-transform:uppercase;letter-spacing:.06em;flex:1;
+  }
+  .tab-section .empty{padding:22px 16px;font-size:12.5px;}
   .preview-thumb{margin-top:10px;width:84px;height:84px;border-radius:var(--radius-xs);object-fit:cover;display:none;background:#222;border:1px solid var(--border);}
   .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(5,23,15,.25);border-top-color:#05170f;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;}
   @keyframes spin{to{transform:rotate(360deg);}}
@@ -273,6 +296,21 @@
   .fab:active{transform:scale(.97);}
   .fab svg{width:24px;height:24px;}
   .fab.hidden{transform:scale(0);opacity:0;pointer-events:none;}
+
+  /* ── FAB KHUSUS CONFIG FF — bulat, ditumpuk di atas FAB utama ── */
+  .fab-configff{
+    position:fixed;right:18px;bottom:88px;z-index:90;
+    width:48px;height:48px;border-radius:50%;
+    background:linear-gradient(135deg,#1b1b1b,#111111);color:var(--green);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 8px 20px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.3);
+    border:1px solid rgba(0,229,160,.3);cursor:pointer;will-change:transform,opacity;
+    transition:transform var(--t-mid) var(--ease-soft),box-shadow var(--t-mid) var(--ease-soft),opacity var(--t-mid) var(--ease-soft);
+  }
+  .fab-configff:hover{transform:scale(1.06) translateY(-1px);box-shadow:0 10px 26px rgba(0,229,160,.28);}
+  .fab-configff:active{transform:scale(.97);}
+  .fab-configff svg{width:20px;height:20px;}
+  .fab-configff.hidden{transform:scale(0);opacity:0;pointer-events:none;}
 
   /* ── FORM CARD (collapsible) ── */
   .form-card{display:none;}
@@ -613,6 +651,10 @@
         <div class="stat-num" id="statAllgame">0</div>
         <div class="stat-label">All Game</div>
       </div>
+      <div class="stat-box">
+        <div class="stat-num" id="statConfigff">0</div>
+        <div class="stat-label">Config FF</div>
+      </div>
     </div>
 
     <div id="formMsg" class="msg"></div>
@@ -727,17 +769,78 @@
       </div>
     </div>
 
+    <!-- ═══ FORM CONFIG FF — form terpisah, khusus tab Config FF ═══ -->
+    <div class="card form-card" id="formCardCf">
+      <div class="form-card-header">
+        <div id="formTitleCf" style="font-weight:700;font-size:16px;">Tambah Config FF Baru</div>
+        <button type="button" class="form-card-close" onclick="closeFormCf()" title="Tutup form" aria-label="Tutup form">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <input type="hidden" id="cfEditId" value="">
+
+      <label>Nama Config</label>
+      <input type="text" id="cfName" placeholder="">
+
+      <label>URL Foto Config <span class="hint"></span></label>
+      <input type="text" id="cfImageUrl" placeholder="" oninput="onCfImageUrlInput()">
+      <img id="cfImagePreview" class="preview-thumb">
+
+      <label>URL Foto Sebelum <span class="hint"></span></label>
+      <input type="text" id="cfImageUrlBefore" placeholder="" oninput="onCfImageUrlBeforeInput()">
+      <img id="cfImagePreviewBefore" class="preview-thumb">
+
+      <label>Link Download Config</label>
+      <input type="text" id="cfDownloadLink" placeholder="">
+
+      <button class="btn-primary" id="saveBtnCf" onclick="saveConfigFf()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Simpan Config FF
+      </button>
+    </div>
+
     <div id="productListSection">
       <div class="section-title">
         Daftar Produk
         <span class="count-chip" id="productCount">0</span>
       </div>
-      <div id="productList"></div>
+
+      <div class="tab-section" id="tabSectionFreefire">
+        <div class="tab-section-head">
+          <span class="tab-section-dot tab-dot-freefire"></span>
+          <span class="tab-section-name">Free Fire</span>
+          <span class="count-chip" id="countFreefire">0</span>
+        </div>
+        <div id="productListFreefire"></div>
+      </div>
+
+      <div class="tab-section" id="tabSectionAllgame">
+        <div class="tab-section-head">
+          <span class="tab-section-dot tab-dot-allgame"></span>
+          <span class="tab-section-name">All Game</span>
+          <span class="count-chip" id="countAllgame">0</span>
+        </div>
+        <div id="productListAllgame"></div>
+      </div>
+
+      <div class="tab-section" id="tabSectionConfigff">
+        <div class="tab-section-head">
+          <span class="tab-section-dot tab-dot-configff"></span>
+          <span class="tab-section-name">Config FF</span>
+          <span class="count-chip" id="countConfigff">0</span>
+        </div>
+        <div id="productListConfigff"></div>
+      </div>
     </div>
   </div>
 
   <!-- FAB untuk buka form tambah produk -->
   <button class="fab" id="addFab" onclick="openForm()" title="Tambah produk" aria-label="Tambah produk baru">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+
+  <!-- FAB khusus buka form Config FF -->
+  <button class="fab-configff" id="addFabCf" onclick="openFormCf()" title="Tambah Config FF" aria-label="Tambah Config FF baru">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
   </button>
 
@@ -852,6 +955,7 @@ function togglePasswordVisibility(){
 function openForm(){
   document.getElementById('formCard').classList.add('open');
   document.getElementById('addFab').classList.add('hidden');
+  document.getElementById('addFabCf').classList.add('hidden');
   document.getElementById('productListSection').style.display = 'none';
   goStep(1);
   setTimeout(()=> document.getElementById('fName').focus(), 250);
@@ -861,8 +965,125 @@ function openForm(){
 function closeForm(){
   document.getElementById('formCard').classList.remove('open');
   document.getElementById('addFab').classList.remove('hidden');
+  document.getElementById('addFabCf').classList.remove('hidden');
   document.getElementById('productListSection').style.display = '';
   resetForm();
+}
+
+/* ═══════════════════════════════════════════════════
+   FORM CONFIG FF (terpisah dari form produk biasa)
+   ═══════════════════════════════════════════════════ */
+function openFormCf(){
+  document.getElementById('formCardCf').classList.add('open');
+  document.getElementById('addFab').classList.add('hidden');
+  document.getElementById('addFabCf').classList.add('hidden');
+  document.getElementById('productListSection').style.display = 'none';
+  setTimeout(()=> document.getElementById('cfName').focus(), 250);
+  document.getElementById('formCardCf').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function closeFormCf(){
+  document.getElementById('formCardCf').classList.remove('open');
+  document.getElementById('addFab').classList.remove('hidden');
+  document.getElementById('addFabCf').classList.remove('hidden');
+  document.getElementById('productListSection').style.display = '';
+  resetFormCf();
+}
+
+function resetFormCf(){
+  document.getElementById('cfEditId').value = '';
+  document.getElementById('cfName').value = '';
+  document.getElementById('cfImageUrl').value = '';
+  document.getElementById('cfImageUrlBefore').value = '';
+  document.getElementById('cfDownloadLink').value = '';
+  document.getElementById('cfImagePreview').style.display = 'none';
+  document.getElementById('cfImagePreviewBefore').style.display = 'none';
+  document.getElementById('formTitleCf').textContent = 'Tambah Config FF Baru';
+}
+
+function onCfImageUrlInput(){
+  const url = document.getElementById('cfImageUrl').value.trim();
+  const preview = document.getElementById('cfImagePreview');
+  if(url){ preview.src = url; preview.style.display = 'block'; }
+  else preview.style.display = 'none';
+}
+
+function onCfImageUrlBeforeInput(){
+  const url = document.getElementById('cfImageUrlBefore').value.trim();
+  const preview = document.getElementById('cfImagePreviewBefore');
+  if(url){ preview.src = url; preview.style.display = 'block'; }
+  else preview.style.display = 'none';
+}
+
+async function saveConfigFf(){
+  const btn = document.getElementById('saveBtnCf');
+  const name = document.getElementById('cfName').value.trim();
+  const image_url = document.getElementById('cfImageUrl').value.trim();
+  const image_url_before = document.getElementById('cfImageUrlBefore').value.trim();
+  const download_link = document.getElementById('cfDownloadLink').value.trim();
+  const editId = document.getElementById('cfEditId').value;
+
+  if(!name){
+    showFormMsg('Nama config wajib diisi.', 'error');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Menyimpan...';
+
+  try{
+    const payload = {
+      name,
+      tab: 'configff',
+      image_url: image_url || null,
+      // URL foto SEBELUM dititipkan di kolom download_link_2 (sudah ada di skema,
+      // tidak dipakai lagi untuk arti "link" pada tab configff)
+      download_link_2: image_url_before || null,
+      download_link,
+      features: [],
+      platform: 'android',
+      price: ''
+    };
+
+    let error;
+    if(editId){
+      ({ error } = await db.from('products').update(payload).eq('id', editId));
+    } else {
+      ({ error } = await db.from('products').insert(payload));
+    }
+
+    if(error) throw new Error(error.message);
+
+    showFormMsg(editId ? 'Config FF berhasil diperbarui.' : 'Config FF berhasil ditambahkan.', 'success');
+    closeFormCf();
+    loadProducts();
+  } catch(err){
+    showFormMsg(err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Simpan Config FF';
+  }
+}
+
+function editConfigFf(id){
+  const p = (window._productsCache || []).find(x => x.id === id);
+  if(!p) return;
+
+  document.getElementById('cfEditId').value = p.id;
+  document.getElementById('cfName').value = p.name || '';
+  document.getElementById('cfImageUrl').value = p.image_url || '';
+  document.getElementById('cfImageUrlBefore').value = p.download_link_2 || '';
+  document.getElementById('cfDownloadLink').value = p.download_link || '';
+
+  onCfImageUrlInput();
+  onCfImageUrlBeforeInput();
+
+  document.getElementById('formTitleCf').textContent = 'Edit Config FF: ' + p.name;
+  document.getElementById('formCardCf').classList.add('open');
+  document.getElementById('addFab').classList.add('hidden');
+  document.getElementById('addFabCf').classList.add('hidden');
+  document.getElementById('productListSection').style.display = 'none';
+  document.getElementById('formCardCf').scrollIntoView({ behavior:'smooth', block:'start' });
 }
 
 function goStep(n){
@@ -1015,8 +1236,12 @@ function resetForm(){
 }
 
 async function loadProducts(){
-  const listEl = document.getElementById('productList');
-  listEl.innerHTML = '<p class="empty">Memuat produk...</p>';
+  const listFreefireEl = document.getElementById('productListFreefire');
+  const listAllgameEl = document.getElementById('productListAllgame');
+  const listConfigffEl = document.getElementById('productListConfigff');
+  listFreefireEl.innerHTML = '<p class="empty">Memuat produk...</p>';
+  listAllgameEl.innerHTML = '';
+  listConfigffEl.innerHTML = '';
 
   const { data, error } = await db
     .from('products')
@@ -1025,27 +1250,34 @@ async function loadProducts(){
     .order('created_at', { ascending: false });
 
   if(error){
-    listEl.innerHTML = '<p class="empty">Gagal memuat produk: ' + error.message + '</p>';
+    listFreefireEl.innerHTML = '<p class="empty">Gagal memuat produk: ' + error.message + '</p>';
     return;
   }
 
   document.getElementById('productCount').textContent = data.length;
 
-  const totalFreefire = data.filter(p => (p.tab || 'freefire') === 'freefire').length;
-  const totalAllgame = data.filter(p => p.tab === 'allgame').length;
+  const freefireItems = data.filter(p => (p.tab || 'freefire') === 'freefire');
+  const allgameItems = data.filter(p => p.tab === 'allgame');
+  const configffItems = data.filter(p => p.tab === 'configff');
+
   document.getElementById('statTotal').textContent = data.length;
-  document.getElementById('statFreefire').textContent = totalFreefire;
-  document.getElementById('statAllgame').textContent = totalAllgame;
+  document.getElementById('statFreefire').textContent = freefireItems.length;
+  document.getElementById('statAllgame').textContent = allgameItems.length;
+  document.getElementById('statConfigff').textContent = configffItems.length;
+  document.getElementById('countFreefire').textContent = freefireItems.length;
+  document.getElementById('countAllgame').textContent = allgameItems.length;
+  document.getElementById('countConfigff').textContent = configffItems.length;
+
+  window._productsCache = data;
 
   if(data.length === 0){
-    listEl.innerHTML = '<p class="empty">Belum ada produk. Tambahkan lewat form di atas.</p>';
+    listFreefireEl.innerHTML = '<p class="empty">Belum ada produk. Tambahkan lewat form di atas.</p>';
     return;
   }
 
-  const tabLabel = { freefire: 'Free Fire', allgame: 'All Game' };
   const platformLabel = { android: 'Android', pc: 'PC', ios: 'iOS' };
 
-  listEl.innerHTML = data.map(p => `
+  const renderItem = (p) => `
     <div class="product-item" data-id="${p.id}">
       <div class="drag-handle" title="Tahan &amp; geser untuk ubah urutan">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="9" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="9" cy="18" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg>
@@ -1054,7 +1286,6 @@ async function loadProducts(){
       <div class="info">
         <h4>${escapeHtml(p.name)}</h4>
         <div class="meta">
-          <span class="badge badge-tab">${escapeHtml(tabLabel[p.tab] || p.tab || '')}</span>
           <span class="badge badge-platform">${escapeHtml(platformLabel[p.platform] || p.platform || '')}</span>
         </div>
       </div>
@@ -1063,9 +1294,20 @@ async function loadProducts(){
         <button class="btn-danger" onclick="deleteProduct('${p.id}')">Hapus</button>
       </div>
     </div>
-  `).join('');
+  `;
 
-  window._productsCache = data;
+  listFreefireEl.innerHTML = freefireItems.length
+    ? freefireItems.map(renderItem).join('')
+    : '<p class="empty">Belum ada produk Free Fire.</p>';
+
+  listAllgameEl.innerHTML = allgameItems.length
+    ? allgameItems.map(renderItem).join('')
+    : '<p class="empty">Belum ada produk All Game.</p>';
+
+  listConfigffEl.innerHTML = configffItems.length
+    ? configffItems.map(renderItem).join('')
+    : '<p class="empty">Belum ada Config FF.</p>';
+
   initReorder();
 }
 
@@ -1079,17 +1321,20 @@ const LONG_PRESS_MS = 380;
 let _dragState = null;
 
 function initReorder(){
-  const listEl = document.getElementById('productList');
-  listEl.querySelectorAll('.product-item').forEach(item => {
-    const handle = item.querySelector('.drag-handle');
-    if(!handle) return;
-    handle.addEventListener('pointerdown', (e) => onHandlePointerDown(e, item));
+  ['productListFreefire', 'productListAllgame', 'productListConfigff'].forEach(id => {
+    const listEl = document.getElementById(id);
+    if(!listEl) return;
+    listEl.querySelectorAll('.product-item').forEach(item => {
+      const handle = item.querySelector('.drag-handle');
+      if(!handle) return;
+      handle.addEventListener('pointerdown', (e) => onHandlePointerDown(e, item));
+    });
   });
 }
 
 function onHandlePointerDown(e, item){
   if(e.button !== undefined && e.button !== 0) return; // hanya klik kiri untuk mouse
-  const listEl = document.getElementById('productList');
+  const listEl = item.parentNode; // grup tab asal item ini (freefire/allgame/configff) — reorder tetap dalam grup
   const startY = e.clientY;
   let longPressTimer = null;
   let cancelled = false;
@@ -1228,6 +1473,12 @@ async function persistNewOrder(listEl){
 function editProduct(id){
   const p = (window._productsCache || []).find(x => x.id === id);
   if(!p) return;
+
+  // produk Config FF punya form terpisah, bukan wizard produk biasa
+  if(p.tab === 'configff'){
+    editConfigFf(id);
+    return;
+  }
 
   document.getElementById('editId').value = p.id;
   document.getElementById('fName').value = p.name || '';
