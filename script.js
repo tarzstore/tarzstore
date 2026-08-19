@@ -1610,7 +1610,7 @@ function renderVipQris(data){
         <span class="qris-code-corner-a"></span>
         <span class="qris-code-corner-b"></span>
         <img src="${data.qrImageUrl}" alt="QRIS VIP Tarz Store" decoding="async">
-        <div class="qris-logo-badge"><img src="https://xxaenbqyeliyhrulyjuz.supabase.co/storage/v1/object/public/Videos/tarz.jpg" alt="Tarz" decoding="async"></div>
+        <div class="qris-logo-badge"><img src="https://bvblcdnmbzncoqeoqkoc.supabase.co/storage/v1/object/public/Tarz/tarz.jpg" alt="Tarz" decoding="async"></div>
       </div>
 
       <div class="qris-timer-row" id="qrisTimerRow">
