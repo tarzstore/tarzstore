@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
 <title>Tarz Store — Upload ke Supabase</title>
 <style>
   :root{
@@ -27,19 +27,19 @@
     --warn:#eab308;
     --mono:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
     --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
-    --shadow-card:0 1px 0 rgba(255,255,255,.03) inset, 0 12px 32px -16px rgba(0,0,0,.6), 0 2px 8px -2px rgba(0,0,0,.5);
-    --shadow-card-hover:0 1px 0 rgba(255,255,255,.04) inset, 0 20px 44px -18px rgba(0,0,0,.7), 0 2px 8px -2px rgba(0,0,0,.5);
+    --shadow-card:0 1px 0 rgba(255,255,255,.03) inset, 0 8px 20px -14px rgba(0,0,0,.45);
+    --shadow-card-hover:0 1px 0 rgba(255,255,255,.04) inset, 0 12px 26px -16px rgba(0,0,0,.5);
   }
   *{box-sizing:border-box;}
-  html{background:var(--bg);}
+  html{background:var(--bg); touch-action:pan-x pan-y; -ms-touch-action:pan-x pan-y;}
   body{
     margin:0;
     font-family:var(--sans);
     background:var(--bg);
+    touch-action:pan-x pan-y;
     background-image:
-      radial-gradient(circle at 15% -5%, rgba(99,102,241,.14), transparent 42%),
-      radial-gradient(circle at 105% 10%, rgba(139,140,247,.08), transparent 45%),
-      radial-gradient(circle at 50% 100%, rgba(240,180,41,.03), transparent 50%);
+      radial-gradient(circle at 15% -5%, rgba(99,102,241,.09), transparent 42%),
+      radial-gradient(circle at 105% 10%, rgba(139,140,247,.05), transparent 45%);
     background-attachment:fixed;
     color:var(--text);
     padding:36px 18px 96px;
@@ -64,13 +64,13 @@
   .topline .dot{
     width:6px;height:6px;border-radius:50%;
     background:var(--ok);
-    box-shadow:0 0 0 3px var(--ok-soft), 0 0 10px rgba(34,197,94,.5);
+    box-shadow:0 0 0 3px var(--ok-soft);
     flex-shrink:0;
-    animation:pulse-dot 2.4s ease-in-out infinite;
+    animation:pulse-dot 3s ease-in-out infinite;
   }
   @keyframes pulse-dot{
     0%,100%{opacity:1;}
-    50%{opacity:.55;}
+    50%{opacity:.7;}
   }
 
   h1{
@@ -115,8 +115,7 @@
     border-radius:2px;
     height:calc(100% - 28px);
     background:linear-gradient(var(--accent), var(--accent-2) 60%, transparent);
-    box-shadow:0 0 12px rgba(99,102,241,.5);
-    transition:height .4s ease;
+    transition:height .3s ease;
   }
   .step{
     position:relative;
@@ -139,13 +138,13 @@
     font-weight:600;
     color:var(--muted);
     z-index:1;
-    transition:all .2s ease;
+    transition:background .2s ease, border-color .2s ease, color .2s ease;
   }
   .step-num.done{
     color:#fff;
     border-color:var(--accent-2);
     background:linear-gradient(135deg, var(--accent), var(--accent-2));
-    box-shadow:0 0 0 3px var(--accent-soft), 0 2px 8px -2px rgba(99,102,241,.6);
+    box-shadow:0 0 0 3px var(--accent-soft);
   }
 
   .card{
@@ -154,7 +153,7 @@
     border-radius:14px;
     padding:20px 20px 18px;
     box-shadow:var(--shadow-card);
-    transition:box-shadow .25s ease, border-color .25s ease;
+    transition:box-shadow .2s ease, border-color .2s ease;
   }
   .card:hover{
     border-color:#2c2c33;
@@ -200,13 +199,15 @@
   }
   select option{background:var(--inset);}
   input[type=file]{
-    width:100%;
-    color:var(--muted);
-    font-size:.82rem;
-    font-family:var(--sans);
-    padding:2px 0;
+    display:none;
   }
-  input[type=file]::file-selector-button{
+  .filepicker-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .filepicker-btn{
     background:var(--inset);
     border:1px solid var(--border);
     color:var(--text);
@@ -214,11 +215,17 @@
     padding:9px 14px;
     font-size:.8rem;
     font-weight:600;
-    margin-right:12px;
     cursor:pointer;
+    width:auto;
+    box-shadow:none;
     transition:border-color .15s, background .15s;
   }
-  input[type=file]::file-selector-button:hover{border-color:var(--accent-border);background:#1f1f26;}
+  .filepicker-btn:hover{border-color:var(--accent-border);background:#1f1f26;filter:none;}
+  .filepicker-status{
+    color:var(--muted);
+    font-size:.82rem;
+    font-family:var(--sans);
+  }
 
   button{
     background:linear-gradient(135deg, var(--accent), #5457e0);
@@ -231,10 +238,10 @@
     width:100%;
     cursor:pointer;
     letter-spacing:-.005em;
-    box-shadow:0 1px 0 rgba(255,255,255,.15) inset, 0 6px 16px -6px rgba(99,102,241,.55);
-    transition:filter .15s, opacity .15s, transform .1s, box-shadow .2s;
+    box-shadow:0 1px 0 rgba(255,255,255,.15) inset, 0 4px 10px -6px rgba(99,102,241,.4);
+    transition:filter .15s ease, transform .1s ease, box-shadow .2s ease;
   }
-  button:hover{filter:brightness(1.08);box-shadow:0 1px 0 rgba(255,255,255,.15) inset, 0 8px 20px -6px rgba(99,102,241,.7);}
+  button:hover{filter:brightness(1.06);}
   button:active{filter:brightness(.95);transform:translateY(1px);}
   button.secondary{
     background:var(--inset);
@@ -319,8 +326,8 @@
     display:flex;align-items:center;justify-content:center;
     background:var(--panel-2);border:1px solid var(--border);color:var(--muted);
     text-decoration:none;cursor:pointer;
-    box-shadow:0 4px 18px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.03) inset;
-    transition:background .16s ease,color .16s ease,border-color .16s ease,transform .16s ease;
+    box-shadow:0 2px 10px rgba(0,0,0,.3), 0 1px 0 rgba(255,255,255,.03) inset;
+    transition:background .15s ease,color .15s ease,border-color .15s ease,transform .15s ease;
   }
   .close-admin-btn:hover{color:var(--text);border-color:var(--accent-border);background:#1c1c22;}
   .close-admin-btn:active{transform:scale(.94);}
@@ -403,6 +410,10 @@
     <div class="card">
       <span class="card-label">File</span>
       <input type="file" id="fileInput" multiple>
+      <div class="filepicker-row">
+        <button type="button" class="filepicker-btn" id="filePickerBtn">Pilih File</button>
+        <span class="filepicker-status" id="filePickerStatus">Belum ada file dipilih</span>
+      </div>
 
       <div class="filelist" id="fileList"></div>
 
@@ -534,11 +545,20 @@ renderAccountSelect();
 const fileInput = document.getElementById('fileInput');
 const fileListEl = document.getElementById('fileList');
 const uploadBtn = document.getElementById('uploadBtn');
+const filePickerBtn = document.getElementById('filePickerBtn');
+const filePickerStatus = document.getElementById('filePickerStatus');
 
 let selectedFiles = [];
 
+filePickerBtn.addEventListener('click', () => {
+  fileInput.click();
+});
+
 fileInput.addEventListener('change', () => {
   selectedFiles = Array.from(fileInput.files);
+  filePickerStatus.textContent = selectedFiles.length === 0
+    ? 'Belum ada file dipilih'
+    : (selectedFiles.length === 1 ? selectedFiles[0].name : selectedFiles.length + ' file dipilih');
   renderFileList();
 });
 
