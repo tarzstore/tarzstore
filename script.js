@@ -2617,6 +2617,9 @@ document.addEventListener('dragstart', function(e){
     let cheatHtml = '';
     let allgameHtml = '';
     let configffHtml = '';
+    let cheatIndex = 0;
+    let allgameIndex = 0;
+    let configffIndex = 0;
 
     data.forEach(p => {
       const name = p.name || '';
@@ -2628,6 +2631,12 @@ document.addEventListener('dragstart', function(e){
         const imgBefore = p.download_link_2 || ''; // foto SEBELUM (dititipkan di kolom download_link_2)
         const dlLink = npAttr(p.download_link || '');
 
+        /* Kartu Config FF pertama disisipkan paling atas grid (afterbegin) —
+           berpotensi jadi elemen LCP. Muat cepat, jangan lazy. */
+        const cfIsFirst = (configffIndex === 0);
+        configffIndex++;
+        const cfLoadingAttr = cfIsFirst ? 'fetchpriority="high"' : 'loading="lazy"';
+
         const cfCardHtml = `
       <div class="card"
         data-special="configff-empty"
@@ -2638,7 +2647,7 @@ document.addEventListener('dragstart', function(e){
         data-config-download-link="${dlLink}"
         data-poster-original="${npAttr(imgBefore)}" data-poster-premium="${npAttr(imgUrl)}">
         <div class="product-image" data-label="CONFIG FF">
-          <img src="${npAttr(imgUrl)}" alt="${npAttr(name)}" onerror="this.classList.add('img-error')" loading="lazy" decoding="async" width="300" height="450">
+          <img src="${npAttr(imgUrl)}" alt="${npAttr(name)}" onerror="this.classList.add('img-error')" ${cfLoadingAttr} decoding="async" width="300" height="450">
         </div>
         <h4>${npEscape(name)}</h4>        <button class="buy-btn" onclick="openModal(this)" style="display:flex;align-items:center;justify-content:center;gap:6px;"><span class="js-icon" data-icon-key="installBtn"></span>INSTALL</button>
       </div>`;
@@ -2662,6 +2671,14 @@ document.addEventListener('dragstart', function(e){
 
       /* Kartu identik dengan produk lama:
          klik INSTALL -> openModal(this) -> tampil APK CHEAT (download) + Key/Get Key (jika ada) + List Fitur. */
+      /* Kartu produk baru disisipkan paling atas grid (afterbegin) — kartu pertama
+         di tiap tab berpotensi jadi elemen LCP (terlihat langsung tanpa scroll).
+         Muat cepat khusus kartu pertama, sisanya tetap lazy seperti biasa. */
+      const targetIsAllgame = (p.tab === 'allgame');
+      const isFirstInTab = targetIsAllgame ? (allgameIndex === 0) : (cheatIndex === 0);
+      if(targetIsAllgame) allgameIndex++; else cheatIndex++;
+      const loadingAttr = isFirstInTab ? 'fetchpriority="high"' : 'loading="lazy"';
+
       const cardHtml = `
       <div class="card"
         data-special="${specialMode}"
@@ -2671,7 +2688,7 @@ document.addEventListener('dragstart', function(e){
         data-note="${noteAttr}"
         data-poster="">
         <div class="product-image" data-label="${npAttr(name)}">
-          <img src="${npAttr(imgUrl)}" alt="${npAttr(name)}" onerror="this.classList.add('img-error')" loading="lazy" decoding="async" width="300" height="200">
+          <img src="${npAttr(imgUrl)}" alt="${npAttr(name)}" onerror="this.classList.add('img-error')" ${loadingAttr} decoding="async" width="300" height="200">
         </div>
         <h4>${npEscape(name)}</h4>        <button class="buy-btn" onclick="openModal(this)" style="display:flex;align-items:center;justify-content:center;gap:6px;"><span class="js-icon" data-icon-key="installBtn"></span>INSTALL</button>
       </div>`;
