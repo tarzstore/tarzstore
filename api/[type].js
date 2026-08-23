@@ -28,7 +28,7 @@ const CONFIGS = {
   },
   fakeffduo: {
     // Endpoint ini pakai domain apii.nexadev.my.id (dobel i), beda dari yang lain.
-    base: "https://apii.nexadev.my.id/fakeffduo",
+    base: "https://apii.nexadev.my.id/fakeffduo?nickname1=Tarz&nickname2=Kuntul",
     params: ["nickname1", "nickname2"],
   },
   tiktokstalker: {
