@@ -436,152 +436,160 @@
   ::selection{background:rgba(0,229,160,.3);color:#fff;}
 
   /* ═══════════════════════════════════════════════════
-     LOGIN SCREEN — full-screen premium
+     LOGIN SCREEN — terminal hacker style
      ═══════════════════════════════════════════════════ */
   body:has(#loginView.show){padding:0;overflow:hidden;}
   .login-screen{
-    min-height:100vh;display:flex;align-items:center;justify-content:center;
-    padding:24px;position:relative;
+    min-height:100vh;display:flex;align-items:flex-start;justify-content:center;
+    padding:80px 24px 24px;position:relative;
     width:100vw;margin-left:calc(50% - 50vw);
-    background:
-      linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
-      linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
-    background-size:38px 38px;
-    background-position:center;
+    background:#050505;
+    overflow:hidden;
   }
-  .login-screen::before{
-    content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-    background:radial-gradient(ellipse 60% 50% at 50% 40%,rgba(0,0,0,0) 0%,var(--bg) 90%);
+  /* matrix rain background */
+  .login-matrix{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;opacity:.4;}
+  .login-matrix-col{
+    position:absolute;top:-100%;width:20px;height:100%;
+    font-family:'Space Mono',ui-monospace,Menlo,Consolas,monospace;
+    font-size:15px;line-height:17px;font-weight:700;white-space:nowrap;
+    writing-mode:vertical-lr;letter-spacing:1px;
+    animation:login-matrix-fall linear infinite;
+    background:linear-gradient(to bottom,#fff 0%,#fff 5%,#ccc 15%,#888 40%,#444 70%,transparent 100%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
   }
-  /* ambient glow orbs — halus bergerak lambat */
-  .login-orb{position:fixed;border-radius:50%;pointer-events:none;filter:blur(70px);z-index:0;}
-  .login-orb-1{
-    width:380px;height:380px;background:radial-gradient(circle,rgba(0,229,160,.22),transparent 70%);
-    top:-100px;left:-100px;animation:orb-float-1 10s ease-in-out infinite;
-  }
-  .login-orb-2{
-    width:320px;height:320px;background:radial-gradient(circle,rgba(0,229,160,.13),transparent 70%);
-    bottom:-80px;right:-80px;animation:orb-float-2 12s ease-in-out infinite;
-  }
-  @keyframes orb-float-1{0%,100%{transform:translate(0,0);}50%{transform:translate(30px,20px);}}
-  @keyframes orb-float-2{0%,100%{transform:translate(0,0);}50%{transform:translate(-25px,-25px);}}
-  @media (prefers-reduced-motion: reduce){
-    .login-orb-1,.login-orb-2{animation:none;}
-  }
+  @keyframes login-matrix-fall{0%{transform:translateY(-10%);opacity:1;}100%{transform:translateY(200%);opacity:0;}}
+  @media (prefers-reduced-motion: reduce){.login-matrix-col{animation:none;}}
 
-  .login-box{position:relative;z-index:1;width:100%;max-width:380px;}
+  .login-box{position:relative;z-index:1;width:100%;max-width:360px;}
 
-  .login-logo-wrap{display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:32px;}
+  .login-logo-wrap{display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:22px;}
   .login-logo-ring{
-    width:84px;height:84px;border-radius:22px;overflow:hidden;
-    display:flex;align-items:center;justify-content:center;margin-bottom:18px;
-    background:linear-gradient(160deg,var(--card),var(--card2));
-    border:1px solid rgba(0,229,160,.25);
-    box-shadow:0 0 0 1px rgba(0,229,160,.08),0 10px 36px rgba(0,229,160,.18),0 0 50px rgba(0,229,160,.1);
-    position:relative;
+    width:64px;height:64px;border-radius:14px;overflow:hidden;
+    display:flex;align-items:center;justify-content:center;margin-bottom:14px;
+    background:#0c0c0c;border:1px solid rgba(255,255,255,.2);
   }
-  .login-logo-ring::after{
-    content:'';position:absolute;inset:-1px;border-radius:inherit;
-    background:conic-gradient(from 0deg,transparent,rgba(0,229,160,.5),transparent 30%);
-    animation:ring-spin 4s linear infinite;z-index:-1;opacity:.8;
-  }
-  @keyframes ring-spin{to{transform:rotate(360deg);}}
-  .login-logo-ring img{width:100%;height:100%;object-fit:cover;border-radius:21px;position:relative;z-index:1;}
+  .login-logo-ring img{width:100%;height:100%;object-fit:cover;border-radius:13px;}
 
-  .login-brand-name{font-size:1.42rem;font-weight:700;letter-spacing:.6px;color:var(--text);margin-bottom:5px;}
-  .login-brand-sub{font-size:10px;letter-spacing:3px;color:var(--green);text-transform:uppercase;font-weight:700;}
+  .login-brand-name{
+    font-family:'Space Mono',ui-monospace,monospace;
+    font-size:1.1rem;font-weight:700;letter-spacing:1px;color:#fff;margin-bottom:5px;
+  }
+  .login-brand-sub{font-size:9.5px;letter-spacing:3px;color:#8a8a8a;text-transform:uppercase;font-weight:700;}
 
   .login-card{
-    background:linear-gradient(160deg,rgba(18,18,18,.94),rgba(23,23,23,.94));
-    backdrop-filter:blur(28px) saturate(150%);-webkit-backdrop-filter:blur(28px) saturate(150%);
-    border:1px solid var(--border-strong);border-radius:26px;
-    padding:32px 28px 30px;
-    position:relative;overflow:hidden;
-    box-shadow:0 1px 0 rgba(255,255,255,.07) inset,0 40px 80px -24px rgba(0,0,0,.7);
+    padding:0;overflow:hidden;
+    background:rgba(9,11,14,.94);
+    border:1px solid rgba(255,255,255,.16);
+    border-radius:12px;
+    box-shadow:0 30px 70px -28px rgba(0,0,0,.9);
     animation:cardRise var(--t-slow) var(--ease-out);
   }
   @keyframes cardRise{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
-  .login-card::before{
-    content:'';position:absolute;top:0;left:0;right:0;height:1px;
-    background:linear-gradient(90deg,transparent,rgba(0,229,160,.6) 50%,transparent);
+
+  .login-termbar{
+    display:flex;align-items:center;gap:6px;padding:10px 13px;
+    background:#11151d;border-bottom:1px solid rgba(255,255,255,.14);
+  }
+  .login-termbar span{width:10px;height:10px;border-radius:50%;}
+  .login-termbar span:nth-child(1){background:#ff5f56;}
+  .login-termbar span:nth-child(2){background:#ffbd2e;}
+  .login-termbar span:nth-child(3){background:#27c93f;}
+  .login-termbar em{
+    margin-left:6px;font-style:normal;font-size:11px;color:#6b6b6b;
+    font-family:'Space Mono',ui-monospace,monospace;
   }
 
-  .login-title{font-size:21px;font-weight:700;margin-bottom:5px;letter-spacing:.1px;}
-  .login-subtitle{color:var(--text2);font-size:13px;margin-bottom:26px;}
+  .login-termbody{padding:22px 22px 26px;}
+  .login-title{
+    font-family:'Space Mono',ui-monospace,monospace;
+    font-size:12px;color:#6b6b6b;margin-bottom:18px;
+  }
+  .login-title .cur{
+    display:inline-block;width:7px;height:13px;margin-left:3px;background:#fff;
+    animation:login-blink 1s steps(1) infinite;vertical-align:middle;
+  }
+  @keyframes login-blink{50%{opacity:0;}}
+  @media (prefers-reduced-motion: reduce){.login-title .cur{animation:none;}}
+  .login-subtitle{display:none;}
 
-  /* input dengan icon di kiri + floating label */
-  .field-floating{position:relative;margin-bottom:16px;}
-  .field-floating:last-of-type{margin-bottom:0;}
-  .input-icon-wrap{position:relative;}
+  /* input dengan icon di kiri + floating label -> terminal prompt style */
+  .field-floating{position:relative;margin-bottom:0;}
+  .field-floating + .field-floating{margin-top:16px;}
+  .input-icon-wrap{position:relative;display:flex;align-items:center;gap:9px;
+    border-bottom:1px solid rgba(255,255,255,.14);padding-bottom:7px;
+    transition:border-color var(--t-fast) var(--ease);
+  }
+  .input-icon-wrap:focus-within{border-bottom-color:#fff;}
   .input-icon-wrap svg{
-    position:absolute;left:14px;top:50%;transform:translateY(-50%);
-    width:17px;height:17px;color:var(--text3);pointer-events:none;
+    position:static;width:15px;height:15px;color:#6b6b6b;flex-shrink:0;
     transition:color var(--t-fast) var(--ease);
-    z-index:1;
   }
+  .input-icon-wrap:focus-within svg{color:#fff;}
   .input-icon-wrap input{
-    padding-left:41px;padding-top:16px;padding-bottom:8px;height:54px;
-    font-size:14.5px;
+    padding:4px 0;height:auto;font-size:13.5px;
+    background:transparent;border:0;color:#f2f2f2;
+    font-family:'Space Mono',ui-monospace,monospace;
+    flex:1;min-width:0;
   }
-  .input-icon-wrap:focus-within svg{color:var(--green);}
-  .input-icon-wrap:has(.toggle-pw) input{padding-right:44px;}
+  .input-icon-wrap input::placeholder{color:transparent;}
+  .input-icon-wrap:has(.toggle-pw) input{padding-right:30px;}
   .floating-label{
-    position:absolute;left:41px;top:50%;transform:translateY(-50%);
-    font-size:14.5px;color:var(--text3);pointer-events:none;
-    margin:0;font-weight:500;letter-spacing:.2px;
+    position:absolute;left:24px;top:50%;transform:translateY(-50%);
+    font-size:13.5px;color:#5a5a5a;pointer-events:none;
+    margin:0;font-weight:400;letter-spacing:0;
+    font-family:'Space Mono',ui-monospace,monospace;
     transition:all var(--t-fast) var(--ease-soft);
-    z-index:1;
   }
   .input-icon-wrap input:focus ~ .floating-label,
   .input-icon-wrap input:not(:placeholder-shown) ~ .floating-label{
-    top:16px;font-size:10.5px;font-weight:600;letter-spacing:.03em;
-    color:var(--green);text-transform:uppercase;
+    opacity:0;
   }
   .toggle-pw{
-    position:absolute;right:8px;top:50%;transform:translateY(-50%);
-    background:none;border:none;width:30px;height:30px;color:var(--text3);cursor:pointer;
-    display:flex;align-items:center;justify-content:center;border-radius:8px;
-    z-index:2;transition:color var(--t-fast) var(--ease),background var(--t-fast) var(--ease);
+    position:absolute;right:0;top:50%;transform:translateY(-50%);
+    background:none;border:none;width:26px;height:26px;color:#6b6b6b;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;border-radius:6px;
+    z-index:2;transition:color var(--t-fast) var(--ease);
   }
-  .toggle-pw svg{width:16px;height:16px;}
-  .toggle-pw:hover{color:var(--text2);background:rgba(255,255,255,.06);}
+  .toggle-pw svg{width:15px;height:15px;}
+  .toggle-pw:hover{color:#fff;}
 
   .login-options{
     display:flex;align-items:center;justify-content:space-between;
-    margin:18px 0 24px;font-size:12.5px;
+    margin:18px 0 0;font-size:12px;font-family:'Space Mono',ui-monospace,monospace;
   }
-  .remember-check{display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--text2);user-select:none;}
+  .remember-check{display:flex;align-items:center;gap:8px;cursor:pointer;color:#8a8a8a;user-select:none;}
   .remember-check input{
-    appearance:none;-webkit-appearance:none;width:16px;height:16px;border-radius:5px;
-    border:1.5px solid var(--border-strong);background:var(--surface);cursor:pointer;flex-shrink:0;
+    appearance:none;-webkit-appearance:none;width:15px;height:15px;border-radius:4px;
+    border:1.5px solid rgba(255,255,255,.3);background:transparent;cursor:pointer;flex-shrink:0;
     display:flex;align-items:center;justify-content:center;padding:0;
     transition:background var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease);
   }
-  .remember-check input:checked{background:var(--green);border-color:var(--green);}
+  .remember-check input:checked{background:#fff;border-color:#fff;}
   .remember-check input:checked::after{
-    content:'';width:4px;height:8px;border:solid #05170f;border-width:0 2px 2px 0;
+    content:'';width:4px;height:7px;border:solid #050505;border-width:0 2px 2px 0;
     transform:rotate(45deg) translate(-1px,-1px);
   }
-  .remember-check:hover input:not(:checked){border-color:var(--border-strong);background:#151515;}
-  .forgot-link{color:var(--text3);text-decoration:none;font-weight:500;transition:color var(--t-fast) var(--ease);}
-  .forgot-link:hover{color:var(--green);}
+  .remember-check:hover input:not(:checked){border-color:rgba(255,255,255,.5);}
+  .forgot-link{display:none;}
 
   .login-btn{
-    position:relative;overflow:hidden;margin-top:0;
+    position:relative;overflow:hidden;margin-top:20px;width:100%;
+    background:transparent;border:1px solid #fff;border-radius:8px;
+    color:#fff;font-family:'Space Mono',ui-monospace,monospace;
+    font-size:13px;font-weight:600;letter-spacing:0;text-transform:none;
+    padding:11px;box-shadow:none;
   }
-  .login-btn::after{
-    content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;
-    background:linear-gradient(120deg,transparent,rgba(255,255,255,.35),transparent);
-    transform:skewX(-20deg);
-    animation:btn-shine 3.5s ease-in-out infinite;
-  }
-  @keyframes btn-shine{0%{left:-60%;}50%{left:130%;}100%{left:130%;}}
+  .login-btn:hover:not(:disabled){background:rgba(255,255,255,.1);}
+  .login-btn::after{content:none;}
 
-  .login-footer{
-    display:flex;align-items:center;justify-content:center;gap:6px;
-    text-align:center;margin-top:26px;font-size:11.5px;color:var(--text3);letter-spacing:.3px;
+  .login-footer{display:none;}
+
+  .login-card .msg{
+    font-family:'Space Mono',ui-monospace,monospace; font-size:12px;
+    background:rgba(255,255,255,.05); color:#f2f2f2; border:1px solid rgba(255,255,255,.3);
+    margin-bottom:16px;
   }
-  .login-footer svg{width:12px;height:12px;color:var(--text3);flex-shrink:0;}
+  .login-btn .spinner{border-color:rgba(255,255,255,.25);border-top-color:#fff;}
 </style>
 </head>
 <body>
@@ -589,20 +597,20 @@
   <!-- ═══ LOGIN VIEW ═══ -->
   <div id="loginView" class="show">
   <div class="login-screen">
-    <div class="login-orb login-orb-1"></div>
-    <div class="login-orb login-orb-2"></div>
+    <div class="login-matrix" id="loginMatrix"></div>
     <div class="login-box">
       <div class="login-logo-wrap">
-        <div class="login-logo-ring">
-          <img src="https://bvblcdnmbzncoqeoqkoc.supabase.co/storage/v1/object/public/Tarz/logo.jpg" alt="Tarz Store Logo" width="84" height="84" loading="eager" onerror="this.style.display='none'">
+        <div class="">
+          <img src="https://xxaenbqyeliyhrulyjuz.supabase.co/storage/v1/object/public/Videos/Logohhhh.png" alt="Tarz Store Logo" width="70" height="70" loading="eager" onerror="this.style.display='none'">
         </div>
         <div class="login-brand-name">TARZ STORE</div>
         <div class="login-brand-sub">Admin Panel</div>
       </div>
 
       <div class="login-card">
-        <div class="login-title">Selamat Datang Kembali</div>
-        <div class="login-subtitle">Masuk untuk mengelola produk toko</div>
+        <div class="login-termbar" aria-hidden="true"><span></span><span></span><span></span><em>auth — tarz store</em></div>
+        <div class="login-termbody">
+        <div class="login-title">$ ./login --secure<span class="cur" aria-hidden="true"></span></div>
 
         <div id="loginMsg" class="msg error"></div>
 
@@ -610,7 +618,7 @@
           <div class="input-icon-wrap">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6l-10 7L2 6"/><path d="M2 6h20v12H2z"/></svg>
             <input type="email" id="loginEmail" placeholder=" " autocomplete="username">
-            <label class="floating-label" for="loginEmail">Email</label>
+            <label class="floating-label" for="loginEmail">email</label>
           </div>
         </div>
 
@@ -618,7 +626,7 @@
           <div class="input-icon-wrap">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             <input type="password" id="loginPassword" class="has-toggle" placeholder=" " autocomplete="current-password">
-            <label class="floating-label" for="loginPassword">Password</label>
+            <label class="floating-label" for="loginPassword">password</label>
             <button type="button" class="toggle-pw" id="togglePwBtn" onclick="togglePasswordVisibility()" aria-label="Tampilkan password">
               <svg id="toggleEyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
@@ -628,19 +636,14 @@
         <div class="login-options">
           <label class="remember-check">
             <input type="checkbox" id="rememberMe">
-            Ingat saya
+            ingat saya
           </label>
         </div>
 
         <button class="btn-primary login-btn" id="loginBtn" onclick="doLogin()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-          Masuk ke Dashboard
+          ▸ authenticate
         </button>
-      </div>
-
-      <div class="login-footer">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        Akses Admin Tarz Store
+        </div>
       </div>
     </div>
   </div>
@@ -652,12 +655,12 @@
   <div id="adminView">
     <header class="admin-header" role="banner">
       <div class="logo">
-        <div class="logo-icon">
-          <img src="https://bvblcdnmbzncoqeoqkoc.supabase.co/storage/v1/object/public/Tarz/logo.jpg" alt="Tarz Store Logo" width="34" height="34" loading="eager" onerror="this.parentElement.style.display='none'">
+        <div class="">
+          <img src="https://xxaenbqyeliyhrulyjuz.supabase.co/storage/v1/object/public/Videos/Logohhhh.png" alt="Tarz Store Logo" width="40" height="40" loading="eager" onerror="this.parentElement.style.display='none'">
         </div>
         <div>
           <div class="logo-name">TARZ STORE</div>
-          <div class="logo-sub-label">Admin Panel</div>
+          <div class="logo-sub-label">admin Panel</div>
         </div>
       </div>
       <div class="header-actions">
@@ -1091,6 +1094,8 @@ async function saveConfigFf(){
     if(editId){
       ({ error } = await db.from('products').update(payload).eq('id', editId));
     } else {
+      // config baru: taruh di posisi PALING ATAS pada tab configff
+      payload.sort_order = getNextSortOrder('configff');
       ({ error } = await db.from('products').insert(payload));
     }
 
@@ -1237,6 +1242,9 @@ async function saveProduct(){
     if(editId){
       ({ error } = await db.from('products').update(payload).eq('id', editId));
     } else {
+      // produk baru: taruh di posisi PALING ATAS pada tab-nya, dengan sort_order
+      // lebih tinggi dari nilai maksimum yang ada saat ini di tab yang sama
+      payload.sort_order = getNextSortOrder(tab);
       ({ error } = await db.from('products').insert(payload));
     }
 
@@ -1274,6 +1282,17 @@ function resetForm(){
   document.getElementById('advToggle').classList.remove('open');
   document.getElementById('advBody').style.maxHeight = '0px';
   goStep(1);
+}
+
+/* Hitung sort_order berikutnya supaya produk BARU langsung tampil
+   di posisi PALING ATAS pada tab yang sama (bukan di bawah). Diambil
+   dari nilai sort_order tertinggi yang sudah ada di tab tsb, lalu +1.
+   Kalau belum ada produk sama sekali di tab itu, mulai dari 1. */
+function getNextSortOrder(tab){
+  const items = (window._productsCache || []).filter(p => (p.tab || 'freefire') === tab);
+  if(!items.length) return 1;
+  const maxOrder = items.reduce((max, p) => Math.max(max, Number(p.sort_order) || 0), 0);
+  return maxOrder + 1;
 }
 
 async function loadProducts(){
@@ -1595,6 +1614,42 @@ checkSession();
 document.getElementById('loginPassword').addEventListener('keydown', e=>{
   if(e.key === 'Enter') doLogin();
 });
+
+/* ═══════════════════════════════════════════════════
+   MATRIX RAIN — login background
+   ═══════════════════════════════════════════════════ */
+(function(){
+  const container = document.getElementById('loginMatrix');
+  if(!container) return;
+  const chars = 'アイウエオカキクケコサシスセソ0123456789ABCDEFｱｲｳｴｵｶｷｸｹｺ';
+  const colWidth = 20;
+  function build(){
+    container.innerHTML = '';
+    const count = Math.ceil(window.innerWidth / colWidth);
+    const frag = document.createDocumentFragment();
+    for(let i = 0; i < count; i++){
+      const col = document.createElement('div');
+      col.className = 'login-matrix-col';
+      let text = '';
+      const len = 18 + Math.floor(Math.random()*10);
+      for(let j = 0; j < len; j++){
+        text += chars[Math.floor(Math.random()*chars.length)];
+      }
+      col.textContent = text;
+      col.style.left = (i * colWidth) + 'px';
+      col.style.animationDelay = (-Math.random()*8) + 's';
+      col.style.animationDuration = (5 + Math.random()*4) + 's';
+      frag.appendChild(col);
+    }
+    container.appendChild(frag);
+  }
+  build();
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(build, 300);
+  });
+})();
 </script>
 </body>
 </html>
