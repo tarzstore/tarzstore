@@ -5215,7 +5215,7 @@ let _keyDownloadLink = '#';
 let _keySourceTab = null;
 
 const VIP_WA_NUMBER = '6281918665183';
-const VIP_PRICE_TEXT = 'Rp10.000';
+const VIP_PRICE_TEXT = 'ACCESS LOCKED';
 /* Teks harga KHUSUS untuk kartu di halaman VIP (tab "vip") -- sengaja dipisah dari
    VIP_PRICE_TEXT di atas supaya bisa diubah independen tanpa mempengaruhi header
    VIP produk lain atau teks pesan WhatsApp. Ubah nilai ini saja untuk halaman VIP. */
@@ -6449,26 +6449,24 @@ document.addEventListener('dragstart', function(e){
 
     // Fetch lewat serverless function sendiri (/api/ttdl) supaya tidak kena
     // masalah CORS/blokir saat request langsung dari browser ke API pihak ketiga.
-    const targetUrl = '/api/ttdl?url=' + encodeURIComponent(url);
+    const targetUrl = '/api/dl/ttdl?url=' + encodeURIComponent(url);
 
     try{
       let data = null;
 
       try{
         const res = await fetch(targetUrl);
-        if(res.ok){
-          const json = await res.json();
-          if(json) data = json;
-        }
+        data = await res.json().catch(()=>null);
+        if(!res.ok && data && data.message){ throw new Error(data.message); }
       } catch(innerErr){
-        // biarkan data tetap null, ditangani di bawah
+        if(innerErr instanceof Error && innerErr.message){ throw innerErr; }
       }
 
       if(!data){
         throw new Error('Tidak bisa menjangkau server pengambil video. Coba lagi sebentar lagi.');
       }
       if(!data.status || !data.data){
-        throw new Error('Tautan tidak bisa diproses. Pastikan tautannya benar dan videonya publik.');
+        throw new Error(data.message || 'Tautan tidak bisa diproses. Pastikan tautannya benar dan videonya publik.');
       }
 
       const info = data.data;
@@ -6565,17 +6563,20 @@ document.addEventListener('dragstart', function(e){
 
     // Fetch lewat serverless function sendiri (/api/spotifyplay) supaya tidak kena
     // masalah CORS/blokir saat request langsung dari browser ke API pihak ketiga.
-    const targetUrl = '/api/spotifyplay?q=' + encodeURIComponent(q);
+    const targetUrl = '/api/dl/spotifyplay?q=' + encodeURIComponent(q);
 
     try{
       let data = null;
       try{
         const res = await fetch(targetUrl);
-        if(res.ok){ const json = await res.json(); if(json) data = json; }
-      } catch(innerErr){}
+        data = await res.json().catch(()=>null);
+        if(!res.ok && data && data.message){ throw new Error(data.message); }
+      } catch(innerErr){
+        if(innerErr instanceof Error && innerErr.message){ throw innerErr; }
+      }
 
       if(!data) throw new Error('Tidak bisa menjangkau server pencari lagu. Coba lagi sebentar lagi.');
-      if(!data.status || !data.result) throw new Error('Lagu tidak ditemukan. Coba judul lain.');
+      if(!data.status || !data.result) throw new Error(data.message || 'Lagu tidak ditemukan. Coba judul lain.');
 
       const r = data.result;
       thumb.src = r.thumbnail || '';
@@ -6644,17 +6645,20 @@ document.addEventListener('dragstart', function(e){
     statusBox.classList.add('show');
     fetchBtn.disabled = true;
 
-    const targetUrl = '/api/spotify?url=' + encodeURIComponent(url);
+    const targetUrl = '/api/dl/spotify?url=' + encodeURIComponent(url);
 
     try{
       let data = null;
       try{
         const res = await fetch(targetUrl);
-        if(res.ok){ const json = await res.json(); if(json) data = json; }
-      } catch(innerErr){}
+        data = await res.json().catch(()=>null);
+        if(!res.ok && data && data.message){ throw new Error(data.message); }
+      } catch(innerErr){
+        if(innerErr instanceof Error && innerErr.message){ throw innerErr; }
+      }
 
       if(!data) throw new Error('Tidak bisa menjangkau server pengambil lagu. Coba lagi sebentar lagi.');
-      if(!data.status || !data.data) throw new Error('Tautan tidak bisa diproses. Pastikan link track Spotify benar.');
+      if(!data.status || !data.data) throw new Error(data.message || 'Tautan tidak bisa diproses. Pastikan link track Spotify benar.');
 
       const r = data.data;
       thumb.src = r.thumbnail || '';
@@ -6732,17 +6736,20 @@ document.addEventListener('dragstart', function(e){
     statusBox.classList.add('show');
     fetchBtn.disabled = true;
 
-    const targetUrl = '/api/ig?url=' + encodeURIComponent(url);
+    const targetUrl = '/api/dl/ig?url=' + encodeURIComponent(url);
 
     try{
       let data = null;
       try{
         const res = await fetch(targetUrl);
-        if(res.ok){ const json = await res.json(); if(json) data = json; }
-      } catch(innerErr){}
+        data = await res.json().catch(()=>null);
+        if(!res.ok && data && data.message){ throw new Error(data.message); }
+      } catch(innerErr){
+        if(innerErr instanceof Error && innerErr.message){ throw innerErr; }
+      }
 
       if(!data) throw new Error('Tidak bisa menjangkau server pengunduh. Coba lagi sebentar lagi.');
-      if(!data.status || !Array.isArray(data.data) || !data.data.length) throw new Error('Tautan tidak bisa diproses. Pastikan kontennya publik.');
+      if(!data.status || !Array.isArray(data.data) || !data.data.length) throw new Error(data.message || 'Tautan tidak bisa diproses. Pastikan kontennya publik.');
 
       const items = data.data;
       const firstVideo = items.find(it => it.type === 'mp4' || it.type === 'video');
@@ -6833,17 +6840,20 @@ document.addEventListener('dragstart', function(e){
     statusBox.classList.add('show');
     fetchBtn.disabled = true;
 
-    const targetUrl = '/api/fb?url=' + encodeURIComponent(url);
+    const targetUrl = '/api/dl/fb?url=' + encodeURIComponent(url);
 
     try{
       let data = null;
       try{
         const res = await fetch(targetUrl);
-        if(res.ok){ const json = await res.json(); if(json) data = json; }
-      } catch(innerErr){}
+        data = await res.json().catch(()=>null);
+        if(!res.ok && data && data.message){ throw new Error(data.message); }
+      } catch(innerErr){
+        if(innerErr instanceof Error && innerErr.message){ throw innerErr; }
+      }
 
       if(!data) throw new Error('Tidak bisa menjangkau server pengunduh. Coba lagi sebentar lagi.');
-      if(!data.status || !Array.isArray(data.data) || !data.data.length) throw new Error('Tautan tidak bisa diproses. Pastikan videonya publik.');
+      if(!data.status || !Array.isArray(data.data) || !data.data.length) throw new Error(data.message || 'Tautan tidak bisa diproses. Pastikan videonya publik.');
 
       qualities = data.data;
       qualities.forEach((q, i) => {
@@ -6917,17 +6927,20 @@ document.addEventListener('dragstart', function(e){
     statusBox.classList.add('show');
     fetchBtn.disabled = true;
 
-    const targetUrl = '/api/capcut?url=' + encodeURIComponent(url);
+    const targetUrl = '/api/dl/capcut?url=' + encodeURIComponent(url);
 
     try{
       let data = null;
       try{
         const res = await fetch(targetUrl);
-        if(res.ok){ const json = await res.json(); if(json) data = json; }
-      } catch(innerErr){}
+        data = await res.json().catch(()=>null);
+        if(!res.ok && data && data.message){ throw new Error(data.message); }
+      } catch(innerErr){
+        if(innerErr instanceof Error && innerErr.message){ throw innerErr; }
+      }
 
       if(!data) throw new Error('Tidak bisa menjangkau server pengunduh. Coba lagi sebentar lagi.');
-      if(!data.status || !data.data || !data.data.url) throw new Error('Tautan tidak bisa diproses. Pastikan link CapCut benar.');
+      if(!data.status || !data.data || !data.data.url) throw new Error(data.message || 'Tautan tidak bisa diproses. Pastikan link CapCut benar.');
 
       previewVideo.src = data.data.url;
       dlLink.href = data.data.url;
@@ -6989,17 +7002,20 @@ document.addEventListener('dragstart', function(e){
 
     // Endpoint ini pakai domain apii.nexadev.my.id (bukan api.nexadev.my.id),
     // tetap dilewatkan proxy sendiri supaya konsisten dan aman dari CORS.
-    const targetUrl = '/api/fakeffduo?nickname1=' + encodeURIComponent(n1) + '&nickname2=' + encodeURIComponent(n2);
+    const targetUrl = '/api/dl/fakeffduo?nickname1=' + encodeURIComponent(n1) + '&nickname2=' + encodeURIComponent(n2);
 
     try{
       let data = null;
       try{
         const res = await fetch(targetUrl);
-        if(res.ok){ const json = await res.json(); if(json) data = json; }
-      } catch(innerErr){}
+        data = await res.json().catch(()=>null);
+        if(!res.ok && data && data.message){ throw new Error(data.message); }
+      } catch(innerErr){
+        if(innerErr instanceof Error && innerErr.message){ throw innerErr; }
+      }
 
       if(!data) throw new Error('Tidak bisa menjangkau server. Coba lagi sebentar lagi.');
-      if(data.status === false) throw new Error('Gagal membuat duo. Coba nickname lain.');
+      if(data.status === false) throw new Error(data.message || 'Gagal membuat duo. Coba nickname lain.');
 
       // Bentuk hasil bisa berupa teks/gambar tergantung API; tangani keduanya.
       const result = data.result || data.data || data;
@@ -7102,26 +7118,24 @@ document.addEventListener('dragstart', function(e){
 
     // Fetch lewat serverless function sendiri (/api/ff) supaya tidak kena
     // masalah CORS/blokir saat request langsung dari browser ke API pihak ketiga.
-    const targetUrl = '/api/ff?id=' + encodeURIComponent(id);
+    const targetUrl = '/api/dl/ff?id=' + encodeURIComponent(id);
 
     try{
       let data = null;
 
       try{
         const res = await fetch(targetUrl);
-        if(res.ok){
-          const json = await res.json();
-          if(json) data = json;
-        }
+        data = await res.json().catch(()=>null);
+        if(!res.ok && data && data.message){ throw new Error(data.message); }
       } catch(innerErr){
-        // biarkan data tetap null, ditangani di bawah
+        if(innerErr instanceof Error && innerErr.message){ throw innerErr; }
       }
 
       if(!data){
         throw new Error('Tidak bisa menjangkau server. Coba lagi sebentar lagi.');
       }
       if(!data.status || !data.data || !data.data.username){
-        throw new Error('User ID tidak ditemukan. Pastikan ID-nya benar.');
+        throw new Error(data.message || 'User ID tidak ditemukan. Pastikan ID-nya benar.');
       }
 
       resultName.textContent = data.data.username;
@@ -7234,26 +7248,24 @@ document.addEventListener('dragstart', function(e){
 
     // Fetch lewat serverless function sendiri (/api/tiktokstalker) supaya tidak
     // kena masalah CORS/blokir saat request langsung dari browser ke API pihak ketiga.
-    const targetUrl = '/api/tiktokstalker?username=' + encodeURIComponent(rawUsername);
+    const targetUrl = '/api/dl/tiktokstalker?username=' + encodeURIComponent(rawUsername);
 
     try{
       let data = null;
 
       try{
         const res = await fetch(targetUrl);
-        if(res.ok){
-          const json = await res.json();
-          if(json) data = json;
-        }
+        data = await res.json().catch(()=>null);
+        if(!res.ok && data && data.message){ throw new Error(data.message); }
       } catch(innerErr){
-        // biarkan data tetap null, ditangani di bawah
+        if(innerErr instanceof Error && innerErr.message){ throw innerErr; }
       }
 
       if(!data){
         throw new Error('Tidak bisa menjangkau server. Coba lagi sebentar lagi.');
       }
       if(!data.status || !data.data || !data.data.username){
-        throw new Error('Username tidak ditemukan.');
+        throw new Error(data.message || 'Username tidak ditemukan.');
       }
 
       const info = data.data;
