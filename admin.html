@@ -601,7 +601,7 @@
     <div class="login-box">
       <div class="login-logo-wrap">
         <div class="">
-          <img src="https://xxaenbqyeliyhrulyjuz.supabase.co/storage/v1/object/public/Videos/Logohhhh.png" alt="Tarz Store Logo" width="70" height="70" loading="eager" onerror="this.style.display='none'">
+          <img src="https://apmxdcwebivmusqcuzcv.supabase.co/storage/v1/object/public/Tarzx/Ts.png" alt="Tarz Store Logo" width="70" height="70" loading="eager" onerror="this.style.display='none'">
         </div>
         <div class="login-brand-name">TARZ STORE</div>
         <div class="login-brand-sub">Admin Panel</div>
@@ -757,6 +757,12 @@
         <label>Get Key <span class="hint"></span></label>
         <input type="text" id="fGetKeyLink" placeholder="">
 
+        <label>Tutorial Get Key <span class="hint"></span></label>
+        <input type="text" id="fGetKeyTutorialLink" placeholder="">
+
+        <label>Tombol Tutorial Get Key <span class="hint"></span></label>
+        <input type="text" id="fGetKeyTutorialLabel" placeholder="Default: TUTORIAL GET KEY">
+
         <label>Note <span class="hint">(opsional)</span></label>
         <textarea id="fNote" placeholder=""></textarea>
 
@@ -783,6 +789,9 @@
 
             <label>Link Mediafire FREE FIRE<span class="hint"></span></label>
             <input type="text" id="fDownloadLink2" placeholder="">
+
+            <label>Teks Tombol APK FREE FIRE <span class="hint">(opsional)</span></label>
+            <input type="text" id="fFreefireLabel" placeholder="Default: APK FREE FIRE">
 
             <label>Key</label>
             <input type="text" id="fCopyKey" placeholder="">
@@ -1202,12 +1211,15 @@ async function saveProduct(){
   const features = parseFeatures(document.getElementById('fFeatures').value);
   const download_link = document.getElementById('fDownloadLink').value.trim();
   const download_link_2 = document.getElementById('fDownloadLink2').value.trim();
+  const freefire_label = document.getElementById('fFreefireLabel').value.trim();
   const platform = document.getElementById('fPlatform').value;
   const copy_key = document.getElementById('fCopyKey').value.trim();
   const key_label = document.getElementById('fKeyLabel').value.trim();
   const user_field = document.getElementById('fUserField').value.trim();
   const user_label = document.getElementById('fUserLabel').value.trim();
   const get_key_link = document.getElementById('fGetKeyLink').value.trim();
+  const get_key_tutorial_link = document.getElementById('fGetKeyTutorialLink').value.trim();
+  const get_key_tutorial_label = document.getElementById('fGetKeyTutorialLabel').value.trim();
   const note = document.getElementById('fNote').value.trim();
   const editId = document.getElementById('editId').value;
 
@@ -1227,12 +1239,15 @@ async function saveProduct(){
       features,
       download_link,
       download_link_2: download_link_2 || null,
+      freefire_label: freefire_label || null,
       platform,
       copy_key: copy_key || null,
       key_label: key_label || null,
       user_field: user_field || null,
       user_label: user_label || null,
       get_key_link: get_key_link || null,
+      get_key_tutorial_link: get_key_tutorial_link || null,
+      get_key_tutorial_label: get_key_tutorial_label || null,
       note: note || null,
       // price tetap diisi (kolom lama wajib not-null di database), tidak ditampilkan di form
       price: ''
@@ -1269,12 +1284,15 @@ function resetForm(){
   document.getElementById('fFeatures').value = '';
   document.getElementById('fDownloadLink').value = '';
   document.getElementById('fDownloadLink2').value = '';
+  document.getElementById('fFreefireLabel').value = '';
   document.getElementById('fPlatform').value = 'android';
   document.getElementById('fCopyKey').value = '';
   document.getElementById('fKeyLabel').value = '';
   document.getElementById('fUserField').value = '';
   document.getElementById('fUserLabel').value = '';
   document.getElementById('fGetKeyLink').value = '';
+  document.getElementById('fGetKeyTutorialLink').value = '';
+  document.getElementById('fGetKeyTutorialLabel').value = '';
   document.getElementById('fNote').value = '';
   document.getElementById('fImagePreview').style.display = 'none';
   document.getElementById('formTitle').textContent = 'Tambah Produk Baru';
@@ -1547,12 +1565,15 @@ function editProduct(id){
   document.getElementById('fFeatures').value = Array.isArray(p.features) ? p.features.join('\n') : '';
   document.getElementById('fDownloadLink').value = p.download_link || '';
   document.getElementById('fDownloadLink2').value = p.download_link_2 || '';
+  document.getElementById('fFreefireLabel').value = p.freefire_label || '';
   document.getElementById('fPlatform').value = p.platform || 'android';
   document.getElementById('fCopyKey').value = p.copy_key || '';
   document.getElementById('fKeyLabel').value = p.key_label || '';
   document.getElementById('fUserField').value = p.user_field || '';
   document.getElementById('fUserLabel').value = p.user_label || '';
   document.getElementById('fGetKeyLink').value = p.get_key_link || '';
+  document.getElementById('fGetKeyTutorialLink').value = p.get_key_tutorial_link || '';
+  document.getElementById('fGetKeyTutorialLabel').value = p.get_key_tutorial_label || '';
   document.getElementById('fNote').value = p.note || '';
   const preview = document.getElementById('fImagePreview');
   if(p.image_url){
@@ -1572,7 +1593,7 @@ function editProduct(id){
   // buka accordion lanjutan otomatis kalau ada data yang terisi di sana (selain platform default)
   const advBody = document.getElementById('advBody');
   const advToggle = document.getElementById('advToggle');
-  const hasAdvData = (p.platform && p.platform !== 'android') || p.download_link_2 || p.copy_key || p.key_label || p.user_field || p.user_label;
+  const hasAdvData = (p.platform && p.platform !== 'android') || p.download_link_2 || p.copy_key || p.key_label || p.user_field || p.user_label || p.freefire_label;
   if(hasAdvData){
     advBody.classList.add('open');
     advToggle.classList.add('open');
