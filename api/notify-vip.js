@@ -15,6 +15,9 @@
 //   TELEGRAM_BOT_TOKEN = (token dari @BotFather)
 //   TELEGRAM_CHAT_ID   = 8620265239
 // Lalu redeploy.
+// (URL foto sudah ditulis langsung di kode di bawah, tidak perlu env tambahan)
+
+const NOTIF_PHOTO_URL = 'https://pisylvcyumuygsytxmvg.supabase.co/storage/v1/object/public/Tr/tarzstore.png';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -32,7 +35,7 @@ export default async function handler(req, res) {
     const { method, isTrial, trialHours } = req.body || {};
     const waktu = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
 
-    const lines = ['🎉 <b>VIP BARU!</b> — Tarz Store', ''];
+    const lines = ['🟢 <b>VIP BARU!</b> — Tarz Store', ''];
     if (method === 'qris') {
       lines.push('💳 Metode: QRIS');
     } else if (method === 'key') {
@@ -42,14 +45,16 @@ export default async function handler(req, res) {
     }
     lines.push(`🕒 Waktu: ${waktu} WIB`);
 
-    const tgRes = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    const caption = lines.join('\n');
+
+    const tgRes = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         chat_id: chatId,
-        text: lines.join('\n'),
-        parse_mode: 'HTML',
-        disable_web_page_preview: true
+        photo: NOTIF_PHOTO_URL,
+        caption: caption,
+        parse_mode: 'HTML'
       })
     });
     const data = await tgRes.json();
