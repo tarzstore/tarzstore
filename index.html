@@ -6045,14 +6045,16 @@ function initGoogleAuth(){
      kadang berhasil kadang tidak (tidak konsisten), jadi TIDAK bisa
      diandalkan hanya dari satu event. Solusinya: kalau URL yang di-load
      ini masih membawa hash token OAuth, cek ulang sesi secara eksplisit
-     BEBERAPA KALI dengan jeda yang membesar, sampai sesi terdeteksi atau
-     sampai batas percobaan habis. refreshGoogleVipStatus() aman dipanggil
-     berkali-kali -- kalau sesi sudah tersimpan di percobaan pertama,
-     panggilan berikutnya tidak mengubah apapun. */
+     BEBERAPA KALI dengan jeda yang membesar -- TAPI berhenti otomatis
+     begitu sesi sudah berhasil terdeteksi di salah satu percobaan, supaya
+     tidak numpuk query ke vip_users lebih banyak dari yang perlu. */
   try{
     const hasAuthHash = window.location.hash && /access_token=|refresh_token=|provider_token=/.test(window.location.hash);
     if(hasAuthHash){
-      [300, 800, 1500, 3000].forEach(delay => setTimeout(refreshGoogleVipStatus, delay));
+      [300, 800, 1500, 3000].forEach(delay => setTimeout(()=>{
+        if(_googleUser) return; // sesi sudah ketemu di percobaan sebelumnya, tidak perlu cek lagi
+        refreshGoogleVipStatus();
+      }, delay));
     }
   }catch(e){}
 }
