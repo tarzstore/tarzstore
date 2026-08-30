@@ -5811,26 +5811,20 @@ function clearLocalVipState(){
 function googleSignOut(){
   const client = getAuthClient();
   if(!client) return;
-  client.auth.signOut().then(()=>{
-    /* PENTING: buang instance client auth yang sudah dipakai supaya login
-       berikutnya membuat GoTrueClient benar-benar baru (persis kondisi
-       tab baru). Kalau _authClient dibiarkan sama, sebagian state internal
-       library (listener, lock session, dsb) bisa nyangkut dan bikin
-       percobaan login berikutnya gagal/diam sampai halaman di-reload
-       penuh atau dibuka di tab baru. */
-    _authClient = null;
-    _googleUser = null;
-    _googleVipStatus = null;
-    clearLocalVipState();
-    renderProfilePanel();
-    refreshVipHeaderBadge();
-    refreshVipPageCard();
-    showVipGate();
-  }).catch((e)=>{
-    console.error('Google sign-out gagal:', e);
-    /* fallback: walau signOut() error (mis. network putus), tetap bersihkan
-       sesi lokal supaya UI tidak nyangkut di status "sudah login" palsu dan
-       localStorage tidak menyisakan token basi yang mengganggu login berikutnya. */
+
+  /* auth.signOut() versi supabase-js yang dipakai di sini dikenal kadang
+     "menggantung" -- promise-nya tidak pernah resolve/reject dengan bersih
+     di kondisi tertentu. Kalau itu terjadi, reset state di bawah tidak akan
+     pernah jalan lewat .then()/.catch(), sehingga client lama yang sudah
+     rusak tetap dipakai -- inilah kenapa login berikutnya di tab yang sama
+     kelihatan "diam saja" (klik tombol tidak sampai membuka Google). Supaya
+     reset SELALU terjadi apapun yang terjadi pada signOut(), fungsi
+     resetLocalAuthState() dipanggil lewat .finally() DAN lewat timeout
+     cadangan, mana yang lebih dulu. */
+  let alreadyReset = false;
+  function resetLocalAuthState(){
+    if(alreadyReset) return;
+    alreadyReset = true;
     try{ localStorage.removeItem('tarz-google-auth'); }catch(err){}
     _authClient = null;
     _googleUser = null;
@@ -5840,7 +5834,21 @@ function googleSignOut(){
     refreshVipHeaderBadge();
     refreshVipPageCard();
     showVipGate();
-  });
+  }
+
+  try{
+    client.auth.signOut().catch((e)=>{
+      console.error('Google sign-out gagal:', e);
+    }).finally(resetLocalAuthState);
+  }catch(e){
+    console.error('Google sign-out error sinkron:', e);
+    resetLocalAuthState();
+  }
+  /* Jaring pengaman terakhir: kalau signOut() menggantung tanpa pernah
+     resolve/reject sama sekali (bug yang diketahui di beberapa versi
+     supabase-js), tetap reset state lokal setelah 2 detik supaya user
+     tidak nyangkut selamanya dan bisa langsung login lagi. */
+  setTimeout(resetLocalAuthState, 2000);
 }
 
 /* Isi panel "Profil" di sidebar: kalau sudah login tampil
