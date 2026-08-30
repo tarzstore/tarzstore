@@ -5675,7 +5675,20 @@ let _googleUser = null;
 function getAuthClient(){
   if(_authClient) return _authClient;
   if(!window.supabase) return null;
-  _authClient = window.supabase.createClient(GOOGLE_AUTH_SUPABASE_URL, GOOGLE_AUTH_SUPABASE_KEY);
+  /* storageKey unik + auth options eksplisit supaya client auth Google ini
+     TIDAK bentrok dengan instance Supabase client lain di halaman ini
+     (npClient, statsClient) yang memakai URL+key publishable yang sama.
+     Tanpa ini, beberapa instance GoTrueClient saling berebut localStorage
+     key default yang sama dan bisa saling menimpa sesi -- efeknya setelah
+     logout lalu login lagi, sesi baru gagal tersimpan dengan benar. */
+  _authClient = window.supabase.createClient(GOOGLE_AUTH_SUPABASE_URL, GOOGLE_AUTH_SUPABASE_KEY, {
+    auth: {
+      storageKey: 'tarz-google-auth',
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true
+    }
+  });
   return _authClient;
 }
 
@@ -5713,6 +5726,18 @@ function googleSignOut(){
   const client = getAuthClient();
   if(!client) return;
   client.auth.signOut().then(()=>{
+    _googleUser = null;
+    _googleVipStatus = null;
+    renderProfilePanel();
+    refreshVipHeaderBadge();
+    refreshVipPageCard();
+    showVipGate();
+  }).catch((e)=>{
+    console.error('Google sign-out gagal:', e);
+    /* fallback: walau signOut() error (mis. network putus), tetap bersihkan
+       sesi lokal supaya UI tidak nyangkut di status "sudah login" palsu dan
+       localStorage tidak menyisakan token basi yang mengganggu login berikutnya. */
+    try{ localStorage.removeItem('tarz-google-auth'); }catch(err){}
     _googleUser = null;
     _googleVipStatus = null;
     renderProfilePanel();
@@ -8685,7 +8710,14 @@ document.addEventListener('dragstart', function(e){
   const NP_SUPABASE_KEY = 'sb_publishable_II7ZGSsImxo10OqzRy3U4A_JWQ4rg46';
 
   function npInit(){
-  const npClient = window.supabase.createClient(NP_SUPABASE_URL, NP_SUPABASE_KEY);
+  const npClient = window.supabase.createClient(NP_SUPABASE_URL, NP_SUPABASE_KEY, {
+    /* client ini murni untuk query data produk, tidak butuh session login.
+       auth di-nonaktifkan supaya tidak bentrok dengan client auth Google
+       (getAuthClient() di script utama) yang berbagi URL+key publishable
+       yang sama -- kalau dibiarkan default, dua instance GoTrueClient bisa
+       saling menimpa sesi login di localStorage. */
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+  });
 
   function npEscape(str){
     if(!str) return '';
@@ -9045,7 +9077,12 @@ document.addEventListener('dragstart', function(e){
 
   function initStats(){
     if(!window.supabase) return;
-    statsClient = window.supabase.createClient(STATS_URL, STATS_KEY);
+    statsClient = window.supabase.createClient(STATS_URL, STATS_KEY, {
+      /* sama seperti npClient: murni query statistik, tidak butuh session
+         login, dan auth dimatikan supaya tidak bentrok dengan client auth
+         Google yang berbagi URL+key publishable yang sama. */
+      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+    });
     refreshStatsWidget();
     trackVisitorOnce();
     trackPurchaseIfVipDetected();
