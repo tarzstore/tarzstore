@@ -6039,22 +6039,20 @@ function initGoogleAuth(){
      getAuthClient()), dijalankan SETELAH sesi berhasil didapat. */
   refreshGoogleVipStatus();
 
-  /* Jaring pengaman terhadap race condition: createClient() dengan
-     detectSessionInUrl:true mulai memproses hash #access_token=... di
-     URL secara internal SEGERA saat dibuat. Kalau proses itu selesai
-     lebih cepat dari saat listener onAuthStateChange sempat terpasang
-     (bisa terjadi di koneksi/HP lambat), event SIGNED_IN yang pertama
-     bisa terlewat -- akibatnya sesi TIDAK PERNAH kesimpan walau redirect
-     dari Google sudah sukses sampai /callback (bisa dicek di log server:
-     /callback sukses tapi /auth/v1/user tidak pernah menyusul). Untuk
-     jaga-jaga, kalau URL yang di-load ini masih membawa hash token OAuth,
-     cek ulang sesi secara eksplisit sesaat kemudian -- ini idempotent dan
-     aman dipanggil dobel karena refreshGoogleVipStatus() cuma membaca
-     status, tidak mengubah apapun kalau sesi sudah tersimpan sebelumnya. */
+  /* Jaring pengaman terhadap race condition antara proses internal
+     Supabase membaca hash #access_token=... dari URL dan listener
+     onAuthStateChange yang mendengarkannya -- terbukti dari log server
+     kadang berhasil kadang tidak (tidak konsisten), jadi TIDAK bisa
+     diandalkan hanya dari satu event. Solusinya: kalau URL yang di-load
+     ini masih membawa hash token OAuth, cek ulang sesi secara eksplisit
+     BEBERAPA KALI dengan jeda yang membesar, sampai sesi terdeteksi atau
+     sampai batas percobaan habis. refreshGoogleVipStatus() aman dipanggil
+     berkali-kali -- kalau sesi sudah tersimpan di percobaan pertama,
+     panggilan berikutnya tidak mengubah apapun. */
   try{
     const hasAuthHash = window.location.hash && /access_token=|refresh_token=|provider_token=/.test(window.location.hash);
     if(hasAuthHash){
-      setTimeout(refreshGoogleVipStatus, 600);
+      [300, 800, 1500, 3000].forEach(delay => setTimeout(refreshGoogleVipStatus, delay));
     }
   }catch(e){}
 }
