@@ -4587,6 +4587,21 @@ function showToast(msg){
 
 document.addEventListener('DOMContentLoaded', initTheme);
 
+/* Jaring pengaman: pastikan meta viewport tetap benar walau browser mobile
+   sempat salah kalkulasi ulang layout setelah redirect balik dari Google
+   OAuth (URL sempat membawa hash/query token yang panjang). */
+(function enforceMobileViewport(){
+  try{
+    let vp = document.querySelector('meta[name="viewport"]');
+    if(!vp){
+      vp = document.createElement('meta');
+      vp.name = 'viewport';
+      document.head.appendChild(vp);
+    }
+    vp.setAttribute('content', 'width=device-width, initial-scale=1.0, viewport-fit=cover');
+  }catch(e){}
+})();
+
 /* ── SIDE MENU (HAMBURGER) ── */
 function toggleSideMenu(){
   const menu = document.getElementById('sideMenu');
@@ -5679,6 +5694,9 @@ async function googleSignIn(){
     if(_pendingVipAction){
       try{ sessionStorage.setItem('tarz_pending_vip_action', _pendingVipAction); }catch(e){}
     }
+    /* tandai bahwa sebuah login baru saja diminta, supaya begitu balik dari
+       redirect Google kita tahu harus menampilkan toast "Berhasil Login" */
+    try{ sessionStorage.setItem('tarz_login_requested', '1'); }catch(e){}
     await client.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: window.location.href }
@@ -5824,8 +5842,19 @@ async function refreshGoogleVipStatus(){
     refreshVipHeaderBadge();
     refreshVipPageCard();
 
+    /* kalau login ini baru saja diminta lewat googleSignIn() (baru balik dari
+       redirect Google), kasih tahu user kalau login berhasil */
+    let justLoggedIn = false;
+    try{
+      if(sessionStorage.getItem('tarz_login_requested') === '1'){
+        justLoggedIn = true;
+        sessionStorage.removeItem('tarz_login_requested');
+      }
+    }catch(e){}
+
     /* kalau tadi ada aksi tertunda (baru saja balik dari redirect Google login),
-       lanjutkan otomatis ke key form / qris / wa */
+       JANGAN lanjut otomatis ke key form / qris / wa -- kembalikan ke layar
+       awal (gate VIP) dan kasih tahu user kalau login sudah berhasil. */
     let pending = _pendingVipAction;
     if(!pending){
       try{ pending = sessionStorage.getItem('tarz_pending_vip_action'); }catch(e){}
@@ -5833,7 +5862,20 @@ async function refreshGoogleVipStatus(){
     if(pending){
       _pendingVipAction = null;
       try{ sessionStorage.removeItem('tarz_pending_vip_action'); }catch(e){}
-      runVipAction(pending);
+      /* pastikan modal overlay-nya terbuka -- perlu, karena halaman ini
+         fresh reload setelah redirect balik dari Google */
+      const overlay = document.getElementById('keyOverlay');
+      if(overlay && !overlay.classList.contains('open')){
+        overlay.classList.add('open');
+        overlay.setAttribute('aria-hidden','false');
+        overlay.removeAttribute('inert');
+        document.body.style.overflow = 'hidden';
+        document.body.classList.add('tabbar-hide');
+      }
+      showVipGate();
+      showToast('Berhasil Login', 'success');
+    } else if(justLoggedIn){
+      showToast('Berhasil Login', 'success');
     }
   }catch(e){ console.error('refreshGoogleVipStatus error:', e); }
 }
@@ -5843,6 +5885,22 @@ async function refreshGoogleVipStatus(){
 function initGoogleAuth(){
   const client = getAuthClient();
   if(!client) return;
+  /* bersihkan hash/query token OAuth (#access_token=..., ?code=...) dari URL
+     begitu balik dari redirect Google. URL yang masih membawa token panjang
+     ini kadang bikin browser mobile salah kalkulasi ulang layout/viewport
+     dan halaman terlihat seperti "mode desktop". */
+  try{
+    const url = new URL(window.location.href);
+    const hasAuthHash = window.location.hash && /access_token=|refresh_token=|provider_token=/.test(window.location.hash);
+    const hasAuthQuery = url.searchParams.has('code') || url.searchParams.has('error_description');
+    if(hasAuthHash || hasAuthQuery){
+      url.hash = '';
+      url.searchParams.delete('code');
+      url.searchParams.delete('error_description');
+      url.searchParams.delete('error');
+      window.history.replaceState({}, document.title, url.pathname + url.search);
+    }
+  }catch(e){}
   refreshGoogleVipStatus();
   client.auth.onAuthStateChange((event, session)=>{
     if(event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED'){
