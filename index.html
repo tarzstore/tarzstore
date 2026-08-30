@@ -443,13 +443,14 @@ body.scroll-tabbar-hide .bottom-tab-bar{
 .profilepg-hero .profile-name{margin-bottom:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
 .profilepg-hero .profile-email{position:relative;z-index:1;margin-bottom:0;}
 .profilepg-signed-in .profile-logout-btn{
-  flex-shrink:0;width:auto;white-space:nowrap;margin-left:0;
-  position:relative;z-index:1;padding:9px 18px;font-size:.74rem;
-  margin-top:20px;
+  position:absolute;top:16px;right:16px;z-index:2;
+  width:34px;height:34px;padding:0;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:50%;
 }
+.profilepg-signed-in .profile-logout-btn svg{width:17px;height:17px;}
 @media(max-width:400px){
   .profilepg-signed-in{flex-wrap:wrap;}
-  .profilepg-signed-in .profile-logout-btn{width:100%;margin-left:0;}
 }
 
 
@@ -461,19 +462,16 @@ body.scroll-tabbar-hide .bottom-tab-bar{
 }
 .profilepg-signed-out{
   display:flex;flex-direction:column;align-items:center;text-align:center;
-  gap:18px;padding:32px 26px;
+  gap:14px;padding:24px 26px;
 }
-.profilepg-signed-out .profile-gate-icon{margin:0 auto;flex-shrink:0;align-self:center;width:60px;height:60px;}
-.profilepg-signed-out .profile-gate-icon svg{width:26px;height:26px;}
 .profilepg-signed-out .profile-gate-text{flex:none;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px;}
 .profilepg-signed-out .profile-gate-title{margin-bottom:0;font-size:1rem;}
 .profilepg-signed-out .profile-gate-sub{margin:0 auto;max-width:none;font-size:.76rem;}
 .profilepg-signed-out .profile-google-btn{
   width:auto;flex-shrink:0;white-space:nowrap;padding:9px 18px;font-size:.74rem;
-  margin-top:20px;
+  margin-top:6px;
 }
 .profilepg-signed-out .profile-google-btn .profile-google-icon{width:15px;height:15px;}
-.profilepg-signed-out .profile-gate-icon,
 .profilepg-signed-out .profile-gate-title,
 .profilepg-signed-out .profile-gate-sub,
 .profilepg-signed-out .profile-google-btn{position:relative;z-index:1;}
@@ -4306,6 +4304,9 @@ body.side-menu-open{overflow:hidden;}
     <!-- PROFIL — dipindah ke tab VIP, tampil di atas card membership.
          Ukuran & posisi mengikuti gaya banner video: lebar penuh, landscape. -->
     <div class="profilepg-signed-in" id="profileSignedIn" style="display:none;">
+      <button type="button" class="profile-logout-btn" onclick="googleSignOut()" aria-label="Keluar dari Akun">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-out-icon lucide-log-out"><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/></svg>
+      </button>
       <div class="profilepg-hero">
         <div class="profilepg-hero-glow"></div>
         <div class="profile-avatar-wrap" id="profileAvatarWrap">
@@ -4319,16 +4320,11 @@ body.side-menu-open{overflow:hidden;}
           <div class="profile-email" id="profileEmail">—</div>
         </div>
       </div>
-
-      <button type="button" class="profile-logout-btn" onclick="googleSignOut()">Keluar dari Akun</button>
     </div>
 
     <!-- Tampil kalau BELUM login Google -->
     <div class="profilepg-signed-out" id="profileSignedOut">
       <div class="profilepg-gate-glow"></div>
-      <div class="profile-gate-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      </div>
       <div class="profile-gate-text">
         <div class="profile-gate-title">Kamu Belum Login</div>
       </div>
