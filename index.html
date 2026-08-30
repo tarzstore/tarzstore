@@ -6029,6 +6029,25 @@ function initGoogleAuth(){
      onAuthStateChange (didaftarkan lewat bindAuthStateListener() di dalam
      getAuthClient()), dijalankan SETELAH sesi berhasil didapat. */
   refreshGoogleVipStatus();
+
+  /* Jaring pengaman terhadap race condition: createClient() dengan
+     detectSessionInUrl:true mulai memproses hash #access_token=... di
+     URL secara internal SEGERA saat dibuat. Kalau proses itu selesai
+     lebih cepat dari saat listener onAuthStateChange sempat terpasang
+     (bisa terjadi di koneksi/HP lambat), event SIGNED_IN yang pertama
+     bisa terlewat -- akibatnya sesi TIDAK PERNAH kesimpan walau redirect
+     dari Google sudah sukses sampai /callback (bisa dicek di log server:
+     /callback sukses tapi /auth/v1/user tidak pernah menyusul). Untuk
+     jaga-jaga, kalau URL yang di-load ini masih membawa hash token OAuth,
+     cek ulang sesi secara eksplisit sesaat kemudian -- ini idempotent dan
+     aman dipanggil dobel karena refreshGoogleVipStatus() cuma membaca
+     status, tidak mengubah apapun kalau sesi sudah tersimpan sebelumnya. */
+  try{
+    const hasAuthHash = window.location.hash && /access_token=|refresh_token=|provider_token=/.test(window.location.hash);
+    if(hasAuthHash){
+      setTimeout(refreshGoogleVipStatus, 600);
+    }
+  }catch(e){}
 }
 
 if(window.supabase){
