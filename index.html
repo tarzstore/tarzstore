@@ -5722,12 +5722,25 @@ async function googleSignIn(){
   }
 }
 
+/* Bersihkan SEMUA sumber status VIP yang tersimpan lokal di device ini
+   (permanen, trial, token terverifikasi). Dipanggil setiap kali logout
+   supaya akses VIP tidak "nyangkut" di device walau sudah keluar dari
+   akun Google -- sebelumnya cuma _googleVipStatus yang direset, jadi
+   device yang pernah dapat status VIP lewat key/trial/token tetap
+   dianggap VIP meski sudah logout. */
+function clearLocalVipState(){
+  try{ localStorage.removeItem('tarz_vip'); }catch(e){}
+  try{ localStorage.removeItem('tarz_vip_expiry'); }catch(e){}
+  try{ localStorage.removeItem('tarz_vip_token'); }catch(e){}
+}
+
 function googleSignOut(){
   const client = getAuthClient();
   if(!client) return;
   client.auth.signOut().then(()=>{
     _googleUser = null;
     _googleVipStatus = null;
+    clearLocalVipState();
     renderProfilePanel();
     refreshVipHeaderBadge();
     refreshVipPageCard();
@@ -5740,6 +5753,7 @@ function googleSignOut(){
     try{ localStorage.removeItem('tarz-google-auth'); }catch(err){}
     _googleUser = null;
     _googleVipStatus = null;
+    clearLocalVipState();
     renderProfilePanel();
     refreshVipHeaderBadge();
     refreshVipPageCard();
