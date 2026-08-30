@@ -2520,12 +2520,41 @@ footer::before{
 
 /* status: sudah login */
 .profile-signed-in{text-align:center;padding:6px 0 2px;}
+.profile-avatar-wrap{
+  width:66px;height:66px;margin:0 auto 14px;position:relative;
+}
 .profile-avatar{
   width:66px;height:66px;border-radius:50%;
   object-fit:cover;background:rgba(255,255,255,.06);
   border:1px solid var(--border-strong);
-  margin:0 auto 14px;display:block;
+  display:block;
 }
+/* ring emas berputar pelan di sekeliling avatar, hanya saat VIP aktif */
+.profile-avatar-wrap.is-vip .profile-avatar{
+  border:2px solid transparent;
+  padding:2px;
+  background:
+    linear-gradient(var(--surface),var(--surface)) padding-box,
+    conic-gradient(from 0deg,#ffd76a,#fff3c4,#e8b64a,#ffd76a) border-box;
+  animation:vipRingSpin 4s linear infinite;
+}
+@keyframes vipRingSpin{to{filter:hue-rotate(0deg);transform:rotate(360deg);}}
+@media (prefers-reduced-motion: reduce){
+  .profile-avatar-wrap.is-vip .profile-avatar{animation:none;}
+}
+
+/* badge "MEMBER VIP" — gradient emas, sedikit glow, ikon mahkota */
+.profile-vip-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  margin:0 auto 10px;padding:5px 14px;
+  border-radius:999px;
+  background:linear-gradient(135deg,#ffe9a8,#e8b64a 55%,#ffd76a);
+  box-shadow:0 2px 14px rgba(232,182,74,.35),inset 0 1px 0 rgba(255,255,255,.5);
+  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.68rem;
+  letter-spacing:.8px;color:#1a1200;
+  width:fit-content;
+}
+.profile-vip-badge svg{width:13px;height:13px;flex-shrink:0;color:#1a1200;}
 .profile-name{
   font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1rem;
   color:var(--text);margin-bottom:3px;
@@ -3518,7 +3547,13 @@ body.side-menu-open{overflow:hidden;}
 
     <!-- Tampil kalau SUDAH login Google -->
     <div class="profile-signed-in" id="profileSignedIn" style="display:none;">
-      <img id="profileAvatar" src="" alt="Foto profil Google" class="profile-avatar">
+      <div class="profile-avatar-wrap" id="profileAvatarWrap">
+        <img id="profileAvatar" src="" alt="Foto profil Google" class="profile-avatar">
+      </div>
+      <div class="profile-vip-badge" id="profileVipBadge" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 17h14l1.6-8.8-4.8 2.9L12 5l-3.8 6.1-4.8-2.9L5 17Zm0 2.5h14a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/></svg>
+        <span>MEMBER VIP</span>
+      </div>
       <div class="profile-name" id="profileName">—</div>
       <div class="profile-email" id="profileEmail">—</div>
       <button type="button" class="profile-logout-btn" onclick="googleSignOut()">Keluar dari Akun</button>
@@ -5712,7 +5747,16 @@ async function googleSignIn(){
     try{ sessionStorage.setItem('tarz_login_requested', '1'); }catch(e){}
     await client.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.href }
+      options: {
+        redirectTo: window.location.href,
+        /* Paksa Google selalu menampilkan layar "Pilih Akun" setiap kali
+           tombol login diklik, walau browser masih punya sesi Google aktif
+           dari akun sebelumnya. Tanpa ini, Google diam-diam auto-login ke
+           akun terakhir yang dipakai (session cookie Google, bukan cookie
+           situs ini) -- makanya ganti akun kelihatan "tidak bisa" kecuali
+           dicoba di tab baru yang belum kena auto-login itu. */
+        queryParams: { prompt: 'select_account' }
+      }
     });
     /* browser akan redirect keluar halaman di sini */
   }catch(e){
@@ -5774,6 +5818,13 @@ function renderProfilePanel(){
     document.getElementById('profileAvatar').src = meta.avatar_url || '';
     signedIn.style.display = 'block';
     signedOut.style.display = 'none';
+
+    /* tampilkan badge "MEMBER VIP" + ring emas di avatar kalau akun ini VIP */
+    const isVip = isVipUnlocked();
+    const badge = document.getElementById('profileVipBadge');
+    const avatarWrap = document.getElementById('profileAvatarWrap');
+    if(badge) badge.style.display = isVip ? 'inline-flex' : 'none';
+    if(avatarWrap) avatarWrap.classList.toggle('is-vip', isVip);
   } else {
     signedIn.style.display = 'none';
     signedOut.style.display = 'block';
@@ -5880,6 +5931,7 @@ async function refreshGoogleVipStatus(){
     }
     refreshVipHeaderBadge();
     refreshVipPageCard();
+    renderProfilePanel(); // update badge "MEMBER VIP" + ring avatar begitu status VIP diketahui
 
     /* kalau login ini baru saja diminta lewat googleSignIn() (baru balik dari
        redirect Google), kasih tahu user kalau login berhasil */
