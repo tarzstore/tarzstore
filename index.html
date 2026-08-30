@@ -2529,18 +2529,13 @@ footer::before{
   border:1px solid var(--border-strong);
   display:block;
 }
-/* ring emas berputar pelan di sekeliling avatar, hanya saat VIP aktif */
+/* ring emas statis di sekeliling avatar, hanya saat VIP aktif (tanpa animasi putar) */
 .profile-avatar-wrap.is-vip .profile-avatar{
   border:2px solid transparent;
   padding:2px;
   background:
     linear-gradient(var(--surface),var(--surface)) padding-box,
     conic-gradient(from 0deg,#ffd76a,#fff3c4,#e8b64a,#ffd76a) border-box;
-  animation:vipRingSpin 4s linear infinite;
-}
-@keyframes vipRingSpin{to{filter:hue-rotate(0deg);transform:rotate(360deg);}}
-@media (prefers-reduced-motion: reduce){
-  .profile-avatar-wrap.is-vip .profile-avatar{animation:none;}
 }
 
 /* badge "MEMBER VIP" — gradient emas, sedikit glow, ikon mahkota */
@@ -5724,7 +5719,42 @@ function getAuthClient(){
       detectSessionInUrl: true
     }
   });
+  /* PENTING: client baru (mis. dibuat ulang setelah logout) belum punya
+     listener onAuthStateChange sama sekali -- listener lama nempel di
+     instance client yang sudah dibuang. Tanpa daftar ulang di sini, event
+     SIGNED_IN dari percobaan login berikutnya tidak akan pernah terdeteksi
+     di tab yang sama, sehingga kelihatan "tidak bisa login" kecuali di tab
+     baru (yang memanggil initGoogleAuth() dari awal). */
+  bindAuthStateListener(_authClient);
   return _authClient;
+}
+
+function bindAuthStateListener(client){
+  client.auth.onAuthStateChange((event, session)=>{
+    if(event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED'){
+      refreshGoogleVipStatus();
+      /* sesi sudah AMAN tersimpan oleh Supabase di titik ini -- baru sekarang
+         boleh bersihkan hash/query token OAuth dari URL. Ini murni kosmetik
+         (URL rapi, hindari browser mobile salah kalkulasi ulang layout) dan
+         tidak lagi mengganggu proses penyimpanan sesi. */
+      if(event === 'SIGNED_IN'){
+        try{
+          const url = new URL(window.location.href);
+          const hasAuthHash = window.location.hash && /access_token=|refresh_token=|provider_token=/.test(window.location.hash);
+          const hasAuthQuery = url.searchParams.has('code');
+          if(hasAuthHash || hasAuthQuery){
+            url.hash = '';
+            url.searchParams.delete('code');
+            window.history.replaceState({}, document.title, url.pathname + url.search);
+          }
+        }catch(e){}
+      }
+    } else if(event === 'SIGNED_OUT'){
+      _googleUser = null;
+      _googleVipStatus = null;
+      renderProfilePanel();
+    }
+  });
 }
 
 /* dipanggil saat tombol "LOGIN DENGAN GOOGLE" diklik (baik dari gate VIP
@@ -5782,6 +5812,13 @@ function googleSignOut(){
   const client = getAuthClient();
   if(!client) return;
   client.auth.signOut().then(()=>{
+    /* PENTING: buang instance client auth yang sudah dipakai supaya login
+       berikutnya membuat GoTrueClient benar-benar baru (persis kondisi
+       tab baru). Kalau _authClient dibiarkan sama, sebagian state internal
+       library (listener, lock session, dsb) bisa nyangkut dan bikin
+       percobaan login berikutnya gagal/diam sampai halaman di-reload
+       penuh atau dibuka di tab baru. */
+    _authClient = null;
     _googleUser = null;
     _googleVipStatus = null;
     clearLocalVipState();
@@ -5795,6 +5832,7 @@ function googleSignOut(){
        sesi lokal supaya UI tidak nyangkut di status "sudah login" palsu dan
        localStorage tidak menyisakan token basi yang mengganggu login berikutnya. */
     try{ localStorage.removeItem('tarz-google-auth'); }catch(err){}
+    _authClient = null;
     _googleUser = null;
     _googleVipStatus = null;
     clearLocalVipState();
@@ -5976,33 +6014,9 @@ function initGoogleAuth(){
      menyimpan sesi ke localStorage lewat onAuthStateChange di bawah.
      Kalau hash dihapus lebih dulu, sesi GAGAL tersimpan dan user akan
      diminta login lagi terus-menerus. Pembersihan URL dipindah ke dalam
-     onAuthStateChange, dijalankan SETELAH sesi berhasil didapat. */
+     onAuthStateChange (didaftarkan lewat bindAuthStateListener() di dalam
+     getAuthClient()), dijalankan SETELAH sesi berhasil didapat. */
   refreshGoogleVipStatus();
-  client.auth.onAuthStateChange((event, session)=>{
-    if(event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED'){
-      refreshGoogleVipStatus();
-      /* sesi sudah AMAN tersimpan oleh Supabase di titik ini -- baru sekarang
-         boleh bersihkan hash/query token OAuth dari URL. Ini murni kosmetik
-         (URL rapi, hindari browser mobile salah kalkulasi ulang layout) dan
-         tidak lagi mengganggu proses penyimpanan sesi. */
-      if(event === 'SIGNED_IN'){
-        try{
-          const url = new URL(window.location.href);
-          const hasAuthHash = window.location.hash && /access_token=|refresh_token=|provider_token=/.test(window.location.hash);
-          const hasAuthQuery = url.searchParams.has('code');
-          if(hasAuthHash || hasAuthQuery){
-            url.hash = '';
-            url.searchParams.delete('code');
-            window.history.replaceState({}, document.title, url.pathname + url.search);
-          }
-        }catch(e){}
-      }
-    } else if(event === 'SIGNED_OUT'){
-      _googleUser = null;
-      _googleVipStatus = null;
-      renderProfilePanel();
-    }
-  });
 }
 
 if(window.supabase){
