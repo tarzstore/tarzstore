@@ -418,14 +418,14 @@ body.scroll-tabbar-hide .bottom-tab-bar{
   pointer-events:none;opacity:.5;
 }
 
-/* layout center: avatar & info di tengah (vertikal), teks rata tengah */
+/* layout: avatar di kiri, nama & email di kanan (nama di atas, email di bawah) */
 .profilepg-signed-in{
   display:flex;flex-direction:column;align-items:center;text-align:center;
   gap:18px;padding:32px 26px;
 }
 .profilepg-hero{
-  position:relative;flex-shrink:0;width:auto;
-  display:flex;flex-direction:column;align-items:center;gap:14px;
+  position:relative;flex-shrink:0;width:100%;
+  display:flex;flex-direction:row;align-items:center;justify-content:center;gap:14px;
 }
 .profilepg-hero-glow{
   position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
@@ -434,13 +434,13 @@ body.scroll-tabbar-hide .bottom-tab-bar{
   pointer-events:none;filter:blur(10px);z-index:0;
 }
 .profilepg-hero .profile-avatar-wrap,
-.profilepg-hero .profile-name,
-.profilepg-hero .profile-vip-badge{position:relative;z-index:1;}
-.profilepg-hero .profile-avatar-wrap{width:60px;height:60px;margin:0 auto;align-self:center;}
+.profilepg-hero .profile-name{position:relative;z-index:1;}
+.profilepg-hero .profile-avatar-wrap{width:60px;height:60px;margin:0;flex-shrink:0;}
 .profilepg-hero .profile-avatar{width:60px;height:60px;}
-.profilepg-hero-info{display:flex;flex-direction:column;align-items:center;gap:6px;}
-.profilepg-hero .profile-vip-badge{margin:0;}
-.profilepg-hero .profile-name{margin-bottom:0;}
+.profilepg-hero-info{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;text-align:left;min-width:0;}
+.profile-name-row{display:flex;align-items:center;gap:5px;min-width:0;}
+.profile-verified-badge{width:15px;height:15px;flex-shrink:0;}
+.profilepg-hero .profile-name{margin-bottom:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
 .profilepg-hero .profile-email{position:relative;z-index:1;margin-bottom:0;}
 .profilepg-signed-in .profile-logout-btn{
   flex-shrink:0;width:auto;white-space:nowrap;margin-left:0;
@@ -2614,13 +2614,13 @@ footer::before{
   border:1px solid var(--border-strong);
   display:block;
 }
-/* ring emas statis di sekeliling avatar, hanya saat VIP aktif (tanpa animasi putar) */
+/* ring biru statis di sekeliling avatar, hanya saat VIP aktif (tanpa animasi putar) */
 .profile-avatar-wrap.is-vip .profile-avatar{
   border:2px solid transparent;
   padding:2px;
   background:
     linear-gradient(var(--surface),var(--surface)) padding-box,
-    conic-gradient(from 0deg,#ffd76a,#fff3c4,#e8b64a,#ffd76a) border-box;
+    conic-gradient(from 0deg,#5fb3ff,#bfe3ff,#3b82f6,#5fb3ff) border-box;
 }
 
 /* badge "MEMBER VIP" — gradient emas, sedikit glow, ikon mahkota */
@@ -4312,11 +4312,10 @@ body.side-menu-open{overflow:hidden;}
           <img id="profileAvatar" src="" alt="Foto profil Google" class="profile-avatar">
         </div>
         <div class="profilepg-hero-info">
-          <div class="profile-vip-badge" id="profileVipBadge" style="display:none;">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 17h14l1.6-8.8-4.8 2.9L12 5l-3.8 6.1-4.8-2.9L5 17Zm0 2.5h14a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/></svg>
-            <span>MEMBER VIP</span>
+          <div class="profile-name-row">
+            <span class="profile-name" id="profileName">—</span>
+            <svg class="profile-verified-badge" viewBox="0 0 24 24" fill="none" aria-label="Terverifikasi"><path d="M12 2.5l2.3 1.6 2.7-.4 1.2 2.5 2.5 1.2-.4 2.7L22 12.5l-1.6 2.3.4 2.7-2.5 1.2-1.2 2.5-2.7-.4L12 22.5l-2.3-1.6-2.7.4-1.2-2.5-2.5-1.2.4-2.7L2 12.5l1.6-2.3-.4-2.7 2.5-1.2 1.2-2.5 2.7.4L12 2.5z" fill="#3b82f6"/><path d="M8.5 12.5l2.4 2.4 4.6-5.3" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
-          <div class="profile-name" id="profileName">—</div>
           <div class="profile-email" id="profileEmail">—</div>
         </div>
       </div>
