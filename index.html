@@ -5710,7 +5710,19 @@ function getAuthClient(){
      (npClient, statsClient) yang memakai URL+key publishable yang sama.
      Tanpa ini, beberapa instance GoTrueClient saling berebut localStorage
      key default yang sama dan bisa saling menimpa sesi -- efeknya setelah
-     logout lalu login lagi, sesi baru gagal tersimpan dengan benar. */
+     logout lalu login lagi, sesi baru gagal tersimpan dengan benar.
+
+     PENTING: instance ini dibuat SEKALI SAJA untuk seumur hidup halaman
+     dan TIDAK PERNAH dibuang/dibuat ulang (mis. saat logout). Supabase-js
+     sendiri memperingatkan "Multiple GoTrueClient instances detected in
+     the same browser context" kalau ada lebih dari satu client dengan
+     storageKey yang sama hidup bersamaan -- itu persis yang terjadi kalau
+     kita bikin client baru tiap logout sementara instance lama belum
+     benar-benar mati. Efeknya dua client saling rebutan baca/tulis sesi,
+     dan login berikutnya kelihatan "diam saja" / tidak jalan sampai
+     halaman benar-benar di-reload penuh (tab baru). Jadi: logout HANYA
+     boleh memanggil signOut() di client yang sama ini, tidak membuat
+     ulang client-nya. */
   _authClient = window.supabase.createClient(GOOGLE_AUTH_SUPABASE_URL, GOOGLE_AUTH_SUPABASE_KEY, {
     auth: {
       storageKey: 'tarz-google-auth',
@@ -5719,12 +5731,6 @@ function getAuthClient(){
       detectSessionInUrl: true
     }
   });
-  /* PENTING: client baru (mis. dibuat ulang setelah logout) belum punya
-     listener onAuthStateChange sama sekali -- listener lama nempel di
-     instance client yang sudah dibuang. Tanpa daftar ulang di sini, event
-     SIGNED_IN dari percobaan login berikutnya tidak akan pernah terdeteksi
-     di tab yang sama, sehingga kelihatan "tidak bisa login" kecuali di tab
-     baru (yang memanggil initGoogleAuth() dari awal). */
   bindAuthStateListener(_authClient);
   return _authClient;
 }
@@ -5812,21 +5818,20 @@ function googleSignOut(){
   const client = getAuthClient();
   if(!client) return;
 
-  /* auth.signOut() versi supabase-js yang dipakai di sini dikenal kadang
-     "menggantung" -- promise-nya tidak pernah resolve/reject dengan bersih
-     di kondisi tertentu. Kalau itu terjadi, reset state di bawah tidak akan
-     pernah jalan lewat .then()/.catch(), sehingga client lama yang sudah
-     rusak tetap dipakai -- inilah kenapa login berikutnya di tab yang sama
-     kelihatan "diam saja" (klik tombol tidak sampai membuka Google). Supaya
-     reset SELALU terjadi apapun yang terjadi pada signOut(), fungsi
-     resetLocalAuthState() dipanggil lewat .finally() DAN lewat timeout
-     cadangan, mana yang lebih dulu. */
+  /* auth.signOut() versi supabase-js yang dipakai di sini kadang tidak
+     resolve/reject dengan bersih di kondisi tertentu. Supaya UI tidak
+     nyangkut selamanya kalau itu terjadi, reset tampilan tetap dijamin
+     jalan lewat .finally() DAN lewat timeout cadangan, mana yang lebih
+     dulu -- TAPI, tidak seperti sebelumnya, di sini client auth-nya
+     (_authClient) TIDAK dibuang/dibuat ulang. signOut() di client yang
+     sama sudah cukup untuk menghapus sesi dari localStorage; membuat
+     client baru justru menyebabkan dua GoTrueClient hidup bersamaan
+     dengan storageKey yang sama (lihat catatan di getAuthClient()),
+     yang merusak proses login berikutnya di tab yang sama. */
   let alreadyReset = false;
   function resetLocalAuthState(){
     if(alreadyReset) return;
     alreadyReset = true;
-    try{ localStorage.removeItem('tarz-google-auth'); }catch(err){}
-    _authClient = null;
     _googleUser = null;
     _googleVipStatus = null;
     clearLocalVipState();
@@ -5845,9 +5850,8 @@ function googleSignOut(){
     resetLocalAuthState();
   }
   /* Jaring pengaman terakhir: kalau signOut() menggantung tanpa pernah
-     resolve/reject sama sekali (bug yang diketahui di beberapa versi
-     supabase-js), tetap reset state lokal setelah 2 detik supaya user
-     tidak nyangkut selamanya dan bisa langsung login lagi. */
+     resolve/reject sama sekali, tetap reset tampilan setelah 2 detik
+     supaya user tidak nyangkut selamanya dan bisa langsung login lagi. */
   setTimeout(resetLocalAuthState, 2000);
 }
 
