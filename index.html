@@ -5901,17 +5901,12 @@ async function refreshGoogleVipStatus(){
     if(pending){
       _pendingVipAction = null;
       try{ sessionStorage.removeItem('tarz_pending_vip_action'); }catch(e){}
-      /* pastikan modal overlay-nya terbuka -- perlu, karena halaman ini
-         fresh reload setelah redirect balik dari Google */
-      const overlay = document.getElementById('keyOverlay');
-      if(overlay && !overlay.classList.contains('open')){
-        overlay.classList.add('open');
-        overlay.setAttribute('aria-hidden','false');
-        overlay.removeAttribute('inert');
-        document.body.style.overflow = 'hidden';
-        document.body.classList.add('tabbar-hide');
-      }
-      showVipGate();
+
+      /* Baik sudah VIP maupun belum, JANGAN otomatis lanjut ke gate/key form/
+         QRIS setelah balik dari login Google. Tutup overlay total dan
+         kembalikan user ke halaman utama -- kalau belum VIP dan mau lanjut,
+         user klik ulang sendiri tombol produk / "Masukkan Key" / "Buy via QRIS". */
+      closeKeyModal();
       showToast('Berhasil Login', 'success');
     } else if(justLoggedIn){
       showToast('Berhasil Login', 'success');
