@@ -5885,26 +5885,32 @@ async function refreshGoogleVipStatus(){
 function initGoogleAuth(){
   const client = getAuthClient();
   if(!client) return;
-  /* bersihkan hash/query token OAuth (#access_token=..., ?code=...) dari URL
-     begitu balik dari redirect Google. URL yang masih membawa token panjang
-     ini kadang bikin browser mobile salah kalkulasi ulang layout/viewport
-     dan halaman terlihat seperti "mode desktop". */
-  try{
-    const url = new URL(window.location.href);
-    const hasAuthHash = window.location.hash && /access_token=|refresh_token=|provider_token=/.test(window.location.hash);
-    const hasAuthQuery = url.searchParams.has('code') || url.searchParams.has('error_description');
-    if(hasAuthHash || hasAuthQuery){
-      url.hash = '';
-      url.searchParams.delete('code');
-      url.searchParams.delete('error_description');
-      url.searchParams.delete('error');
-      window.history.replaceState({}, document.title, url.pathname + url.search);
-    }
-  }catch(e){}
+  /* PENTING: jangan bersihkan hash/query URL di sini. Supabase (implicit
+     flow) butuh membaca hash #access_token=... dari URL ini dulu untuk
+     menyimpan sesi ke localStorage lewat onAuthStateChange di bawah.
+     Kalau hash dihapus lebih dulu, sesi GAGAL tersimpan dan user akan
+     diminta login lagi terus-menerus. Pembersihan URL dipindah ke dalam
+     onAuthStateChange, dijalankan SETELAH sesi berhasil didapat. */
   refreshGoogleVipStatus();
   client.auth.onAuthStateChange((event, session)=>{
     if(event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED'){
       refreshGoogleVipStatus();
+      /* sesi sudah AMAN tersimpan oleh Supabase di titik ini -- baru sekarang
+         boleh bersihkan hash/query token OAuth dari URL. Ini murni kosmetik
+         (URL rapi, hindari browser mobile salah kalkulasi ulang layout) dan
+         tidak lagi mengganggu proses penyimpanan sesi. */
+      if(event === 'SIGNED_IN'){
+        try{
+          const url = new URL(window.location.href);
+          const hasAuthHash = window.location.hash && /access_token=|refresh_token=|provider_token=/.test(window.location.hash);
+          const hasAuthQuery = url.searchParams.has('code');
+          if(hasAuthHash || hasAuthQuery){
+            url.hash = '';
+            url.searchParams.delete('code');
+            window.history.replaceState({}, document.title, url.pathname + url.search);
+          }
+        }catch(e){}
+      }
     } else if(event === 'SIGNED_OUT'){
       _googleUser = null;
       _googleVipStatus = null;
