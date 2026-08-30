@@ -5822,16 +5822,25 @@ function googleSignOut(){
      resolve/reject dengan bersih di kondisi tertentu. Supaya UI tidak
      nyangkut selamanya kalau itu terjadi, reset tampilan tetap dijamin
      jalan lewat .finally() DAN lewat timeout cadangan, mana yang lebih
-     dulu -- TAPI, tidak seperti sebelumnya, di sini client auth-nya
-     (_authClient) TIDAK dibuang/dibuat ulang. signOut() di client yang
-     sama sudah cukup untuk menghapus sesi dari localStorage; membuat
-     client baru justru menyebabkan dua GoTrueClient hidup bersamaan
-     dengan storageKey yang sama (lihat catatan di getAuthClient()),
-     yang merusak proses login berikutnya di tab yang sama. */
+     dulu -- client auth-nya (_authClient) TIDAK dibuang/dibuat ulang;
+     membuat client baru menyebabkan dua GoTrueClient hidup bersamaan
+     dengan storageKey yang sama (lihat catatan di getAuthClient()).
+
+     TAPI: signOut() sendiri, menurut dokumentasi resminya, melakukan
+     "teardown" pada background work milik client -- salah satunya
+     MEMBERSIHKAN SEMUA subscriber onAuthStateChange yang terdaftar.
+     Ini persis kenapa login PERTAMA di sebuah tab selalu berhasil
+     (listener masih terpasang dari initGoogleAuth()), tapi login KEDUA
+     di tab yang sama (setelah logout) selalu gagal diam-diam -- listener
+     sudah hilang walau instance client-nya sama. Makanya begitu proses
+     sign-out selesai, listener-nya WAJIB didaftarkan ulang di client
+     yang sama supaya percobaan login berikutnya di tab ini tetap
+     terdeteksi. */
   let alreadyReset = false;
   function resetLocalAuthState(){
     if(alreadyReset) return;
     alreadyReset = true;
+    bindAuthStateListener(client); // pasang ulang listener yang dibersihkan signOut()
     _googleUser = null;
     _googleVipStatus = null;
     clearLocalVipState();
