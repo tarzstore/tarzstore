@@ -229,7 +229,7 @@ body.tab-hidden .dot{animation-play-state:paused;}
   bottom:calc(16px + env(safe-area-inset-bottom));
   left:50%;
   transform:translateX(-50%);
-  width:340px;
+  width:350px;
   max-width:calc(100vw - 24px);
   background:rgba(14,14,16,.55);
   -webkit-backdrop-filter:blur(20px) saturate(1.4);
@@ -269,13 +269,12 @@ body.scroll-tabbar-hide .bottom-tab-bar{
   position:relative;
   display:flex;flex-direction:column;align-items:center;gap:3px;
   background:none;border:none;cursor:pointer;
-  padding:6px 4px;
+  padding:6px 8px;
   flex:1;
-  min-width:0;
   border-radius:12px;
   color:rgba(255,255,255,.4);
   font-family:'Space Grotesk',sans-serif;
-  font-size:.56rem;font-weight:500;letter-spacing:.2px;text-transform:uppercase;
+  font-size:.62rem;font-weight:500;letter-spacing:.4px;text-transform:uppercase;
   transition:color .3s ease,transform .25s ease,background .3s ease;
   -webkit-tap-highlight-color:transparent;
   outline:none;
@@ -396,95 +395,7 @@ body.scroll-tabbar-hide .bottom-tab-bar{
    VIP MEMBERSHIP PAGE — simple, satu kartu, tanpa video/thumbnail
    ══════════════════════════════════════════ */
 .vip-page{display:none;align-items:center;justify-content:center;padding-top:24px;}
-.vip-page.active{display:flex;flex-direction:column;}
-
-/* ── KARTU PROFIL — tampil di bagian atas tab VIP, ukuran & posisi mengikuti
-     gaya banner video (lebar penuh, landscape, radius sama) ── */
-.profilepg-signed-in,.profilepg-signed-out{
-  position:relative;overflow:hidden;width:100%;margin:0 auto 20px;
-  border-radius:var(--radius-lg);
-  background:linear-gradient(165deg,rgba(200,205,215,.1),rgba(140,145,155,.03) 55%,rgba(200,205,215,.06));
-  border:1px solid rgba(200,205,215,.22);
-  box-shadow:0 20px 50px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.06);
-}
-/* sapuan highlight metalik tipis di tepi kartu, senada dengan vippg-card */
-.profilepg-signed-in::before,.profilepg-signed-out::before{
-  content:'';
-  position:absolute;inset:0;border-radius:var(--radius-lg);
-  padding:1px;
-  background:linear-gradient(135deg,rgba(255,255,255,.5),transparent 30%,transparent 70%,rgba(255,255,255,.25));
-  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
-  -webkit-mask-composite:xor;mask-composite:exclude;
-  pointer-events:none;opacity:.5;
-}
-
-/* layout: avatar di kiri, nama & email di kanan (nama di atas, email di bawah) */
-.profilepg-signed-in{
-  display:flex;flex-direction:column;align-items:center;text-align:center;
-  gap:18px;padding:32px 26px;
-  background-image:
-    linear-gradient(165deg,rgba(5,5,5,.72),rgba(5,5,5,.45) 55%,rgba(5,5,5,.72)),
-    url('https://bvblcdnmbzncoqeoqkoc.supabase.co/storage/v1/object/public/Tarz/banner.png');
-  background-size:cover;
-  background-position:center;
-  background-repeat:no-repeat;
-}
-.profilepg-hero{
-  position:relative;flex-shrink:0;width:100%;
-  display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:14px;
-}
-.profilepg-hero-glow{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:150px;height:150px;border-radius:50%;
-  background:radial-gradient(circle,rgba(210,215,225,.18),transparent 70%);
-  pointer-events:none;filter:blur(10px);z-index:0;
-}
-.profilepg-hero .profile-avatar-wrap,
-.profilepg-hero .profile-name{position:relative;z-index:1;}
-.profilepg-hero .profile-avatar-wrap{width:60px;height:60px;margin:0;flex-shrink:0;}
-.profilepg-hero .profile-avatar{width:60px;height:60px;}
-.profilepg-hero-info{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;text-align:left;min-width:0;}
-.profile-name-row{display:flex;align-items:center;gap:5px;min-width:0;}
-.profile-verified-badge{width:15px;height:15px;flex-shrink:0;}
-.profilepg-hero .profile-name{margin-bottom:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
-.profilepg-hero .profile-email{position:relative;z-index:1;margin-bottom:0;}
-.profilepg-signed-in .profile-logout-btn{
-  position:absolute;top:16px;right:16px;z-index:2;
-  width:34px;height:34px;padding:0;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  border-radius:50%;
-}
-.profilepg-signed-in .profile-logout-btn svg{width:17px;height:17px;}
-@media(max-width:400px){
-  .profilepg-signed-in{flex-wrap:wrap;}
-}
-
-
-.profilepg-gate-glow{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:150px;height:150px;border-radius:50%;
-  background:radial-gradient(circle,rgba(210,215,225,.16),transparent 70%);
-  pointer-events:none;filter:blur(10px);z-index:0;
-}
-.profilepg-signed-out{
-  display:flex;flex-direction:column;align-items:center;text-align:center;
-  gap:14px;padding:24px 26px;
-}
-.profilepg-signed-out .profile-gate-text{flex:none;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px;}
-.profilepg-signed-out .profile-gate-title{margin-bottom:0;font-size:1rem;}
-.profilepg-signed-out .profile-gate-sub{margin:0 auto;max-width:none;font-size:.76rem;}
-.profilepg-signed-out .profile-google-btn{
-  width:auto;flex-shrink:0;white-space:nowrap;padding:9px 18px;font-size:.74rem;
-  margin-top:6px;
-}
-.profilepg-signed-out .profile-google-btn .profile-google-icon{width:15px;height:15px;}
-.profilepg-signed-out .profile-gate-title,
-.profilepg-signed-out .profile-gate-sub,
-.profilepg-signed-out .profile-google-btn{position:relative;z-index:1;}
-@media(max-width:400px){
-  .profilepg-signed-out{flex-wrap:wrap;}
-  .profilepg-signed-out .profile-google-btn{width:100%;}
-}
+.vip-page.active{display:flex;}
 
 .vippg-card{
   position:relative;overflow:hidden;width:100%;max-width:360px;
@@ -575,7 +486,7 @@ body.scroll-tabbar-hide .bottom-tab-bar{
 
 /* ── WIDGET STATISTIK OTOMATIS (di atas card VIP) — versi modern ── */
 .stats-widget{
-  width:100%;max-width:360px;margin:20px auto 0;
+  width:100%;max-width:360px;margin:0 auto 16px;
   position:relative;overflow:hidden;
   display:grid;grid-template-columns:repeat(3,1fr);
   border-radius:var(--radius-lg);
@@ -1728,7 +1639,7 @@ background:linear-gradient(135deg,#1e2a47,#2563eb);
 }
 .toast.show{transform:translate3d(-50%,0,0);opacity:1;}
 .toast.error{border-color:rgba(245,80,80,.35);color:#ff6b6b;}
-.toast.success{border-color:rgba(59,130,246,.35);color:#fff;}
+.toast.success{border-color:rgba(0,229,160,.35);color:var(--green);}
 
 /* ── VIP CELEBRATION OVERLAY — EDISI HITAM PUTIH ── */
 .vip-celebrate-overlay{
@@ -2001,133 +1912,166 @@ footer::before{
 }
 
 /* ══════════════════════════════════════════
-   KEY SYSTEM MODAL — versi sederhana: kecil, flat, tanpa efek
+   KEY SYSTEM MODAL — panel akses VIP, gaya "console" senyap & presisi
    ══════════════════════════════════════════ */
 .key-overlay{
   position:fixed;inset:0;z-index:1000;
-  background:rgba(0,0,0,.7);
+  background:rgba(2,4,10,.92);
+  /* backdrop-filter:blur() dihapus: berat di HP, dan browser mobile terus
+     repaint blur ini tiap frame saat keyboard muncul/hilang -> kerasa lag/patah.
+     Diganti overlay solid lebih gelap, visual tetap kontras tanpa beban GPU. */
   display:flex;align-items:center;justify-content:center;
   opacity:0;pointer-events:none;
+  transition:opacity var(--t-mid) var(--ease);
   padding:20px;
 }
 .key-overlay.open{opacity:1;pointer-events:auto;}
 
 .key-box{
-  width:100%;max-width:300px;
-  background:var(--surface);
-  border:1px solid var(--border-strong);
-  border-radius:12px;
+  width:100%;max-width:380px;
+  background:linear-gradient(180deg,#0f0f0f 0%,#0a0a0a 100%);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:16px;
   padding:0;
+  transform:scale(.96) translate3d(0,8px,0);
+  transition:transform var(--t-slow) var(--ease-out);
   overflow:hidden;
+  box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 0 1px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.03);
   position:relative;
   max-height:88vh;max-height:88svh;
   display:flex;flex-direction:column;
 }
 .key-box .key-body{overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.key-overlay.open .key-box{transform:scale(1) translate3d(0,0,0);}
+
 
 .key-head{
-  padding:20px 20px 12px;
+  padding:30px 26px 18px;
   text-align:center;
   position:relative;
 }
-.key-eyebrow{display:none;}
+.key-eyebrow{
+  font-family:'Space Mono','Space Grotesk',monospace;
+  font-size:9.5px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--cyan);opacity:.75;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  margin-bottom:16px;
+}
+.key-eyebrow::before{content:'';width:14px;height:1px;background:rgba(255,255,255,.35);order:1;}
+.key-eyebrow::after{content:'';width:14px;height:1px;background:rgba(255,255,255,.35);order:5;}
+.key-eyebrow .dot{width:4px;height:4px;border-radius:50%;background:var(--cyan);flex-shrink:0;box-shadow:0 0 6px rgba(255,255,255,.8);order:2;}
+.key-eyebrow .eyebrow-text{order:3;}
+.key-eyebrow .dot-end{width:4px;height:4px;border-radius:50%;background:var(--cyan);flex-shrink:0;box-shadow:0 0 6px rgba(255,255,255,.8);order:4;}
 
 .key-close{
-  position:absolute;top:10px;right:10px;
-  width:26px;height:26px;border-radius:6px;
-  border:1px solid var(--border);
-  background:transparent;
+  position:absolute;top:14px;right:14px;
+  width:28px;height:28px;border-radius:7px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.02);
   color:var(--text2);
   display:flex;align-items:center;justify-content:center;
-  cursor:pointer;
+  cursor:pointer;transition:background var(--t-fast),color var(--t-fast),border-color var(--t-fast);
   -webkit-tap-highlight-color:transparent;
 }
+.key-close:hover{background:rgba(255,80,80,.1);border-color:rgba(255,80,80,.3);color:#ff7070;}
 
 .key-icon-badge{
-  width:40px;height:40px;margin:0 auto 12px;
-  border-radius:10px;
-  background:rgba(255,255,255,.05);
-  border:1px solid var(--border-strong);
+  width:52px;height:52px;margin:0 auto 16px;
+  border-radius:13px;
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.24);
   display:flex;align-items:center;justify-content:center;
-  color:var(--text);
+  color:var(--cyan);
   position:relative;
 }
-.key-icon-badge svg{width:19px;height:19px;}
+.key-icon-badge svg{width:24px;height:24px;}
 
 .key-title{
-  font-size:1rem;font-weight:700;color:var(--text);letter-spacing:.1px;margin-bottom:3px;
+  font-size:1.08rem;font-weight:700;color:#fff;letter-spacing:.2px;margin-bottom:6px;
 }
 .key-sub{
-  font-size:11.5px;color:var(--text2);line-height:1.5;padding:0 6px;
-  min-height:0;
+  font-size:12px;color:var(--text2);line-height:1.55;padding:0 10px;
 }
-.key-sub:empty{margin:0;padding:0;}
-.key-sub b{color:var(--text);font-weight:700;}
+.key-sub b{color:var(--cyan);font-weight:700;}
 
-.key-body{padding:4px 20px 20px;}
+.key-body{padding:2px 26px 26px;}
 
 .key-input-wrap{
-  position:relative;margin-bottom:10px;
+  position:relative;margin-bottom:12px;
 }
 .key-input-label{
-  font-family:'Space Grotesk',sans-serif;
-  font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
-  color:var(--text2);margin-bottom:6px;display:block;
+  font-family:'Space Mono','Space Grotesk',monospace;
+  font-size:9.5px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;
+  color:var(--text2);margin-bottom:7px;display:block;
 }
 .key-input{
   width:100%;
-  background:rgba(255,255,255,.03);
-  border:1px solid var(--border-strong);
-  border-radius:9px;
-  padding:12px 42px 12px 14px;
-  font-family:'Space Grotesk',sans-serif;
-  font-size:.85rem;letter-spacing:.2px;
+  background:rgba(0,0,0,.35);
+  border:1.5px solid rgba(255,255,255,.09);
+  border-radius:10px;
+  padding:14px 46px 14px 16px;
+  font-family:'Space Mono','Space Grotesk',monospace;
+  font-size:.95rem;letter-spacing:2px;
   color:var(--text);
+  transition:border-color var(--t-fast) var(--ease),background var(--t-fast);
   outline:none;
   -webkit-appearance:none;appearance:none;
   display:block;
 }
-.key-input::placeholder{color:var(--text2);font-family:'Space Grotesk',sans-serif;}
-.key-input:focus{border-color:var(--border-strong);}
-.key-input.shake{border-color:#ff6b6b;}
+.key-input::placeholder{color:rgba(138,155,191,.55);letter-spacing:.5px;font-family:'Space Grotesk',sans-serif;}
+.key-input:focus{border-color:var(--cyan);background:rgba(255,255,255,.04);box-shadow:0 0 0 3px rgba(255,255,255,.08);}
+.key-input.shake{animation:key-shake .38s var(--ease);border-color:#ff6b6b;}
+@keyframes key-shake{
+  0%,100%{transform:translate3d(0,0,0);}
+  20%{transform:translate3d(-6px,0,0);}
+  40%{transform:translate3d(5px,0,0);}
+  60%{transform:translate3d(-4px,0,0);}
+  80%{transform:translate3d(3px,0,0);}
+}
 .key-toggle-eye{
-  position:absolute;right:5px;top:50%;
+  position:absolute;right:6px;top:50%;
   transform:translateY(-50%);
-  width:28px;height:28px;border-radius:6px;border:none;background:transparent;
+  width:32px;height:32px;border-radius:8px;border:none;background:transparent;
   color:var(--text2);display:flex;align-items:center;justify-content:center;
-  cursor:pointer;
+  cursor:pointer;transition:color var(--t-fast),background var(--t-fast);
   -webkit-tap-highlight-color:transparent;
 }
-.key-toggle-eye svg{width:16px;height:16px;}
+.key-toggle-eye:hover{color:var(--cyan);background:rgba(255,255,255,.05);}
+.key-toggle-eye svg{width:18px;height:18px;}
 
 .key-error-msg{
-  font-family:'Space Grotesk',sans-serif;
-  font-size:11px;color:#ff6b6b;font-weight:600;letter-spacing:.1px;
+  font-family:'Space Mono','Space Grotesk',monospace;
+  font-size:11px;color:#ff6b6b;font-weight:600;letter-spacing:.2px;
   display:flex;align-items:center;gap:6px;
-  margin:-2px 0 10px;min-height:14px;
-  opacity:0;
+  margin:-2px 0 12px;min-height:14px;
+  opacity:0;transform:translate3d(0,-4px,0);
+  transition:opacity var(--t-fast),transform var(--t-fast);
 }
-.key-error-msg.show{opacity:1;}
-.key-error-msg::before{content:'✕';font-size:9px;opacity:.8;}
+.key-error-msg.show{opacity:1;transform:translate3d(0,0,0);}
+.key-error-msg::before{content:'✕';font-size:10px;opacity:.8;}
 
 .key-btn-login{
-  width:100%;border:none;border-radius:9px;padding:12px;
-  background:var(--text);
-  color:var(--bg);font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.82rem;
-  letter-spacing:.2px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:7px;
+  width:100%;border:none;border-radius:10px;padding:15px;
+  background:var(--cyan);
+  color:#050505;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.85rem;
+  letter-spacing:1px;text-transform:uppercase;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 6px 24px rgba(255,255,255,.22);
+  transition:filter var(--t-fast) var(--ease-soft),transform var(--t-fast) var(--ease-out);
   -webkit-tap-highlight-color:transparent;
   outline:none;-webkit-appearance:none;appearance:none;
-  margin-bottom:0;
-  position:relative;
+  margin-bottom:10px;
+  position:relative;overflow:hidden;
 }
+.key-btn-login:hover{filter:brightness(1.08);transform:translate3d(0,-2px,0);}
+.key-btn-login:active{transform:translate3d(0,0,0) scale(.97);filter:brightness(.94);transition-duration:.1s;}
 .key-btn-login.loading{pointer-events:none;}
-.key-btn-login svg{width:15px;height:15px;flex-shrink:0;}
+.key-btn-login svg{width:16px;height:16px;flex-shrink:0;}
 
 .key-spinner{
-  width:14px;height:14px;border-radius:50%;
-  border:2px solid rgba(0,0,0,.25);
-  border-top-color:var(--bg);
+  width:15px;height:15px;border-radius:50%;
+  border:2px solid rgba(2,19,28,.3);
+  border-top-color:#050505;
   animation:key-spin .6s linear infinite;
   display:none;
 }
@@ -2135,105 +2079,65 @@ footer::before{
 .key-btn-login.loading .key-btn-label{display:none;}
 @keyframes key-spin{to{transform:rotate(360deg);}}
 
-/* ── LOGIN WITH GOOGLE ── */
-.key-divider{
-  display:flex;align-items:center;gap:10px;
-  margin:14px 0;
-  color:var(--text2);font-family:'Space Mono',monospace;
-  font-size:10.5px;letter-spacing:1px;text-transform:uppercase;
-}
-.key-divider::before,.key-divider::after{
-  content:'';flex:1;height:1px;background:var(--border-strong);
-}
-.key-btn-google{
-  width:100%;border:1px solid var(--border-strong);border-radius:9px;padding:11px 14px;
-  background:#fff;
-  color:#1f1f1f;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.82rem;
-  letter-spacing:.1px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  -webkit-tap-highlight-color:transparent;
-  outline:none;-webkit-appearance:none;appearance:none;
-  margin-bottom:0;position:relative;
-}
-.key-btn-google.loading{pointer-events:none;opacity:.7;}
-.key-btn-google svg{width:16px;height:16px;flex-shrink:0;}
-.key-btn-google .g-spinner{
-  width:14px;height:14px;border-radius:50%;
-  border:2px solid rgba(0,0,0,.15);
-  border-top-color:#1f1f1f;
-  animation:key-spin .6s linear infinite;
-  display:none;
-}
-.key-btn-google.loading .g-spinner{display:inline-block;}
-.key-btn-google.loading .key-btn-google-label,.key-btn-google.loading svg:not(.g-spinner){display:none;}
-
-.vip-google-gate-body{text-align:center;padding:14px 0 4px;}
-.google-gate-icon{
-  width:40px;height:40px;margin:0 auto 12px;
-  border-radius:10px;
-  display:flex;align-items:center;justify-content:center;
-  background:rgba(255,255,255,.05);
-  border:1px solid var(--border-strong);
-}
-.google-gate-icon svg{width:19px;height:19px;}
-.google-gate-title{
-  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1rem;
-  color:var(--text);letter-spacing:.1px;margin-bottom:6px;
-}
-.google-gate-sub{
-  font-family:'Space Grotesk',sans-serif;font-size:.78rem;line-height:1.45;
-  color:var(--text2);max-width:260px;margin:0 auto 16px;
-}
-
 .key-success-wrap{
   display:none;
-  text-align:center;padding:6px 0 4px;
+  text-align:center;padding:10px 0 4px;
 }
 .key-success-wrap.show{display:block;}
 .key-success-icon{
-  width:40px;height:40px;margin:0 auto 12px;border-radius:10px;
-  background:rgba(0,229,160,.08);border:1px solid rgba(0,229,160,.25);
+  width:54px;height:54px;margin:0 auto 16px;border-radius:13px;
+  background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.3);
   display:flex;align-items:center;justify-content:center;color:var(--green);
+  animation:key-pop .38s var(--ease);
 }
-.key-success-icon svg{width:19px;height:19px;}
-.key-success-title{font-size:.9rem;font-weight:700;color:var(--text);margin-bottom:4px;}
-.key-success-sub{font-size:11px;color:var(--text2);line-height:1.45;padding:0 8px;}
+@keyframes key-pop{0%{transform:scale(.5);opacity:0;}100%{transform:scale(1);opacity:1;}}
+.key-success-icon svg{width:24px;height:24px;}
+.key-success-title{font-size:.98rem;font-weight:700;color:#fff;margin-bottom:5px;}
+.key-success-sub{font-size:11.5px;color:var(--text2);line-height:1.5;padding:0 8px;}
 
 
 
 /* ── VIP GATE (ajakan beli / masukkan key) ── */
 .key-btn-vipbuy{
-  width:100%;border:none;border-radius:9px;padding:12px;
-  background:#22c55e;
-  color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.8rem;
-  letter-spacing:.2px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:7px;
+  width:100%;border:none;border-radius:10px;padding:15px;
+  background:linear-gradient(135deg,#22c55e,#16a34a);
+  color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.85rem;
+  letter-spacing:.4px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 6px 22px rgba(34,197,94,.22);
+  transition:filter var(--t-fast) var(--ease-soft),transform var(--t-fast) var(--ease-out);
   -webkit-tap-highlight-color:transparent;
   outline:none;-webkit-appearance:none;appearance:none;
-  margin-bottom:8px;
+  margin-bottom:10px;
 }
-.key-btn-vipbuy svg{width:15px;height:15px;flex-shrink:0;}
+.key-btn-vipbuy:hover{filter:brightness(1.06);transform:translate3d(0,-2px,0);}
+.key-btn-vipbuy:active{transform:translate3d(0,0,0) scale(.97);filter:brightness(.94);transition-duration:.1s;}
+.key-btn-vipbuy svg{width:16px;height:16px;flex-shrink:0;}
 
 .key-btn-vipbuy-wa{
-  background:#25d366;
+  background:linear-gradient(135deg,#25d366,#1da851);
+  box-shadow:0 6px 22px rgba(37,211,102,.22);
   margin-bottom:0;
 }
 
 .key-btn-vipkey{
-  width:100%;border:1px solid var(--border-strong);border-radius:9px;padding:11px;
-  background:transparent;
-  color:var(--text);font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.78rem;
-  letter-spacing:.2px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:7px;
+  width:100%;border:1.5px solid rgba(255,255,255,.1);border-radius:10px;padding:13.5px;
+  background:rgba(255,255,255,.02);
+  color:var(--text);font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.83rem;
+  letter-spacing:.3px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:background var(--t-fast),border-color var(--t-fast),transform var(--t-fast);
   -webkit-tap-highlight-color:transparent;
   outline:none;-webkit-appearance:none;appearance:none;
 }
-.key-btn-vipkey svg{width:14px;height:14px;flex-shrink:0;}
+.key-btn-vipkey:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.3);color:var(--cyan);transform:translate3d(0,-1px,0);}
+.key-btn-vipkey:active{transform:translate3d(0,1px,0);}
+.key-btn-vipkey svg{width:15px;height:15px;flex-shrink:0;}
 
 .key-icon-badge.vip-gold{
-  background:rgba(255,255,255,.05);
-  border-color:var(--border-strong);
-  color:var(--text);
+  background:rgba(230,230,238,.07);
+  border-color:rgba(230,230,238,.26);
+  color:var(--gold);
 }
 
 .vip-gate-body{display:block;}
@@ -2242,20 +2146,24 @@ footer::before{
 .vip-keyform-body.show{display:block;}
 .vip-back-link{
   display:block;width:100%;text-align:center;
-  font-size:11px;color:var(--text2);font-weight:600;letter-spacing:.1px;
-  background:none;border:none;cursor:pointer;padding:8px 0 0;
+  font-size:11.5px;color:var(--text2);font-weight:600;letter-spacing:.3px;
+  background:none;border:none;cursor:pointer;padding:10px 0 0;
   -webkit-tap-highlight-color:transparent;
 }
+.vip-back-link:hover{color:var(--cyan);}
 
 .vip-qris-download-btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:6px;
-  width:100%;border:1px solid var(--border-strong);border-radius:9px;
-  padding:9px;background:transparent;
-  color:var(--text);font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.74rem;
-  letter-spacing:.2px;cursor:pointer;margin-bottom:8px;
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  width:100%;border:1.5px solid rgba(255,255,255,.25);border-radius:10px;
+  padding:11px;background:rgba(255,255,255,.05);
+  color:var(--cyan);font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.78rem;
+  letter-spacing:.3px;cursor:pointer;margin-bottom:10px;
+  transition:background var(--t-fast),border-color var(--t-fast),transform var(--t-fast);
   -webkit-tap-highlight-color:transparent;outline:none;-webkit-appearance:none;appearance:none;
 }
-.vip-qris-download-btn svg{width:13px;height:13px;flex-shrink:0;}
+.vip-qris-download-btn:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.4);}
+.vip-qris-download-btn:active{transform:scale(.97);}
+.vip-qris-download-btn svg{width:14px;height:14px;flex-shrink:0;}
 
 /* ══════════════════════════════════════════
    QRIS PAYMENT CARD — tampilan pembayaran baru, lebih rapi & jelas
@@ -2518,137 +2426,6 @@ footer::before{
   opacity:.55;
   flex-shrink:0;
 }
-
-/* ── PROFIL MODAL (login Google, dibuka dari sidebar) ── */
-.profile-modal-overlay{
-  position:fixed;inset:0;z-index:420;
-  background:rgba(0,0,0,.6);
-  backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
-  display:flex;align-items:center;justify-content:center;
-  padding:20px;
-  opacity:0;pointer-events:none;
-  transition:opacity var(--t-mid) var(--ease);
-}
-.profile-modal-overlay.open{opacity:1;pointer-events:auto;}
-.profile-modal{
-  width:100%;max-width:360px;
-  background:var(--surface);
-  border:1px solid var(--border-strong);
-  border-radius:var(--radius-lg);
-  padding:26px 22px 24px;
-  position:relative;
-  box-shadow:0 24px 60px rgba(0,0,0,.5);
-  transform:translateY(10px) scale(.97);
-  transition:transform var(--t-mid) var(--ease);
-}
-.profile-modal-overlay.open .profile-modal{transform:translateY(0) scale(1);}
-.profile-modal-close{
-  position:absolute;top:14px;right:14px;
-  width:30px;height:30px;border-radius:50%;
-  background:rgba(255,255,255,.05);border:1px solid var(--border);
-  color:var(--text2);display:flex;align-items:center;justify-content:center;
-  cursor:pointer;-webkit-tap-highlight-color:transparent;
-}
-.profile-modal-close svg{width:16px;height:16px;}
-.profile-modal-close:active{background:rgba(255,255,255,.1);transform:scale(.9);}
-.profile-modal-title{
-  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.05rem;
-  color:var(--text);margin-bottom:18px;
-}
-
-/* status: sudah login */
-.profile-signed-in{text-align:center;padding:6px 0 2px;}
-.profile-avatar-wrap{
-  width:66px;height:66px;margin:0 auto 14px;position:relative;
-}
-.profile-avatar{
-  width:66px;height:66px;border-radius:50%;
-  object-fit:cover;background:rgba(255,255,255,.06);
-  border:1px solid var(--border-strong);
-  display:block;
-}
-/* ring biru statis di sekeliling avatar, hanya saat VIP aktif (tanpa animasi putar) */
-.profile-avatar-wrap.is-vip .profile-avatar{
-  border:2px solid transparent;
-  padding:2px;
-  background:
-    linear-gradient(var(--surface),var(--surface)) padding-box,
-    conic-gradient(from 0deg,#5fb3ff,#bfe3ff,#3b82f6,#5fb3ff) border-box;
-}
-
-/* badge "MEMBER VIP" — gradient emas, sedikit glow, ikon mahkota */
-.profile-vip-badge{
-  display:inline-flex;align-items:center;gap:5px;
-  margin:0 auto 10px;padding:5px 14px;
-  border-radius:999px;
-  background:linear-gradient(135deg,#ffe9a8,#e8b64a 55%,#ffd76a);
-  box-shadow:0 2px 14px rgba(232,182,74,.35),inset 0 1px 0 rgba(255,255,255,.5);
-  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.68rem;
-  letter-spacing:.8px;color:#1a1200;
-  width:fit-content;
-}
-.profile-vip-badge svg{width:13px;height:13px;flex-shrink:0;color:#1a1200;}
-.profile-name{
-  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1rem;
-  color:var(--text);margin-bottom:3px;
-}
-.profile-email{
-  font-family:'Space Grotesk',sans-serif;font-size:.8rem;
-  color:var(--text2);margin-bottom:20px;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-}
-.profile-logout-btn{
-  width:100%;padding:12px 16px;border-radius:999px;
-  background:rgba(255,255,255,.05);border:1px solid var(--border-strong);
-  color:var(--text);font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.85rem;
-  cursor:pointer;-webkit-tap-highlight-color:transparent;
-  transition:background var(--t-fast) var(--ease);
-}
-.profile-logout-btn:hover{background:rgba(255,255,255,.09);}
-.profile-logout-btn:active{transform:scale(.97);}
-
-/* status: belum login */
-.profile-signed-out{text-align:center;padding:4px 0 0;}
-.profile-gate-icon{
-  width:56px;height:56px;margin:0 auto 16px;
-  border-radius:16px;
-  display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(150deg,rgba(255,255,255,.08),rgba(255,255,255,.02));
-  border:1px solid var(--border-strong);
-  color:var(--text2);
-}
-.profile-gate-icon svg{width:24px;height:24px;}
-.profile-gate-title{
-  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.1rem;
-  color:var(--text);margin-bottom:9px;
-}
-.profile-gate-sub{
-  font-family:'Space Grotesk',sans-serif;font-size:.82rem;line-height:1.5;
-  color:var(--text2);max-width:280px;margin:0 auto 22px;
-}
-.profile-google-btn{
-  width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
-  border:1px solid var(--border-strong);border-radius:999px;
-  padding:13px 16px;
-  background:#fff;color:#1f1f1f;
-  font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.85rem;
-  cursor:pointer;-webkit-tap-highlight-color:transparent;outline:none;
-  -webkit-appearance:none;appearance:none;
-  box-shadow:0 8px 22px rgba(0,0,0,.25);position:relative;
-  transition:filter var(--t-fast) var(--ease-soft),transform var(--t-fast) var(--ease-out);
-}
-.profile-google-btn:hover{filter:brightness(.97);}
-.profile-google-btn:active{transform:scale(.97);}
-.profile-google-icon{width:18px;height:18px;flex-shrink:0;}
-.profile-google-btn.loading{pointer-events:none;opacity:.7;}
-.profile-google-btn .pg-spinner{
-  width:15px;height:15px;border-radius:50%;
-  border:2px solid rgba(0,0,0,.15);border-top-color:#1f1f1f;
-  animation:key-spin .6s linear infinite;display:none;
-}
-.profile-google-btn.loading .pg-spinner{display:inline-block;}
-.profile-google-btn.loading .profile-google-btn-label,
-.profile-google-btn.loading .profile-google-icon{display:none;}
 
 .side-menu-list{
   list-style:none;
@@ -3542,15 +3319,11 @@ body.side-menu-open{overflow:hidden;}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
   </div>
-  <div class="side-menu-section-label">SIDEBAR ACCES</div>
+  <div class="side-menu-section-label">ADMIN ACCES</div>
   <ul class="side-menu-list">
     <li><a href="#main-content" onclick="switchTabFromSideMenu('tab-cheat');">
       <span class="side-menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
       <span>Beranda</span>
-    </a></li>
-    <li><a href="#" onclick="openKeyModalFromSideMenu(); return false;">
-      <span class="side-menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
-      <span>Input Key</span>
     </a></li>
     <li><a href="https://tarzzstore.vercel.app/admin.html">
       <span class="side-menu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a8a8a8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-shield-icon lucide-user-shield"><path d="M10 15H6a4 4 0 0 0-4 4v2"/><path d="M22 17.5c0 2.499-1.75 3.749-3.83 4.474a.5.5 0 0 1-.335-.005c-2.085-.72-3.835-1.97-3.835-4.47V14a.5.5 0 0 1 .5-.499c1 0 2.25-.6 3.12-1.36a.6.6 0 0 1 .76-.001c.875.765 2.12 1.36 3.12 1.36a.5.5 0 0 1 .5.5z"/><circle cx="9" cy="7" r="4"/></svg></span>
@@ -3558,7 +3331,7 @@ body.side-menu-open{overflow:hidden;}
     </a></li>
     <li><a href="https://tarzzstore.vercel.app/keygen.html" target="_blank" rel="noopener noreferrer">
       <span class="side-menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6M15.5 7.5l3 3L22 7l-3-3"/></svg></span>
-      <span>Generate Key</span>
+      <span>Key Generate</span>
     </a></li>
   </ul>
 
@@ -3959,7 +3732,7 @@ body.side-menu-open{overflow:hidden;}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
 
-    <div class="lobbyff-modal-title">FAKE DANA</div>
+    <div class="lobbyff-modal-title">TARZ BJR</div>
     <div class="lobbyff-modal-sub"></div>
 
     <div class="lobbyff-canvas-wrap">
@@ -4260,38 +4033,30 @@ body.side-menu-open{overflow:hidden;}
   <!-- VIP MEMBERSHIP TAB — halaman khusus jual VIP, tanpa thumbnail/video, tanpa grid produk -->
   <div class="tab-content vip-page" id="vip" role="tabpanel" aria-labelledby="tab-vip">
 
-    <!-- PROFIL — dipindah ke tab VIP, tampil di atas card membership.
-         Ukuran & posisi mengikuti gaya banner video: lebar penuh, landscape. -->
-    <div class="profilepg-signed-in" id="profileSignedIn" style="display:none;">
-      <button type="button" class="profile-logout-btn" onclick="googleSignOut()" aria-label="Keluar dari Akun">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-out-icon lucide-log-out"><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/></svg>
-      </button>
-      <div class="profilepg-hero">
-        <div class="profilepg-hero-glow"></div>
-        <div class="profile-avatar-wrap" id="profileAvatarWrap">
-          <img id="profileAvatar" src="" alt="Foto profil Google" class="profile-avatar">
+    <!-- WIDGET STATISTIK OTOMATIS -->
+    <div class="stats-widget" aria-label="Statistik toko">
+      <div class="stats-widget-live"><span class="stats-live-dot"></span>Live Statistik</div>
+      <div class="stats-item">
+        <div class="stats-item-icon-wrap">
+          <svg class="stats-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
         </div>
-        <div class="profilepg-hero-info">
-          <div class="profile-name-row">
-            <span class="profile-name" id="profileName">—</span>
-            <svg class="profile-verified-badge" viewBox="0 0 24 24" fill="none" aria-label="Terverifikasi"><path d="M12 2.5l2.3 1.6 2.7-.4 1.2 2.5 2.5 1.2-.4 2.7L22 12.5l-1.6 2.3.4 2.7-2.5 1.2-1.2 2.5-2.7-.4L12 22.5l-2.3-1.6-2.7.4-1.2-2.5-2.5-1.2.4-2.7L2 12.5l1.6-2.3-.4-2.7 2.5-1.2 1.2-2.5 2.7.4L12 2.5z" fill="#3b82f6"/><path d="M8.5 12.5l2.4 2.4 4.6-5.3" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
-          <div class="profile-email" id="profileEmail">—</div>
+        <div class="stats-item-value is-loading" id="statVisitors">···</div>
+        <div class="stats-item-label">Pengunjung</div>
+      </div>
+      <div class="stats-item">
+        <div class="stats-item-icon-wrap">
+          <svg class="stats-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         </div>
+        <div class="stats-item-value is-loading" id="statDownloads">···</div>
+        <div class="stats-item-label">Download</div>
       </div>
-    </div>
-
-    <!-- Tampil kalau BELUM login Google -->
-    <div class="profilepg-signed-out" id="profileSignedOut">
-      <div class="profilepg-gate-glow"></div>
-      <div class="profile-gate-text">
-        <div class="profile-gate-title">Kamu Belum Login</div>
+      <div class="stats-item">
+        <div class="stats-item-icon-wrap">
+          <svg class="stats-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        </div>
+        <div class="stats-item-value is-loading" id="statPurchases">···</div>
+        <div class="stats-item-label">Terjual</div>
       </div>
-      <button type="button" class="profile-google-btn" id="profileLoginBtn" onclick="googleSignIn()">
-        <span class="pg-spinner"></span>
-        <svg class="profile-google-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.52 12.27c0-.85-.08-1.67-.22-2.45H12v4.64h6.47c-.28 1.5-1.13 2.77-2.4 3.62v3h3.88c2.27-2.09 3.57-5.17 3.57-8.81z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.95-2.92l-3.88-3c-1.08.72-2.45 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.96H1.26v3.1C3.24 21.3 7.28 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.27A7.2 7.2 0 0 1 4.89 12c0-.79.14-1.55.38-2.27v-3.1H1.26A11.98 11.98 0 0 0 0 12c0 1.94.46 3.77 1.26 5.37l4.01-3.1z"/><path fill="#EA4335" d="M12 4.77c1.76 0 3.34.6 4.58 1.79l3.44-3.44C17.95 1.19 15.24 0 12 0 7.28 0 3.24 2.7 1.26 6.63l4.01 3.1c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
-        <span class="profile-google-btn-label">Lanjutkan dengan Google</span>
-      </button>
     </div>
 
     <div class="vippg-cards-grid">
@@ -4372,32 +4137,6 @@ body.side-menu-open{overflow:hidden;}
       </div>
     </div>
 
-    </div>
-
-    <!-- WIDGET STATISTIK OTOMATIS — dipindah ke bawah card VIP -->
-    <div class="stats-widget" aria-label="Statistik toko">
-      <div class="stats-widget-live"><span class="stats-live-dot"></span>Live Statistik</div>
-      <div class="stats-item">
-        <div class="stats-item-icon-wrap">
-          <svg class="stats-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-        </div>
-        <div class="stats-item-value is-loading" id="statVisitors">···</div>
-        <div class="stats-item-label">Pengunjung</div>
-      </div>
-      <div class="stats-item">
-        <div class="stats-item-icon-wrap">
-          <svg class="stats-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        </div>
-        <div class="stats-item-value is-loading" id="statDownloads">···</div>
-        <div class="stats-item-label">Download</div>
-      </div>
-      <div class="stats-item">
-        <div class="stats-item-icon-wrap">
-          <svg class="stats-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-        </div>
-        <div class="stats-item-value is-loading" id="statPurchases">···</div>
-        <div class="stats-item-label">Terjual</div>
-      </div>
     </div>
 
   </div>
@@ -4492,8 +4231,9 @@ body.side-menu-open{overflow:hidden;}
         </span>
         <span class="key-close-dot"></span>
       </button>
+      <div class="key-eyebrow"><span class="dot"></span><span class="eyebrow-text">ACCESS TERKUNCI</span><span class="dot-end"></span></div>
       <div class="key-icon-badge vip-gold" id="keyIconBadge">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4"/><path d="m21 2-9.6 9.6"/><circle cx="7.5" cy="15.5" r="5.5"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
       </div>
       <div class="key-title" id="keyTitle">Khusus Member VIP</div>
       <div class="key-sub" id="keySub">Buka <b>produk ini</b> &amp; <b>semua produk lainnya</b> dengan 1x VIP</div>
@@ -4503,12 +4243,12 @@ body.side-menu-open{overflow:hidden;}
 
       <!-- STATE 1: GATE — belum VIP, masukkan key -->
       <div class="vip-gate-body" id="vipGateBody">
-        <button type="button" class="key-btn-vipkey" onclick="requireGoogleThen('key')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4"/><path d="m21 2-9.6 9.6"/><circle cx="7.5" cy="15.5" r="5.5"/></svg>
-          Input Key
+        <button type="button" class="key-btn-vipkey" onclick="showVipKeyForm()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          MASUKKAN KEY VIP
         </button>
         <!-- Hanya tampil untuk produk tab CHEAT (lihat showVipGate()) -->
-        <button type="button" class="key-btn-vipbuy" id="keyBtnJoinVip" onclick="requireGoogleThen('qris')" style="display:none;margin-top:10px;margin-bottom:0;">
+        <button type="button" class="key-btn-vipbuy" id="keyBtnJoinVip" onclick="startVipPayment()" style="display:none;margin-top:10px;margin-bottom:0;">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-qr-code-icon lucide-qr-code"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>
           BUY VIA QRIS
         </button>
@@ -4518,24 +4258,11 @@ body.side-menu-open{overflow:hidden;}
         </button>
       </div>
 
-      <!-- STATE 0: WAJIB LOGIN GOOGLE DULU — muncul sebelum lanjut ke key form / QRIS / WA -->
-      <div class="vip-google-gate-body" id="vipGoogleGateBody" style="display:none;">
-        <div class="google-gate-title">Login Google Dulu Ya</div>
-        <div class="google-gate-sub">Akses VIP kini terikat ke akun Google kamu, supaya tidak hilang walau ganti HP atau browser</div>
-
-        <button type="button" class="key-btn-google" id="googleLoginBtn" onclick="googleSignIn()">
-          <span class="g-spinner"></span>
-          <svg class="key-btn-google-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.52 12.27c0-.85-.08-1.67-.22-2.45H12v4.64h6.47c-.28 1.5-1.13 2.77-2.4 3.62v3h3.88c2.27-2.09 3.57-5.17 3.57-8.81z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.95-2.92l-3.88-3c-1.08.72-2.45 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.96H1.26v3.1C3.24 21.3 7.28 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.27A7.2 7.2 0 0 1 4.89 12c0-.79.14-1.55.38-2.27v-3.1H1.26A11.98 11.98 0 0 0 0 12c0 1.94.46 3.77 1.26 5.37l4.01-3.1z"/><path fill="#EA4335" d="M12 4.77c1.76 0 3.34.6 4.58 1.79l3.44-3.44C17.95 1.19 15.24 0 12 0 7.28 0 3.24 2.7 1.26 6.63l4.01 3.1c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
-          <span class="key-btn-google-label">Lanjutkan dengan Google</span>
-        </button>
-
-        <button type="button" class="vip-back-link" id="vipGoogleGateBackLink" onclick="showVipGate()">← kembali</button>
-      </div>
-
       <!-- STATE 2: FORM INPUT KEY VIP -->
       <div class="vip-keyform-body" id="vipKeyFormBody">
+        <label class="key-input-label" for="keyInput">Key Akses</label>
         <div class="key-input-wrap">
-          <input type="password" id="keyInput" class="key-input" placeholder="Masukkan key kamu di sini" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter'){event.preventDefault();keyLogin();}">
+          <input type="password" id="keyInput" class="key-input" placeholder="••••••••••" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter'){event.preventDefault();keyLogin();}">
           <button type="button" class="key-toggle-eye" onclick="toggleKeyEye()" aria-label="Tampilkan key" id="keyEyeBtn">
             <svg id="keyEyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
           </button>
@@ -4547,8 +4274,10 @@ body.side-menu-open{overflow:hidden;}
           <span class="key-btn-label">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
           </span>
-          <span class="key-btn-label-text">Verifikasi</span>
+          <span class="key-btn-label-text">VERIFIKASI KEY</span>
         </button>
+
+        <button type="button" class="vip-back-link" onclick="showVipGate()">← kembali</button>
       </div>
 
       <!-- STATE 3: SUCCESS -->
@@ -4642,21 +4371,6 @@ function showToast(msg){
 
 document.addEventListener('DOMContentLoaded', initTheme);
 
-/* Jaring pengaman: pastikan meta viewport tetap benar walau browser mobile
-   sempat salah kalkulasi ulang layout setelah redirect balik dari Google
-   OAuth (URL sempat membawa hash/query token yang panjang). */
-(function enforceMobileViewport(){
-  try{
-    let vp = document.querySelector('meta[name="viewport"]');
-    if(!vp){
-      vp = document.createElement('meta');
-      vp.name = 'viewport';
-      document.head.appendChild(vp);
-    }
-    vp.setAttribute('content', 'width=device-width, initial-scale=1.0, viewport-fit=cover');
-  }catch(e){}
-})();
-
 /* ── SIDE MENU (HAMBURGER) ── */
 function toggleSideMenu(){
   const menu = document.getElementById('sideMenu');
@@ -4688,7 +4402,7 @@ function closeSideMenu(){
   document.body.classList.remove('side-menu-open');
 }
 document.addEventListener('keydown', function(e){
-  if(e.key === 'Escape'){ closeSideMenu(); closeProfilePanel(); }
+  if(e.key === 'Escape') closeSideMenu();
 });
 
 /* ── TABS — with ARIA & keyboard support ── */
@@ -4702,13 +4416,10 @@ function activateTab(btn){
   btn.setAttribute('aria-selected','true');
   const target = document.getElementById(btn.dataset.tab);
   target.classList.add('active');
-  /* Halaman VIP tidak pakai banner/poster video -- sembunyikan section
-     hero video saat tab itu aktif, tampilkan lagi untuk tab produk lainnya. */
+  /* Halaman VIP tidak pakai banner/poster video -- sembunyikan section hero
+     video saat tab VIP aktif, tampilkan lagi untuk tab produk lainnya. */
   const heroBanner = document.getElementById('heroBanner');
   if(heroBanner) heroBanner.style.display = (btn.dataset.tab === 'vip') ? 'none' : '';
-  /* Setiap kali tab VIP dibuka, refresh kartu profil di dalamnya supaya
-     status login/VIP yang ditampilkan selalu terbaru. */
-  if(btn.dataset.tab === 'vip' && typeof renderProfilePanel === 'function') renderProfilePanel();
   /* Otomatis geser balik ke paling atas halaman tiap ganti tab, supaya
      user tidak "kejauhan" scroll-nya waktu pindah ke tab lain. */
   window.scrollTo({top:0, behavior:'smooth'});
@@ -5698,11 +5409,10 @@ const VIP_PRICE_TEXT = 'Rp10.000';
 const VIP_PAGE_PRICE_TEXT = 'Rp10.000';
 
 /* cek apakah device ini sudah VIP (berlaku untuk SEMUA produk).
-   Ada 3 sumber: (1) akun Google yang statusnya sudah dicek ke Supabase,
-   (2) permanen lewat key (tarz_vip='true'), (3) trial (tarz_vip_expiry). */
+   Ada 2 mode: permanen (tarz_vip='true', tanpa batas waktu) dan
+   trial (tarz_vip_expiry=timestamp, otomatis terkunci lagi setelah lewat). */
 function isVipUnlocked(){
   try {
-    if(_googleVipStatus === true) return true;
     if(localStorage.getItem('tarz_vip') === 'true') return true;
 
     const expiry = localStorage.getItem('tarz_vip_expiry');
@@ -5719,397 +5429,12 @@ function isVipUnlocked(){
   } catch(e){ return false; }
 }
 
-/* ══════════════════════════════════════════
-   LOGIN WITH GOOGLE (Supabase Auth)
-   Status VIP disimpan per akun Google di tabel `vip_users`
-   (lihat setup_vip_users.sql), bukan per-browser lagi.
-   ══════════════════════════════════════════ */
-const GOOGLE_AUTH_SUPABASE_URL = 'https://bvblcdnmbzncoqeoqkoc.supabase.co';
-const GOOGLE_AUTH_SUPABASE_KEY = 'sb_publishable_II7ZGSsImxo10OqzRy3U4A_JWQ4rg46';
-let _authClient = null;
-let _googleVipStatus = null; // null=belum dicek, true/false=hasil cek dari Supabase
-let _googleUser = null;
-
-function getAuthClient(){
-  if(_authClient) return _authClient;
-  if(!window.supabase) return null;
-  /* storageKey unik + auth options eksplisit supaya client auth Google ini
-     TIDAK bentrok dengan instance Supabase client lain di halaman ini
-     (npClient, statsClient) yang memakai URL+key publishable yang sama.
-     Tanpa ini, beberapa instance GoTrueClient saling berebut localStorage
-     key default yang sama dan bisa saling menimpa sesi -- efeknya setelah
-     logout lalu login lagi, sesi baru gagal tersimpan dengan benar.
-
-     PENTING: instance ini dibuat SEKALI SAJA untuk seumur hidup halaman
-     dan TIDAK PERNAH dibuang/dibuat ulang (mis. saat logout). Supabase-js
-     sendiri memperingatkan "Multiple GoTrueClient instances detected in
-     the same browser context" kalau ada lebih dari satu client dengan
-     storageKey yang sama hidup bersamaan -- itu persis yang terjadi kalau
-     kita bikin client baru tiap logout sementara instance lama belum
-     benar-benar mati. Efeknya dua client saling rebutan baca/tulis sesi,
-     dan login berikutnya kelihatan "diam saja" / tidak jalan sampai
-     halaman benar-benar di-reload penuh (tab baru). Jadi: logout HANYA
-     boleh memanggil signOut() di client yang sama ini, tidak membuat
-     ulang client-nya. */
-  _authClient = window.supabase.createClient(GOOGLE_AUTH_SUPABASE_URL, GOOGLE_AUTH_SUPABASE_KEY, {
-    auth: {
-      storageKey: 'tarz-google-auth',
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true
-    }
-  });
-  bindAuthStateListener(_authClient);
-  return _authClient;
-}
-
-function bindAuthStateListener(client){
-  client.auth.onAuthStateChange((event, session)=>{
-    if(event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED'){
-      refreshGoogleVipStatus();
-      /* sesi sudah AMAN tersimpan oleh Supabase di titik ini -- baru sekarang
-         boleh bersihkan hash/query token OAuth dari URL. Ini murni kosmetik
-         (URL rapi, hindari browser mobile salah kalkulasi ulang layout) dan
-         tidak lagi mengganggu proses penyimpanan sesi. */
-      if(event === 'SIGNED_IN'){
-        try{
-          const url = new URL(window.location.href);
-          const hasAuthHash = window.location.hash && /access_token=|refresh_token=|provider_token=/.test(window.location.hash);
-          const hasAuthQuery = url.searchParams.has('code');
-          if(hasAuthHash || hasAuthQuery){
-            url.hash = '';
-            url.searchParams.delete('code');
-            window.history.replaceState({}, document.title, url.pathname + url.search);
-          }
-        }catch(e){}
-      }
-    } else if(event === 'SIGNED_OUT'){
-      _googleUser = null;
-      _googleVipStatus = null;
-      renderProfilePanel();
-    }
-  });
-}
-
-/* dipanggil saat tombol "LOGIN DENGAN GOOGLE" diklik (baik dari gate VIP
-   maupun dari panel Profil di sidebar) */
-async function googleSignIn(){
-  const client = getAuthClient();
-  if(!client){ return; }
-  const btn = document.getElementById('googleLoginBtn');
-  if(btn) btn.classList.add('loading');
-  const profileBtn = document.getElementById('profileLoginBtn');
-  if(profileBtn) profileBtn.classList.add('loading');
-  try{
-    /* simpan aksi yang tertunda supaya begitu redirect balik dari Google,
-       kita tahu harus lanjut ke mana (key form / qris / wa) */
-    if(_pendingVipAction){
-      try{ sessionStorage.setItem('tarz_pending_vip_action', _pendingVipAction); }catch(e){}
-    }
-    /* tandai bahwa sebuah login baru saja diminta, supaya begitu balik dari
-       redirect Google kita tahu harus menampilkan toast "Berhasil Login" */
-    try{ sessionStorage.setItem('tarz_login_requested', '1'); }catch(e){}
-    await client.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: window.location.href,
-        /* Paksa Google selalu menampilkan layar "Pilih Akun" setiap kali
-           tombol login diklik, walau browser masih punya sesi Google aktif
-           dari akun sebelumnya. Tanpa ini, Google diam-diam auto-login ke
-           akun terakhir yang dipakai (session cookie Google, bukan cookie
-           situs ini) -- makanya ganti akun kelihatan "tidak bisa" kecuali
-           dicoba di tab baru yang belum kena auto-login itu. */
-        queryParams: { prompt: 'select_account' }
-      }
-    });
-    /* browser akan redirect keluar halaman di sini */
-  }catch(e){
-    if(btn) btn.classList.remove('loading');
-    if(profileBtn) profileBtn.classList.remove('loading');
-    console.error('Google sign-in gagal:', e);
-  }
-}
-
-/* Bersihkan SEMUA sumber status VIP yang tersimpan lokal di device ini
-   (permanen, trial, token terverifikasi). Dipanggil setiap kali logout
-   supaya akses VIP tidak "nyangkut" di device walau sudah keluar dari
-   akun Google -- sebelumnya cuma _googleVipStatus yang direset, jadi
-   device yang pernah dapat status VIP lewat key/trial/token tetap
-   dianggap VIP meski sudah logout. */
-function clearLocalVipState(){
-  try{ localStorage.removeItem('tarz_vip'); }catch(e){}
-  try{ localStorage.removeItem('tarz_vip_expiry'); }catch(e){}
-  try{ localStorage.removeItem('tarz_vip_token'); }catch(e){}
-}
-
-function googleSignOut(){
-  const client = getAuthClient();
-  if(!client) return;
-
-  /* auth.signOut() versi supabase-js yang dipakai di sini kadang tidak
-     resolve/reject dengan bersih di kondisi tertentu. Supaya UI tidak
-     nyangkut selamanya kalau itu terjadi, reset tampilan tetap dijamin
-     jalan lewat .finally() DAN lewat timeout cadangan, mana yang lebih
-     dulu -- client auth-nya (_authClient) TIDAK dibuang/dibuat ulang;
-     membuat client baru menyebabkan dua GoTrueClient hidup bersamaan
-     dengan storageKey yang sama (lihat catatan di getAuthClient()).
-
-     TAPI: signOut() sendiri, menurut dokumentasi resminya, melakukan
-     "teardown" pada background work milik client -- salah satunya
-     MEMBERSIHKAN SEMUA subscriber onAuthStateChange yang terdaftar.
-     Ini persis kenapa login PERTAMA di sebuah tab selalu berhasil
-     (listener masih terpasang dari initGoogleAuth()), tapi login KEDUA
-     di tab yang sama (setelah logout) selalu gagal diam-diam -- listener
-     sudah hilang walau instance client-nya sama. Makanya begitu proses
-     sign-out selesai, listener-nya WAJIB didaftarkan ulang di client
-     yang sama supaya percobaan login berikutnya di tab ini tetap
-     terdeteksi. */
-  let alreadyReset = false;
-  function resetLocalAuthState(){
-    if(alreadyReset) return;
-    alreadyReset = true;
-    bindAuthStateListener(client); // pasang ulang listener yang dibersihkan signOut()
-    _googleUser = null;
-    _googleVipStatus = null;
-    clearLocalVipState();
-    renderProfilePanel();
-    refreshVipHeaderBadge();
-    refreshVipPageCard();
-    showVipGate();
-  }
-
-  try{
-    client.auth.signOut().catch((e)=>{
-      console.error('Google sign-out gagal:', e);
-    }).finally(resetLocalAuthState);
-  }catch(e){
-    console.error('Google sign-out error sinkron:', e);
-    resetLocalAuthState();
-  }
-  /* Jaring pengaman terakhir: kalau signOut() menggantung tanpa pernah
-     resolve/reject sama sekali, tetap reset tampilan setelah 2 detik
-     supaya user tidak nyangkut selamanya dan bisa langsung login lagi. */
-  setTimeout(resetLocalAuthState, 2000);
-}
-
-/* Isi panel "Profil" di sidebar: kalau sudah login tampil
-   avatar+nama+email+tombol keluar, kalau belum tampil ajakan login Google. */
-function renderProfilePanel(){
-  const signedIn = document.getElementById('profileSignedIn');
-  const signedOut = document.getElementById('profileSignedOut');
-  if(!signedIn || !signedOut) return;
-  if(_googleUser){
-    const meta = _googleUser.user_metadata || {};
-    document.getElementById('profileName').textContent = meta.full_name || meta.name || 'Akun Google';
-    document.getElementById('profileEmail').textContent = _googleUser.email || '';
-    document.getElementById('profileAvatar').src = meta.avatar_url || '';
-    signedIn.style.display = 'block';
-    signedOut.style.display = 'none';
-
-    /* tampilkan badge "MEMBER VIP" + ring emas di avatar kalau akun ini VIP */
-    const isVip = isVipUnlocked();
-    const badge = document.getElementById('profileVipBadge');
-    const avatarWrap = document.getElementById('profileAvatarWrap');
-    if(badge) badge.style.display = isVip ? 'inline-flex' : 'none';
-    if(avatarWrap) avatarWrap.classList.toggle('is-vip', isVip);
-  } else {
-    signedIn.style.display = 'none';
-    signedOut.style.display = 'block';
-    const loginBtn = document.getElementById('profileLoginBtn');
-    if(loginBtn) loginBtn.classList.remove('loading');
-  }
-}
-
-/* buka panel Profil: sekarang berupa tab "PROFIL" di tab bar bawah,
-   bukan modal lagi. Fungsi ini tetap dipertahankan (dipanggil dari
-   beberapa titik lain) supaya cukup pindah ke tab tersebut. */
-function openProfilePanel(){
-  closeSideMenu();
-  renderProfilePanel();
-  const btn = document.getElementById('tab-vip');
-  if(btn) activateTab(btn);
-}
-function closeProfilePanel(){ /* no-op: Profil kini tab, bukan modal yang perlu ditutup */ }
-
-/* ── GATE: dipanggil dari tombol "MASUKKAN KEY VIP" / "BUY VIA QRIS" / "BUY VIA WHATSAPP".
-   Kalau user belum login Google, tampilkan dulu layar ajakan login dan simpan
-   aksi yang ingin dilakukan (action) supaya lanjut otomatis setelah login sukses. */
-let _pendingVipAction = null;
-function requireGoogleThen(action){
-  if(_googleUser){
-    runVipAction(action);
-    return;
-  }
-  _pendingVipAction = action;
-  document.getElementById('vipGateBody').classList.add('hide');
-  document.getElementById('vipKeyFormBody').classList.remove('show');
-  document.getElementById('keySuccessWrap').classList.remove('show');
-  document.getElementById('vipGoogleGateBody').style.display = 'block';
-  document.getElementById('keyTitle').textContent = '';
-  document.getElementById('keySub').innerHTML = '';
-  setKeyHeadDecorHidden(true);
-
-  // Khusus tab VIP (halaman VIP) tidak ada gate "MASUKKAN KEY VIP" untuk kembali,
-  // jadi tombol "← kembali" di layar login Google disembunyikan di sana.
-  const backLink = document.getElementById('vipGoogleGateBackLink');
-  if(backLink) backLink.style.display = (_qrisContext === 'vippage') ? 'none' : '';
-}
-
-function runVipAction(action){
-  /* pastikan modal overlay-nya terbuka — perlu, karena kalau baru saja balik
-     dari redirect login Google, halaman ini fresh reload dan modal belum terbuka */
-  const overlay = document.getElementById('keyOverlay');
-  if(overlay && !overlay.classList.contains('open')){
-    overlay.classList.add('open');
-    overlay.setAttribute('aria-hidden','false');
-    overlay.removeAttribute('inert');
-    document.body.style.overflow = 'hidden';
-    document.body.classList.add('tabbar-hide');
-  }
-
-  document.getElementById('vipGoogleGateBody').style.display = 'none';
-  setKeyHeadDecorHidden(false);
-  if(action === 'key') showVipKeyForm();
-  else if(action === 'qris') startVipPayment();
-  else if(action === 'wa') openVipWhatsApp();
-}
-
-/* cek status VIP akun Google ini ke tabel vip_users di Supabase */
-async function refreshGoogleVipStatus(){
-  const client = getAuthClient();
-  if(!client) return;
-  try{
-    const { data: { session } } = await client.auth.getSession();
-    if(!session || !session.user){
-      _googleUser = null;
-      _googleVipStatus = null;
-      renderProfilePanel();
-      return;
-    }
-    _googleUser = session.user;
-    renderProfilePanel();
-
-    const { data, error } = await client
-      .from('vip_users')
-      .select('is_vip,vip_expiry')
-      .eq('user_id', session.user.id)
-      .maybeSingle();
-
-    if(error){ console.error('Cek status VIP gagal:', error); return; }
-
-    if(data && data.is_vip){
-      if(data.vip_expiry && Date.now() > new Date(data.vip_expiry).getTime()){
-        _googleVipStatus = false; // trial via akun Google sudah habis
-      } else {
-        _googleVipStatus = true;
-        markVipUnlocked(); // sinkronkan supaya UI lain yang baca localStorage tetap konsisten di sesi ini
-      }
-    } else {
-      _googleVipStatus = false;
-    }
-    refreshVipHeaderBadge();
-    refreshVipPageCard();
-    renderProfilePanel(); // update badge "MEMBER VIP" + ring avatar begitu status VIP diketahui
-
-    /* kalau login ini baru saja diminta lewat googleSignIn() (baru balik dari
-       redirect Google), kasih tahu user kalau login berhasil */
-    let justLoggedIn = false;
-    try{
-      if(sessionStorage.getItem('tarz_login_requested') === '1'){
-        justLoggedIn = true;
-        sessionStorage.removeItem('tarz_login_requested');
-      }
-    }catch(e){}
-
-    /* kalau tadi ada aksi tertunda (baru saja balik dari redirect Google login),
-       lanjutkan otomatis ke aksi yang diminta sebelumnya (key form / qris / wa)
-       supaya klik "Buy via QRIS" tidak berakhir menampilkan form Input Key. */
-    let pending = _pendingVipAction;
-    if(!pending){
-      try{ pending = sessionStorage.getItem('tarz_pending_vip_action'); }catch(e){}
-    }
-    if(pending){
-      _pendingVipAction = null;
-      try{ sessionStorage.removeItem('tarz_pending_vip_action'); }catch(e){}
-
-      showToast('Berhasil Login', 'success');
-      runVipAction(pending);
-    } else if(justLoggedIn){
-      showToast('Berhasil Login', 'success');
-    }
-  }catch(e){ console.error('refreshGoogleVipStatus error:', e); }
-}
-
-/* jalan begitu Supabase siap: cek sesi login Google yang mungkin sudah ada
-   (termasuk setelah redirect balik dari Google) */
-function initGoogleAuth(){
-  const client = getAuthClient();
-  if(!client) return;
-  /* PENTING: jangan bersihkan hash/query URL di sini. Supabase (implicit
-     flow) butuh membaca hash #access_token=... dari URL ini dulu untuk
-     menyimpan sesi ke localStorage lewat onAuthStateChange di bawah.
-     Kalau hash dihapus lebih dulu, sesi GAGAL tersimpan dan user akan
-     diminta login lagi terus-menerus. Pembersihan URL dipindah ke dalam
-     onAuthStateChange (didaftarkan lewat bindAuthStateListener() di dalam
-     getAuthClient()), dijalankan SETELAH sesi berhasil didapat. */
-  refreshGoogleVipStatus();
-
-  /* Jaring pengaman terhadap race condition antara proses internal
-     Supabase membaca hash #access_token=... dari URL dan listener
-     onAuthStateChange yang mendengarkannya -- terbukti dari log server
-     kadang berhasil kadang tidak (tidak konsisten), jadi TIDAK bisa
-     diandalkan hanya dari satu event. Solusinya: kalau URL yang di-load
-     ini masih membawa hash token OAuth, cek ulang sesi secara eksplisit
-     BEBERAPA KALI dengan jeda yang membesar -- TAPI berhenti otomatis
-     begitu sesi sudah berhasil terdeteksi di salah satu percobaan, supaya
-     tidak numpuk query ke vip_users lebih banyak dari yang perlu. */
-  try{
-    const hasAuthHash = window.location.hash && /access_token=|refresh_token=|provider_token=/.test(window.location.hash);
-    if(hasAuthHash){
-      [300, 800, 1500, 3000].forEach(delay => setTimeout(()=>{
-        if(_googleUser) return; // sesi sudah ketemu di percobaan sebelumnya, tidak perlu cek lagi
-        refreshGoogleVipStatus();
-      }, delay));
-    }
-  }catch(e){}
-}
-
-if(window.supabase){
-  initGoogleAuth();
-} else {
-  window.addEventListener('npSupabaseReady', initGoogleAuth, {once:true});
-}
-
 /* akses permanen (key VIP biasa) */
 function markVipUnlocked(){
   try {
     localStorage.setItem('tarz_vip', 'true');
     localStorage.removeItem('tarz_vip_expiry');
   } catch(e){ /* localStorage tidak tersedia, abaikan */ }
-}
-
-/* catat status VIP ke akun Google yang sedang login (tabel vip_users di Supabase).
-   Dipanggil dari 2 tempat: (1) pembayaran QRIS terverifikasi sukses oleh server,
-   dan (2) redeem key VIP berhasil. Kalau user belum login Google, fungsi ini
-   diam saja (localStorage tetap jadi fallback seperti biasa lewat
-   markVipUnlocked()/markVipUnlockedTrial() yang dipanggil terpisah). */
-async function markVipInGoogleAccount(expiryTimestampMs){
-  const client = getAuthClient();
-  if(!client) return;
-  try{
-    const { data: { session } } = await client.auth.getSession();
-    if(!session || !session.user) return; // belum login Google, tidak apa-apa
-
-    const expiryIso = expiryTimestampMs ? new Date(expiryTimestampMs).toISOString() : null;
-    const { error } = await client.rpc('mark_vip_success', { p_expiry: expiryIso });
-    if(error){
-      console.error('Gagal mencatat VIP ke akun Google:', error);
-      return;
-    }
-    _googleUser = session.user;
-    _googleVipStatus = true;
-    renderProfilePanel();
-  }catch(e){ console.error('markVipInGoogleAccount error:', e); }
 }
 
 /* akses trial: berlaku sampai waktu tertentu (expiryTimestampMs), lalu otomatis terkunci lagi */
@@ -6274,17 +5599,9 @@ function downloadUnlockedProduct(){
   }
 }
 
-/* Dipanggil saat produk yang masih terkunci diklik: pindah otomatis ke
-   halaman VIP dan tampilkan toast "Access Terkunci". */
-function redirectToVipLocked(){
-  const vipTabBtn = document.getElementById('tab-vip');
-  if(vipTabBtn) activateTab(vipTabBtn);
-  showToast('Access Terkunci', 'error');
-}
-
 /* dipanggil dari tombol download tiap produk.
    kalau device sudah VIP -> langsung download, tanpa modal/key sama sekali.
-   kalau belum VIP -> redirect otomatis ke halaman VIP + tampilkan pesan "Access Terkunci". */
+   kalau belum VIP -> tampilkan modal ajakan join VIP. */
 function openKeyModal(productName, downloadLink, sourceTab){
   _keyProduct = productName;
   _keyDownloadLink = downloadLink;
@@ -6303,28 +5620,6 @@ function openKeyModal(productName, downloadLink, sourceTab){
   }
 
   closeModal();
-  redirectToVipLocked();
-}
-
-/* Dipanggil dari sidebar "Input Key" — kalau belum login Google, redirect ke
-   halaman VIP + toast "Kamu Belum Login" (tanpa membuka modal key sama sekali).
-   Kalau sudah login, buka modal key langsung ke form input. */
-function openKeyModalFromSideMenu(){
-  closeSideMenu();
-
-  if(!_googleUser){
-    const vipTabBtn = document.getElementById('tab-vip');
-    if(vipTabBtn) activateTab(vipTabBtn);
-    showToast('Kamu Belum Login', 'error');
-    return;
-  }
-
-  _keyProduct = null;
-  _keyDownloadLink = null;
-  _keySourceTab = null;
-  _qrisContext = 'product';
-
-  closeModal();
 
   const overlay = document.getElementById('keyOverlay');
   overlay.classList.add('open');
@@ -6333,15 +5628,13 @@ function openKeyModalFromSideMenu(){
   document.body.style.overflow = 'hidden';
   document.body.classList.add('tabbar-hide');
 
-  showVipKeyForm();
+  showVipGate();
 }
 
 function showVipGate(){
   document.getElementById('vipGateBody').classList.remove('hide');
   document.getElementById('vipKeyFormBody').classList.remove('show');
   document.getElementById('keySuccessWrap').classList.remove('show');
-  const googleGate = document.getElementById('vipGoogleGateBody');
-  if(googleGate) googleGate.style.display = 'none';
   document.getElementById('keyTitle').textContent = 'VIP RP 10.000';
   setKeyHeadDecorHidden(false);
 
@@ -6366,8 +5659,9 @@ function escapeHtml(str){
 /* markup asli form input key VIP — dipakai untuk restore jika sebelumnya body ini
    ditimpa oleh tampilan QRIS (showVipQrisLoading/renderVipQris) */
 const VIP_KEYFORM_MARKUP = `
+  <label class="key-input-label" for="keyInput">Key Akses</label>
   <div class="key-input-wrap">
-    <input type="password" id="keyInput" class="key-input" placeholder="Masukkan key kamu di sini" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter'){event.preventDefault();keyLogin();}">
+    <input type="password" id="keyInput" class="key-input" placeholder="••••••••••" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter'){event.preventDefault();keyLogin();}">
     <button type="button" class="key-toggle-eye" onclick="toggleKeyEye()" aria-label="Tampilkan key" id="keyEyeBtn">
       <svg id="keyEyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
     </button>
@@ -6379,19 +5673,19 @@ const VIP_KEYFORM_MARKUP = `
     <span class="key-btn-label">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
     </span>
-    <span class="key-btn-label-text">Verifikasi</span>
+    <span class="key-btn-label-text">VERIFIKASI KEY</span>
   </button>
+
+  <button type="button" class="vip-back-link" onclick="showVipGate()">← kembali</button>
 `;
 
 function showVipKeyForm(){
   document.getElementById('vipGateBody').classList.add('hide');
-  const googleGate = document.getElementById('vipGoogleGateBody');
-  if(googleGate) googleGate.style.display = 'none';
   document.getElementById('vipKeyFormBody').classList.add('show');
   document.getElementById('keySuccessWrap').classList.remove('show');
-  document.getElementById('keyTitle').textContent = 'Input Key';
-  document.getElementById('keySub').textContent = '';
-  setKeyHeadDecorHidden(true);
+  document.getElementById('keyTitle').textContent = 'MASUKKAN KEY VIP';
+  document.getElementById('keySub').textContent = 'Key hanya berlaku 1x pakai dan langsung hangus setelah digunakan';
+  setKeyHeadDecorHidden(false);
 
   /* hentikan proses QRIS yang mungkin masih berjalan di background, lalu
      kembalikan HTML form key ke aslinya (bisa saja sebelumnya ditimpa QRIS) */
@@ -6419,28 +5713,13 @@ function closeKeyModal(){
   overlay.setAttribute('inert','');
   document.body.style.overflow = '';
   document.body.classList.remove('tabbar-hide');
+  _qrisPaymentActive = false;
   // PENTING: jangan matikan _qrisPollTimer di sini. Kalau user klik X / klik area luar /
   // tekan Escape SAAT lagi ada pembayaran QRIS pending, polling harus tetap jalan di
   // background supaya VIP tetap otomatis terbuka begitu pembayaran terdeteksi sukses —
   // menutup modal bukan berarti user membatalkan pembayaran (beda dengan cancelVipPayment()).
   // Timer countdown visual boleh dimatikan karena elemennya sudah tidak ada di layar.
   clearInterval(_qrisCountdownTimer);
-
-  // Reset semua state body key modal (gate VIP, google gate, form key, success)
-  // supaya modal SELALU mulai bersih dari 1 state saja tiap kali dibuka lagi,
-  // tidak peduli jalur mana yang terakhir dipakai (sidebar Input Key, Buy via
-  // QRIS, dst). Tanpa ini, class ".show"/".hide" yang tertinggal dari alur
-  // sebelumnya bisa membuat 2 state tampil bertumpuk (mis. Google Gate + form
-  // Input Key kelihatan sekaligus). Dilewati kalau QRIS pending sedang aktif,
-  // supaya progres pembayaran yang sudah tampil tidak ikut kereset.
-  if(!_qrisPaymentActive){
-    document.getElementById('vipGoogleGateBody').style.display = 'none';
-    document.getElementById('vipKeyFormBody').classList.remove('show');
-    document.getElementById('keySuccessWrap').classList.remove('show');
-    document.getElementById('vipGateBody').classList.remove('hide');
-  }
-
-  _qrisPaymentActive = false;
 }
 
 function handleKeyOverlayClick(e){
@@ -6499,10 +5778,8 @@ function keyLogin(){
   function success(isTrial, trialHours){
     if(isTrial){
       markVipUnlockedTrial(Date.now() + trialHours * 60 * 60 * 1000);
-      markVipInGoogleAccount(Date.now() + trialHours * 60 * 60 * 1000); // catat juga ke akun Google (trial)
     } else {
       markVipUnlocked();
-      markVipInGoogleAccount(); // catat juga ke akun Google (permanen)
     }
     // Kabari bot Telegram ada VIP baru lewat key. Sengaja tidak ditunggu (no await)
     // dan errornya diabaikan -- kalau notifikasi gagal, akses VIP user tetap jalan normal.
@@ -6638,17 +5915,11 @@ function openResellerWhatsApp(){
 }
 
 /* dipanggil langsung dari tombol "Buy via QRIS" di halaman VIP (tab "vip") --
-   kalau belum login Google, cukup tampilkan toast "Kamu Belum Login" tanpa
-   membuka modal sama sekali (user sudah berada di tab VIP). Kalau sudah
-   login, langsung proses QRIS tanpa gate lain. */
+   khusus di sini TIDAK menampilkan modal gate "ACCESS TERKUNCI" / pilihan lain sama sekali,
+   karena halaman VIP memang sudah 100% tentang beli VIP, jadi langsung proses QRIS. */
 function openVipPaymentDirect(){
   if(isVipUnlocked()){
     showToast('Kamu sudah VIP di device ini.', 'success');
-    return;
-  }
-
-  if(!_googleUser){
-    showToast('Kamu Belum Login', 'error');
     return;
   }
 
@@ -6662,6 +5933,8 @@ function openVipPaymentDirect(){
   // memang menampilkan gate itu dulu.
   document.getElementById('vipGateBody').classList.add('hide');
   setKeyHeadDecorHidden(true);
+  document.getElementById('keyTitle').textContent = 'Menyiapkan QRIS...';
+  document.getElementById('keySub').textContent = 'Mohon tunggu sebentar';
 
   const overlay = document.getElementById('keyOverlay');
   overlay.classList.add('open');
@@ -6895,7 +6168,6 @@ async function pollVipPayment(orderId, silentMode){
         try{ localStorage.removeItem('tarz_vip_pending_order'); }catch(e){}
         localStorage.setItem('tarz_vip_token', data.vipToken);
         markVipUnlocked();
-        markVipInGoogleAccount(); // catat juga ke akun Google (Supabase), kalau user sedang login
         notifyVipViaQris(orderId);
         refreshVipHeaderBadge();
         refreshVipPageCard();
@@ -8886,14 +8158,7 @@ document.addEventListener('dragstart', function(e){
   const NP_SUPABASE_KEY = 'sb_publishable_II7ZGSsImxo10OqzRy3U4A_JWQ4rg46';
 
   function npInit(){
-  const npClient = window.supabase.createClient(NP_SUPABASE_URL, NP_SUPABASE_KEY, {
-    /* client ini murni untuk query data produk, tidak butuh session login.
-       auth di-nonaktifkan supaya tidak bentrok dengan client auth Google
-       (getAuthClient() di script utama) yang berbagi URL+key publishable
-       yang sama -- kalau dibiarkan default, dua instance GoTrueClient bisa
-       saling menimpa sesi login di localStorage. */
-    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
-  });
+  const npClient = window.supabase.createClient(NP_SUPABASE_URL, NP_SUPABASE_KEY);
 
   function npEscape(str){
     if(!str) return '';
@@ -9253,12 +8518,7 @@ document.addEventListener('dragstart', function(e){
 
   function initStats(){
     if(!window.supabase) return;
-    statsClient = window.supabase.createClient(STATS_URL, STATS_KEY, {
-      /* sama seperti npClient: murni query statistik, tidak butuh session
-         login, dan auth dimatikan supaya tidak bentrok dengan client auth
-         Google yang berbagi URL+key publishable yang sama. */
-      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
-    });
+    statsClient = window.supabase.createClient(STATS_URL, STATS_KEY);
     refreshStatsWidget();
     trackVisitorOnce();
     trackPurchaseIfVipDetected();
