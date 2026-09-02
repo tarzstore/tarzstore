@@ -3495,13 +3495,23 @@ body.side-menu-open{overflow:hidden;}
     radial-gradient(ellipse 70% 50% at 20% 20%,rgba(230,230,238,.07) 0%,transparent 60%),
     radial-gradient(ellipse 60% 40% at 80% 70%,rgba(255,255,255,.05) 0%,transparent 55%),
     radial-gradient(ellipse 50% 60% at 50% 100%,rgba(230,230,238,.04) 0%,transparent 50%);
-  display:flex;align-items:center;justify-content:center;
-  padding:24px;
+  display:flex;flex-direction:column;align-items:stretch;
   overflow-y:auto;
   -webkit-overflow-scrolling:touch;
 }
 #authGate.hide{display:none;}
 body.auth-locked{overflow:hidden;}
+
+/* Header di layar login mengikuti gaya header halaman utama (lihat class
+   `header` di CSS umum), hanya saja statis (bukan sticky) karena halaman
+   login tidak discroll jauh, dan tanpa tombol hamburger. */
+.authgate-header{position:static;}
+
+.authgate-content{
+  flex:1;
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;
+}
 
 .authgate-box{
   width:100%;max-width:380px;
@@ -3513,14 +3523,6 @@ body.auth-locked{overflow:hidden;}
   animation:authgate-in .42s var(--ease-out);
 }
 @keyframes authgate-in{from{opacity:0;transform:translateY(14px) scale(.98);}to{opacity:1;transform:translateY(0) scale(1);}}
-
-.authgate-logo{
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  margin-bottom:22px;
-}
-.authgate-logo img{width:36px;height:36px;border-radius:11px;object-fit:cover;}
-.authgate-logo-name{font-family:'Space Grotesk',sans-serif;font-size:1.15rem;font-weight:700;color:var(--text);}
-.authgate-logo-name .accent{color:#3b82f6;}
 
 .authgate-title{
   font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;
@@ -3637,6 +3639,20 @@ body.auth-locked{overflow:hidden;}
      ══════════════════════════════════════════ -->
 <div id="authGate">
 
+  <!-- HEADER (sama seperti halaman utama, tanpa hamburger) -->
+  <header role="banner" class="authgate-header">
+    <div class="logo">
+      <div class="logo-icon">
+        <img src="https://apmxdcwebivmusqcuzcv.supabase.co/storage/v1/object/public/Tarzx/Ts.png" alt="Tarz Store Logo" width="44" height="44" loading="eager" decoding="async" onerror="this.classList.add('img-error')">
+      </div>
+      <div>
+        <div class="logo-name" aria-label="Tarz Store">TARZ <span class="logo-name-accent">STORE</span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="authgate-content">
+
   <!-- state: sedang mengecek session tersimpan -->
   <div class="authgate-box authgate-boot" id="authBootState">
     <div class="authgate-boot-spinner"></div>
@@ -3645,12 +3661,8 @@ body.auth-locked{overflow:hidden;}
 
   <!-- state: form login -->
   <div class="authgate-box" id="authFormState" style="display:none;">
-    <div class="authgate-logo">
-      <img src="https://apmxdcwebivmusqcuzcv.supabase.co/storage/v1/object/public/Tarzx/Ts.png" alt="Tarz Store" width="36" height="36" loading="eager">
-      <div class="authgate-logo-name">TARZ <span class="accent">STORE</span></div>
-    </div>
 
-    <div class="authgate-title" id="authTitle">Login</div>
+    <div class="authgate-title" id="authTitle">Welcome Back</div>
     <div class="authgate-sub" id="authSub">Access your account to continue</div>
 
     <div class="authgate-error" id="authErrorMsg"></div>
@@ -3658,7 +3670,7 @@ body.auth-locked{overflow:hidden;}
     <button type="button" class="authgate-google-btn" id="authGoogleBtn" onclick="authGoogleSignIn()">
       <span class="authgate-g-spinner"></span>
       <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23.52 12.27c0-.85-.08-1.67-.22-2.45H12v4.64h6.47c-.28 1.5-1.13 2.77-2.4 3.62v3h3.88c2.27-2.09 3.57-5.17 3.57-8.81z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.95-2.92l-3.88-3c-1.08.72-2.45 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.96H1.26v3.1C3.24 21.3 7.28 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.27A7.2 7.2 0 0 1 4.89 12c0-.79.14-1.55.38-2.27v-3.1H1.26A11.98 11.98 0 0 0 0 12c0 1.94.46 3.77 1.26 5.37l4.01-3.1z"/><path fill="#EA4335" d="M12 4.77c1.76 0 3.34.6 4.58 1.79l3.44-3.44C17.95 1.19 15.24 0 12 0 7.28 0 3.24 2.7 1.26 6.63l4.01 3.1c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
-      <span class="authgate-google-label">Login Cepat Dengan Google...</span>
+      <span class="authgate-google-label">Continue with Google</span>
     </button>
 
     <div class="authgate-divider">OR LOGIN WITH EMAIL</div>
@@ -3692,6 +3704,8 @@ body.auth-locked{overflow:hidden;}
         <span class="authgate-submit-label" id="authSubmitLabel">Login</span>
       </button>
     </form>
+
+  </div>
 
   </div>
 
