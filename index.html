@@ -2019,6 +2019,14 @@ footer::before{
 }
 .key-box .key-body{overflow-y:auto;-webkit-overflow-scrolling:touch;}
 
+/* ── QRIS MODE — dipakai khusus saat kartu "Scan & Bayar VIP" tampil.
+   Box dilebarkan sedikit dan semua jarak/ukuran dipadatkan supaya seluruh
+   konten (jumlah, kode QR, timer, status, langkah bayar, tombol batal)
+   muat sekaligus di satu layar tanpa perlu scroll pada kebanyakan HP. ── */
+.key-box.qris-mode{max-width:340px;max-height:96vh;max-height:96svh;}
+.key-box.qris-mode .key-head{padding:14px 20px 4px;}
+.key-box.qris-mode .key-body{padding:2px 18px 14px;}
+
 .key-head{
   padding:20px 20px 12px;
   text-align:center;
@@ -2265,6 +2273,34 @@ footer::before{
   border-radius:16px;
   background:#fff;
   box-shadow:0 12px 32px rgba(0,0,0,.35),0 0 0 1px rgba(255,255,255,.12);
+}
+
+/* Versi padat khusus qris-mode: semua ukuran & jarak diperkecil supaya
+   kartu QRIS lengkap muat 1 layar tanpa scroll di HP pada umumnya. */
+.key-box.qris-mode .qris-amount-row{margin-bottom:1px;}
+.key-box.qris-mode .qris-amount-value{font-size:1.2rem;}
+.key-box.qris-mode .qris-order-id{margin:1px 0 8px;font-size:9px;}
+.key-box.qris-mode .qris-code-frame{width:150px;height:150px;padding:9px;margin:0 auto 8px;}
+.key-box.qris-mode .qris-logo-badge{width:30px;height:30px;}
+.key-box.qris-mode .qris-timer-row{margin-bottom:8px;}
+.key-box.qris-mode .qris-action-row{margin-bottom:6px;}
+.key-box.qris-mode .vip-qris-download-btn{padding:6px;font-size:.66rem;margin-bottom:0;}
+.key-box.qris-mode .qris-status-card{padding:8px 10px;margin-bottom:8px;gap:8px;}
+.key-box.qris-mode .qris-status-spinner{width:15px;height:15px;}
+.key-box.qris-mode .qris-status-title{font-size:11px;}
+.key-box.qris-mode .qris-status-sub{font-size:9.5px;}
+.key-box.qris-mode .qris-steps{padding:9px 11px;margin-bottom:8px;}
+.key-box.qris-mode .qris-steps-title{margin-bottom:6px;}
+.key-box.qris-mode .qris-step{font-size:10.5px;}
+.key-box.qris-mode .qris-step+.qris-step{margin-top:4px;}
+.key-box.qris-mode .qris-step-num{width:14px;height:14px;font-size:8.5px;}
+.key-box.qris-mode .vip-back-link{padding-top:2px;font-size:10px;}
+
+/* Di layar yang lebih tinggi (>=680px), longgarkan sedikit supaya tidak
+   terlalu sesak — tetap tanpa scroll. */
+@media (min-height:680px){
+  .key-box.qris-mode .qris-code-frame{width:180px;height:180px;padding:12px;}
+  .key-box.qris-mode .qris-logo-badge{width:34px;height:34px;}
 }
 .qris-code-frame img{width:100%;height:100%;display:block;border-radius:4px;}
 .qris-code-frame::before,.qris-code-frame::after,
@@ -7100,6 +7136,7 @@ function showVipGate(){
   document.getElementById('keySuccessWrap').classList.remove('show');
   document.getElementById('keyTitle').textContent = 'VIP RP 10.000';
   setKeyHeadDecorHidden(false);
+  document.getElementById('keyBox').classList.remove('qris-mode');
 
   document.getElementById('keySub').innerHTML = '<b>' + '</b> <b>JOIN VIP AGAR BISA AKSES SEMUA PRODUK</b>';
 
@@ -7191,6 +7228,7 @@ function closeKeyModal(){
     document.getElementById('vipKeyFormBody').classList.remove('show');
     document.getElementById('keySuccessWrap').classList.remove('show');
     document.getElementById('vipGateBody').classList.remove('hide');
+    document.getElementById('keyBox').classList.remove('qris-mode');
   }
 
   _qrisPaymentActive = false;
@@ -7468,8 +7506,9 @@ let _qrisPaymentActive = false;
 
 function renderVipQris(data){
   document.getElementById('keyTitle').textContent = 'Scan & Bayar VIP';
-  document.getElementById('keySub').innerHTML = 'Selesaikan pembayaran untuk membuka akses';
+  document.getElementById('keySub').innerHTML = 'Selesaikan pembayaran';
   setKeyHeadDecorHidden(true);
+  document.getElementById('keyBox').classList.add('qris-mode');
 
   _vipQrisImageUrl = data.qrImageUrl;
   _qrisExpiresAt = Date.now() + 15 * 60 * 1000;
@@ -7521,7 +7560,7 @@ function renderVipQris(data){
         <div class="qris-status-spinner"></div>
         <div class="qris-status-text">
           <div class="qris-status-title" id="vipPayStatus">Menunggu pembayaran...</div>
-          <div class="qris-status-sub">Status akan terupdate otomatis</div>
+          <div class="qris-status-sub"></div>
         </div>
       </div>
 
