@@ -2019,6 +2019,41 @@ footer::before{
 }
 .key-box .key-body{overflow-y:auto;-webkit-overflow-scrolling:touch;}
 
+/* ── STATE: KARTU QRIS — full-viewport, tanpa scroll internal ──
+   Saat modal berada di state pembayaran QRIS, kartu melebar mengisi
+   layar penuh (bukan lagi kotak kecil 300px) supaya semua elemen —
+   nominal, kode QR, timer, status, langkah bayar — tampil sekaligus
+   tanpa perlu discroll. */
+.key-overlay.qris-active{padding:0;}
+.key-box.qris-fullcard{
+  max-width:460px;
+  width:100%;
+  max-height:none;
+  height:100%;
+  border-radius:0;
+  background:
+    radial-gradient(120% 60% at 50% 0%,rgba(0,229,160,.05),transparent 60%),
+    linear-gradient(180deg,#111114 0%,#08080a 100%);
+  border:none;
+  box-shadow:none;
+}
+.key-box.qris-fullcard .key-head{display:none;}
+.key-box.qris-fullcard .key-body{
+  flex:1;
+  display:flex;
+  overflow-y:hidden;
+  padding:0;
+}
+@media(min-height:760px) and (min-width:461px){
+  .key-overlay.qris-active{padding:20px;align-items:center;}
+  .key-box.qris-fullcard{
+    height:auto;max-height:94vh;max-height:94svh;
+    border-radius:22px;
+    border:1px solid rgba(255,255,255,.08);
+    box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.04);
+  }
+}
+
 .key-head{
   padding:20px 20px 12px;
   text-align:center;
@@ -2219,28 +2254,63 @@ footer::before{
 .vip-back-link{
   display:block;width:100%;text-align:center;
   font-size:11px;color:var(--text2);font-weight:600;letter-spacing:.1px;
-  background:none;border:none;cursor:pointer;padding:8px 0 0;
+  background:none;border:none;cursor:pointer;padding:2px 0 0;
   -webkit-tap-highlight-color:transparent;
 }
+.vip-back-link:active{color:var(--text);}
 
 .vip-qris-download-btn{
   display:inline-flex;align-items:center;justify-content:center;gap:6px;
-  width:100%;border:1px solid var(--border-strong);border-radius:9px;
-  padding:9px;background:transparent;
+  width:100%;border:1px solid rgba(255,255,255,.12);border-radius:10px;
+  padding:10px;background:rgba(255,255,255,.03);
   color:var(--text);font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.74rem;
-  letter-spacing:.2px;cursor:pointer;margin-bottom:8px;
+  letter-spacing:.2px;cursor:pointer;margin-bottom:0;
   -webkit-tap-highlight-color:transparent;outline:none;-webkit-appearance:none;appearance:none;
+  transition:background .15s var(--ease-soft),border-color .15s var(--ease-soft);
 }
+.vip-qris-download-btn:active{background:rgba(255,255,255,.08);}
 .vip-qris-download-btn svg{width:13px;height:13px;flex-shrink:0;}
 
 /* ══════════════════════════════════════════
-   QRIS PAYMENT CARD — tampilan pembayaran baru, lebih rapi & jelas
+   QRIS PAYMENT CARD — v2: full-height, modern, tanpa scroll
+   Layout dibagi 3 zona flex (header / QR+amount / status+steps)
+   yang menyesuaikan tinggi layar secara proporsional, sehingga
+   semuanya selalu terlihat sekaligus tanpa perlu discroll.
    ══════════════════════════════════════════ */
-.qris-pay-wrap{text-align:center;}
+.qris-pay-wrap{
+  text-align:center;
+  width:100%;height:100%;
+  display:flex;flex-direction:column;
+  padding:18px 20px 16px;
+  position:relative;
+  overflow:hidden;
+}
+
+/* header ringkas: judul + tombol tutup, menggantikan .key-head lama
+   supaya lebih rapat dan tidak makan tempat vertikal */
+.qris-topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;flex-shrink:0;
+}
+.qris-topbar-title{
+  display:flex;align-items:center;gap:8px;
+  font-family:'Space Grotesk',sans-serif;
+  font-size:.86rem;font-weight:700;color:var(--text);letter-spacing:.1px;
+}
+.qris-topbar-title svg{width:16px;height:16px;color:var(--green);flex-shrink:0;}
+.qris-topbar-close{
+  width:28px;height:28px;border-radius:8px;
+  border:1px solid rgba(255,255,255,.09);
+  background:rgba(255,255,255,.03);
+  color:var(--text2);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;
+}
+.qris-topbar-close svg{width:14px;height:14px;}
 
 .qris-amount-row{
   display:flex;align-items:baseline;justify-content:center;gap:6px;
-  margin-bottom:2px;
+  margin-bottom:2px;flex-shrink:0;
 }
 .qris-amount-label{
   font-family:'Space Mono','Space Grotesk',monospace;
@@ -2248,48 +2318,62 @@ footer::before{
   color:var(--text2);
 }
 .qris-amount-value{
-  font-size:1.5rem;font-weight:700;color:#fff;letter-spacing:.2px;
+  font-size:1.6rem;font-weight:700;color:#fff;letter-spacing:.2px;
   font-variant-numeric:tabular-nums;
+  background:linear-gradient(180deg,#fff,#c9c9d4);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
 }
 .qris-order-id{
   font-family:'Space Mono','Space Grotesk',monospace;
   font-size:10px;color:var(--text2);letter-spacing:.5px;
-  margin:2px 0 16px;opacity:.75;
+  margin:2px 0 14px;opacity:.75;flex-shrink:0;
+}
+
+/* area tengah yang fleksibel — QR code, timer, status, langkah bayar
+   semua dipadatkan proporsional supaya total tinggi selalu pas layar */
+.qris-mid{
+  flex:1 1 auto;min-height:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:clamp(10px,2.4vh,16px);
 }
 
 .qris-code-frame{
   position:relative;
-  width:212px;height:212px;
-  margin:0 auto 14px;
-  padding:14px;
-  border-radius:16px;
+  width:min(46vh,208px);height:min(46vh,208px);
+  flex-shrink:1;
+  margin:0 auto;
+  padding:12px;
+  border-radius:18px;
   background:#fff;
-  box-shadow:0 12px 32px rgba(0,0,0,.35),0 0 0 1px rgba(255,255,255,.12);
+  box-shadow:0 16px 40px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.1);
 }
-.qris-code-frame img{width:100%;height:100%;display:block;border-radius:4px;}
+.qris-code-frame img{width:100%;height:100%;display:block;border-radius:6px;}
 .qris-code-frame::before,.qris-code-frame::after,
 .qris-code-corner-a,.qris-code-corner-b{
-  content:'';position:absolute;width:20px;height:20px;
-  border-color:var(--cyan);pointer-events:none;
+  content:'';position:absolute;width:22px;height:22px;
+  border-color:var(--green);pointer-events:none;
 }
-.qris-code-frame::before{top:-6px;left:-6px;border-top:2.5px solid var(--cyan);border-left:2.5px solid var(--cyan);border-radius:6px 0 0 0;}
-.qris-code-frame::after{bottom:-6px;right:-6px;border-bottom:2.5px solid var(--cyan);border-right:2.5px solid var(--cyan);border-radius:0 0 6px 0;}
-.qris-code-corner-a{top:-6px;right:-6px;border-top:2.5px solid var(--cyan);border-right:2.5px solid var(--cyan);border-radius:0 6px 0 0;}
-.qris-code-corner-b{bottom:-6px;left:-6px;border-bottom:2.5px solid var(--cyan);border-left:2.5px solid var(--cyan);border-radius:0 0 0 6px;}
+.qris-code-frame::before{top:-7px;left:-7px;border-top:2.5px solid var(--green);border-left:2.5px solid var(--green);border-radius:8px 0 0 0;}
+.qris-code-frame::after{bottom:-7px;right:-7px;border-bottom:2.5px solid var(--green);border-right:2.5px solid var(--green);border-radius:0 0 8px 0;}
+.qris-code-corner-a{top:-7px;right:-7px;border-top:2.5px solid var(--green);border-right:2.5px solid var(--green);border-radius:0 8px 0 0;}
+.qris-code-corner-b{bottom:-7px;left:-7px;border-bottom:2.5px solid var(--green);border-left:2.5px solid var(--green);border-radius:0 0 0 8px;}
 
 .qris-logo-badge{
   position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:38px;height:38px;border-radius:9px;
+  width:36px;height:36px;border-radius:10px;
   background:#fff;border:2px solid #f2f2f2;
   display:flex;align-items:center;justify-content:center;
-  box-shadow:0 2px 8px rgba(0,0,0,.15);
+  box-shadow:0 2px 8px rgba(0,0,0,.18);
   overflow:hidden;
 }
 .qris-logo-badge img{width:100%;height:100%;object-fit:cover;}
 
 .qris-timer-row{
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  margin-bottom:16px;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  padding:6px 14px;border-radius:999px;
+  background:rgba(232,197,103,.08);
+  border:1px solid rgba(232,197,103,.18);
+  flex-shrink:0;
 }
 .qris-timer-row svg{width:13px;height:13px;color:var(--gold);flex-shrink:0;}
 .qris-timer-text{
@@ -2297,16 +2381,18 @@ footer::before{
   font-size:12px;font-weight:700;color:var(--gold);letter-spacing:.5px;
   font-variant-numeric:tabular-nums;
 }
+.qris-timer-row.urgent{background:rgba(255,107,107,.08);border-color:rgba(255,107,107,.22);}
 .qris-timer-row.urgent .qris-timer-text,.qris-timer-row.urgent svg{color:#ff6b6b;}
 
 .qris-status-card{
   display:flex;align-items:center;gap:11px;
-  background:rgba(255,255,255,.02);
-  border:1px solid rgba(255,255,255,.07);
-  border-radius:12px;
-  padding:13px 14px;
-  margin-bottom:16px;
+  background:rgba(255,255,255,.025);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:14px;
+  padding:12px 14px;
   text-align:left;
+  width:100%;
+  flex-shrink:0;
 }
 .qris-status-spinner{
   width:18px;height:18px;border-radius:50%;flex-shrink:0;
@@ -2314,12 +2400,14 @@ footer::before{
   border-top-color:var(--cyan);
   animation:key-spin .7s linear infinite;
 }
+.qris-status-card.ok{background:rgba(0,229,160,.05);border-color:rgba(0,229,160,.22);}
 .qris-status-card.ok .qris-status-spinner{
   border:none;width:22px;height:22px;
   background:rgba(0,229,160,.14);
   display:flex;align-items:center;justify-content:center;
   animation:none;
 }
+.qris-status-card.error{background:rgba(255,107,107,.05);border-color:rgba(255,107,107,.22);}
 .qris-status-card.error .qris-status-spinner{
   border:none;width:22px;height:22px;
   background:rgba(255,107,107,.14);
@@ -2343,6 +2431,7 @@ footer::before{
   gap:22px;
   padding:38px 20px 30px;
   text-align:center;
+  width:100%;
 }
 
 .qris-loading-orb{
@@ -2396,10 +2485,12 @@ footer::before{
   font-size:.98rem;font-weight:700;
   color:var(--text);
   letter-spacing:.2px;
+  text-align:center;width:100%;
 }
 .qris-loading-sub{
   font-size:.78rem;color:var(--text2);
   display:flex;align-items:center;justify-content:center;gap:2px;
+  width:100%;
 }
 .qris-loading-dots{display:inline-flex;gap:3px;margin-left:1px;}
 .qris-loading-dots span{
@@ -2444,29 +2535,38 @@ footer::before{
   text-align:left;
   background:rgba(255,255,255,.015);
   border:1px solid rgba(255,255,255,.05);
-  border-radius:12px;
-  padding:13px 14px;
-  margin-bottom:16px;
+  border-radius:14px;
+  padding:12px 14px;
+  width:100%;
+  flex-shrink:1;
+  min-height:0;
+  overflow:hidden;
 }
 .qris-steps-title{
   font-family:'Space Mono','Space Grotesk',monospace;
   font-size:9px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;
-  color:var(--text2);margin-bottom:9px;
+  color:var(--text2);margin-bottom:8px;
 }
 .qris-step{
   display:flex;align-items:flex-start;gap:9px;
-  font-size:11.5px;color:var(--text2);line-height:1.5;
+  font-size:11.5px;color:var(--text2);line-height:1.45;
 }
-.qris-step+.qris-step{margin-top:7px;}
+.qris-step+.qris-step{margin-top:6px;}
 .qris-step-num{
   flex-shrink:0;width:16px;height:16px;border-radius:50%;
-  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);
-  color:var(--cyan);font-size:9px;font-weight:700;
+  background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.3);
+  color:var(--green);font-size:9px;font-weight:700;
   display:flex;align-items:center;justify-content:center;
   font-family:'Space Mono',monospace;margin-top:1px;
 }
 
-.qris-action-row{display:flex;gap:8px;margin-bottom:8px;}
+/* footer tetap (tidak ikut menyusut) berisi tombol download + batal */
+.qris-footer{
+  flex-shrink:0;
+  display:flex;flex-direction:column;gap:8px;
+  margin-top:14px;
+}
+.qris-action-row{display:flex;gap:8px;margin:0;}
 .qris-action-row .vip-qris-download-btn{margin-bottom:0;}
 
 @media(max-width:380px){
@@ -7100,6 +7200,7 @@ function showVipGate(){
   document.getElementById('keySuccessWrap').classList.remove('show');
   document.getElementById('keyTitle').textContent = 'VIP RP 10.000';
   setKeyHeadDecorHidden(false);
+  setQrisFullCard(false);
 
   document.getElementById('keySub').innerHTML = '<b>' + '</b> <b>JOIN VIP AGAR BISA AKSES SEMUA PRODUK</b>';
 
@@ -7192,8 +7293,22 @@ function closeKeyModal(){
     document.getElementById('keySuccessWrap').classList.remove('show');
     document.getElementById('vipGateBody').classList.remove('hide');
   }
+  // Mode kartu full-viewport khusus QRIS selalu dimatikan saat modal ditutup,
+  // baik pembayaran masih pending (ditutup sementara via tombol X) maupun sudah
+  // tuntas (dipanggil dari showVipCelebration) -- state QRIS lokal sudah tidak
+  // relevan begitu modal tertutup.
+  setQrisFullCard(false);
 
   _qrisPaymentActive = false;
+}
+
+/* aktif/nonaktifkan mode kartu full-viewport untuk state pembayaran QRIS */
+function setQrisFullCard(on){
+  const overlay = document.getElementById('keyOverlay');
+  const box = document.getElementById('keyBox');
+  if(!overlay || !box) return;
+  overlay.classList.toggle('qris-active', on);
+  box.classList.toggle('qris-fullcard', on);
 }
 
 function handleKeyOverlayClick(e){
@@ -7433,11 +7548,12 @@ function showVipQrisLoading(){
   document.getElementById('keyTitle').textContent = 'Menyiapkan QRIS';
   document.getElementById('keySub').textContent = '';
   setKeyHeadDecorHidden(true);
+  setQrisFullCard(true);
 
   const body = document.getElementById('vipKeyFormBody');
   body.classList.add('show');
   body.innerHTML = `
-    <div class="qris-loading-wrap">
+    <div class="qris-loading-wrap" style="width:100%;height:100%;justify-content:center;">
       <div class="qris-loading-orb">
         <div class="qris-loading-ring"></div>
         <div class="qris-loading-ring qris-loading-ring--inner"></div>
@@ -7445,7 +7561,7 @@ function showVipQrisLoading(){
           <path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/>
         </svg>
       </div>
-      <div>
+      <div style="width:100%;text-align:center;">
         <div class="qris-loading-title">Menghubungkan</div>
         <div class="qris-loading-sub">Mohon tunggu sebentar<span class="qris-loading-dots"><span></span><span></span><span></span></span></div>
       </div>
@@ -7467,9 +7583,12 @@ let _qrisCountdownTimer = null;
 let _qrisPaymentActive = false;
 
 function renderVipQris(data){
+  // Judul/subjudul lama (.key-head) tidak dipakai lagi di state ini -- diganti
+  // topbar ringkas di dalam kartu supaya seluruh konten muat tanpa scroll.
   document.getElementById('keyTitle').textContent = 'Scan & Bayar VIP';
-  document.getElementById('keySub').innerHTML = 'Selesaikan pembayaran untuk membuka akses';
+  document.getElementById('keySub').innerHTML = '';
   setKeyHeadDecorHidden(true);
+  setQrisFullCard(true);
 
   _vipQrisImageUrl = data.qrImageUrl;
   _qrisExpiresAt = Date.now() + 15 * 60 * 1000;
@@ -7492,47 +7611,60 @@ function renderVipQris(data){
   body.classList.add('show');
   body.innerHTML = `
     <div class="qris-pay-wrap">
+      <div class="qris-topbar">
+        <div class="qris-topbar-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>
+          Scan &amp; Bayar VIP
+        </div>
+        <button type="button" class="qris-topbar-close" onclick="closeKeyModal()" aria-label="Tutup">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
       <div class="qris-amount-row">
         <span class="qris-amount-label">Rp</span>
         <span class="qris-amount-value">${data.amount.toLocaleString('id-ID')}</span>
       </div>
       ${data.orderId ? `<div class="qris-order-id">Order #${data.orderId}</div>` : `<div style="margin-bottom:12px;"></div>`}
 
-      <div class="qris-code-frame">
-        <span class="qris-code-corner-a"></span>
-        <span class="qris-code-corner-b"></span>
-        <img src="${data.qrImageUrl}" alt="QRIS VIP Tarz Store" decoding="async">
-        <div class="qris-logo-badge"><img src="https://apmxdcwebivmusqcuzcv.supabase.co/storage/v1/object/public/Tarzx/Ts.png" alt="Tarz" decoding="async"></div>
-      </div>
+      <div class="qris-mid">
+        <div class="qris-code-frame">
+          <span class="qris-code-corner-a"></span>
+          <span class="qris-code-corner-b"></span>
+          <img src="${data.qrImageUrl}" alt="QRIS VIP Tarz Store" decoding="async">
+          <div class="qris-logo-badge"><img src="https://apmxdcwebivmusqcuzcv.supabase.co/storage/v1/object/public/Tarzx/Ts.png" alt="Tarz" decoding="async"></div>
+        </div>
 
-      <div class="qris-timer-row" id="qrisTimerRow">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
-        <span class="qris-timer-text" id="qrisTimerText">15:00</span>
-      </div>
+        <div class="qris-timer-row" id="qrisTimerRow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+          <span class="qris-timer-text" id="qrisTimerText">15:00</span>
+        </div>
 
-      <div class="qris-action-row">
-        <button type="button" class="vip-qris-download-btn" onclick="downloadVipQris()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
-          DOWNLOAD QRIS
-        </button>
-      </div>
+        <div class="qris-status-card" id="qrisStatusCard">
+          <div class="qris-status-spinner"></div>
+          <div class="qris-status-text">
+            <div class="qris-status-title" id="vipPayStatus">Menunggu pembayaran...</div>
+            <div class="qris-status-sub">Status akan terupdate otomatis</div>
+          </div>
+        </div>
 
-      <div class="qris-status-card" id="qrisStatusCard">
-        <div class="qris-status-spinner"></div>
-        <div class="qris-status-text">
-          <div class="qris-status-title" id="vipPayStatus">Menunggu pembayaran...</div>
-          <div class="qris-status-sub">Status akan terupdate otomatis</div>
+        <div class="qris-steps">
+          <div class="qris-steps-title">Cara Bayar</div>
+          <div class="qris-step"><span class="qris-step-num">1</span><span>Buka aplikasi e-wallet atau m-banking apa saja</span></div>
+          <div class="qris-step"><span class="qris-step-num">2</span><span>Pilih menu <b style="color:var(--text)">Scan QRIS</b> lalu arahkan ke kode di atas</span></div>
+          <div class="qris-step"><span class="qris-step-num">3</span><span>Periksa nominal, lalu selesaikan pembayaran</span></div>
         </div>
       </div>
 
-      <div class="qris-steps">
-        <div class="qris-steps-title">Cara Bayar</div>
-        <div class="qris-step"><span class="qris-step-num">1</span><span>Buka aplikasi e-wallet atau m-banking apa saja</span></div>
-        <div class="qris-step"><span class="qris-step-num">2</span><span>Pilih menu <b style="color:var(--text)">Scan QRIS</b> lalu arahkan ke kode di atas</span></div>
-        <div class="qris-step"><span class="qris-step-num">3</span><span>Periksa nominal, lalu selesaikan pembayaran</span></div>
+      <div class="qris-footer">
+        <div class="qris-action-row">
+          <button type="button" class="vip-qris-download-btn" onclick="downloadVipQris()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
+            DOWNLOAD QRIS
+          </button>
+        </div>
+        <button type="button" class="vip-back-link" onclick="cancelVipPayment()">← batal pembayaran</button>
       </div>
-
-      <button type="button" class="vip-back-link" onclick="cancelVipPayment()">← batal pembayaran</button>
     </div>
   `;
 
