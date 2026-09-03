@@ -2330,6 +2330,116 @@ footer::before{
 .qris-status-title{font-size:12.5px;font-weight:700;color:var(--text);line-height:1.3;}
 .qris-status-sub{font-size:10.5px;color:var(--text2);line-height:1.4;margin-top:2px;}
 
+/* ══════════════════════════════════════════
+   LOADER "PREPARING QRIS" — dipakai khusus saat menyiapkan/menghubungkan
+   ke server pembayaran (BUKAN status "menunggu pembayaran" yang pakai
+   .qris-status-card di atas). Konsep: ring ganda berputar arah
+   berlawanan mengelilingi ikon koneksi, dengan pulse halus di
+   belakangnya -- kesan "sedang membangun koneksi aman ke payment
+   gateway", elegan tanpa ramai efek cahaya.
+   ══════════════════════════════════════════ */
+.qris-loading-wrap{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:22px;
+  padding:38px 20px 30px;
+  text-align:center;
+}
+
+.qris-loading-orb{
+  position:relative;
+  width:64px;height:64px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.qris-loading-orb::before{
+  content:'';
+  position:absolute;inset:-8px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(0,229,160,.12) 0%,transparent 68%);
+  animation:qris-orb-pulse 2.4s var(--ease-soft) infinite;
+}
+.qris-loading-ring{
+  position:absolute;inset:0;
+  border-radius:50%;
+  border:2px solid transparent;
+  border-top-color:var(--green);
+  border-right-color:rgba(0,229,160,.25);
+  animation:qris-ring-spin-cw 1.15s cubic-bezier(.65,.05,.36,1) infinite;
+}
+.qris-loading-ring--inner{
+  inset:10px;
+  border-top-color:transparent;
+  border-bottom-color:var(--cyan);
+  border-left-color:rgba(255,255,255,.2);
+  animation:qris-ring-spin-ccw 1.6s cubic-bezier(.65,.05,.36,1) infinite;
+}
+@keyframes qris-ring-spin-cw{to{transform:rotate(360deg);}}
+@keyframes qris-ring-spin-ccw{to{transform:rotate(-360deg);}}
+@keyframes qris-orb-pulse{
+  0%,100%{opacity:.55;transform:scale(.92);}
+  50%{opacity:1;transform:scale(1.08);}
+}
+
+.qris-loading-icon{
+  position:relative;z-index:1;
+  width:26px;height:26px;
+  color:var(--green);
+  animation:qris-icon-breathe 2.4s var(--ease-soft) infinite;
+}
+@keyframes qris-icon-breathe{
+  0%,100%{transform:scale(1);opacity:.9;}
+  50%{transform:scale(1.08);opacity:1;}
+}
+
+.qris-loading-title{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:.98rem;font-weight:700;
+  color:var(--text);
+  letter-spacing:.2px;
+}
+.qris-loading-sub{
+  font-size:.78rem;color:var(--text2);
+  display:flex;align-items:center;justify-content:center;gap:2px;
+}
+.qris-loading-dots{display:inline-flex;gap:3px;margin-left:1px;}
+.qris-loading-dots span{
+  width:3.5px;height:3.5px;border-radius:50%;
+  background:var(--text2);
+  animation:qris-dot-bounce 1.3s ease-in-out infinite;
+}
+.qris-loading-dots span:nth-child(2){animation-delay:.15s;}
+.qris-loading-dots span:nth-child(3){animation-delay:.3s;}
+@keyframes qris-dot-bounce{
+  0%,60%,100%{opacity:.3;transform:translateY(0);}
+  30%{opacity:1;transform:translateY(-2.5px);}
+}
+
+/* garis progres tipis penuh lebar -- indeterminate, segmen bergerak
+   bolak-balik, memberi kesan proses transfer data berlangsung */
+.qris-loading-bar{
+  width:150px;height:2.5px;border-radius:2px;
+  background:rgba(255,255,255,.08);
+  overflow:hidden;position:relative;
+}
+.qris-loading-bar::after{
+  content:'';
+  position:absolute;top:0;bottom:0;left:0;
+  width:35%;border-radius:2px;
+  background:linear-gradient(90deg,transparent,var(--green) 50%,transparent);
+  animation:qris-bar-slide 1.3s ease-in-out infinite;
+}
+@keyframes qris-bar-slide{
+  0%{transform:translateX(-100%);}
+  100%{transform:translateX(385%);}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .qris-loading-orb::before,.qris-loading-ring,.qris-loading-ring--inner,
+  .qris-loading-icon,.qris-loading-dots span,.qris-loading-bar::after{
+    animation:none!important;
+  }
+}
+
 .qris-steps{
   text-align:left;
   background:rgba(255,255,255,.015);
@@ -3668,16 +3778,177 @@ body.auth-locked{overflow:hidden;}
 
 /* saat cek session awal (sebelum tahu sudah login atau belum) -- spinner
    fullscreen supaya tidak kelihatan "kedip" form login lalu langsung hilang */
+/* saat cek session awal (sebelum tahu sudah login atau belum) -- loader
+   fullscreen supaya tidak kelihatan "kedip" form login lalu langsung hilang */
+/* saat cek session awal (sebelum tahu sudah login atau belum) -- loader
+   fullscreen supaya tidak kelihatan "kedip" form login lalu langsung hilang */
+/* saat cek session awal (sebelum tahu sudah login atau belum) -- TANPA
+   card/box, langsung di tengah layar. Lebih ringan & modern dibanding
+   kotak form biasa. */
+/* saat cek session awal (sebelum tahu sudah login atau belum) -- TANPA
+   card/box, langsung di tengah layar. */
+/* saat cek session awal (sebelum tahu sudah login atau belum) -- TANPA
+   card/box, langsung di tengah layar. */
 .authgate-boot{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:14px;
+  gap:30px;
+  background:none;border:none;box-shadow:none;padding:0;
+  animation:authgate-boot-fade .6s var(--ease-out);
 }
-.authgate-boot-spinner{
-  width:34px;height:34px;border-radius:50%;
-  border:3px solid rgba(255,255,255,.12);border-top-color:var(--text);
-  animation:authgate-spin .8s linear infinite;
+@keyframes authgate-boot-fade{from{opacity:0;}to{opacity:1;}}
+
+/* ══════════════════════════════════════════
+   LOADER "SECURE GATE" — frame heksagonal dengan garis pelacak (tracer)
+   yang berjalan mengelilingi tepi, monogram di tengah dengan sapuan
+   scan-line, dan label status yang berganti kata (kesan sistem
+   otentikasi sedang benar-benar bekerja, bukan cuma spinner generik).
+   Dibangun 2 layer heksagon terpisah (bukan pseudo-element bertumpuk)
+   supaya tracer tidak "bocor" ke luar tepi saat rotasi -- ini yang
+   sebelumnya bikin animasinya kelihatan patah/kedip di sudut.
+   ══════════════════════════════════════════ */
+.authgate-boot-loader{
+  position:relative;
+  width:88px;height:88px;
+  display:flex;align-items:center;justify-content:center;
 }
-.authgate-boot-text{font-size:.82rem;color:var(--text2);}
+
+/* frame heksagon dasar, statis, jadi anchor bentuk */
+.authgate-boot-hex{
+  position:absolute;inset:0;
+  clip-path:polygon(50% 0%,93.3% 25%,93.3% 75%,50% 100%,6.7% 75%,6.7% 25%);
+  background:rgba(255,255,255,.05);
+}
+
+/* wrapper tracer: clip ke bentuk heksagon SEKALI di sini, lalu isinya
+   (conic-gradient) yang berputar di dalam wrapper -- rotasi jadi mulus
+   karena tidak perlu re-clip tiap frame. */
+.authgate-boot-tracer{
+  position:absolute;inset:0;
+  clip-path:polygon(50% 0%,93.3% 25%,93.3% 75%,50% 100%,6.7% 75%,6.7% 25%);
+  overflow:hidden;
+}
+.authgate-boot-tracer i{
+  position:absolute;inset:-25%;
+  display:block;
+  background:conic-gradient(from 0deg,
+    transparent 0deg,
+    transparent 300deg,
+    var(--text) 336deg,
+    var(--cyan) 352deg,
+    var(--cyan) 360deg);
+  animation:authgate-tracer-spin 2.2s linear infinite;
+  will-change:transform;
+}
+@keyframes authgate-tracer-spin{to{transform:rotate(360deg);}}
+
+/* lapisan gelap di dalam tracer supaya cuma tepi tipis yang kelihatan
+   menyala, isi tengah tetap transparan/gelap */
+.authgate-boot-inner{
+  position:absolute;inset:3px;
+  clip-path:polygon(50% 0%,93.3% 25%,93.3% 75%,50% 100%,6.7% 75%,6.7% 25%);
+  background:var(--bg);
+}
+
+/* monogram di tengah + sapuan scan-line horizontal yang lewat berkala.
+   Ditaruh dalam kotak fixed-size supaya scan-line punya batas jelas
+   dan tidak overflow keluar bentuk heksagon. */
+.authgate-boot-mono{
+  position:relative;z-index:1;
+  width:48px;height:48px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Space Grotesk',sans-serif;
+  font-weight:700;font-size:1.1rem;letter-spacing:1px;
+  color:var(--text);
+  overflow:hidden;
+  border-radius:4px;
+}
+.authgate-boot-mono::after{
+  content:'';
+  position:absolute;left:-15%;right:-15%;height:2px;
+  background:linear-gradient(90deg,transparent,var(--cyan) 50%,transparent);
+  box-shadow:0 0 8px 1px rgba(255,255,255,.45);
+  animation:authgate-scan-move 2.2s cubic-bezier(.45,0,.55,1) infinite;
+}
+@keyframes authgate-scan-move{
+  0%{top:-10%;opacity:0;}
+  10%{opacity:1;}
+  50%{top:100%;opacity:1;}
+  60%{opacity:0;}
+  100%{top:100%;opacity:0;}
+}
+
+.authgate-boot-status{
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+}
+
+/* label status berganti kata -- pakai container dengan tinggi tetap
+   supaya layout tidak "loncat" (CLS) saat teks bertukar panjang.
+   Setiap <span> jadi lapisan absolute yang fade+slide bergantian
+   dengan delay terjadwal, totalnya berputar mulus tanpa jeda kosong. */
+.authgate-boot-text{
+  position:relative;
+  width:180px;height:1.1em;
+  font-family:'Space Mono',monospace;
+  font-size:.72rem;font-weight:700;
+  color:var(--text2);
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  text-align:center;
+}
+.authgate-boot-text span{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;
+  animation:authgate-text-cycle 4.5s ease-in-out infinite;
+}
+.authgate-boot-text span:nth-child(1){animation-delay:0s;}
+.authgate-boot-text span:nth-child(2){animation-delay:1.5s;}
+.authgate-boot-text span:nth-child(3){animation-delay:3s;}
+@keyframes authgate-text-cycle{
+  0%{opacity:0;transform:translateY(4px);}
+  8%,25%{opacity:1;transform:translateY(0);}
+  33%,100%{opacity:0;transform:translateY(-4px);}
+}
+
+/* progress bar micro — segmented, terkesan "checklist" proses berjalan */
+.authgate-boot-segbar{
+  display:flex;gap:4px;
+}
+.authgate-boot-segbar i{
+  width:18px;height:2px;border-radius:2px;
+  background:rgba(255,255,255,.1);
+  overflow:hidden;
+  position:relative;
+  display:block;
+}
+.authgate-boot-segbar i::after{
+  content:'';
+  position:absolute;inset:0;
+  background:var(--text);
+  transform:scaleX(0);
+  transform-origin:left;
+  animation:authgate-seg-fill 1.8s ease-in-out infinite;
+}
+.authgate-boot-segbar i:nth-child(1)::after{animation-delay:0s;}
+.authgate-boot-segbar i:nth-child(2)::after{animation-delay:.2s;}
+.authgate-boot-segbar i:nth-child(3)::after{animation-delay:.4s;}
+.authgate-boot-segbar i:nth-child(4)::after{animation-delay:.6s;}
+.authgate-boot-segbar i:nth-child(5)::after{animation-delay:.8s;}
+@keyframes authgate-seg-fill{
+  0%{transform:scaleX(0);opacity:.4;}
+  35%{transform:scaleX(1);opacity:1;}
+  70%{transform:scaleX(1);opacity:1;}
+  100%{transform:scaleX(1);opacity:.25;}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .authgate-boot-tracer i,.authgate-boot-mono::after,.authgate-boot-text span,
+  .authgate-boot-segbar i::after{
+    animation:none!important;
+  }
+  .authgate-boot-text span{opacity:1;}
+  .authgate-boot-text span:not(:first-child){display:none;}
+}
 </style>
 </head>
 <body><a href="#main-content" class="skip-link">Lewati ke konten utama</a>
@@ -3705,9 +3976,21 @@ body.auth-locked{overflow:hidden;}
   <div class="authgate-content">
 
   <!-- state: sedang mengecek session tersimpan -->
-  <div class="authgate-box authgate-boot" id="authBootState">
-    <div class="authgate-boot-spinner"></div>
-    <div class="authgate-boot-text">Memeriksa sesi login…</div>
+  <div class="authgate-boot" id="authBootState">
+    <div class="authgate-boot-loader">
+      <div class="authgate-boot-hex"></div>
+      <div class="authgate-boot-tracer"><i></i></div>
+      <div class="authgate-boot-inner"></div>
+      <div class="authgate-boot-mono">TR</div>
+    </div>
+    <div class="authgate-boot-status">
+      <div class="authgate-boot-text">
+        <span>Memeriksa sesi</span>
+        <span>Menghubungi server</span>
+        <span>Memverifikasi akun</span>
+      </div>
+      <div class="authgate-boot-segbar"><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
   </div>
 
   <!-- state: form login -->
@@ -6010,6 +6293,13 @@ function isVipUnlocked(){
 let _googleVipStatus = null; // null=belum dicek, true/false=hasil cek dari Firestore
 let _googleUser = null;
 let _authListenerBound = false;
+/* Flag: true begitu onAuthStateChanged FIRST FIRE (Firebase sudah selesai
+   restore sesi dari IndexedDB, status user beneran sudah diketahui).
+   Sebelum flag ini true, kita TIDAK BOLEH menampilkan form login lewat
+   client.currentUser -- karena currentUser masih bisa null sesaat walau
+   user sebenarnya sudah login, dan itulah penyebab layar login "kedip"
+   sebentar sebelum akhirnya hilang. */
+let _authStateResolved = false;
 
 function getAuthClient(){
   if(!window.fbAuth) return null;
@@ -6026,6 +6316,7 @@ function getAuthClient(){
 
 function bindAuthStateListener(client){
   client.onAuthStateChanged((user)=>{
+    _authStateResolved = true;
     if(user){
       hideAuthGate();
       refreshGoogleVipStatus();
@@ -6295,11 +6586,13 @@ async function checkAuthGateSession(){
   }
   try{
     /* Firebase Auth compat menyelesaikan restorasi sesi secara async di
-       balik layar; onAuthStateChanged (dipasang di getAuthClient() lewat
-       bindAuthStateListener) akan otomatis memanggil hideAuthGate() atau
-       showAuthGateForm() begitu status diketahui, jadi fungsi ini cukup
-       menangani logika "remember me" saja lalu membiarkan listener itu
-       yang menentukan tampilan akhir. */
+       balik layar. onAuthStateChanged (dipasang di getAuthClient() lewat
+       bindAuthStateListener) adalah SATU-SATUNYA sumber kebenaran untuk
+       menampilkan/menyembunyikan gate begitu status diketahui -- fungsi
+       ini HANYA menangani logika "remember me" (paksa logout kalau perlu)
+       dan membiarkan gate tetap di boot-state (spinner) sampai listener
+       itu fire. Ini mencegah form login sempat kelihatan sekilas padahal
+       user sudah login. */
     let noRemember = false;
     try{ noRemember = localStorage.getItem('tarz_no_remember') === 'true'; }catch(e){}
 
@@ -6307,19 +6600,22 @@ async function checkAuthGateSession(){
       // sesi lama dari "remember me" yang di-uncheck, dan ini kunjungan
       // baru (tab/browser baru) -- paksa logout dulu.
       await client.signOut().catch(()=>{});
-      showAuthGateForm();
+      // signOut() memicu onAuthStateChanged(null) sendiri, yang akan
+      // memanggil showAuthGateForm() -- tidak perlu dipanggil manual di sini.
       return;
     }
 
     try{ sessionStorage.setItem('tarz_gate_session_active','1'); }catch(e){}
 
-    if(client.currentUser){
-      hideAuthGate();
-    } else {
-      showAuthGateForm();
+    // Kalau onAuthStateChanged belum pernah fire, biarkan boot-spinner
+    // tetap tampil -- JANGAN tebak status login dari client.currentUser,
+    // biar listener yang memutuskan begitu status sudah pasti.
+    if(_authStateResolved){
+      if(client.currentUser) hideAuthGate();
+      else showAuthGateForm();
     }
   }catch(err){
-    showAuthGateForm();
+    if(_authStateResolved) showAuthGateForm();
   }
 }
 
@@ -7070,7 +7366,7 @@ async function startVipPayment(){
   }catch(e){
     if(_qrisContext === 'vippage'){
       closeKeyModal();
-      showToast('Gagal terhubung ke server pembayaran.', 'error');
+      showToast('Gagal terhubung.', 'error');
     } else {
       showToast('Gagal terhubung ke server pembayaran.', 'error');
       showVipGate();
@@ -7134,19 +7430,26 @@ function showVipQrisLoading(){
   document.getElementById('vipGateBody').classList.add('hide');
   document.getElementById('vipKeyFormBody').classList.remove('show');
   document.getElementById('keySuccessWrap').classList.remove('show');
-  document.getElementById('keyTitle').textContent = 'Menyiapkan QRIS...';
-  document.getElementById('keySub').textContent = 'Mohon tunggu sebentar';
+  document.getElementById('keyTitle').textContent = 'Menyiapkan QRIS';
+  document.getElementById('keySub').textContent = '';
   setKeyHeadDecorHidden(true);
 
   const body = document.getElementById('vipKeyFormBody');
   body.classList.add('show');
   body.innerHTML = `
-    <div class="qris-status-card" style="justify-content:center;">
-      <div class="qris-status-spinner"></div>
-      <div class="qris-status-text">
-        <div class="qris-status-title">Menghubungkan ke server pembayaran</div>
-        <div class="qris-status-sub">Mohon tunggu sebentar...</div>
+    <div class="qris-loading-wrap">
+      <div class="qris-loading-orb">
+        <div class="qris-loading-ring"></div>
+        <div class="qris-loading-ring qris-loading-ring--inner"></div>
+        <svg class="qris-loading-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/>
+        </svg>
       </div>
+      <div>
+        <div class="qris-loading-title">Menghubungkan</div>
+        <div class="qris-loading-sub">Mohon tunggu sebentar<span class="qris-loading-dots"><span></span><span></span><span></span></span></div>
+      </div>
+      <div class="qris-loading-bar"></div>
     </div>
   `;
 }
