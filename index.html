@@ -3635,6 +3635,11 @@ body.auth-locked{overflow:hidden;}
 .authgate-remember input{
   width:15px;height:15px;accent-color:var(--blue2);cursor:pointer;
 }
+.authgate-register-link{
+  color:var(--gold);text-decoration:none;font-weight:600;
+  transition:opacity var(--t-fast) var(--ease);
+}
+.authgate-register-link:hover{opacity:.75;text-decoration:underline;}
 
 .authgate-submit{
   width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
@@ -3713,19 +3718,11 @@ body.auth-locked{overflow:hidden;}
 
     <div class="authgate-error" id="authErrorMsg"></div>
 
-    <button type="button" class="authgate-google-btn" id="authGoogleBtn" onclick="authGoogleSignIn()">
-      <span class="authgate-g-spinner"></span>
-      <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23.52 12.27c0-.85-.08-1.67-.22-2.45H12v4.64h6.47c-.28 1.5-1.13 2.77-2.4 3.62v3h3.88c2.27-2.09 3.57-5.17 3.57-8.81z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.95-2.92l-3.88-3c-1.08.72-2.45 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.96H1.26v3.1C3.24 21.3 7.28 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.27A7.2 7.2 0 0 1 4.89 12c0-.79.14-1.55.38-2.27v-3.1H1.26A11.98 11.98 0 0 0 0 12c0 1.94.46 3.77 1.26 5.37l4.01-3.1z"/><path fill="#EA4335" d="M12 4.77c1.76 0 3.34.6 4.58 1.79l3.44-3.44C17.95 1.19 15.24 0 12 0 7.28 0 3.24 2.7 1.26 6.63l4.01 3.1c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
-      <span class="authgate-google-label">Continue with Google</span>
-    </button>
-
-    <div class="authgate-divider">OR LOGIN WITH EMAIL</div>
-
     <form id="authForm" onsubmit="authSubmit(event)">
       <div class="authgate-field">
-        <label class="authgate-label" for="authEmail">Email atau Username</label>
+        <label class="authgate-label" for="authEmail">Username</label>
         <div class="authgate-input-wrap">
-          <input type="text" id="authEmail" class="authgate-input" placeholder="nama@email.com" autocomplete="username" required>
+          <input type="text" id="authEmail" class="authgate-input" placeholder="Username kamu" autocomplete="username" required>
         </div>
       </div>
       <div class="authgate-field">
@@ -3741,14 +3738,61 @@ body.auth-locked{overflow:hidden;}
       <div class="authgate-row">
         <label class="authgate-remember">
           <input type="checkbox" id="authRemember" checked>
-          Remember me
+          Remember
         </label>
+        <span style="color:var(--text2);font-size:.8rem;">Belum punya akun? <a href="#" class="authgate-register-link" id="authRegisterLink">Daftar</a></span>
       </div>
 
       <button type="submit" class="authgate-submit" id="authSubmitBtn">
         <span class="authgate-spinner"></span>
         <span class="authgate-submit-label" id="authSubmitLabel">Login</span>
       </button>
+    </form>
+
+    <div class="authgate-divider">OR LOGIN WITH GOOGLE</div>
+
+    <button type="button" class="authgate-google-btn" id="authGoogleBtn" onclick="authGoogleSignIn()">
+      <span class="authgate-g-spinner"></span>
+      <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23.52 12.27c0-.85-.08-1.67-.22-2.45H12v4.64h6.47c-.28 1.5-1.13 2.77-2.4 3.62v3h3.88c2.27-2.09 3.57-5.17 3.57-8.81z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.95-2.92l-3.88-3c-1.08.72-2.45 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.96H1.26v3.1C3.24 21.3 7.28 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.27A7.2 7.2 0 0 1 4.89 12c0-.79.14-1.55.38-2.27v-3.1H1.26A11.98 11.98 0 0 0 0 12c0 1.94.46 3.77 1.26 5.37l4.01-3.1z"/><path fill="#EA4335" d="M12 4.77c1.76 0 3.34.6 4.58 1.79l3.44-3.44C17.95 1.19 15.24 0 12 0 7.28 0 3.24 2.7 1.26 6.63l4.01 3.1c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
+      <span class="authgate-google-label">Continue with Google</span>
+    </button>
+
+  </div>
+
+  <!-- state: form daftar akun baru -->
+  <div class="authgate-box" id="authRegisterState" style="display:none;">
+
+    <div class="authgate-title">Buat Akun</div>
+    <div class="authgate-sub">Daftar untuk mulai menggunakan Tarz Store</div>
+
+    <div class="authgate-error" id="authRegisterErrorMsg"></div>
+
+    <form id="authRegisterForm" onsubmit="authRegisterSubmit(event)">
+      <div class="authgate-field">
+        <label class="authgate-label" for="authRegUsername">Username</label>
+        <div class="authgate-input-wrap">
+          <input type="text" id="authRegUsername" class="authgate-input" placeholder="Username kamu" autocomplete="username" required minlength="3">
+        </div>
+      </div>
+      <div class="authgate-field">
+        <label class="authgate-label" for="authRegPassword">Password</label>
+        <div class="authgate-input-wrap">
+          <input type="password" id="authRegPassword" class="authgate-input" placeholder="••••••••" autocomplete="new-password" required minlength="6">
+          <button type="button" class="authgate-eye-btn" onclick="authRegToggleEye('authRegPassword','authRegEyeIcon')" aria-label="Tampilkan password">
+            <svg id="authRegEyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" class="authgate-submit" id="authRegisterSubmitBtn">
+        <span class="authgate-spinner"></span>
+        <span class="authgate-submit-label">Daftar</span>
+      </button>
+
+      <div class="authgate-row" style="justify-content:center;margin-top:14px;">
+        <span style="color:var(--text2);">Sudah punya akun?</span>&nbsp;
+        <a href="#" class="authgate-register-link" id="authBackToLoginLink">Login</a>
+      </div>
     </form>
 
   </div>
@@ -6025,7 +6069,9 @@ function showAuthGateForm(){
   _authGateClosed = false;
   const boot = document.getElementById('authBootState');
   const form = document.getElementById('authFormState');
+  const reg = document.getElementById('authRegisterState');
   if(boot) boot.style.display = 'none';
+  if(reg) reg.style.display = 'none';
   if(form) form.style.display = 'block';
   document.body.classList.add('auth-locked');
   const gate = document.getElementById('authGate');
@@ -6052,6 +6098,103 @@ function authToggleEye(){
   icon.innerHTML = showing
     ? '<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/>'
     : '<path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a18.6 18.6 0 0 1 4.22-5.06M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 7 11 7a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/>';
+}
+
+/* ── Switch antara layar Login dan layar Daftar ── */
+function authShowRegisterForm(){
+  authClearError();
+  const login = document.getElementById('authFormState');
+  const reg = document.getElementById('authRegisterState');
+  if(login) login.style.display = 'none';
+  if(reg) reg.style.display = 'block';
+}
+function authShowLoginForm(){
+  authRegClearError();
+  const login = document.getElementById('authFormState');
+  const reg = document.getElementById('authRegisterState');
+  if(reg) reg.style.display = 'none';
+  if(login) login.style.display = 'block';
+}
+(function(){
+  const regLink = document.getElementById('authRegisterLink');
+  if(regLink) regLink.addEventListener('click', function(e){ e.preventDefault(); authShowRegisterForm(); });
+  const backLink = document.getElementById('authBackToLoginLink');
+  if(backLink) backLink.addEventListener('click', function(e){ e.preventDefault(); authShowLoginForm(); });
+})();
+
+function authRegShowError(msg){
+  const el = document.getElementById('authRegisterErrorMsg');
+  if(!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+}
+function authRegClearError(){
+  const el = document.getElementById('authRegisterErrorMsg');
+  if(el){ el.textContent = ''; el.classList.remove('show'); }
+}
+
+function authRegToggleEye(inputId, iconId){
+  const input = document.getElementById(inputId);
+  const icon = document.getElementById(iconId);
+  if(!input || !icon) return;
+  const showing = input.type === 'text';
+  input.type = showing ? 'password' : 'text';
+  icon.innerHTML = showing
+    ? '<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/>'
+    : '<path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a18.6 18.6 0 0 1 4.22-5.06M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 7 11 7a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/>';
+}
+
+/* submit form daftar akun baru -- Firebase Auth (email/password) tetap
+   butuh format email secara teknis, jadi username diubah otomatis jadi
+   email internal (username@tarzstore.local) di belakang layar -- user
+   cukup isi Username & Password saja tanpa perlu tahu soal email. */
+async function authRegisterSubmit(e){
+  e.preventDefault();
+  authRegClearError();
+  const client = getAuthClient();
+  if(!client){ authRegShowError('Layanan pendaftaran belum siap, coba lagi sebentar.'); return; }
+
+  const usernameRaw = (document.getElementById('authRegUsername').value || '').trim();
+  const password = document.getElementById('authRegPassword').value || '';
+  const submitBtn = document.getElementById('authRegisterSubmitBtn');
+
+  if(!usernameRaw || !password){
+    authRegShowError('Username dan password wajib diisi.');
+    return;
+  }
+  if(password.length < 6){
+    authRegShowError('Password minimal 6 karakter.');
+    return;
+  }
+
+  const username = usernameRaw.toLowerCase().replace(/[^a-z0-9_.-]/g, '');
+  if(username.length < 3){
+    authRegShowError('Username minimal 3 karakter (huruf/angka).');
+    return;
+  }
+  const internalEmail = username + '@tarzstore.local';
+
+  submitBtn.classList.add('loading');
+  try{
+    const cred = await client.createUserWithEmailAndPassword(internalEmail, password);
+    if(cred && cred.user && typeof cred.user.updateProfile === 'function'){
+      await cred.user.updateProfile({ displayName: usernameRaw }).catch(()=>{});
+    }
+    showToast('Akun berhasil dibuat', 'success');
+    hideAuthGate();
+  }catch(err){
+    authRegShowError(authFriendlyRegisterError(err) || 'Pendaftaran gagal. Coba lagi.');
+  }finally{
+    submitBtn.classList.remove('loading');
+  }
+}
+
+function authFriendlyRegisterError(err){
+  const code = err && err.code;
+  if(code === 'auth/email-already-in-use') return 'Username sudah digunakan. Silakan login atau pilih username lain.';
+  if(code === 'auth/invalid-email') return 'Username mengandung karakter yang tidak valid.';
+  if(code === 'auth/weak-password') return 'Password terlalu lemah, minimal 6 karakter.';
+  return err && err.message;
 }
 
 /* tombol "Login with Google" di layar gate -- reuse googleSignIn() yang
@@ -6088,15 +6231,22 @@ async function authSubmit(e){
   const client = getAuthClient();
   if(!client){ authShowError('Layanan login belum siap, coba lagi sebentar.'); return; }
 
-  const email = (document.getElementById('authEmail').value || '').trim();
+  const emailOrUsername = (document.getElementById('authEmail').value || '').trim();
   const password = document.getElementById('authPassword').value || '';
   const remember = document.getElementById('authRemember').checked;
   const submitBtn = document.getElementById('authSubmitBtn');
 
-  if(!email || !password){
+  if(!emailOrUsername || !password){
     authShowError('Email/username dan password wajib diisi.');
     return;
   }
+
+  /* Kalau input tidak mengandung "@", anggap ini username (bukan email
+     asli) -- konversi ke format email internal yang sama seperti saat
+     akun dibuat lewat authRegisterSubmit(). */
+  const email = emailOrUsername.includes('@')
+    ? emailOrUsername
+    : emailOrUsername.toLowerCase().replace(/[^a-z0-9_.-]/g, '') + '@tarzstore.local';
 
   /* "remember me" -- kalau TIDAK dicentang, sesi hanya disimpan selama tab
      ini terbuka (browserSessionPersistence), hilang begitu tab/browser
@@ -6124,7 +6274,7 @@ async function authSubmit(e){
 function authFriendlyError(err){
   const code = err && err.code;
   if(code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found'){
-    return 'Email atau password salah.';
+    return 'Username atau password salah.';
   }
   if(code === 'auth/invalid-email') return 'Format email tidak valid.';
   if(code === 'auth/too-many-requests') return 'Terlalu banyak percobaan. Coba lagi sebentar.';
