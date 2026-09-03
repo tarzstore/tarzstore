@@ -904,28 +904,64 @@
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
+<script type="module">
 /* ═══════════════════════════════════════════════════
-   KONFIGURASI SUPABASE
+   KONFIGURASI FIREBASE
    ═══════════════════════════════════════════════════ */
-const SUPABASE_URL = 'https://bvblcdnmbzncoqeoqkoc.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_II7ZGSsImxo10OqzRy3U4A_JWQ4rg46';
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js';
+import {
+  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged
+} from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js';
+import {
+  getFirestore, collection, doc, addDoc, updateDoc, deleteDoc,
+  getDocs, query, orderBy, serverTimestamp, writeBatch
+} from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js';
 
+const firebaseConfig = {
+  apiKey: "AIzaSyA3EYAyAnPt7-xc77ApG5U6GH6ZWTmD7Hw",
+  authDomain: "tarz-80183.firebaseapp.com",
+  projectId: "tarz-80183",
+  storageBucket: "tarz-80183.firebasestorage.app",
+  messagingSenderId: "1005977729680",
+  appId: "1:1005977729680:web:ec8385dab8e60cb9dcb615"
+};
 
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+const dbFs = getFirestore(firebaseApp);
+const productsCol = collection(dbFs, 'products');
+
+/* Semua fungsi di bawah dipanggil langsung dari atribut onclick="..." di HTML
+   (mis. onclick="doLogin()"). Karena script ini type="module", fungsi TIDAK
+   otomatis jadi global -- makanya di-expose manual ke window di sini. */
+window.doLogin = doLogin;
+window.doLogout = doLogout;
+window.togglePasswordVisibility = togglePasswordVisibility;
+window.openForm = openForm;
+window.closeForm = closeForm;
+window.openFormCf = openFormCf;
+window.closeFormCf = closeFormCf;
+window.onCfImageUrlInput = onCfImageUrlInput;
+window.onCfImageUrlBeforeInput = onCfImageUrlBeforeInput;
+window.saveConfigFf = saveConfigFf;
+window.editConfigFf = editConfigFf;
+window.goStep = goStep;
+window.toggleAdvanced = toggleAdvanced;
+window.onImageUrlInput = onImageUrlInput;
+window.saveProduct = saveProduct;
+window.editProduct = editProduct;
+window.deleteProduct = deleteProduct;
 
 /* ═══════════════════════════════════════════════════
    AUTH: LOGIN / LOGOUT / CEK SESSION
    ═══════════════════════════════════════════════════ */
-async function checkSession(){
-  const { data:{ session } } = await db.auth.getSession();
-  if(session){
-    showAdminView(session.user.email);
+onAuthStateChanged(auth, (user) => {
+  if(user){
+    showAdminView(user.email);
   } else {
     showLoginView();
   }
-}
+});
 
 function showLoginView(){
   document.getElementById('loginView').classList.add('show');
@@ -957,26 +993,28 @@ async function doLogin(){
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>Masuk...';
 
-  const { data, error } = await db.auth.signInWithPassword({ email, password });
-
-  btn.disabled = false;
-  btn.innerHTML = originalBtnHtml;
-
-  if(error){
-    msg.textContent = 'Login gagal: ' + (error.message === 'Invalid login credentials' ? 'Email atau password salah.' : error.message);
-    msg.classList.add('show','error');
-    return;
-  }
-
   try{
-    if(remember){
-      localStorage.setItem('tarz_admin_email', email);
-    } else {
-      localStorage.removeItem('tarz_admin_email');
-    }
-  } catch(e){ /* localStorage tidak tersedia, lewati saja */ }
+    const cred = await signInWithEmailAndPassword(auth, email, password);
 
-  showAdminView(data.user.email);
+    try{
+      if(remember){
+        localStorage.setItem('tarz_admin_email', email);
+      } else {
+        localStorage.removeItem('tarz_admin_email');
+      }
+    } catch(e){ /* localStorage tidak tersedia, lewati saja */ }
+
+    showAdminView(cred.user.email);
+  } catch(error){
+    const friendly = (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found')
+      ? 'Email atau password salah.'
+      : error.message;
+    msg.textContent = 'Login gagal: ' + friendly;
+    msg.classList.add('show','error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = originalBtnHtml;
+  }
 }
 
 /* isi otomatis email yang diingat, kalau ada */
@@ -990,7 +1028,7 @@ try{
 
 
 async function doLogout(){
-  await db.auth.signOut();
+  await signOut(auth);
   showLoginView();
 }
 
@@ -1099,16 +1137,14 @@ async function saveConfigFf(){
       price: ''
     };
 
-    let error;
     if(editId){
-      ({ error } = await db.from('products').update(payload).eq('id', editId));
+      await updateDoc(doc(dbFs, 'products', editId), payload);
     } else {
       // config baru: taruh di posisi PALING ATAS pada tab configff
       payload.sort_order = getNextSortOrder('configff');
-      ({ error } = await db.from('products').insert(payload));
+      payload.created_at = serverTimestamp();
+      await addDoc(productsCol, payload);
     }
-
-    if(error) throw new Error(error.message);
 
     showFormMsg(editId ? 'Config FF berhasil diperbarui.' : 'Config FF berhasil ditambahkan.', 'success');
     closeFormCf();
@@ -1253,17 +1289,15 @@ async function saveProduct(){
       price: ''
     };
 
-    let error;
     if(editId){
-      ({ error } = await db.from('products').update(payload).eq('id', editId));
+      await updateDoc(doc(dbFs, 'products', editId), payload);
     } else {
       // produk baru: taruh di posisi PALING ATAS pada tab-nya, dengan sort_order
       // lebih tinggi dari nilai maksimum yang ada saat ini di tab yang sama
       payload.sort_order = getNextSortOrder(tab);
-      ({ error } = await db.from('products').insert(payload));
+      payload.created_at = serverTimestamp();
+      await addDoc(productsCol, payload);
     }
-
-    if(error) throw new Error(error.message);
 
     showFormMsg(editId ? 'Produk berhasil diperbarui.' : 'Produk berhasil ditambahkan.', 'success');
     closeForm();
@@ -1321,13 +1355,24 @@ async function loadProducts(){
   listAllgameEl.innerHTML = '';
   listConfigffEl.innerHTML = '';
 
-  const { data, error } = await db
-    .from('products')
-    .select('*')
-    .order('sort_order', { ascending: false, nullsFirst: false })
-    .order('created_at', { ascending: false });
-
-  if(error){
+  let data;
+  try{
+    /* Firestore tidak punya "nullsFirst/nullsLast" seperti Supabase, dan
+       orderBy ganda (sort_order lalu created_at) butuh index komposit kalau
+       dipakai lewat query(). Supaya tidak bergantung pada index tambahan,
+       kita ambil semua dokumen lalu urutkan manual di sisi client -- jumlah
+       produk di toko kecil ini realistis kecil, jadi ini murah. */
+    const snap = await getDocs(productsCol);
+    data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    data.sort((a, b) => {
+      const soA = Number(a.sort_order) || 0;
+      const soB = Number(b.sort_order) || 0;
+      if(soB !== soA) return soB - soA; // sort_order menurun
+      const caA = a.created_at && a.created_at.toMillis ? a.created_at.toMillis() : 0;
+      const caB = b.created_at && b.created_at.toMillis ? b.created_at.toMillis() : 0;
+      return caB - caA; // created_at menurun
+    });
+  } catch(error){
     listFreefireEl.innerHTML = '<p class="empty">Gagal memuat produk: ' + error.message + '</p>';
     return;
   }
@@ -1540,9 +1585,12 @@ async function persistNewOrder(listEl){
   }
 
   try{
-    await Promise.all(updates.map(u =>
-      db.from('products').update({ sort_order: u.sort_order }).eq('id', u.id)
-    ));
+    // writeBatch: satu round-trip untuk semua update urutan, bukan N request terpisah
+    const batch = writeBatch(dbFs);
+    updates.forEach(u => {
+      batch.update(doc(dbFs, 'products', u.id), { sort_order: u.sort_order });
+    });
+    await batch.commit();
   } catch(err){
     showFormMsg('Gagal menyimpan urutan: ' + err.message, 'error');
   }
@@ -1611,8 +1659,9 @@ function editProduct(id){
 async function deleteProduct(id){
   if(!confirm('Yakin mau hapus produk ini? Tindakan ini tidak bisa dibatalkan.')) return;
 
-  const { error } = await db.from('products').delete().eq('id', id);
-  if(error){
+  try{
+    await deleteDoc(doc(dbFs, 'products', id));
+  } catch(error){
     showFormMsg('Gagal menghapus: ' + error.message, 'error');
     return;
   }
@@ -1630,7 +1679,7 @@ function escapeHtml(str){
 /* ═══════════════════════════════════════════════════
    INIT
    ═══════════════════════════════════════════════════ */
-checkSession();
+// Cek sesi login sekarang ditangani otomatis oleh onAuthStateChanged() di atas.
 
 document.getElementById('loginPassword').addEventListener('keydown', e=>{
   if(e.key === 'Enter') doLogin();

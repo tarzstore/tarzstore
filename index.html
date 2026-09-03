@@ -47,7 +47,8 @@
 <link rel="preload" as="image" href="https://apmxdcwebivmusqcuzcv.supabase.co/storage/v1/object/public/Tarzx/Ts.png" fetchpriority="high">
 <!-- Font: preconnect + async load untuk hindari render-blocking -->
 <link rel="dns-prefetch" href="https://wa.me">
-<link rel="preconnect" href="https://bvblcdnmbzncoqeoqkoc.supabase.co" crossorigin>
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://apmxdcwebivmusqcuzcv.supabase.co" crossorigin>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -5958,71 +5959,36 @@ function isVipUnlocked(){
 }
 
 /* ══════════════════════════════════════════
-   LOGIN WITH GOOGLE (Supabase Auth)
-   Status VIP disimpan per akun Google di tabel `vip_users`
-   (lihat setup_vip_users.sql), bukan per-browser lagi.
+   LOGIN WITH GOOGLE (Firebase Auth)
+   Status VIP disimpan per akun Google di koleksi Firestore `vip_users`
+   (docId = uid akun Google), bukan per-browser lagi.
    ══════════════════════════════════════════ */
-const GOOGLE_AUTH_SUPABASE_URL = 'https://bvblcdnmbzncoqeoqkoc.supabase.co';
-const GOOGLE_AUTH_SUPABASE_KEY = 'sb_publishable_II7ZGSsImxo10OqzRy3U4A_JWQ4rg46';
-let _authClient = null;
-let _googleVipStatus = null; // null=belum dicek, true/false=hasil cek dari Supabase
+let _googleVipStatus = null; // null=belum dicek, true/false=hasil cek dari Firestore
 let _googleUser = null;
+let _authListenerBound = false;
 
 function getAuthClient(){
-  if(_authClient) return _authClient;
-  if(!window.supabase) return null;
-  /* storageKey unik + auth options eksplisit supaya client auth Google ini
-     TIDAK bentrok dengan instance Supabase client lain di halaman ini
-     (npClient, statsClient) yang memakai URL+key publishable yang sama.
-     Tanpa ini, beberapa instance GoTrueClient saling berebut localStorage
-     key default yang sama dan bisa saling menimpa sesi -- efeknya setelah
-     logout lalu login lagi, sesi baru gagal tersimpan dengan benar.
-
-     PENTING: instance ini dibuat SEKALI SAJA untuk seumur hidup halaman
-     dan TIDAK PERNAH dibuang/dibuat ulang (mis. saat logout). Supabase-js
-     sendiri memperingatkan "Multiple GoTrueClient instances detected in
-     the same browser context" kalau ada lebih dari satu client dengan
-     storageKey yang sama hidup bersamaan -- itu persis yang terjadi kalau
-     kita bikin client baru tiap logout sementara instance lama belum
-     benar-benar mati. Efeknya dua client saling rebutan baca/tulis sesi,
-     dan login berikutnya kelihatan "diam saja" / tidak jalan sampai
-     halaman benar-benar di-reload penuh (tab baru). Jadi: logout HANYA
-     boleh memanggil signOut() di client yang sama ini, tidak membuat
-     ulang client-nya. */
-  _authClient = window.supabase.createClient(GOOGLE_AUTH_SUPABASE_URL, GOOGLE_AUTH_SUPABASE_KEY, {
-    auth: {
-      storageKey: 'tarz-google-auth',
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true
-    }
-  });
-  bindAuthStateListener(_authClient);
-  return _authClient;
+  if(!window.fbAuth) return null;
+  /* Firebase Auth SDK sendiri sudah menjaga SATU instance auth per app
+     (beda dengan Supabase-js yang butuh instance manual per storageKey),
+     jadi cukup pasang listener SEKALI saja di percobaan pertama client
+     ini tersedia. */
+  if(!_authListenerBound){
+    _authListenerBound = true;
+    bindAuthStateListener(window.fbAuth);
+  }
+  return window.fbAuth;
 }
 
 function bindAuthStateListener(client){
-  client.auth.onAuthStateChange((event, session)=>{
-    if(event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED'){
+  client.onAuthStateChanged((user)=>{
+    if(user){
       hideAuthGate();
       refreshGoogleVipStatus();
-      /* sesi sudah AMAN tersimpan oleh Supabase di titik ini -- baru sekarang
-         boleh bersihkan hash/query token OAuth dari URL. Ini murni kosmetik
-         (URL rapi, hindari browser mobile salah kalkulasi ulang layout) dan
-         tidak lagi mengganggu proses penyimpanan sesi. */
-      if(event === 'SIGNED_IN'){
-        try{
-          const url = new URL(window.location.href);
-          const hasAuthHash = window.location.hash && /access_token=|refresh_token=|provider_token=/.test(window.location.hash);
-          const hasAuthQuery = url.searchParams.has('code');
-          if(hasAuthHash || hasAuthQuery){
-            url.hash = '';
-            url.searchParams.delete('code');
-            window.history.replaceState({}, document.title, url.pathname + url.search);
-          }
-        }catch(e){}
-      }
-    } else if(event === 'SIGNED_OUT'){
+      /* Firebase Auth (via signInWithRedirect) sudah membersihkan sendiri
+         parameter redirect OAuth dari URL, jadi tidak perlu penanganan
+         hash/query manual seperti pada alur implicit flow Supabase dulu. */
+    } else {
       _googleUser = null;
       _googleVipStatus = null;
       renderProfilePanel();
@@ -6034,7 +6000,7 @@ function bindAuthStateListener(client){
 
 /* ══════════════════════════════════════════
    AUTH GATE — layar login wajib sebelum masuk situs.
-   Pakai client Supabase YANG SAMA (getAuthClient()) dengan sistem
+   Pakai client Firebase Auth YANG SAMA (getAuthClient()) dengan sistem
    VIP Google yang sudah ada, supaya status login konsisten di
    seluruh halaman (satu kali login = berlaku untuk gate & VIP).
    ══════════════════════════════════════════ */
@@ -6097,17 +6063,21 @@ async function authGoogleSignIn(){
   if(btn) btn.classList.add('loading');
   authClearError();
   try{
-    try{ sessionStorage.setItem('tarz_login_requested', '1'); }catch(e){}
-    await client.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: window.location.href,
-        queryParams: { prompt: 'select_account' }
-      }
-    });
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+    await client.signInWithPopup(provider);
+    /* onAuthStateChanged (bindAuthStateListener) akan otomatis memanggil
+       hideAuthGate() + refreshGoogleVipStatus() begitu login berhasil,
+       jadi tidak perlu penanganan manual di sini. Popup (bukan redirect
+       full-page) berarti halaman TIDAK reload, sehingga semua state
+       JS in-memory (mis. _pendingVipAction) tetap utuh secara alami --
+       beda dengan alur redirect Supabase dulu yang butuh sessionStorage
+       untuk "mengingat" aksi tertunda lintas reload. */
+    showToast('Berhasil Login', 'success');
   }catch(err){
+    authShowError(err && err.code === 'auth/popup-closed-by-user' ? 'Login dibatalkan.' : 'Login Google gagal. Coba lagi.');
+  }finally{
     if(btn) btn.classList.remove('loading');
-    authShowError('Login Google gagal. Coba lagi.');
   }
 }
 
@@ -6128,11 +6098,11 @@ async function authSubmit(e){
     return;
   }
 
-  /* "remember me" -- kalau TIDAK dicentang, sesi cuma disimpan di
-     sessionStorage (hilang saat tab ditutup) alih-alih localStorage
-     (persist selamanya). Supabase secara default pakai localStorage lewat
-     client ini, jadi kalau user uncheck, kita tandai supaya sesi
-     dibersihkan saat tab/browser ditutup. */
+  /* "remember me" -- kalau TIDAK dicentang, sesi hanya disimpan selama tab
+     ini terbuka (browserSessionPersistence), hilang begitu tab/browser
+     ditutup. Kalau dicentang, sesi persist selamanya di device ini
+     (browserLocalPersistence, default Firebase Auth). Firebase menerapkan
+     ini secara native lewat setPersistence(), dipanggil SEBELUM login. */
   try{
     if(remember){ localStorage.removeItem('tarz_no_remember'); }
     else { localStorage.setItem('tarz_no_remember','true'); }
@@ -6140,44 +6110,60 @@ async function authSubmit(e){
 
   submitBtn.classList.add('loading');
   try{
-    const { error } = await client.auth.signInWithPassword({ email, password });
-    if(error){ authShowError(error.message || 'Email/username atau password salah.'); return; }
+    await client.setPersistence(remember ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION);
+    await client.signInWithEmailAndPassword(email, password);
     hideAuthGate();
   }catch(err){
-    authShowError('Terjadi kesalahan. Coba lagi.');
+    authShowError(authFriendlyError(err) || 'Email/username atau password salah.');
   }finally{
     submitBtn.classList.remove('loading');
   }
 }
 
-/* dipanggil begitu Supabase siap: cek apakah sudah ada session tersimpan.
+/* Terjemahkan kode error Firebase Auth yang umum ke pesan berbahasa Indonesia. */
+function authFriendlyError(err){
+  const code = err && err.code;
+  if(code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found'){
+    return 'Email atau password salah.';
+  }
+  if(code === 'auth/invalid-email') return 'Format email tidak valid.';
+  if(code === 'auth/too-many-requests') return 'Terlalu banyak percobaan. Coba lagi sebentar.';
+  return err && err.message;
+}
+
+/* dipanggil begitu Firebase siap: cek apakah sudah ada session tersimpan.
    Kalau "remember me" sebelumnya di-uncheck dan ini sesi baru (tab baru
    dibuka setelah browser ditutup), paksa logout supaya gate tetap muncul. */
 async function checkAuthGateSession(){
   const client = getAuthClient();
   if(!client){
-    // Supabase gagal dimuat -- jangan kunci user selamanya di layar boot,
+    // Firebase gagal dimuat -- jangan kunci user selamanya di layar boot,
     // tampilkan form login supaya minimal masih bisa dilihat (walau tombol
     // tidak akan berfungsi sampai koneksi pulih).
     showAuthGateForm();
     return;
   }
   try{
-    const { data: { session } } = await client.auth.getSession();
+    /* Firebase Auth compat menyelesaikan restorasi sesi secara async di
+       balik layar; onAuthStateChanged (dipasang di getAuthClient() lewat
+       bindAuthStateListener) akan otomatis memanggil hideAuthGate() atau
+       showAuthGateForm() begitu status diketahui, jadi fungsi ini cukup
+       menangani logika "remember me" saja lalu membiarkan listener itu
+       yang menentukan tampilan akhir. */
     let noRemember = false;
     try{ noRemember = localStorage.getItem('tarz_no_remember') === 'true'; }catch(e){}
 
-    if(session && noRemember && !sessionStorage.getItem('tarz_gate_session_active')){
+    if(noRemember && !sessionStorage.getItem('tarz_gate_session_active') && client.currentUser){
       // sesi lama dari "remember me" yang di-uncheck, dan ini kunjungan
       // baru (tab/browser baru) -- paksa logout dulu.
-      await client.auth.signOut().catch(()=>{});
+      await client.signOut().catch(()=>{});
       showAuthGateForm();
       return;
     }
 
     try{ sessionStorage.setItem('tarz_gate_session_active','1'); }catch(e){}
 
-    if(session){
+    if(client.currentUser){
       hideAuthGate();
     } else {
       showAuthGateForm();
@@ -6187,10 +6173,10 @@ async function checkAuthGateSession(){
   }
 }
 
-if(window.supabase){
+if(window.fbAuth){
   checkAuthGateSession();
 } else {
-  window.addEventListener('npSupabaseReady', checkAuthGateSession, {once:true});
+  window.addEventListener('npFirebaseFullyReady', checkAuthGateSession, {once:true});
 }
 
 /* dipanggil saat tombol "LOGIN DENGAN GOOGLE" diklik dari panel Profil
@@ -6204,32 +6190,34 @@ async function googleSignIn(){
   const profileBtn = document.getElementById('profileLoginBtn');
   if(profileBtn) profileBtn.classList.add('loading');
   try{
-    /* simpan aksi yang tertunda supaya begitu redirect balik dari Google,
-       kita tahu harus lanjut ke mana (key form / qris / wa) */
+    const provider = new firebase.auth.GoogleAuthProvider();
+    /* Paksa Google selalu menampilkan layar "Pilih Akun" setiap kali
+       tombol login diklik, walau browser masih punya sesi Google aktif
+       dari akun sebelumnya. Tanpa ini, Google diam-diam auto-login ke
+       akun terakhir yang dipakai (session cookie Google, bukan cookie
+       situs ini) -- makanya ganti akun kelihatan "tidak bisa" kecuali
+       dicoba di tab baru yang belum kena auto-login itu. */
+    provider.setCustomParameters({ prompt: 'select_account' });
+    await client.signInWithPopup(provider);
+    /* Popup (bukan redirect) berarti halaman tidak reload, jadi
+       _pendingVipAction yang sudah ada di memory tetap utuh -- tinggal
+       dilanjutkan langsung di sini begitu login sukses, tanpa perlu
+       dititipkan ke sessionStorage lintas reload seperti alur lama. */
     if(_pendingVipAction){
-      try{ sessionStorage.setItem('tarz_pending_vip_action', _pendingVipAction); }catch(e){}
+      const pending = _pendingVipAction;
+      _pendingVipAction = null;
+      showToast('Berhasil Login', 'success');
+      runVipAction(pending);
+    } else {
+      showToast('Berhasil Login', 'success');
     }
-    /* tandai bahwa sebuah login baru saja diminta, supaya begitu balik dari
-       redirect Google kita tahu harus menampilkan toast "Berhasil Login" */
-    try{ sessionStorage.setItem('tarz_login_requested', '1'); }catch(e){}
-    await client.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: window.location.href,
-        /* Paksa Google selalu menampilkan layar "Pilih Akun" setiap kali
-           tombol login diklik, walau browser masih punya sesi Google aktif
-           dari akun sebelumnya. Tanpa ini, Google diam-diam auto-login ke
-           akun terakhir yang dipakai (session cookie Google, bukan cookie
-           situs ini) -- makanya ganti akun kelihatan "tidak bisa" kecuali
-           dicoba di tab baru yang belum kena auto-login itu. */
-        queryParams: { prompt: 'select_account' }
-      }
-    });
-    /* browser akan redirect keluar halaman di sini */
   }catch(e){
+    if(e && e.code !== 'auth/popup-closed-by-user'){
+      console.error('Google sign-in gagal:', e);
+    }
+  }finally{
     if(btn) btn.classList.remove('loading');
     if(profileBtn) profileBtn.classList.remove('loading');
-    console.error('Google sign-in gagal:', e);
   }
 }
 
@@ -6245,35 +6233,16 @@ function clearLocalVipState(){
   try{ localStorage.removeItem('tarz_vip_token'); }catch(e){}
 }
 
-function googleSignOut(){
+async function googleSignOut(){
   const client = getAuthClient();
   if(!client) return;
 
-  /* auth.signOut() versi supabase-js yang dipakai di sini kadang tidak
-     resolve/reject dengan bersih di kondisi tertentu. Supaya UI tidak
-     nyangkut selamanya kalau itu terjadi, reset tampilan tetap dijamin
-     jalan lewat .finally() DAN lewat timeout cadangan, mana yang lebih
-     dulu -- client auth-nya (_authClient) TIDAK dibuang/dibuat ulang;
-     membuat client baru menyebabkan dua GoTrueClient hidup bersamaan
-     dengan storageKey yang sama (lihat catatan di getAuthClient()).
-
-     TAPI: signOut() sendiri, menurut dokumentasi resminya, melakukan
-     "teardown" pada background work milik client -- salah satunya
-     MEMBERSIHKAN SEMUA subscriber onAuthStateChange yang terdaftar.
-     Ini persis kenapa login PERTAMA di sebuah tab selalu berhasil
-     (listener masih terpasang dari initGoogleAuth()), tapi login KEDUA
-     di tab yang sama (setelah logout) selalu gagal diam-diam -- listener
-     sudah hilang walau instance client-nya sama. Makanya begitu proses
-     sign-out selesai, listener-nya WAJIB didaftarkan ulang di client
-     yang sama supaya percobaan login berikutnya di tab ini tetap
-     terdeteksi. */
-  let alreadyReset = false;
-  function resetLocalAuthState(){
-    if(alreadyReset) return;
-    alreadyReset = true;
-    bindAuthStateListener(client); // pasang ulang listener yang dibersihkan signOut()
-    _googleUser = null;
-    _googleVipStatus = null;
+  /* Firebase Auth (beda dengan Supabase-js) TIDAK membersihkan listener
+     onAuthStateChanged saat signOut() dipanggil, jadi tidak perlu lagi
+     pasang-ulang listener secara manual seperti alur lama -- listener
+     yang sama otomatis menerima event "user=null" begitu sign-out selesai
+     dan akan memanggil showAuthGateForm() dari bindAuthStateListener(). */
+  function resetLocalVipDisplay(){
     clearLocalVipState();
     renderProfilePanel();
     refreshVipHeaderBadge();
@@ -6282,17 +6251,11 @@ function googleSignOut(){
   }
 
   try{
-    client.auth.signOut().catch((e)=>{
-      console.error('Google sign-out gagal:', e);
-    }).finally(resetLocalAuthState);
+    await client.signOut();
   }catch(e){
-    console.error('Google sign-out error sinkron:', e);
-    resetLocalAuthState();
+    console.error('Google sign-out gagal:', e);
   }
-  /* Jaring pengaman terakhir: kalau signOut() menggantung tanpa pernah
-     resolve/reject sama sekali, tetap reset tampilan setelah 2 detik
-     supaya user tidak nyangkut selamanya dan bisa langsung login lagi. */
-  setTimeout(resetLocalAuthState, 2000);
+  resetLocalVipDisplay();
 }
 
 /* Isi panel "Profil" di sidebar: kalau sudah login tampil
@@ -6302,10 +6265,9 @@ function renderProfilePanel(){
   const signedOut = document.getElementById('profileSignedOut');
   if(!signedIn || !signedOut) return;
   if(_googleUser){
-    const meta = _googleUser.user_metadata || {};
-    document.getElementById('profileName').textContent = meta.full_name || meta.name || (_googleUser.email ? _googleUser.email.split('@')[0] : 'Akun');
+    document.getElementById('profileName').textContent = _googleUser.displayName || (_googleUser.email ? _googleUser.email.split('@')[0] : 'Akun');
     document.getElementById('profileEmail').textContent = _googleUser.email || '';
-    document.getElementById('profileAvatar').src = meta.avatar_url || 'https://apmxdcwebivmusqcuzcv.supabase.co/storage/v1/object/public/Tarzx/Ts.png';
+    document.getElementById('profileAvatar').src = _googleUser.photoURL || 'https://apmxdcwebivmusqcuzcv.supabase.co/storage/v1/object/public/Tarzx/Ts.png';
     signedIn.style.display = 'block';
     signedOut.style.display = 'none';
 
@@ -6356,31 +6318,27 @@ function runVipAction(action){
   else if(action === 'wa') openVipWhatsApp();
 }
 
-/* cek status VIP akun Google ini ke tabel vip_users di Supabase */
+/* cek status VIP akun Google ini ke koleksi vip_users di Firestore
+   (docId = uid Firebase Auth, sesuai security rules project). */
 async function refreshGoogleVipStatus(){
   const client = getAuthClient();
   if(!client) return;
   try{
-    const { data: { session } } = await client.auth.getSession();
-    if(!session || !session.user){
+    const user = client.currentUser;
+    if(!user){
       _googleUser = null;
       _googleVipStatus = null;
       renderProfilePanel();
       return;
     }
-    _googleUser = session.user;
+    _googleUser = user;
     renderProfilePanel();
 
-    const { data, error } = await client
-      .from('vip_users')
-      .select('is_vip,vip_expiry')
-      .eq('user_id', session.user.id)
-      .maybeSingle();
-
-    if(error){ console.error('Cek status VIP gagal:', error); return; }
+    const snap = await window.fbDb.collection('vip_users').doc(user.uid).get();
+    const data = snap.exists ? snap.data() : null;
 
     if(data && data.is_vip){
-      if(data.vip_expiry && Date.now() > new Date(data.vip_expiry).getTime()){
+      if(data.vip_expiry && Date.now() > toMillis(data.vip_expiry)){
         _googleVipStatus = false; // trial via akun Google sudah habis
       } else {
         _googleVipStatus = true;
@@ -6393,73 +6351,42 @@ async function refreshGoogleVipStatus(){
     refreshVipPageCard();
     renderProfilePanel(); // update badge "MEMBER VIP" + ring avatar begitu status VIP diketahui
 
-    /* kalau login ini baru saja diminta lewat googleSignIn() (baru balik dari
-       redirect Google), kasih tahu user kalau login berhasil */
-    let justLoggedIn = false;
-    try{
-      if(sessionStorage.getItem('tarz_login_requested') === '1'){
-        justLoggedIn = true;
-        sessionStorage.removeItem('tarz_login_requested');
-      }
-    }catch(e){}
-
-    /* kalau tadi ada aksi tertunda (baru saja balik dari redirect Google login),
+    /* kalau tadi ada aksi tertunda (mis. klik "Buy via QRIS" sebelum login),
        lanjutkan otomatis ke aksi yang diminta sebelumnya (key form / qris / wa)
-       supaya klik "Buy via QRIS" tidak berakhir menampilkan form Input Key. */
+       supaya klik itu tidak berakhir menampilkan form Input Key.
+       Catatan: dengan signInWithPopup (bukan redirect), jalur utama untuk ini
+       sudah ditangani langsung di googleSignIn()/authGoogleSignIn(); blok ini
+       tetap dipertahankan sebagai jaring pengaman kalau refreshGoogleVipStatus
+       terpanggil dari jalur lain (mis. restorasi sesi saat halaman dibuka). */
     let pending = _pendingVipAction;
-    if(!pending){
-      try{ pending = sessionStorage.getItem('tarz_pending_vip_action'); }catch(e){}
-    }
     if(pending){
       _pendingVipAction = null;
-      try{ sessionStorage.removeItem('tarz_pending_vip_action'); }catch(e){}
-
-      showToast('Berhasil Login', 'success');
       runVipAction(pending);
-    } else if(justLoggedIn){
-      showToast('Berhasil Login', 'success');
     }
   }catch(e){ console.error('refreshGoogleVipStatus error:', e); }
 }
 
-/* jalan begitu Supabase siap: cek sesi login Google yang mungkin sudah ada
-   (termasuk setelah redirect balik dari Google) */
+/* Firestore Timestamp (punya .toMillis()) ATAU string ISO/angka biasa -> ms epoch. */
+function toMillis(v){
+  if(v && typeof v.toMillis === 'function') return v.toMillis();
+  if(typeof v === 'number') return v;
+  const t = new Date(v).getTime();
+  return isNaN(t) ? 0 : t;
+}
+
+/* jalan begitu Firebase siap: cek sesi login Google yang mungkin sudah ada
+   (restorasi sesi otomatis oleh Firebase Auth SDK, tidak perlu penanganan
+   hash URL manual seperti alur implicit-flow Supabase dulu). */
 function initGoogleAuth(){
   const client = getAuthClient();
   if(!client) return;
-  /* PENTING: jangan bersihkan hash/query URL di sini. Supabase (implicit
-     flow) butuh membaca hash #access_token=... dari URL ini dulu untuk
-     menyimpan sesi ke localStorage lewat onAuthStateChange di bawah.
-     Kalau hash dihapus lebih dulu, sesi GAGAL tersimpan dan user akan
-     diminta login lagi terus-menerus. Pembersihan URL dipindah ke dalam
-     onAuthStateChange (didaftarkan lewat bindAuthStateListener() di dalam
-     getAuthClient()), dijalankan SETELAH sesi berhasil didapat. */
   refreshGoogleVipStatus();
-
-  /* Jaring pengaman terhadap race condition antara proses internal
-     Supabase membaca hash #access_token=... dari URL dan listener
-     onAuthStateChange yang mendengarkannya -- terbukti dari log server
-     kadang berhasil kadang tidak (tidak konsisten), jadi TIDAK bisa
-     diandalkan hanya dari satu event. Solusinya: kalau URL yang di-load
-     ini masih membawa hash token OAuth, cek ulang sesi secara eksplisit
-     BEBERAPA KALI dengan jeda yang membesar -- TAPI berhenti otomatis
-     begitu sesi sudah berhasil terdeteksi di salah satu percobaan, supaya
-     tidak numpuk query ke vip_users lebih banyak dari yang perlu. */
-  try{
-    const hasAuthHash = window.location.hash && /access_token=|refresh_token=|provider_token=/.test(window.location.hash);
-    if(hasAuthHash){
-      [300, 800, 1500, 3000].forEach(delay => setTimeout(()=>{
-        if(_googleUser) return; // sesi sudah ketemu di percobaan sebelumnya, tidak perlu cek lagi
-        refreshGoogleVipStatus();
-      }, delay));
-    }
-  }catch(e){}
 }
 
-if(window.supabase){
+if(window.fbAuth){
   initGoogleAuth();
 } else {
-  window.addEventListener('npSupabaseReady', initGoogleAuth, {once:true});
+  window.addEventListener('npFirebaseFullyReady', initGoogleAuth, {once:true});
 }
 
 /* akses permanen (key VIP biasa) */
@@ -6470,25 +6397,28 @@ function markVipUnlocked(){
   } catch(e){ /* localStorage tidak tersedia, abaikan */ }
 }
 
-/* catat status VIP ke akun Google yang sedang login (tabel vip_users di Supabase).
-   Dipanggil dari 2 tempat: (1) pembayaran QRIS terverifikasi sukses oleh server,
-   dan (2) redeem key VIP berhasil. Kalau user belum login Google, fungsi ini
-   diam saja (localStorage tetap jadi fallback seperti biasa lewat
-   markVipUnlocked()/markVipUnlockedTrial() yang dipanggil terpisah). */
+/* catat status VIP ke akun Google yang sedang login (koleksi vip_users di
+   Firestore, docId = uid). Dipanggil dari 2 tempat: (1) pembayaran QRIS
+   terverifikasi sukses oleh server, dan (2) redeem key VIP berhasil.
+   Kalau user belum login Google, fungsi ini diam saja (localStorage tetap
+   jadi fallback seperti biasa lewat markVipUnlocked()/markVipUnlockedTrial()
+   yang dipanggil terpisah). */
 async function markVipInGoogleAccount(expiryTimestampMs){
   const client = getAuthClient();
   if(!client) return;
   try{
-    const { data: { session } } = await client.auth.getSession();
-    if(!session || !session.user) return; // belum login Google, tidak apa-apa
+    const user = client.currentUser;
+    if(!user) return; // belum login Google, tidak apa-apa
 
     const expiryIso = expiryTimestampMs ? new Date(expiryTimestampMs).toISOString() : null;
-    const { error } = await client.rpc('mark_vip_success', { p_expiry: expiryIso });
-    if(error){
-      console.error('Gagal mencatat VIP ke akun Google:', error);
-      return;
-    }
-    _googleUser = session.user;
+    await window.fbDb.collection('vip_users').doc(user.uid).set({
+      is_vip: true,
+      vip_expiry: expiryIso,
+      email: user.email || null,
+      updated_at: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+
+    _googleUser = user;
     _googleVipStatus = true;
     renderProfilePanel();
   }catch(e){ console.error('markVipInGoogleAccount error:', e); }
@@ -9251,27 +9181,59 @@ document.addEventListener('dragstart', function(e){
 </script>
 
 <!-- ═══════════════════════════════════════════════════
-     PRODUK OTOMATIS DARI PANEL ADMIN (Supabase)
+<!-- ═══════════════════════════════════════════════════
+     FIREBASE — SDK + konfigurasi project (tarz-80183)
+     Dipakai bersama oleh: produk (Firestore `products`),
+     login Google pengunjung (Firebase Auth), status VIP
+     (Firestore `vip_users`), dan statistik (Firestore `stats`).
+     Pakai versi "compat" (bukan modular ESM) supaya firebase.auth()/
+     firebase.firestore() tersedia sebagai global biasa dan kompatibel
+     dengan banyak fungsi non-module + onclick inline di file ini.
+     ═══════════════════════════════════════════════════ -->
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js" defer onload="window.dispatchEvent(new Event('npFirebaseReady'))"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js" defer></script>
+<script>
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyA3EYAyAnPt7-xc77ApG5U6GH6ZWTmD7Hw",
+  authDomain: "tarz-80183.firebaseapp.com",
+  projectId: "tarz-80183",
+  storageBucket: "tarz-80183.firebasestorage.app",
+  messagingSenderId: "1005977729680",
+  appId: "1:1005977729680:web:ec8385dab8e60cb9dcb615"
+};
+/* Init dijalankan sekali begitu ketiga SDK (app/auth/firestore) siap,
+   dengan guard supaya tidak double-init kalau event + polling sama-sama
+   sempat jalan (pola yang sama dengan npInitOnce/statsInitOnce di bawah). */
+let _fbInitCalled = false;
+function fbInitOnce(){
+  if(_fbInitCalled) return;
+  if(!(window.firebase && firebase.auth && firebase.firestore)) return;
+  _fbInitCalled = true;
+  firebase.initializeApp(FIREBASE_CONFIG);
+  window.fbAuth = firebase.auth();
+  window.fbDb = firebase.firestore();
+  window.dispatchEvent(new Event('npFirebaseFullyReady'));
+}
+window.addEventListener('npFirebaseReady', fbInitOnce, {once:true});
+(function pollFirebase(){
+  let tries = 0;
+  const poll = setInterval(()=>{
+    tries++;
+    if(window.firebase && firebase.auth && firebase.firestore){ clearInterval(poll); fbInitOnce(); }
+    else if(tries > 100){ clearInterval(poll); }
+  }, 100);
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════
+     PRODUK OTOMATIS DARI PANEL ADMIN (Firestore)
      Digabung langsung ke grid FREE FIRE atau ALL GAME sesuai kolom "tab",
      memakai kartu & sistem VIP/key modal yang SAMA PERSIS dengan produk lama
      (mode 'aincrad-nokey': tombol INSTALL -> openModal -> APK + Key opsional + List Fitur).
      ═══════════════════════════════════════════════════ -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer onload="window.dispatchEvent(new Event('npSupabaseReady'))"></script>
 <script>
 (function(){
-  const NP_SUPABASE_URL = 'https://bvblcdnmbzncoqeoqkoc.supabase.co';
-  const NP_SUPABASE_KEY = 'sb_publishable_II7ZGSsImxo10OqzRy3U4A_JWQ4rg46';
-
-  function npInit(){
-  const npClient = window.supabase.createClient(NP_SUPABASE_URL, NP_SUPABASE_KEY, {
-    /* client ini murni untuk query data produk, tidak butuh session login.
-       auth di-nonaktifkan supaya tidak bentrok dengan client auth Google
-       (getAuthClient() di script utama) yang berbagi URL+key publishable
-       yang sama -- kalau dibiarkan default, dua instance GoTrueClient bisa
-       saling menimpa sesi login di localStorage. */
-    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
-  });
-
   function npEscape(str){
     if(!str) return '';
     const div = document.createElement('div');
@@ -9291,7 +9253,7 @@ document.addEventListener('dragstart', function(e){
 
     /* Hapus skeleton loading di ketiga grid. Dipanggil di jalur SUKSES
        maupun GAGAL/kosong supaya skeleton tidak pernah nyangkut selamanya
-       kalau fetch Supabase error atau memang belum ada produk. */
+       kalau fetch Firestore error atau memang belum ada produk. */
     function clearSkeletons(){
       [cheatGrid, allgameGrid, configffGrid].forEach(grid=>{
         if(!grid) return;
@@ -9299,14 +9261,23 @@ document.addEventListener('dragstart', function(e){
       });
     }
 
-    const { data, error } = await npClient
-      .from('products')
-      .select('*')
-      .order('sort_order', { ascending: false, nullsFirst: false })
-      .order('created_at', { ascending: false });
-
-    if(error || !data){
-      console.error('Gagal memuat produk dari Supabase:', error && error.message);
+    let data;
+    try{
+      const snap = await window.fbDb.collection('products').get();
+      data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      /* Sort manual di client (sama seperti admin.html) supaya tidak
+         bergantung pada index komposit Firestore: sort_order menurun,
+         lalu created_at menurun sebagai tie-breaker. */
+      data.sort((a, b) => {
+        const soA = Number(a.sort_order) || 0;
+        const soB = Number(b.sort_order) || 0;
+        if(soB !== soA) return soB - soA;
+        const caA = a.created_at && a.created_at.toMillis ? a.created_at.toMillis() : 0;
+        const caB = b.created_at && b.created_at.toMillis ? b.created_at.toMillis() : 0;
+        return caB - caA;
+      });
+    } catch(error){
+      console.error('Gagal memuat produk dari Firestore:', error && error.message);
       clearSkeletons();
       return;
     }
@@ -9316,7 +9287,7 @@ document.addEventListener('dragstart', function(e){
        lain), BUKAN `window._appConfig` — di script non-module, `let` di top-level TIDAK
        otomatis jadi properti `window`, jadi kalau ditulis `window._appConfig = {}` di sini,
        itu membuat objek terpisah yang tidak pernah dibaca oleh getDownloadLink() dkk,
-       sehingga link download produk Supabase selalu dianggap "belum tersedia".
+       sehingga link download produk Firestore selalu dianggap "belum tersedia".
        Karena script ini dimuat setelah script yang mendeklarasikan `_appConfig`,
        variabel itu sudah ada di scope global dan bisa diakses langsung di sini. */
     if(!_appConfig) _appConfig = {};
@@ -9332,7 +9303,7 @@ document.addEventListener('dragstart', function(e){
     if(!_appConfig.freefireLabels) _appConfig.freefireLabels = {};
     /* Jangan paksa _configLoadFailed = false di sini: kalau config.json memang gagal
        dimuat, produk LAMA (yang link-nya cuma ada di config.json) tetap harus
-       menampilkan error, bukan diam-diam dianggap berhasil. Produk Supabase sendiri
+       menampilkan error, bukan diam-diam dianggap berhasil. Produk Firestore sendiri
        tidak bergantung pada _configLoadFailed karena getDownloadLink() akan tetap
        menemukan link-nya di _appConfig.downloads yang sudah kita isi di bawah. */
 
@@ -9430,7 +9401,7 @@ document.addEventListener('dragstart', function(e){
       else cheatHtml += cardHtml; // default: freefire
     });
 
-    /* 'afterbegin' -> produk baru dari Supabase disisipkan di PALING ATAS grid,
+    /* 'afterbegin' -> produk baru dari Firestore disisipkan di PALING ATAS grid,
        sebelum 18 produk lama yang hardcoded, supaya produk paling baru selalu
        tampil paling depan (bukan numpuk di bawah). */
     clearSkeletons();
@@ -9443,36 +9414,25 @@ document.addEventListener('dragstart', function(e){
     if(typeof renderProductStatuses === 'function') renderProductStatuses();
   }
 
-  loadDbProducts();
-  } // end npInit
-
-  // Script Supabase pakai `defer`, jadi baru siap setelah HTML selesai di-parse.
-  // Jalankan npInit begitu window.supabase tersedia (event onload di tag <script>,
-  // dgn fallback polling kalau event kelewat karena race condition).
-  // PENTING: pakai guard `npInitCalled` supaya npInit() (dan loadDbProducts() di
-  // dalamnya) TIDAK PERNAH terpanggil dua kali. Tanpa guard ini, kalau
-  // window.supabase sudah tersedia tepat saat polling jalan sebelum event
-  // 'npSupabaseReady' sempat ditangkap, kedua jalur (listener + polling) bisa
-  // sama-sama memanggil npInit(), sehingga loadDbProducts() meng-insert kartu
-  // produk Supabase ke grid dua kali (produk tampil dobel).
+  // Guard supaya loadDbProducts() tidak terpanggil dua kali (event + polling race).
   let npInitCalled = false;
   function npInitOnce(){
     if(npInitCalled) return;
     npInitCalled = true;
-    npInit();
+    loadDbProducts();
   }
 
-  if(window.supabase){
+  if(window.fbDb){
     npInitOnce();
   } else {
-    window.addEventListener('npSupabaseReady', npInitOnce, {once:true});
+    window.addEventListener('npFirebaseFullyReady', npInitOnce, {once:true});
     let tries = 0;
     const poll = setInterval(()=>{
       tries++;
-      if(window.supabase){ clearInterval(poll); npInitOnce(); }
+      if(window.fbDb){ clearInterval(poll); npInitOnce(); }
       else if(tries > 100){
         clearInterval(poll);
-        /* CDN Supabase gagal dimuat sama sekali (mis. koneksi diblokir) ->
+        /* SDK Firebase gagal dimuat sama sekali (mis. koneksi diblokir) ->
            skeleton akan nyangkut selamanya kalau dibiarkan. Bersihkan
            supaya grid tidak stuck menampilkan shimmer terus-menerus. */
         document.querySelectorAll('.skeleton-card').forEach(el => el.remove());
@@ -9519,17 +9479,12 @@ document.addEventListener('dragstart', function(e){
 
 <!-- ═══════════════════════════════════════════════════
      STATISTIK OTOMATIS — pengunjung, download, transaksi
-     Memakai tabel Supabase: site_stats, visitor_log, download_log
-     (lihat setup_stats.sql). Reuse client Supabase yang sudah
-     dibuat oleh script produk (NP_SUPABASE_URL/KEY) supaya tidak
-     ada koneksi ganda.
+     Memakai koleksi Firestore: stats (counter), visitor_log, download_log.
+     Reuse window.fbDb yang sudah diinisialisasi oleh script Firebase di atas
+     supaya tidak ada koneksi ganda.
      ═══════════════════════════════════════════════════ -->
 <script>
 (function(){
-  const STATS_URL = 'https://bvblcdnmbzncoqeoqkoc.supabase.co';
-  const STATS_KEY = 'sb_publishable_II7ZGSsImxo10OqzRy3U4A_JWQ4rg46';
-  let statsClient = null;
-
   function fmtNum(n){
     n = Number(n) || 0;
     if(n >= 1000000) return (n/1000000).toFixed(1).replace(/\.0$/,'') + 'jt';
@@ -9562,17 +9517,34 @@ document.addEventListener('dragstart', function(e){
     animateStat(el, prev, Number(value) || 0, wasLoading ? 900 : 500);
   }
 
+  /* Catatan: security rules Firestore untuk koleksi `stats` mengizinkan
+     WRITE oleh siapa saja tapi READ hanya oleh yang sudah login
+     (allow read: if request.auth != null). Karena auth gate situs ini
+     mewajibkan login SEBELUM konten tampil, di titik ini pengunjung
+     yang sedang aktif sudah pasti login -- jadi refreshStatsWidget()
+     tetap bisa membaca angka statistiknya secara normal. */
   async function refreshStatsWidget(){
-    if(!statsClient) return;
+    if(!window.fbDb) return;
     try{
-      const { data, error } = await statsClient.from('site_stats').select('key,value');
-      if(error || !data) return;
-      data.forEach(row => {
-        if(row.key === 'visitors') setStat('statVisitors', row.value);
-        if(row.key === 'downloads') setStat('statDownloads', row.value);
-        if(row.key === 'purchases') setStat('statPurchases', row.value);
+      const snap = await window.fbDb.collection('stats').get();
+      snap.forEach(doc => {
+        const value = doc.data().value;
+        if(doc.id === 'visitors') setStat('statVisitors', value);
+        if(doc.id === 'downloads') setStat('statDownloads', value);
+        if(doc.id === 'purchases') setStat('statPurchases', value);
       });
     }catch(e){ /* diamkan, widget tetap tampil "···" */ }
+  }
+
+  /* Naikkan counter statKey di stats/{statKey} secara atomik lewat
+     FieldValue.increment(). merge:true supaya dokumen otomatis dibuat
+     kalau belum ada (setara "upsert"), menggantikan RPC increment_stat
+     di Supabase dulu. */
+  function incrementStat(statKey){
+    if(!window.fbDb) return Promise.resolve();
+    return window.fbDb.collection('stats').doc(statKey).set({
+      value: firebase.firestore.FieldValue.increment(1)
+    }, { merge: true });
   }
 
   // ── Hitung 1 pengunjung per sesi browser (pakai id acak di localStorage,
@@ -9586,30 +9558,36 @@ document.addEventListener('dragstart', function(e){
       try{ localStorage.setItem('tarz_visitor_id', vid); }catch(e){}
     }
     // hanya tambah counter kalau ini kunjungan PERTAMA device ini (bukan tiap refresh)
-    if(isNew && statsClient){
-      statsClient.rpc('increment_stat', { stat_key: 'visitors' }).then(()=>{
+    if(isNew && window.fbDb){
+      incrementStat('visitors').then(()=>{
         setTimeout(refreshStatsWidget, 400);
       }).catch(()=>{});
-      statsClient.from('visitor_log').insert({ visitor_id: vid }).then(()=>{}).catch(()=>{});
+      window.fbDb.collection('visitor_log').add({
+        visitor_id: vid,
+        created_at: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(()=>{}).catch(()=>{});
     }
   }
 
   // Dipanggil dari titik download produk & titik sukses beli VIP di script lain.
-  // Diekspos sebagai fungsi global aman-panggil (aman dipanggil walau statsClient belum siap).
+  // Diekspos sebagai fungsi global aman-panggil (aman dipanggil walau fbDb belum siap).
   window.trackDownload = function(productName){
-    if(!statsClient) return;
-    statsClient.rpc('increment_stat', { stat_key: 'downloads' }).then(()=>{
+    if(!window.fbDb) return;
+    incrementStat('downloads').then(()=>{
       setTimeout(refreshStatsWidget, 400);
     }).catch(()=>{});
     if(productName){
-      statsClient.from('download_log').insert({ product_name: String(productName).slice(0,200) }).then(()=>{}).catch(()=>{});
+      window.fbDb.collection('download_log').add({
+        product_name: String(productName).slice(0,200),
+        created_at: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(()=>{}).catch(()=>{});
     }
   };
 
   window.trackPurchase = function(){
     try{ localStorage.setItem('tarz_purchase_counted', 'true'); }catch(e){}
-    if(!statsClient) return;
-    statsClient.rpc('increment_stat', { stat_key: 'purchases' }).then(()=>{
+    if(!window.fbDb) return;
+    incrementStat('purchases').then(()=>{
       setTimeout(refreshStatsWidget, 400);
     }).catch(()=>{});
   };
@@ -9629,13 +9607,7 @@ document.addEventListener('dragstart', function(e){
   }
 
   function initStats(){
-    if(!window.supabase) return;
-    statsClient = window.supabase.createClient(STATS_URL, STATS_KEY, {
-      /* sama seperti npClient: murni query statistik, tidak butuh session
-         login, dan auth dimatikan supaya tidak bentrok dengan client auth
-         Google yang berbagi URL+key publishable yang sama. */
-      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
-    });
+    if(!window.fbDb) return;
     refreshStatsWidget();
     trackVisitorOnce();
     trackPurchaseIfVipDetected();
@@ -9648,14 +9620,14 @@ document.addEventListener('dragstart', function(e){
     initStats();
   }
 
-  if(window.supabase){
+  if(window.fbDb){
     statsInitOnce();
   } else {
-    window.addEventListener('npSupabaseReady', statsInitOnce, {once:true});
+    window.addEventListener('npFirebaseFullyReady', statsInitOnce, {once:true});
     let tries = 0;
     const poll = setInterval(()=>{
       tries++;
-      if(window.supabase){ clearInterval(poll); statsInitOnce(); }
+      if(window.fbDb){ clearInterval(poll); statsInitOnce(); }
       else if(tries > 100){ clearInterval(poll); }
     }, 100);
   }
