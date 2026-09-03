@@ -425,7 +425,7 @@ body.scroll-tabbar-hide .bottom-tab-bar{
   gap:18px;padding:32px 26px;
   background-image:
     linear-gradient(165deg,rgba(5,5,5,.72),rgba(5,5,5,.45) 55%,rgba(5,5,5,.72)),
-    url('https://bvblcdnmbzncoqeoqkoc.supabase.co/storage/v1/object/public/Tarz/banner.png');
+    url('https://apmxdcwebivmusqcuzcv.supabase.co/storage/v1/object/public/Tarzx/gojo.png');
   background-size:cover;
   background-position:center;
   background-repeat:no-repeat;
@@ -447,6 +447,17 @@ body.scroll-tabbar-hide .bottom-tab-bar{
 .profilepg-hero-info{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;text-align:left;min-width:0;}
 .profile-name-row{display:flex;align-items:center;gap:5px;min-width:0;}
 .profile-verified-badge{width:15px;height:15px;flex-shrink:0;}
+.profile-vip-mini-badge{
+  width:15px;height:15px;flex-shrink:0;
+  margin-left:-3px;
+  filter:drop-shadow(0 0 3px rgba(232,182,74,.65));
+  animation:vipMiniPop .32s var(--ease-out);
+}
+@keyframes vipMiniPop{
+  0%{transform:scale(.4);opacity:0;}
+  60%{transform:scale(1.15);opacity:1;}
+  100%{transform:scale(1);opacity:1;}
+}
 .profilepg-hero .profile-name{margin-bottom:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
 .profilepg-hero .profile-email{position:relative;z-index:1;margin-bottom:0;}
 @media(max-width:400px){
@@ -2686,11 +2697,8 @@ footer::before{
 .profile-avatar{
   width:66px;height:66px;border-radius:50%;
   object-fit:cover;background:rgba(255,255,255,.06);
-  border:1px solid var(--border-strong);
   display:block;
-}
-/* ring biru statis di sekeliling avatar, hanya saat VIP aktif (tanpa animasi putar) */
-.profile-avatar-wrap.is-vip .profile-avatar{
+  /* ring gradient biru selalu tampil, baik VIP maupun belum */
   border:2px solid transparent;
   padding:2px;
   background:
@@ -4891,6 +4899,17 @@ body.auth-locked{overflow:hidden;}
           <div class="profile-name-row">
             <span class="profile-name" id="profileName">—</span>
             <svg class="profile-verified-badge" viewBox="0 0 24 24" fill="none" aria-label="Terverifikasi"><path d="M12 2.5l2.3 1.6 2.7-.4 1.2 2.5 2.5 1.2-.4 2.7L22 12.5l-1.6 2.3.4 2.7-2.5 1.2-1.2 2.5-2.7-.4L12 22.5l-2.3-1.6-2.7.4-1.2-2.5-2.5-1.2.4-2.7L2 12.5l1.6-2.3-.4-2.7 2.5-1.2 1.2-2.5 2.7.4L12 2.5z" fill="#3b82f6"/><path d="M8.5 12.5l2.4 2.4 4.6-5.3" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg class="profile-vip-mini-badge" id="profileVipMiniBadge" viewBox="0 0 24 24" fill="none" aria-label="VIP" style="display:none;">
+              <defs>
+                <linearGradient id="vipMiniGrad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" stop-color="#ffe9a8"/>
+                  <stop offset=".55" stop-color="#e8b64a"/>
+                  <stop offset="1" stop-color="#ffd76a"/>
+                </linearGradient>
+              </defs>
+              <path d="M12 2.5l2.3 1.6 2.7-.4 1.2 2.5 2.5 1.2-.4 2.7L22 12.5l-1.6 2.3.4 2.7-2.5 1.2-1.2 2.5-2.7-.4L12 22.5l-2.3-1.6-2.7.4-1.2-2.5-2.5-1.2.4-2.7L2 12.5l1.6-2.3-.4-2.7 2.5-1.2 1.2-2.5 2.7.4L12 2.5z" fill="url(#vipMiniGrad)"/>
+              <text x="12" y="16" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="11" fill="#1a1200">V</text>
+            </svg>
           </div>
           <div class="profile-email" id="profileEmail">—</div>
         </div>
@@ -6748,8 +6767,21 @@ function renderProfilePanel(){
   if(!signedIn || !signedOut) return;
   if(_googleUser){
     document.getElementById('profileName').textContent = _googleUser.displayName || (_googleUser.email ? _googleUser.email.split('@')[0] : 'Akun');
-    document.getElementById('profileEmail').textContent = _googleUser.email || '';
-    document.getElementById('profileAvatar').src = _googleUser.photoURL || 'https://apmxdcwebivmusqcuzcv.supabase.co/storage/v1/object/public/Tarzx/Ts.png';
+    /* akun yang daftar pakai Username & Password sebenarnya punya email
+       internal (mis. tarzx@tarzstore.local) di belakang layar -- ini cuma
+       dipakai teknis oleh Firebase Auth dan tidak pernah dimaksudkan untuk
+       dilihat user. Supaya tampilan tetap rapi & terlihat seperti email
+       biasa, domain internal ini disamarkan jadi "<username>@gmail.com" di
+       UI (hanya kosmetik, tidak mengubah data asli di Firebase). */
+    const _rawEmail = _googleUser.email || '';
+    document.getElementById('profileEmail').textContent = _rawEmail.endsWith('@tarzstore.local')
+      ? _rawEmail.split('@')[0] + '@gmail.com'
+      : _rawEmail;
+    /* akun Google punya photoURL asli dari Google -- dipakai apa adanya.
+       Akun yang daftar/login pakai Username & Password (Firebase email/
+       password) TIDAK punya photoURL (selalu null), jadi otomatis pakai
+       foto profil default anime.png ini. */
+    document.getElementById('profileAvatar').src = _googleUser.photoURL || 'https://apmxdcwebivmusqcuzcv.supabase.co/storage/v1/object/public/Tarzx/anime.png';
     signedIn.style.display = 'block';
     signedOut.style.display = 'none';
 
@@ -6757,8 +6789,10 @@ function renderProfilePanel(){
     const isVip = isVipUnlocked();
     const badge = document.getElementById('profileVipBadge');
     const avatarWrap = document.getElementById('profileAvatarWrap');
+    const vipMiniBadge = document.getElementById('profileVipMiniBadge');
     if(badge) badge.style.display = isVip ? 'inline-flex' : 'none';
     if(avatarWrap) avatarWrap.classList.toggle('is-vip', isVip);
+    if(vipMiniBadge) vipMiniBadge.style.display = isVip ? 'inline-block' : 'none';
   } else {
     signedIn.style.display = 'none';
     signedOut.style.display = 'block';
