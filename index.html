@@ -230,16 +230,20 @@ body.tab-hidden .dot{animation-play-state:paused;}
   bottom:calc(16px + env(safe-area-inset-bottom));
   left:50%;
   transform:translateX(-50%);
-  width:340px;
-  max-width:calc(100vw - 24px);
-  background:rgba(14,14,16,.55);
-  -webkit-backdrop-filter:blur(20px) saturate(1.4);
-  backdrop-filter:blur(20px) saturate(1.4);
-  border-radius:25px;
-  border:1px solid rgba(255,255,255,.08);
-  box-shadow:0 8px 24px rgba(0,0,0,.35),0 2px 8px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.06);
+  width:300px;
+  max-width:calc(100vw - 32px);
+  background:rgba(20,20,22,.6);
+  -webkit-backdrop-filter:blur(22px) saturate(1.5);
+  backdrop-filter:blur(22px) saturate(1.5);
+  border-radius:24px;
+  border:1px solid rgba(255,255,255,.06);
+  box-shadow:
+    0 10px 32px rgba(0,0,0,.45),
+    0 3px 10px rgba(0,0,0,.3),
+    inset 0 1px 0 rgba(255,255,255,.05),
+    inset 0 0 0 1px rgba(255,255,255,.015);
   z-index:500;
-  padding:7px 10px;
+  padding:6px;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -247,7 +251,7 @@ body.tab-hidden .dot{animation-play-state:paused;}
   transition:opacity .35s var(--ease-soft),transform .35s var(--ease-soft);
 }
 @supports (backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px)){
-  .bottom-tab-bar{background:rgba(14,14,16,.92);}
+  .bottom-tab-bar{background:rgba(18,18,20,.9);}
 }
 body.side-menu-open .bottom-tab-bar{
   opacity:0;
@@ -265,30 +269,61 @@ body.scroll-tabbar-hide .bottom-tab-bar{
   transform:translateX(-50%) translateY(30px);
   pointer-events:none;
 }
-.btb-items{display:flex;align-items:flex-end;justify-content:space-between;width:100%;position:relative;}
+.btb-items{
+  display:flex;
+  align-items:stretch;
+  justify-content:space-between;
+  width:100%;
+  position:relative;
+  gap:4px;
+}
+/* Pil aktif yang bergeser mengikuti tab terpilih — kunci tampilan "rapi" */
+.btb-active-pill{
+  position:absolute;
+  top:0;
+  left:0;
+  height:100%;
+  border-radius:14px;
+  background:linear-gradient(180deg,rgba(70,70,74,.7),rgba(40,40,44,.6));
+  border:1px solid rgba(255,255,255,.06);
+  box-shadow:0 4px 14px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.06);
+  transition:transform .38s var(--ease),width .38s var(--ease);
+  pointer-events:none;
+  z-index:0;
+  will-change:transform,width;
+}
+body.side-menu-open .btb-active-pill,
+body.tabbar-hide .btb-active-pill,
+body.scroll-tabbar-hide .btb-active-pill{transition:none;}
 .btb-item{
   position:relative;
-  display:flex;flex-direction:column;align-items:center;gap:3px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
   background:none;border:none;cursor:pointer;
-  padding:6px 4px;
+  padding:7px 2px 6px;
   flex:1;
   min-width:0;
-  border-radius:12px;
-  color:rgba(255,255,255,.4);
+  border-radius:14px;
+  color:rgba(255,255,255,.42);
   font-family:'Space Grotesk',sans-serif;
-  font-size:.56rem;font-weight:500;letter-spacing:.2px;text-transform:uppercase;
-  transition:color .3s ease,transform .25s ease,background .3s ease;
+  font-size:.52rem;font-weight:500;letter-spacing:.2px;text-transform:uppercase;
+  transition:color .3s ease,transform .25s var(--ease-out);
   -webkit-tap-highlight-color:transparent;
   outline:none;
+  z-index:1;
 }
-.btb-item:active{transform:scale(.88);}
+.btb-item:active{transform:scale(.9);}
 .btb-item.active{color:#fff;font-weight:700;}
-.btb-item .btb-icon{width:20px;height:20px;stroke:currentColor;transition:transform .3s ease,filter .3s ease;}
-.btb-item.active .btb-icon{transform:scale(1.12);filter:drop-shadow(0 0 6px rgba(0,229,160,.4));}
-.btb-item .btb-label{margin-top:2px;transition:opacity .25s ease;}
+.btb-item .btb-icon{width:18px;height:18px;stroke:currentColor;transition:transform .32s var(--ease-out),filter .32s ease;}
+.btb-item.active .btb-icon{transform:scale(1.1) translateY(-1px);filter:drop-shadow(0 0 7px rgba(0,229,160,.45));}
+.btb-item .btb-label{
+  margin-top:1px;
+  transition:opacity .25s ease,letter-spacing .3s ease;
+  opacity:.85;
+}
+.btb-item.active .btb-label{opacity:1;letter-spacing:.4px;}
 
 
-@media(prefers-reduced-motion:reduce){.bottom-tab-bar,.btb-item,.btb-item .btb-icon{transition:none!important;}}
+@media(prefers-reduced-motion:reduce){.bottom-tab-bar,.btb-item,.btb-item .btb-icon,.btb-active-pill{transition:none!important;}}
 
 
 /* ── TOOLS TAB — grid 3 kolom, gaya kartu sama seperti product-grid ── */
@@ -3414,6 +3449,82 @@ body.side-menu-open{overflow:hidden;}
 .gapi-modal-sub{
   text-align:center;font-size:.66rem;color:var(--text2);margin-top:2px;margin-bottom:12px;
 }
+/* ── EDIT PROFIL MODAL — preview banner & avatar terpisah, masing-masing dalam card sendiri ── */
+.editprofil-section{
+  background:rgba(255,255,255,.03);
+  border:1px solid var(--border);
+  border-radius:var(--radius-md);
+  padding:12px;
+  margin-top:12px;
+}
+.editprofil-section:first-of-type{margin-top:2px;}
+.editprofil-preview-banner{
+  position:relative;width:100%;height:110px;border-radius:var(--radius-sm);
+  overflow:hidden;background:#000;border:1px solid var(--border-strong);
+}
+.editprofil-preview-banner img{width:100%;height:100%;object-fit:cover;display:block;}
+.editprofil-preview-avatar-wrap{
+  position:relative;width:84px;height:84px;border-radius:50%;
+  margin:0 auto;overflow:hidden;
+  border:3px solid var(--card2);box-shadow:0 6px 18px rgba(0,0,0,.5);
+  background:#000;
+}
+.editprofil-preview-avatar-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
+.editprofil-block{margin-top:14px;}
+.editprofil-block:first-of-type{margin-top:2px;}
+.editprofil-block-label{
+  font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:.06em;
+  color:var(--text2);text-transform:uppercase;margin:0 0 10px;text-align:center;
+}
+.editprofil-use-btn{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  width:100%;margin-top:10px;padding:9px 12px;
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+  color:#0a0a0a;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.78rem;
+  border:none;border-radius:var(--radius-sm);cursor:pointer;
+  transition:transform var(--t-fast) var(--ease-soft),opacity var(--t-fast) var(--ease-soft);
+  -webkit-tap-highlight-color:transparent;
+}
+.editprofil-use-btn:active{transform:scale(.97);}
+.editprofil-use-btn.is-used{
+  background:rgba(0,229,160,.14);color:var(--green);
+  border:1px solid rgba(0,229,160,.35);
+}
+.editprofil-use-btn svg{width:14px;height:14px;flex-shrink:0;}
+.editprofil-divider{height:1px;background:var(--border);margin:16px 0;}
+.editprofil-note{
+  text-align:center;font-size:.62rem;color:var(--text2);margin-top:12px;line-height:1.5;
+}
+/* ── GALERI PILIHAN — grid thumbnail banner/avatar yang bisa diklik ── */
+.editprofil-gallery{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;
+}
+.editprofil-thumb{
+  position:relative;cursor:pointer;border-radius:var(--radius-sm);
+  overflow:hidden;background:#000;
+  border:2px solid var(--border-strong);
+  transition:border-color var(--t-fast) var(--ease-soft),transform var(--t-fast) var(--ease-soft);
+  -webkit-tap-highlight-color:transparent;
+}
+.editprofil-thumb:active{transform:scale(.97);}
+.editprofil-thumb.banner-thumb{height:64px;}
+.editprofil-thumb.avatar-thumb{
+  width:100%;aspect-ratio:1/1;border-radius:50%;margin:0 auto;max-width:64px;
+}
+.editprofil-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.editprofil-thumb.is-selected{border-color:var(--blue);}
+.editprofil-thumb-check{
+  position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:50%;
+  background:var(--blue);color:#0a0a0a;display:none;
+  align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.4);
+}
+.editprofil-thumb.avatar-thumb .editprofil-thumb-check{top:-2px;right:-2px;}
+.editprofil-thumb.is-selected .editprofil-thumb-check{display:flex;}
+.editprofil-thumb-check svg{width:11px;height:11px;}
+.editprofil-avatar-grid{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px;
+  justify-items:center;
+}
 .gapi-input-row{margin-top:4px;display:flex;gap:6px;align-items:stretch;}
 .gapi-input{
   flex:1;min-width:0;padding:9px 12px;
@@ -3667,6 +3778,7 @@ body.auth-locked{overflow:hidden;}
 .authgate-submit:hover{filter:brightness(.92);}
 .authgate-submit:active{transform:scale(.98);}
 .authgate-submit.loading{pointer-events:none;opacity:.75;}
+.authgate-submit:disabled{opacity:.4;cursor:not-allowed;filter:none;}
 .authgate-submit .authgate-spinner{
   display:none;width:16px;height:16px;border-radius:50%;
   border:2px solid rgba(0,0,0,.25);border-top-color:#0a0a0a;
@@ -4224,6 +4336,207 @@ body.auth-locked{overflow:hidden;}
   </div>
 </div>
 
+<!-- EDIT PROFIL MODAL — preview banner & foto profil + tombol "Gunakan" -->
+<div class="gapi-modal-overlay" id="editProfilModalOverlay">
+  <div class="gapi-modal" role="dialog" aria-modal="true" aria-label="Edit Profil">
+    <button class="gapi-modal-close" aria-label="Tutup" onclick="closeEditProfilModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="gapi-modal-title">EDIT PROFIL</div>
+    <div class="gapi-modal-sub">Edit Foto Profil dan banner</div>
+
+    <div class="editprofil-section">
+      <div class="editprofil-block-label">Foto Profil</div>
+      <img id="editProfilAvatarPreview" src="https://apmxdcwebivmusqcuzcv.supabase.co/storage/v1/object/public/Tarzx/anime.png" alt="Pratinjau foto profil" style="display:none;">
+      <div class="editprofil-avatar-grid" id="editProfilAvatarGallery">
+        <div class="editprofil-thumb avatar-thumb" data-src="https://apmxdcwebivmusqcuzcv.supabase.co/storage/v1/object/public/Tarzx/anime.png">
+          <img src="https://apmxdcwebivmusqcuzcv.supabase.co/storage/v1/object/public/Tarzx/anime.png" alt="Foto profil 1">
+        </div>
+        <div class="editprofil-thumb avatar-thumb" data-src="https://i.ibb.co.com/WW61D1sV/profil2-png.jpg">
+          <img src="https://i.ibb.co.com/WW61D1sV/profil2-png.jpg" alt="Foto profil 2">
+        </div>
+        <div class="editprofil-thumb avatar-thumb" data-src="https://i.ibb.co.com/LXMHt5Bm/b6c03c67d9f97b78604edb9956b12c7e.jpg">
+          <img src="https://i.ibb.co.com/LXMHt5Bm/b6c03c67d9f97b78604edb9956b12c7e.jpg" alt="Foto profil 3">
+        </div>
+        <div class="editprofil-thumb avatar-thumb" data-src="https://i.ibb.co.com/v65GGn9N/3ada57adf75eccdc1ec01e981840fbb7.jpg">
+          <img src="https://i.ibb.co.com/v65GGn9N/3ada57adf75eccdc1ec01e981840fbb7.jpg" alt="Foto profil 4">
+        </div>
+      </div>
+      <button type="button" class="editprofil-use-btn" id="editProfilAvatarUseBtn" onclick="useEditProfilAvatar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Gunakan
+      </button>
+    </div>
+
+    <div class="editprofil-section">
+      <div class="editprofil-block-label">Banner</div>
+      <img id="editProfilBannerPreview" src="https://apmxdcwebivmusqcuzcv.supabase.co/storage/v1/object/public/Tarzx/gojo.png" alt="Pratinjau banner profil" style="display:none;">
+      <div class="editprofil-gallery" id="editProfilBannerGallery">
+        <div class="editprofil-thumb banner-thumb" data-src="https://apmxdcwebivmusqcuzcv.supabase.co/storage/v1/object/public/Tarzx/gojo.png">
+          <img src="https://apmxdcwebivmusqcuzcv.supabase.co/storage/v1/object/public/Tarzx/gojo.png" alt="Banner 1">
+        </div>
+        <div class="editprofil-thumb banner-thumb" data-src="https://i.ibb.co.com/jvS6zjmX/112372.jpg">
+          <img src="https://i.ibb.co.com/jvS6zjmX/112372.jpg" alt="Banner 2">
+        </div>
+        <div class="editprofil-thumb banner-thumb" data-src="https://i.ibb.co.com/YBLRx9YQ/spiderman-80kb.jpg">
+          <img src="https://i.ibb.co.com/YBLRx9YQ/spiderman-80kb.jpg" alt="Banner 3">
+        </div>
+        <div class="editprofil-thumb banner-thumb" data-src="https://i.ibb.co.com/C5zfnW9m/japan-2-1-80kb-1.jpg">
+          <img src="https://i.ibb.co.com/C5zfnW9m/japan-2-1-80kb-1.jpg" alt="Banner 4">
+        </div>
+      </div>
+      <button type="button" class="editprofil-use-btn" id="editProfilBannerUseBtn" onclick="useEditProfilBanner()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Gunakan
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL AKUN MODAL — ringkasan email, metode login, dan status VIP akun yang
+     sedang login. Read-only, tidak ada aksi ubah data (itu tugas menu Edit
+     Profil / Password terpisah). -->
+<div class="gapi-modal-overlay" id="accountDetailModalOverlay">
+  <div class="gapi-modal" role="dialog" aria-modal="true" aria-label="Detail Akun">
+    <button class="gapi-modal-close" aria-label="Tutup" onclick="closeAccountDetailModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="gapi-modal-title">DETAIL AKUN</div>
+    <div class="gapi-modal-sub">Ringkasan akun kamu</div>
+
+    <div class="inline-copykey-wrap">
+      <div class="inline-copykey-label">Email</div>
+      <div class="inline-copykey-row" style="margin-bottom:12px;">
+        <span class="inline-copykey-value" id="accountDetailEmail">-</span>
+        <button type="button" class="inline-copykey-btn" id="accountDetailEmailCopyBtn" aria-label="Salin Email" onclick="copyTextInline(document.getElementById('accountDetailEmail').textContent, this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span class="copykey-btn-text">Salin</span>
+        </button>
+      </div>
+
+      <div class="inline-copykey-label">Metode Login</div>
+      <div class="inline-copykey-row" style="margin-bottom:12px;">
+        <span class="inline-copykey-value" id="accountDetailLoginMethod">-</span>
+      </div>
+
+      <div class="inline-copykey-label">Tanggal Bergabung</div>
+      <div class="inline-copykey-row" style="margin-bottom:12px;">
+        <span class="inline-copykey-value" id="accountDetailJoinDate">-</span>
+      </div>
+
+      <div class="inline-copykey-label">Status Membership</div>
+      <div class="inline-copykey-row">
+        <span class="inline-copykey-value" id="accountDetailVipStatus">-</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- INFO MODAL — tentang toko, syarat & ketentuan singkat, kontak admin.
+     Dibuka dari menu "Info" di card penghubung profil. -->
+<div class="gapi-modal-overlay" id="infoModalOverlay">
+  <div class="gapi-modal" role="dialog" aria-modal="true" aria-label="Info Aplikasi">
+    <button class="gapi-modal-close" aria-label="Tutup" onclick="closeInfoModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="gapi-modal-title">INFO</div>
+    <div class="gapi-modal-sub">Tentang Tarz Store &amp; ketentuan layanan</div>
+
+    <div class="inline-copykey-wrap">
+      <div class="inline-copykey-label">Tentang</div>
+      <div style="font-size:.82rem;line-height:1.55;color:var(--text2);margin-bottom:14px;">
+        Tarz Store adalah toko digital yang menyediakan produk-produk premium dengan proses serba cepat.
+        Semua transaksi diproses otomatis lewat sistem, dan tim admin siap membantu lewat WhatsApp bila ada kendala.
+      </div>
+
+      <div class="inline-copykey-label">Syarat &amp; Ketentuan</div>
+      <ul style="font-size:.8rem;line-height:1.6;color:var(--text2);margin:0 0 14px 18px;padding:0;">
+        <li>Produk yang sudah dibeli/diunduh bersifat final dan tidak dapat direfund kecuali ada kesalahan sistem dari pihak kami.</li>
+        <li>Akun VIP hanya untuk penggunaan pribadi, dilarang dibagikan atau diperjualbelikan kembali tanpa izin.</li>
+        <li>Kami tidak bertanggung jawab atas kerugian akibat penyalahgunaan produk di luar ketentuan yang berlaku.</li>
+        <li>Ketentuan dapat berubah sewaktu-waktu; versi terbaru selalu tersedia di halaman ini.</li>
+      </ul>
+
+      <div class="inline-copykey-label">Kontak Admin</div>
+      <div class="inline-copykey-row" style="margin-bottom:0;">
+        <a href="https://wa.me/+6281918665183" target="_blank" rel="noopener noreferrer" style="font-size:.82rem;color:#25d366;text-decoration:none;font-weight:600;display:flex;align-items:center;gap:6px;">
+          <span class="js-icon" data-icon-key="socialWhatsapp"></span>
+          Hubungi via WhatsApp
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GANTI PASSWORD MODAL — hanya untuk akun yang login pakai Username & Password.
+     Akun Google tidak punya password Firebase (login lewat OAuth), jadi menu
+     ini otomatis disembunyikan/diblokir untuk akun Google (lihat JS terkait). -->
+<div class="gapi-modal-overlay" id="changePasswordModalOverlay">
+  <div class="gapi-modal" role="dialog" aria-modal="true" aria-label="Ganti Password">
+    <button class="gapi-modal-close" aria-label="Tutup" onclick="closeChangePasswordModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="gapi-modal-title">GANTI PASSWORD</div>
+    <div class="gapi-modal-sub">Buat password baru untuk akun kamu</div>
+
+    <form id="changePasswordForm" class="authgate-form" onsubmit="submitChangePassword(event)" novalidate>
+      <div class="authgate-field">
+        <label class="authgate-label" for="cpNewPassword">Password Baru</label>
+        <div class="authgate-input-wrap">
+          <input type="password" id="cpNewPassword" class="authgate-input" placeholder="Minimal 6 karakter" autocomplete="new-password" required minlength="6">
+          <button type="button" class="authgate-eye-btn" onclick="cpTogglePasswordEye('cpNewPassword', this)" aria-label="Tampilkan password">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="authgate-field">
+        <label class="authgate-label" for="cpConfirmPassword">Konfirmasi Password Baru</label>
+        <div class="authgate-input-wrap">
+          <input type="password" id="cpConfirmPassword" class="authgate-input" placeholder="Ulangi password baru" autocomplete="new-password" required minlength="6">
+          <button type="button" class="authgate-eye-btn" onclick="cpTogglePasswordEye('cpConfirmPassword', this)" aria-label="Tampilkan password">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="authgate-error" id="cpErrorMsg"></div>
+
+      <button type="submit" class="authgate-submit" id="cpSubmitBtn">
+        <span class="authgate-spinner"></span>
+        <span class="authgate-submit-label">Simpan Password Baru</span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- HAPUS AKUN MODAL — konfirmasi wajib ketik "Hapus" sebelum tombol aktif -->
+<div class="gapi-modal-overlay" id="deleteAccountModalOverlay">
+  <div class="gapi-modal" role="dialog" aria-modal="true" aria-label="Hapus Akun">
+    <button class="gapi-modal-close" aria-label="Tutup" onclick="closeDeleteAccountModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="gapi-modal-title">HAPUS AKUN</div>
+    <div class="gapi-modal-sub">Tindakan ini permanen dan tidak bisa dibatalkan. Semua data akun kamu (termasuk status VIP) akan hilang selamanya.</div>
+
+    <form id="deleteAccountForm" class="authgate-form" onsubmit="submitDeleteAccount(event)" novalidate>
+      <div class="authgate-field">
+        <label class="authgate-label" for="daConfirmInput">Ketik <strong>Hapus</strong> untuk konfirmasi</label>
+        <div class="authgate-input-wrap">
+          <input type="text" id="daConfirmInput" class="authgate-input" placeholder="Hapus" autocomplete="off" autocapitalize="off" spellcheck="false" oninput="daHandleInput()">
+        </div>
+      </div>
+
+      <div class="authgate-error" id="daErrorMsg"></div>
+
+      <button type="submit" class="authgate-submit" id="daSubmitBtn" disabled>
+        <span class="authgate-spinner"></span>
+        <span class="authgate-submit-label">Hapus Akun Saya</span>
+      </button>
+    </form>
+  </div>
+</div>
+
 <!-- FACEBOOK DOWNLOADER MODAL (video publik, SD/HD) -->
 <div class="gapi-modal-overlay" id="fbdlModalOverlay">
   <div class="gapi-modal" role="dialog" aria-modal="true" aria-label="Unduh video Facebook">
@@ -4560,6 +4873,7 @@ body.auth-locked{overflow:hidden;}
 <!-- BOTTOM TAB BAR -->
 <nav class="bottom-tab-bar" aria-label="Tab navigasi bawah">
   <div class="btb-items" role="tablist" aria-label="Kategori produk">
+    <div class="btb-active-pill" id="btbActivePill" aria-hidden="true"></div>
     <button class="btb-item active" id="tab-cheat" data-tab="cheat" type="button" role="tab" aria-selected="true" aria-controls="cheat">
       <svg class="btb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 6V2"/><path d="M22 12h-4"/><path d="M6 12H2"/><path d="M12 22v-4"/><path d="M12 12h.01"/></svg>
       <span class="btb-label">FREE FIRE</span>
@@ -4577,7 +4891,6 @@ body.auth-locked{overflow:hidden;}
       <span class="btb-label">PROFIL</span>
     </button>
   </div>
-  <div class="btb-home-indicator"></div>
 </nav>
 
 <!-- PRODUCTS -->
@@ -4716,7 +5029,7 @@ body.auth-locked{overflow:hidden;}
 
         <!-- MENU FITUR PROFIL — Edit Profil, Password, Dark Mode -->
         <div class="profile-menu-list" id="profileFeatureMenu" style="display:none;">
-          <button type="button" class="profile-menu-item" onclick="void 0;">
+          <button type="button" class="profile-menu-item" onclick="openEditProfilModal();">
             <span class="profile-menu-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
             </span>
@@ -4724,7 +5037,7 @@ body.auth-locked{overflow:hidden;}
             <svg class="profile-menu-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
 
-          <button type="button" class="profile-menu-item" onclick="void 0;">
+          <button type="button" class="profile-menu-item" id="profilePasswordMenuBtn" onclick="openChangePasswordModal();">
             <span class="profile-menu-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             </span>
@@ -4735,7 +5048,7 @@ body.auth-locked{overflow:hidden;}
 
         <!-- CARD PENGHUBUNG PROFIL — Account, Share, Review, Info, Settings -->
         <div class="profile-menu-list2" id="profileLinkCard">
-          <button type="button" class="profile-menu-item2" onclick="void 0;">
+          <button type="button" class="profile-menu-item2" onclick="openAccountDetailModal();">
             <span class="profile-menu-icon2">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             </span>
@@ -4743,7 +5056,7 @@ body.auth-locked{overflow:hidden;}
             <svg class="profile-menu-chevron2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
 
-          <button type="button" class="profile-menu-item2" onclick="void 0;">
+          <button type="button" class="profile-menu-item2" onclick="shareAppWithFriends();">
             <span class="profile-menu-icon2">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-7-7 18-2-8-8-3z"/></svg>
             </span>
@@ -4751,15 +5064,7 @@ body.auth-locked{overflow:hidden;}
             <svg class="profile-menu-chevron2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
 
-          <button type="button" class="profile-menu-item2" onclick="void 0;">
-            <span class="profile-menu-icon2">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-            </span>
-            <span class="profile-menu-label2">Review</span>
-            <svg class="profile-menu-chevron2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
-
-          <button type="button" class="profile-menu-item2" onclick="void 0;">
+          <button type="button" class="profile-menu-item2" onclick="openInfoModal();">
             <span class="profile-menu-icon2">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
             </span>
@@ -4772,6 +5077,14 @@ body.auth-locked{overflow:hidden;}
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
             </span>
             <span class="profile-menu-label2">Settings</span>
+            <svg class="profile-menu-chevron2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+
+          <button type="button" class="profile-menu-item2 profile-menu-item2-danger" onclick="openDeleteAccountModal();">
+            <span class="profile-menu-icon2">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+            </span>
+            <span class="profile-menu-label2">Hapus Akun</span>
             <svg class="profile-menu-chevron2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
 
@@ -5100,6 +5413,15 @@ document.addEventListener('keydown', function(e){
 
 /* ── TABS — with ARIA & keyboard support ── */
 const tabBtns = document.querySelectorAll('.btb-item[data-tab]');
+/* Geser pil highlight ke posisi tombol tab yang sedang aktif.
+   Dihitung dari offsetLeft/offsetWidth supaya otomatis pas
+   berapapun jumlah/lebar tab-nya, tanpa nilai hardcode. */
+function movePillToBtn(btn){
+  const pill = document.getElementById('btbActivePill');
+  if(!pill || !btn) return;
+  pill.style.width = btn.offsetWidth + 'px';
+  pill.style.transform = 'translateX(' + btn.offsetLeft + 'px)';
+}
 function activateTab(btn){
   const prevBtn = document.querySelector('.btb-item.active');
   if(prevBtn && prevBtn !== btn){ prevBtn.classList.remove('active'); prevBtn.setAttribute('aria-selected','false'); }
@@ -5107,6 +5429,7 @@ function activateTab(btn){
   if(prevActive) prevActive.classList.remove('active');
   btn.classList.add('active');
   btn.setAttribute('aria-selected','true');
+  movePillToBtn(btn);
   const target = document.getElementById(btn.dataset.tab);
   target.classList.add('active');
   /* Halaman VIP/Profil tidak pakai banner/poster video -- sembunyikan section
@@ -5127,6 +5450,23 @@ function activateTab(btn){
      user tidak "kejauhan" scroll-nya waktu pindah ke tab lain. */
   window.scrollTo({top:0, behavior:'smooth'});
 }
+/* Set posisi awal pil saat halaman pertama dimuat (tanpa animasi geser),
+   lalu perbaiki lagi tiap kali ukuran layar berubah (rotate/resize). */
+(function initActivePill(){
+  function place(){
+    const activeBtn = document.querySelector('.btb-item.active[data-tab]');
+    if(activeBtn) movePillToBtn(activeBtn);
+  }
+  const pill = document.getElementById('btbActivePill');
+  if(pill){
+    pill.style.transition = 'none';
+    place();
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){ pill.style.transition = ''; });
+    });
+  }
+  window.addEventListener('resize', place, {passive:true});
+})();
 /* Dipanggil dari link sidebar. */
 function switchTabFromSideMenu(tabId){
   const btn = document.getElementById(tabId);
@@ -5430,6 +5770,137 @@ function copyTextInline(text, btnEl){
     ta.select();
     try{ document.execCommand('copy'); done(); }
     catch(e){}
+    document.body.removeChild(ta);
+  }
+}
+
+/* Detail Akun -- modal read-only berisi email, metode login (Google vs
+   Username & Password), dan status membership VIP akun yang sedang login.
+   Datanya diambil dari _googleUser (Firebase Auth user object) dan
+   isVipUnlocked(), keduanya sudah dipakai di renderProfilePanel(). */
+function openAccountDetailModal(){
+  const overlay = document.getElementById('accountDetailModalOverlay');
+  if(!overlay) return;
+  const user = _googleUser;
+  if(!user){
+    showToast('Kamu belum login.', 'error');
+    return;
+  }
+
+  const rawEmail = user.email || '';
+  const isUsernamePasswordAccount = rawEmail.endsWith('@tarzstore.local');
+
+  const emailEl = document.getElementById('accountDetailEmail');
+  const emailCopyBtn = document.getElementById('accountDetailEmailCopyBtn');
+  if(emailEl){
+    if(isUsernamePasswordAccount){
+      /* email internal @tarzstore.local cuma dipakai Firebase Auth di
+         belakang layar, tidak pernah dimaksudkan untuk dilihat user --
+         tampilkan username saja (sama seperti renderProfilePanel()). */
+      emailEl.textContent = user.displayName || rawEmail.split('@')[0] || '-';
+      if(emailCopyBtn) emailCopyBtn.style.display = 'none';
+    } else {
+      emailEl.textContent = rawEmail || '-';
+      if(emailCopyBtn) emailCopyBtn.style.display = '';
+    }
+  }
+
+  const loginMethodEl = document.getElementById('accountDetailLoginMethod');
+  if(loginMethodEl){
+    loginMethodEl.textContent = isUsernamePasswordAccount ? 'Username & Password' : 'Google';
+  }
+
+  const joinDateEl = document.getElementById('accountDetailJoinDate');
+  if(joinDateEl){
+    const creationTime = user.metadata && user.metadata.creationTime;
+    if(creationTime){
+      const d = new Date(creationTime);
+      joinDateEl.textContent = isNaN(d.getTime()) ? '-' : d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    } else {
+      joinDateEl.textContent = '-';
+    }
+  }
+
+  const vipStatusEl = document.getElementById('accountDetailVipStatus');
+  if(vipStatusEl){
+    const isVip = isVipUnlocked();
+    vipStatusEl.textContent = isVip ? 'VIP Aktif' : 'Belum VIP';
+    vipStatusEl.style.color = isVip ? '#f3d489' : '';
+  }
+
+  overlay.style.display = 'flex'; void overlay.offsetHeight;
+  overlay.classList.add('show');
+  document.body.style.overflow = 'hidden'; document.body.classList.add('tabbar-hide');
+}
+
+function closeAccountDetailModal(){
+  const overlay = document.getElementById('accountDetailModalOverlay');
+  if(!overlay) return;
+  overlay.classList.remove('show');
+  document.body.style.overflow = ''; document.body.classList.remove('tabbar-hide');
+}
+(function(){
+  const overlay = document.getElementById('accountDetailModalOverlay');
+  if(overlay){
+    overlay.addEventListener('click', function(e){
+      if(e.target === overlay) closeAccountDetailModal();
+    });
+  }
+})();
+
+function openInfoModal(){
+  const overlay = document.getElementById('infoModalOverlay');
+  if(!overlay) return;
+  overlay.style.display = 'flex'; void overlay.offsetHeight;
+  overlay.classList.add('show');
+  document.body.style.overflow = 'hidden'; document.body.classList.add('tabbar-hide');
+}
+
+function closeInfoModal(){
+  const overlay = document.getElementById('infoModalOverlay');
+  if(!overlay) return;
+  overlay.classList.remove('show');
+  document.body.style.overflow = ''; document.body.classList.remove('tabbar-hide');
+}
+(function(){
+  const overlay = document.getElementById('infoModalOverlay');
+  if(overlay){
+    overlay.addEventListener('click', function(e){
+      if(e.target === overlay) closeInfoModal();
+    });
+  }
+})();
+
+/* Share with friends -- pakai Web Share API (share sheet native di HP/browser
+   yang support), fallback ke copy link ke clipboard kalau tidak didukung
+   (contoh: sebagian besar browser desktop). */
+function shareAppWithFriends(){
+  const shareData = {
+    title: 'Tarz Store',
+    text: 'Cobain Tarz Store, aplikasi cheat & tools favoritku!',
+    url: window.location.origin + window.location.pathname
+  };
+
+  if(navigator.share){
+    navigator.share(shareData).catch(()=>{ /* user batal share, abaikan */ });
+    return;
+  }
+
+  /* Fallback: copy link ke clipboard + toast */
+  const done = () => showToast('Link berhasil disalin!', 'success');
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(shareData.url).then(done).catch(()=>{
+      showToast('Gagal menyalin link.', 'error');
+    });
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = shareData.url;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try{ document.execCommand('copy'); done(); }
+    catch(e){ showToast('Gagal menyalin link.', 'error'); }
     document.body.removeChild(ta);
   }
 }
@@ -6540,14 +7011,25 @@ function renderProfilePanel(){
         _emailEl.style.display = '';
       }
     }
-    /* akun Google punya photoURL asli dari Google -- dipakai apa adanya.
-       Akun yang daftar/login pakai Username & Password (Firebase email/
-       password) TIDAK punya photoURL (selalu null), jadi otomatis pakai
-       foto profil default anime.png ini. */
-    document.getElementById('profileAvatar').src = _googleUser.photoURL || 'https://apmxdcwebivmusqcuzcv.supabase.co/storage/v1/object/public/Tarzx/anime.png';
+    /* akun Google punya photoURL asli dari Google -- dipakai apa adanya,
+       KECUALI user sudah pernah pilih avatar custom lewat modal "Edit
+       Profil" (tersimpan di localStorage) -- avatar custom itu diprioritaskan
+       supaya pilihan user tidak ketimpa tiap kali renderProfilePanel() jalan
+       (login, refresh, dsb). Akun yang daftar/login pakai Username & Password
+       (Firebase email/password) TIDAK punya photoURL (selalu null), jadi
+       otomatis pakai foto profil default anime.png ini kalau belum ada
+       avatar custom. */
+    let _customAvatar = null;
+    try{ _customAvatar = localStorage.getItem('tarz_custom_avatar'); }catch(e){}
+    document.getElementById('profileAvatar').src = _customAvatar || _googleUser.photoURL || 'https://apmxdcwebivmusqcuzcv.supabase.co/storage/v1/object/public/Tarzx/anime.png';
     signedIn.style.display = 'block';
     signedOut.style.display = 'none';
     if(featureMenu) featureMenu.style.display = 'flex';
+    /* menu "Password" cuma relevan buat akun Username & Password --
+       akun Google login lewat OAuth dan tidak punya password Firebase
+       untuk diganti, jadi menunya disembunyikan untuk akun Google. */
+    const _passwordMenuBtn = document.getElementById('profilePasswordMenuBtn');
+    if(_passwordMenuBtn) _passwordMenuBtn.style.display = _isUsernamePasswordAccount ? 'flex' : 'none';
 
     /* tampilkan badge "MEMBER VIP" + ring emas di avatar kalau akun ini VIP */
     const isVip = isVipUnlocked();
@@ -8275,6 +8757,364 @@ document.addEventListener('dragstart', function(e){
   };
 
   urlInput.addEventListener('keydown', e=>{ if(e.key === 'Enter'){ e.preventDefault(); fetchSpotifyDl(); } });
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════
+     EDIT PROFIL — pratinjau banner & foto profil + tombol "Gunakan"
+     ═══════════════════════════════════════════════════ -->
+<script>
+/* Pilihan disimpan di localStorage per-perangkat lalu diterapkan ke
+   .profilepg-cover (background-image) dan #profileAvatar (src). Kalau user
+   sudah pernah pilih sebelumnya, saat modal dibuka tombol "Gunakan" yang
+   sesuai langsung ditandai "Digunakan" supaya statusnya jelas. */
+(function(){
+  const LS_AVATAR = 'tarz_custom_avatar';
+  const LS_BANNER = 'tarz_custom_banner';
+
+  const overlay = document.getElementById('editProfilModalOverlay');
+
+  function applySavedProfileAssets(){
+    try{
+      const savedAvatar = localStorage.getItem(LS_AVATAR);
+      if(savedAvatar){
+        document.querySelectorAll('#profileAvatar').forEach(el=>{ el.src = savedAvatar; });
+      }
+      const savedBanner = localStorage.getItem(LS_BANNER);
+      if(savedBanner){
+        document.querySelectorAll('.profilepg-cover').forEach(el=>{
+          el.style.backgroundImage = "url('" + savedBanner + "')";
+        });
+      }
+    }catch(e){ /* localStorage tidak tersedia, biarkan default */ }
+  }
+
+  function setUseBtnState(btn, used){
+    btn.classList.toggle('is-used', !!used);
+    btn.innerHTML = used
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Digunakan'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Gunakan';
+  }
+
+  function syncGallerySelection(galleryEl, activeSrc){
+    if(!galleryEl) return;
+    galleryEl.querySelectorAll('.editprofil-thumb').forEach(thumb=>{
+      thumb.classList.toggle('is-selected', thumb.dataset.src === activeSrc);
+    });
+  }
+
+  function setupGallery(galleryId, previewImgId, useBtnId){
+    const galleryEl = document.getElementById(galleryId);
+    const previewImg = document.getElementById(previewImgId);
+    if(!galleryEl || !previewImg) return;
+    galleryEl.querySelectorAll('.editprofil-thumb').forEach(thumb=>{
+      thumb.addEventListener('click', function(){
+        const src = thumb.dataset.src;
+        if(!src) return;
+        previewImg.src = src;
+        syncGallerySelection(galleryEl, src);
+        syncUseButtonState();
+      });
+    });
+  }
+
+  function syncUseButtonState(){
+    try{
+      const avatarBtn = document.getElementById('editProfilAvatarUseBtn');
+      const bannerBtn = document.getElementById('editProfilBannerUseBtn');
+      const avatarImg = document.getElementById('editProfilAvatarPreview');
+      const bannerImg = document.getElementById('editProfilBannerPreview');
+      const avatarGallery = document.getElementById('editProfilAvatarGallery');
+      const bannerGallery = document.getElementById('editProfilBannerGallery');
+      const savedAvatar = localStorage.getItem(LS_AVATAR);
+      const savedBanner = localStorage.getItem(LS_BANNER);
+      if(avatarBtn && avatarImg) setUseBtnState(avatarBtn, savedAvatar === avatarImg.src);
+      if(bannerBtn && bannerImg) setUseBtnState(bannerBtn, savedBanner === bannerImg.src);
+      if(avatarImg) syncGallerySelection(avatarGallery, avatarImg.src);
+      if(bannerImg) syncGallerySelection(bannerGallery, bannerImg.src);
+    }catch(e){}
+  }
+
+  window.openEditProfilModal = function(){
+    if(!overlay) return;
+    overlay.style.display = 'flex'; void overlay.offsetHeight;
+    overlay.classList.add('show');
+    document.body.style.overflow = 'hidden'; document.body.classList.add('tabbar-hide');
+    syncUseButtonState();
+  };
+  window.closeEditProfilModal = function(){
+    if(!overlay) return;
+    overlay.classList.remove('show');
+    document.body.style.overflow = ''; document.body.classList.remove('tabbar-hide');
+  };
+  if(overlay){
+    overlay.addEventListener('click', function(e){
+      if(e.target === overlay) closeEditProfilModal();
+    });
+  }
+
+  window.useEditProfilAvatar = function(){
+    const img = document.getElementById('editProfilAvatarPreview');
+    if(!img) return;
+    try{ localStorage.setItem(LS_AVATAR, img.src); }catch(e){}
+    document.querySelectorAll('#profileAvatar').forEach(el=>{ el.src = img.src; });
+    syncUseButtonState();
+  };
+
+  window.useEditProfilBanner = function(){
+    const img = document.getElementById('editProfilBannerPreview');
+    if(!img) return;
+    try{ localStorage.setItem(LS_BANNER, img.src); }catch(e){}
+    document.querySelectorAll('.profilepg-cover').forEach(el=>{
+      el.style.backgroundImage = "url('" + img.src + "')";
+    });
+    syncUseButtonState();
+  };
+
+  applySavedProfileAssets();
+  setupGallery('editProfilAvatarGallery', 'editProfilAvatarPreview', 'editProfilAvatarUseBtn');
+  setupGallery('editProfilBannerGallery', 'editProfilBannerPreview', 'editProfilBannerUseBtn');
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════
+     GANTI PASSWORD — reauthenticate dengan password lama lalu
+     updatePassword() lewat Firebase Auth. Hanya berlaku untuk akun
+     yang daftar/login pakai Username & Password (email internal
+     @tarzstore.local); akun Google tidak punya password Firebase
+     jadi menu ini otomatis diblokir untuk akun Google.
+     ═══════════════════════════════════════════════════ -->
+<script>
+(function(){
+  const overlay = document.getElementById('changePasswordModalOverlay');
+  const form = document.getElementById('changePasswordForm');
+
+  function isUsernamePasswordAccount(user){
+    const email = (user && user.email) || '';
+    return email.endsWith('@tarzstore.local');
+  }
+
+  function cpShowError(msg){
+    const el = document.getElementById('cpErrorMsg');
+    if(!el) return;
+    el.textContent = msg;
+    el.classList.add('show');
+  }
+  function cpClearError(){
+    const el = document.getElementById('cpErrorMsg');
+    if(!el) return;
+    el.textContent = '';
+    el.classList.remove('show');
+  }
+
+  window.cpTogglePasswordEye = function(inputId, btn){
+    const input = document.getElementById(inputId);
+    if(!input) return;
+    const showing = input.type === 'text';
+    input.type = showing ? 'password' : 'text';
+    btn.setAttribute('aria-label', showing ? 'Tampilkan password' : 'Sembunyikan password');
+  };
+
+  window.openChangePasswordModal = function(){
+    if(!overlay) return;
+    const client = getAuthClient();
+    const user = client && client.currentUser;
+    if(!user){
+      showToast('Kamu belum login.', 'error');
+      return;
+    }
+    if(!isUsernamePasswordAccount(user)){
+      showToast('Akun Google tidak punya password untuk diganti di sini.', 'error');
+      return;
+    }
+    cpClearError();
+    if(form) form.reset();
+    overlay.style.display = 'flex'; void overlay.offsetHeight;
+    overlay.classList.add('show');
+    document.body.style.overflow = 'hidden'; document.body.classList.add('tabbar-hide');
+  };
+
+  window.closeChangePasswordModal = function(){
+    if(!overlay) return;
+    overlay.classList.remove('show');
+    document.body.style.overflow = ''; document.body.classList.remove('tabbar-hide');
+  };
+  if(overlay){
+    overlay.addEventListener('click', function(e){
+      if(e.target === overlay) closeChangePasswordModal();
+    });
+  }
+
+  function cpFriendlyError(err){
+    const code = err && err.code;
+    if(code === 'auth/too-many-requests') return 'Terlalu banyak percobaan. Coba lagi nanti.';
+    if(code === 'auth/weak-password') return 'Password baru terlalu lemah, minimal 6 karakter.';
+    if(code === 'auth/requires-recent-login') return 'Sesi login sudah lama, silakan login ulang lalu coba lagi.';
+    return (err && err.message) || 'Gagal mengganti password. Coba lagi.';
+  }
+
+  window.submitChangePassword = async function(event){
+    event.preventDefault();
+    cpClearError();
+
+    const client = getAuthClient();
+    const user = client && client.currentUser;
+    if(!client || !user){
+      cpShowError('Sesi login tidak ditemukan. Silakan login ulang.');
+      return;
+    }
+    if(!isUsernamePasswordAccount(user)){
+      cpShowError('Akun Google tidak punya password untuk diganti di sini.');
+      return;
+    }
+
+    const newPassword = document.getElementById('cpNewPassword').value || '';
+    const confirmPassword = document.getElementById('cpConfirmPassword').value || '';
+
+    if(!newPassword || !confirmPassword){
+      cpShowError('Semua kolom wajib diisi.');
+      return;
+    }
+    if(newPassword.length < 6){
+      cpShowError('Password baru minimal 6 karakter.');
+      return;
+    }
+    if(newPassword !== confirmPassword){
+      cpShowError('Konfirmasi password baru tidak cocok.');
+      return;
+    }
+
+    const submitBtn = document.getElementById('cpSubmitBtn');
+    submitBtn.classList.add('loading');
+    try{
+      /* Tanpa reauthenticate pakai password lama. Catatan: Firebase Auth
+         tetap bisa menolak updatePassword() dengan error
+         'auth/requires-recent-login' kalau sesi login user sudah tidak
+         "baru" -- dalam kasus itu user perlu logout lalu login ulang
+         sebelum mencoba ganti password lagi. */
+      await user.updatePassword(newPassword);
+
+      showToast('Password berhasil diganti', 'success');
+      closeChangePasswordModal();
+      if(form) form.reset();
+    }catch(err){
+      cpShowError(cpFriendlyError(err));
+    }finally{
+      submitBtn.classList.remove('loading');
+    }
+  };
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════
+     HAPUS AKUN — wajib ketik "Hapus" persis sebelum tombol
+     aktif, lalu hapus dokumen vip_users/{uid} di Firestore
+     (kalau ada), bersihkan status VIP lokal, dan hapus akun
+     dari Firebase Auth lewat user.delete(). Kalau sesi login
+     sudah lama, Firebase menolak dengan 'auth/requires-recent-login'
+     -- dalam kasus itu user diminta logout & login ulang dulu.
+     ═══════════════════════════════════════════════════ -->
+<script>
+(function(){
+  const overlay = document.getElementById('deleteAccountModalOverlay');
+  const form = document.getElementById('deleteAccountForm');
+  const input = document.getElementById('daConfirmInput');
+  const submitBtn = document.getElementById('daSubmitBtn');
+  const CONFIRM_WORD = 'Hapus';
+
+  function daShowError(msg){
+    const el = document.getElementById('daErrorMsg');
+    if(!el) return;
+    el.textContent = msg;
+    el.classList.add('show');
+  }
+  function daClearError(){
+    const el = document.getElementById('daErrorMsg');
+    if(!el) return;
+    el.textContent = '';
+    el.classList.remove('show');
+  }
+
+  window.daHandleInput = function(){
+    if(!input || !submitBtn) return;
+    submitBtn.disabled = input.value !== CONFIRM_WORD;
+  };
+
+  window.openDeleteAccountModal = function(){
+    if(!overlay) return;
+    const client = getAuthClient();
+    const user = client && client.currentUser;
+    if(!user){
+      showToast('Kamu belum login.', 'error');
+      return;
+    }
+    daClearError();
+    if(form) form.reset();
+    if(submitBtn) submitBtn.disabled = true;
+    overlay.style.display = 'flex'; void overlay.offsetHeight;
+    overlay.classList.add('show');
+    document.body.style.overflow = 'hidden'; document.body.classList.add('tabbar-hide');
+  };
+
+  window.closeDeleteAccountModal = function(){
+    if(!overlay) return;
+    overlay.classList.remove('show');
+    document.body.style.overflow = ''; document.body.classList.remove('tabbar-hide');
+  };
+  if(overlay){
+    overlay.addEventListener('click', function(e){
+      if(e.target === overlay) closeDeleteAccountModal();
+    });
+  }
+
+  function daFriendlyError(err){
+    const code = err && err.code;
+    if(code === 'auth/requires-recent-login') return 'Sesi login sudah lama. Silakan keluar lalu login ulang, kemudian coba hapus akun lagi.';
+    if(code === 'auth/too-many-requests') return 'Terlalu banyak percobaan. Coba lagi nanti.';
+    return (err && err.message) || 'Gagal menghapus akun. Coba lagi.';
+  }
+
+  window.submitDeleteAccount = async function(event){
+    event.preventDefault();
+    daClearError();
+
+    if(!input || input.value !== CONFIRM_WORD){
+      daShowError('Ketik "Hapus" persis untuk konfirmasi.');
+      return;
+    }
+
+    const client = getAuthClient();
+    const user = client && client.currentUser;
+    if(!client || !user){
+      daShowError('Sesi login tidak ditemukan. Silakan login ulang.');
+      return;
+    }
+
+    submitBtn.classList.add('loading');
+    try{
+      const uid = user.uid;
+
+      /* Hapus data VIP terkait akun ini di Firestore, kalau tersedia.
+         Dibungkus try terpisah supaya kalau ini gagal (mis. offline),
+         penghapusan akun Auth tetap dicoba jalan. */
+      if(window.fbDb && uid){
+        try{ await window.fbDb.collection('vip_users').doc(uid).delete(); }
+        catch(e){ console.error('Gagal hapus data vip_users:', e); }
+      }
+
+      await user.delete();
+
+      clearLocalVipState();
+      showToast('Akun berhasil dihapus.', 'success');
+      closeDeleteAccountModal();
+      if(form) form.reset();
+    }catch(err){
+      daShowError(daFriendlyError(err));
+    }finally{
+      submitBtn.classList.remove('loading');
+      if(input) submitBtn.disabled = input.value !== CONFIRM_WORD;
+    }
+  };
 })();
 </script>
 
