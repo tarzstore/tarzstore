@@ -2079,7 +2079,6 @@ footer::before{
 
 .vip-gate-body{display:block;}
 .vip-gate-body.hide{display:none;}
-#vippgCard.hide{display:none;}
 .vip-keyform-body{display:none;}
 .vip-keyform-body.show{display:block;}
 .vip-back-link{
@@ -7003,11 +7002,6 @@ function closeKeyModal(){
     document.getElementById('keySuccessWrap').classList.remove('show');
     document.getElementById('vipGateBody').classList.remove('hide');
     document.getElementById('keyBox').classList.remove('qris-mode');
-
-    // Tampilkan lagi kartu VIP di halaman VIP setelah modal QRIS ditutup
-    // (kalau memang QRIS-nya sudah tidak pending lagi).
-    const vippgCardEl = document.getElementById('vippgCard');
-    if(vippgCardEl) vippgCardEl.classList.remove('hide');
   }
 
   _qrisPaymentActive = false;
@@ -7233,10 +7227,9 @@ function openVipPaymentDirect(){
   document.getElementById('vipGateBody').classList.add('hide');
   setKeyHeadDecorHidden(true);
 
-  // Sembunyikan kartu VIP di belakang layar begitu proses QRIS dimulai,
-  // supaya tidak tampil bertumpuk dengan modal QRIS.
-  const vippgCardEl = document.getElementById('vippgCard');
-  if(vippgCardEl) vippgCardEl.classList.add('hide');
+  // Keluar dari halaman/modal VIP dulu, baru tampilkan proses QRIS --
+  // supaya tidak ada 2 modal yang tampil bertumpuk.
+  closeVipModal();
 
   const overlay = document.getElementById('keyOverlay');
   overlay.classList.add('open');
@@ -7595,10 +7588,6 @@ function showVipCelebration(title, sub){
   _vipCelebrationShown = true;
   _vipQrisImageUrl = null;
   closeKeyModal();
-  // Pastikan kartu VIP muncul lagi di belakang layar (sudah beda tampilan
-  // karena isVipUnlocked() sekarang true -> jadi versi "sudah VIP").
-  const vippgCardEl = document.getElementById('vippgCard');
-  if(vippgCardEl) vippgCardEl.classList.remove('hide');
   const titleEl = document.getElementById('vipCelebrateTitle');
   const subEl = document.getElementById('vipCelebrateSub');
   if(titleEl) titleEl.textContent = title || 'WELCOME TO VIP';
