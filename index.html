@@ -399,56 +399,52 @@ body.scroll-tabbar-hide .bottom-tab-bar{
 .vip-page{display:none;align-items:center;justify-content:center;padding-top:24px;}
 .vip-page.active{display:flex;flex-direction:column;}
 
-/* ── KARTU PROFIL — tampil di bagian atas tab VIP, ukuran & posisi mengikuti
-     gaya banner video (lebar penuh, landscape, radius sama) ── */
+/* ══════════════════════════════════════════
+   PROFIL — FULL BANNER, gaya aplikasi modern:
+   cover photo full-bleed + avatar besar overlap + info + stats row.
+   Ditarik keluar dari padding container tab supaya benar-benar edge-to-edge.
+   ══════════════════════════════════════════ */
 .profilepg-signed-in,.profilepg-signed-out{
-  position:relative;overflow:hidden;width:100%;margin:-20px auto 20px;
-  border-radius:var(--radius-lg);
-  background:linear-gradient(165deg,rgba(200,205,215,.1),rgba(140,145,155,.03) 55%,rgba(200,205,215,.06));
-  border:1px solid rgba(200,205,215,.22);
-  box-shadow:0 20px 50px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.06);
-}
-/* sapuan highlight metalik tipis di tepi kartu, senada dengan vippg-card */
-.profilepg-signed-in::before,.profilepg-signed-out::before{
-  content:'';
-  position:absolute;inset:0;border-radius:var(--radius-lg);
-  padding:1px;
-  background:linear-gradient(135deg,rgba(255,255,255,.5),transparent 30%,transparent 70%,rgba(255,255,255,.25));
-  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
-  -webkit-mask-composite:xor;mask-composite:exclude;
-  pointer-events:none;opacity:.5;
+  position:relative;overflow:hidden;
+  width:100%;margin:-10px 0 22px;
+  background:transparent;
 }
 
-/* layout: avatar di kiri, nama & email di kanan (nama di atas, email di bawah) */
-.profilepg-signed-in{
+/* ── COVER PHOTO — sekarang jadi bagian atas card yang sama dengan body ── */
+.profilepg-cover{
+  position:relative;width:auto;height:150px;overflow:hidden;
+  margin:0;
+  border-radius:24px 24px 0 0;
+  background-image:url('https://apmxdcwebivmusqcuzcv.supabase.co/storage/v1/object/public/Tarzx/gojo.png');
+  background-size:cover;background-position:center 30%;background-repeat:no-repeat;
+  border:1px solid var(--border-strong);border-bottom:none;
+}
+.profilepg-signed-out .profilepg-cover{height:120px;}
+
+/* ── BODY (avatar overlap + info) ── */
+/* Card tunggal: separuh menutupi avatar, lalu nama + menu fitur menyatu di dalamnya */
+.profilepg-body{
+  position:relative;padding:30px 0 6px;margin:0;
   display:flex;flex-direction:column;align-items:center;text-align:center;
-  gap:18px;padding:32px 26px;
-  background-image:
-    linear-gradient(165deg,rgba(5,5,5,.72),rgba(5,5,5,.45) 55%,rgba(5,5,5,.72)),
-    url('https://apmxdcwebivmusqcuzcv.supabase.co/storage/v1/object/public/Tarzx/gojo.png');
-  background-size:cover;
-  background-position:center;
-  background-repeat:no-repeat;
+  border-radius:0 0 24px 24px;
+  background:linear-gradient(180deg,#161617,#0d0d0e);
+  border:1px solid var(--border-strong);border-top:none;
+  box-shadow:0 8px 30px rgba(0,0,0,.35);
 }
 .profilepg-hero{
-  position:relative;flex-shrink:0;width:100%;
-  display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:14px;
+  position:relative;display:flex;flex-direction:column;align-items:center;gap:0;width:100%;
 }
-.profilepg-hero-glow{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:150px;height:150px;border-radius:50%;
-  background:radial-gradient(circle,rgba(210,215,225,.18),transparent 70%);
-  pointer-events:none;filter:blur(10px);z-index:0;
+.profilepg-hero-glow{display:none;}
+.profilepg-hero .profile-avatar-wrap{
+  width:84px;height:84px;margin:-72px 0 12px;flex-shrink:0;
+  border-radius:50%;box-shadow:0 6px 24px rgba(0,0,0,.5);
 }
-.profilepg-hero .profile-avatar-wrap,
-.profilepg-hero .profile-name{position:relative;z-index:1;}
-.profilepg-hero .profile-avatar-wrap{width:60px;height:60px;margin:0;flex-shrink:0;}
-.profilepg-hero .profile-avatar{width:60px;height:60px;}
-.profilepg-hero-info{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;text-align:left;min-width:0;}
-.profile-name-row{display:flex;align-items:center;gap:5px;min-width:0;}
-.profile-verified-badge{width:15px;height:15px;flex-shrink:0;}
+.profilepg-hero .profile-avatar{width:84px;height:84px;border-width:3px;}
+.profilepg-hero-info{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-align:center;min-width:0;width:100%;padding-bottom:20px;}
+.profile-name-row{display:flex;align-items:center;justify-content:center;gap:5px;min-width:0;}
+.profile-verified-badge{width:16px;height:16px;flex-shrink:0;}
 .profile-vip-mini-badge{
-  width:15px;height:15px;flex-shrink:0;
+  width:16px;height:16px;flex-shrink:0;
   margin-left:-3px;
   filter:drop-shadow(0 0 3px rgba(232,182,74,.65));
   animation:vipMiniPop .32s var(--ease-out);
@@ -458,74 +454,148 @@ body.scroll-tabbar-hide .bottom-tab-bar{
   60%{transform:scale(1.15);opacity:1;}
   100%{transform:scale(1);opacity:1;}
 }
-.profilepg-hero .profile-name{margin-bottom:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
-.profilepg-hero .profile-email{position:relative;z-index:1;margin-bottom:0;}
-@media(max-width:400px){
-  .profilepg-signed-in{flex-wrap:wrap;}
+.profilepg-hero .profile-name{
+  margin-bottom:0;font-size:1.15rem;max-width:80vw;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;
+}
+.profilepg-hero .profile-email{margin-bottom:0;font-size:.82rem;max-width:80vw;}
+/* garis pemisah antara info profil & daftar menu, dalam card yang sama */
+.profilepg-hero::after{
+  content:'';position:absolute;left:0;right:0;bottom:0;height:1px;
+  background:var(--border);
 }
 
+@media(min-width:520px){
+  .profilepg-cover{height:190px;}
+  .profilepg-body,.profilepg-cover{max-width:488px;margin-left:auto;margin-right:auto;}
+}
 
-.profilepg-gate-glow{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:150px;height:150px;border-radius:50%;
-  background:radial-gradient(circle,rgba(210,215,225,.16),transparent 70%);
-  pointer-events:none;filter:blur(10px);z-index:0;
+/* ── MENU FITUR PROFIL (Edit Profil / Password / Dark Mode) ── */
+.profile-menu-list{
+  display:flex;flex-direction:column;gap:0;
+  margin:0;width:100%;
 }
-.profilepg-signed-out{
-  display:flex;flex-direction:column;align-items:center;text-align:center;
-  gap:14px;padding:24px 26px;
+.profile-menu-item{
+  display:flex;align-items:center;gap:12px;width:100%;
+  padding:13px 18px;
+  background:transparent;border:none;border-bottom:1px solid var(--border);
+  color:var(--text);font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.85rem;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;outline:none;-webkit-appearance:none;appearance:none;
+  text-align:left;border-radius:0;
+  transition:background var(--t-fast) var(--ease-soft);
 }
-.profilepg-signed-out .profile-gate-text{flex:none;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px;}
-.profilepg-signed-out .profile-gate-title{margin-bottom:0;font-size:1rem;}
-.profilepg-signed-out .profile-gate-sub{margin:0 auto;max-width:none;font-size:.76rem;}
+.profile-menu-list .profile-menu-item:last-child{border-bottom:none;}
+button.profile-menu-item:hover{background:rgba(255,255,255,.045);}
+button.profile-menu-item:active{background:rgba(255,255,255,.07);}
+.profile-menu-icon{
+  width:19px;height:19px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text2);
+}
+.profile-menu-icon svg{width:18px;height:18px;}
+.profile-menu-label{flex:1;min-width:0;}
+.profile-menu-chevron{width:14px;height:14px;flex-shrink:0;color:var(--text2);opacity:.55;}
+.profile-menu-item-toggle{cursor:default;}
+
+/* toggle switch ala iOS, dipakai untuk Dark Mode */
+.profile-toggle-switch{
+  position:relative;flex-shrink:0;width:38px;height:22px;display:inline-block;cursor:pointer;
+}
+.profile-toggle-switch input{opacity:0;width:0;height:0;position:absolute;}
+.profile-toggle-slider{
+  position:absolute;inset:0;border-radius:999px;
+  background:rgba(255,255,255,.14);
+  transition:background var(--t-fast) var(--ease-soft);
+}
+.profile-toggle-slider::before{
+  content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;
+  background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.35);
+  transition:transform var(--t-fast) var(--ease-out);
+}
+.profile-toggle-switch input:checked + .profile-toggle-slider{background:#3b82f6;}
+.profile-toggle-switch input:checked + .profile-toggle-slider::before{transform:translateX(16px);}
+.profile-toggle-switch input:disabled + .profile-toggle-slider{opacity:.85;cursor:default;}
+
+/* ── CARD PENGHUBUNG PROFIL (Account/Share/Review/Info/Settings) — menyatu dalam card profilepg-body, icon tanpa container ── */
+.profile-menu-list2{
+  display:flex;flex-direction:column;gap:0;
+  margin:0;width:100%;
+}
+.profile-menu-item2{
+  display:flex;align-items:center;gap:12px;width:100%;
+  padding:13px 18px;
+  background:transparent;border:none;border-bottom:1px solid var(--border);
+  color:var(--text);font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.85rem;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;outline:none;-webkit-appearance:none;appearance:none;
+  text-align:left;border-radius:0;
+  transition:background var(--t-fast) var(--ease-soft);
+}
+.profile-menu-list2 .profile-menu-item2:last-child{border-bottom:none;border-radius:0 0 23px 23px;}
+button.profile-menu-item2:hover{background:rgba(255,255,255,.045);}
+button.profile-menu-item2:active{background:rgba(255,255,255,.07);}
+.profile-menu-icon2{
+  width:19px;height:19px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text2);
+}
+.profile-menu-icon2 svg{width:18px;height:18px;}
+.profile-menu-label2{flex:1;min-width:0;}
+.profile-menu-chevron2{width:14px;height:14px;flex-shrink:0;color:var(--text2);opacity:.55;}
+
+/* item "Log out" — teks & icon merah, aksi keluar akun */
+.profile-menu-item2-danger,
+.profile-menu-item2-danger .profile-menu-icon2{
+  color:#ef4444;
+}
+.profile-menu-item2-danger:hover{background:rgba(239,68,68,.08);}
+.profile-menu-item2-danger:active{background:rgba(239,68,68,.14);}
+
+/* ── SIGNED OUT STATE ── */
+.profilepg-gate-glow{display:none;}
+.profilepg-signed-out .profilepg-body{
+  display:flex;flex-direction:column;align-items:center;text-align:center;gap:0;
+}
+.profilepg-signed-out .profile-gate-text{
+  display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:18px;
+}
+.profilepg-signed-out .profile-gate-title{margin-bottom:0;font-size:1.15rem;}
+.profilepg-signed-out .profile-gate-sub{margin:0 auto;max-width:280px;font-size:.8rem;color:var(--text2);}
+.profilepg-signed-out .profile-avatar-wrap{
+  width:76px;height:76px;margin:0 0 14px;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.06);border:2px dashed var(--border-strong);
+  box-shadow:0 6px 24px rgba(0,0,0,.4);
+}
+.profilepg-signed-out .profilepg-guest-icon{width:34px;height:34px;color:var(--text2);}
 .profilepg-signed-out .profile-google-btn{
-  width:auto;flex-shrink:0;white-space:nowrap;padding:9px 18px;font-size:.74rem;
-  margin-top:6px;
+  width:100%;max-width:300px;flex-shrink:0;white-space:nowrap;padding:13px 18px;font-size:.85rem;
 }
-.profilepg-signed-out .profile-google-btn .profile-google-icon{width:15px;height:15px;}
-.profilepg-signed-out .profile-gate-title,
-.profilepg-signed-out .profile-gate-sub,
-.profilepg-signed-out .profile-google-btn{position:relative;z-index:1;}
-@media(max-width:400px){
-  .profilepg-signed-out{flex-wrap:wrap;}
-  .profilepg-signed-out .profile-google-btn{width:100%;}
+@media(min-width:520px){
+  .profilepg-signed-out .profilepg-body{max-width:400px;margin-left:auto;margin-right:auto;}
 }
 
+/* ══════════════════════════════════════════
+   VIP CARD — didesain ulang: portrait (persegi panjang ke atas),
+   simple, satu tampilan bersih, tanpa layer efek berlebih.
+   ══════════════════════════════════════════ */
 .vippg-card{
-  position:relative;overflow:hidden;width:100%;max-width:360px;
-  display:flex;flex-direction:column;align-items:center;text-align:center;
-  padding:38px 28px 28px;border-radius:var(--radius-lg);
-  background:linear-gradient(165deg,rgba(200,205,215,.1),rgba(140,145,155,.03) 55%,rgba(200,205,215,.06));
-  border:1px solid rgba(200,205,215,.22);
-  box-shadow:0 20px 50px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.06);
+  position:relative;overflow:hidden;width:100%;max-width:300px;
+  aspect-ratio:3/4.3;
+  margin:0 auto;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;
+  padding:36px 26px 28px;border-radius:22px;
+  background:var(--card);
+  border:1px solid var(--border-strong);
   transition:background var(--t-slow) var(--ease-soft),
-             border-color var(--t-slow) var(--ease-soft),
-             box-shadow var(--t-slow) var(--ease-soft);
+             border-color var(--t-slow) var(--ease-soft);
 }
-.vippg-card-glow{
-  position:absolute;top:-70%;left:50%;transform:translateX(-50%);
-  width:280px;height:280px;border-radius:50%;
-  background:radial-gradient(circle,rgba(210,215,225,.16),transparent 70%);
-  pointer-events:none;filter:blur(10px);
-  transition:background var(--t-slow) var(--ease-soft);
-}
-/* sapuan highlight metalik tipis di tepi kartu -- kesan silver/plat */
-.vippg-card::before{
-  content:'';
-  position:absolute;inset:0;border-radius:var(--radius-lg);
-  padding:1px;
-  background:linear-gradient(135deg,rgba(255,255,255,.5),transparent 30%,transparent 70%,rgba(255,255,255,.25));
-  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
-  -webkit-mask-composite:xor;mask-composite:exclude;
-  pointer-events:none;opacity:.5;
-  transition:background var(--t-slow) var(--ease-soft);
-}
+.vippg-card-glow{display:none;}
 .vippg-icon{
   position:relative;z-index:1;
-  width:56px;height:56px;border-radius:16px;margin-bottom:18px;
+  width:52px;height:52px;border-radius:16px;margin-bottom:16px;
   display:flex;align-items:center;justify-content:center;color:#e2e5eb;
-  background:linear-gradient(135deg,rgba(220,224,232,.16),rgba(255,255,255,.05));
-  border:1px solid rgba(220,224,232,.28);
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(220,224,232,.22);
   transition:color var(--t-slow) var(--ease-soft),
              background var(--t-slow) var(--ease-soft),
              border-color var(--t-slow) var(--ease-soft);
@@ -533,43 +603,39 @@ body.scroll-tabbar-hide .bottom-tab-bar{
 .vippg-title{
   position:relative;z-index:1;
   font-family:'Space Grotesk',sans-serif;font-weight:700;
-  font-size:1.3rem;color:var(--text);letter-spacing:.2px;margin-bottom:6px;
+  font-size:1.15rem;color:var(--text);letter-spacing:.2px;margin-bottom:20px;
   transition:color var(--t-slow) var(--ease-soft);
 }
 .vippg-price{
   position:relative;z-index:1;
-  font-family:'Space Grotesk',sans-serif;font-size:2.4rem;font-weight:700;color:#fff;
-  text-shadow:0 0 16px rgba(255,255,255,.22);letter-spacing:.3px;line-height:1;
-  transition:color var(--t-slow) var(--ease-soft),text-shadow var(--t-slow) var(--ease-soft);
+  font-family:'Space Grotesk',sans-serif;font-size:2.5rem;font-weight:700;color:#fff;
+  letter-spacing:-.3px;line-height:1;margin-bottom:22px;
+  transition:color var(--t-slow) var(--ease-soft);
 }
-.vippg-divider{
-  position:relative;z-index:1;width:100%;height:1px;margin:22px 0;
-  background:linear-gradient(90deg,transparent,var(--border-strong) 50%,transparent);
-}
+.vippg-divider{display:none;}
 
 .vippg-list{
   position:relative;z-index:1;list-style:none;width:100%;
-  display:flex;flex-direction:column;gap:12px;margin-bottom:26px;text-align:left;
+  display:flex;flex-direction:column;gap:10px;margin-bottom:24px;text-align:left;
 }
 .vippg-list li{
-  display:flex;align-items:center;gap:10px;
-  font-size:12.5px;color:var(--text);font-weight:500;
+  display:flex;align-items:center;gap:9px;
+  font-size:12px;color:var(--text);font-weight:500;
 }
-.vippg-list li svg{flex-shrink:0;width:16px;height:16px;color:#c7cbd4;transition:color var(--t-slow) var(--ease-soft);}
+.vippg-list li svg{flex-shrink:0;width:14px;height:14px;color:#c7cbd4;transition:color var(--t-slow) var(--ease-soft);}
 
-.vippg-cta-wrap{position:relative;z-index:1;display:flex;flex-direction:column;width:100%;gap:10px;}
+.vippg-cta-wrap{position:relative;z-index:1;display:flex;flex-direction:column;width:100%;gap:8px;margin-top:auto;}
 .vippg-cta{
   width:100%;
-  display:flex;align-items:center;justify-content:center;gap:9px;
-  padding:14px 20px;border-radius:var(--radius-md);
-  font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;letter-spacing:.3px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px 18px;border-radius:13px;
+  font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:.2px;
   border:none;cursor:pointer;
   transition:transform var(--t-fast) var(--ease-out),filter var(--t-fast) var(--ease),background var(--t-slow) var(--ease-soft);
 }
 .vippg-cta:active{transform:scale(.97);}
 .vippg-cta-primary{
-  background:linear-gradient(135deg,#fff,#d8d8de);color:#0a0a0a;
-  box-shadow:0 6px 24px rgba(255,255,255,.12);
+  background:#fff;color:#0a0a0a;
 }
 .vippg-cta-primary:active{filter:brightness(.94);}
 .vippg-cta-secondary{
@@ -645,6 +711,42 @@ body.scroll-tabbar-hide .bottom-tab-bar{
   font-size:9px;letter-spacing:1.2px;text-transform:uppercase;
   color:var(--text2);font-weight:600;
 }
+
+/* ── STATS WIDGET MINI — versi kecil untuk sidebar ── */
+.side-stats-widget{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  margin:10px 12px 6px;
+  border-radius:12px;
+  background:rgba(255,255,255,.03);
+  border:1px solid var(--border-strong);
+  overflow:hidden;
+}
+.side-stats-live{
+  grid-column:1 / -1;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  padding:6px 0 5px;
+  font-size:8px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;
+  color:var(--green);
+  border-bottom:1px solid var(--border);
+}
+.side-stats-live .stats-live-dot{
+  width:4px;height:4px;border-radius:50%;background:var(--green);
+  animation:dot-blink 2s ease-in-out infinite;
+}
+.side-stats-item{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;padding:9px 4px 10px;
+}
+.side-stats-item + .side-stats-item{border-left:1px solid var(--border);}
+.side-stats-item-value{
+  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.86rem;
+  color:var(--text);line-height:1.1;font-variant-numeric:tabular-nums;
+}
+.side-stats-item-value.is-loading{color:var(--text2);font-size:.68rem;}
+.side-stats-item-label{
+  font-size:7px;letter-spacing:.8px;text-transform:uppercase;
+  color:var(--text2);font-weight:600;
+}
 @media(max-width:380px){
   .stats-item{padding:13px 4px 15px;}
   .stats-item-icon-wrap{width:26px;height:26px;}
@@ -653,204 +755,34 @@ body.scroll-tabbar-hide .bottom-tab-bar{
 }
 
 /* ══════════════════════════════════════════
-   VIP CARDS — grid 2 kolom, sejajar satu baris
-   Ditulis ulang biar konsisten & mudah dirawat
+   VIP CARD WRAPPER
    ══════════════════════════════════════════ */
 .vippg-cards-grid{
-  --vc-radius:16px;
-  --vc-pad-x:16px;
-  --vc-pad-top:24px;
-  --vc-pad-bottom:18px;
-  width:100%;max-width:720px;margin:0 auto;
-  display:grid;grid-template-columns:1fr 1fr;gap:13px;
-  align-items:stretch;
+  width:100%;max-width:380px;margin:0 auto;
+  display:flex;justify-content:center;
 }
 
-/* base card shared oleh kedua varian (silver & gold) */
-.vc-card{
-  position:relative;overflow:hidden;
-  display:flex;flex-direction:column;align-items:center;text-align:center;
-  padding:var(--vc-pad-top) var(--vc-pad-x) var(--vc-pad-bottom);
-  border-radius:var(--vc-radius);
-  transition:transform var(--t-fast) var(--ease-out);
-}
-.vc-card:active{transform:scale(.985);}
-
-/* sapuan highlight tepi tipis, dipakai kedua varian */
-.vc-card::before{
-  content:'';
-  position:absolute;inset:0;border-radius:var(--vc-radius);
-  padding:1px;pointer-events:none;
-  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
-  -webkit-mask-composite:xor;mask-composite:exclude;
-}
-.vc-glow{
-  position:absolute;top:-64%;left:50%;transform:translateX(-50%);
-  width:200px;height:200px;border-radius:50%;
-  pointer-events:none;filter:blur(12px);
-}
-
-/* ── badge kecil di atas (VIP: "PALING LARIS" / Reseller: "RESELLER") ── */
-.vc-badge{
-  position:relative;z-index:1;
-  display:inline-flex;align-items:center;gap:4px;
-  padding:4px 10px;border-radius:999px;margin-bottom:14px;
-  font-size:8.5px;font-weight:700;letter-spacing:1.3px;text-transform:uppercase;
-  white-space:nowrap;
-}
-.vc-badge svg{width:10px;height:10px;flex-shrink:0;}
-
-.vc-icon{
-  position:relative;z-index:1;
-  width:44px;height:44px;border-radius:13px;margin-bottom:14px;
-  display:flex;align-items:center;justify-content:center;
-}
-.vc-icon svg{width:20px;height:20px;}
-
-.vc-title{
-  position:relative;z-index:1;
-  font-family:'Space Grotesk',sans-serif;font-weight:700;
-  font-size:.82rem;line-height:1.3;letter-spacing:.1px;
-  margin-bottom:4px;
-  min-height:2.1em;display:flex;align-items:center;justify-content:center;
-}
-.vc-price-row{position:relative;z-index:1;margin-bottom:2px;}
-.vc-price{
-  font-family:'Space Grotesk',sans-serif;font-weight:700;
-  font-size:1.5rem;letter-spacing:.2px;line-height:1;
-}
-.vc-divider{
-  position:relative;z-index:1;width:100%;height:1px;margin-bottom:16px;
-  background:linear-gradient(90deg,transparent,var(--border-strong) 50%,transparent);
-}
-
-.vc-list{
-  position:relative;z-index:1;list-style:none;width:100%;flex:1;
-  display:flex;flex-direction:column;gap:9px;margin-bottom:18px;text-align:left;
-}
-.vc-list li{
-  display:flex;align-items:flex-start;gap:7px;
-  font-size:10px;font-weight:500;line-height:1.35;color:var(--text);
-}
-.vc-list li svg{flex-shrink:0;width:13px;height:13px;margin-top:1px;}
-
-.vc-cta-wrap{position:relative;z-index:1;display:flex;flex-direction:column;width:100%;gap:7px;margin-top:auto;}
-.vc-cta{
-  width:100%;
-  display:flex;align-items:center;justify-content:center;gap:6px;
-  padding:11px 10px;border-radius:11px;
-  font-family:'Space Grotesk',sans-serif;font-size:10.5px;font-weight:700;letter-spacing:.15px;
-  border:none;cursor:pointer;white-space:nowrap;
-  transition:transform var(--t-fast) var(--ease-out),filter var(--t-fast) var(--ease);
-}
-.vc-cta:active{transform:scale(.96);}
-.vc-cta svg{width:13px;height:13px;flex-shrink:0;}
-
-/* ── VARIAN SILVER (card VIP utama) ── */
-.vc-silver{
-  background:linear-gradient(165deg,rgba(200,205,215,.1),rgba(140,145,155,.03) 55%,rgba(200,205,215,.06));
-  border:1px solid rgba(200,205,215,.22);
-  box-shadow:0 16px 40px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.06);
-}
-.vc-silver::before{
-  background:linear-gradient(135deg,rgba(255,255,255,.5),transparent 30%,transparent 70%,rgba(255,255,255,.25));
-  opacity:.5;
-}
-.vc-silver .vc-glow{background:radial-gradient(circle,rgba(210,215,225,.16),transparent 70%);}
-.vc-silver .vc-badge{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);color:#e2e5eb;}
-.vc-silver .vc-icon{
-  color:#e2e5eb;
-  background:linear-gradient(135deg,rgba(220,224,232,.16),rgba(255,255,255,.05));
-  border:1px solid rgba(220,224,232,.28);
-}
-.vc-silver .vc-title{color:var(--text);}
-.vc-silver .vc-price{color:#fff;text-shadow:0 0 16px rgba(255,255,255,.22);}
-.vc-silver .vc-list li svg{color:#c7cbd4;}
-.vc-silver .vc-cta-primary{
-  background:linear-gradient(135deg,#fff,#d8d8de);color:#0a0a0a;
-  box-shadow:0 6px 20px rgba(255,255,255,.12);
-}
-.vc-silver .vc-cta-primary:active{filter:brightness(.94);}
-.vc-silver .vc-cta-secondary{
-  background:rgba(255,255,255,.05);color:var(--text);
-  border:1px solid var(--border-strong);
-}
-.vc-silver .vc-cta-secondary:active{background:rgba(255,255,255,.09);}
-
-/* ── VARIAN GOLD (card Reseller) ── */
-.vc-gold{
-  background:linear-gradient(165deg,rgba(232,197,103,.13),rgba(60,48,16,.06) 55%,rgba(232,197,103,.05));
-  border:1px solid rgba(232,197,103,.3);
-  box-shadow:0 16px 40px rgba(0,0,0,.4),0 0 28px rgba(232,197,103,.06),inset 0 1px 0 rgba(255,255,255,.06);
-}
-.vc-gold::before{
-  background:linear-gradient(135deg,rgba(255,224,140,.6),transparent 30%,transparent 70%,rgba(255,224,140,.25));
-  opacity:.65;
-}
-.vc-gold .vc-glow{background:radial-gradient(circle,rgba(232,197,103,.22),transparent 70%);}
-.vc-gold .vc-badge{background:rgba(232,197,103,.14);border:1px solid rgba(232,197,103,.32);color:#f3d489;}
-.vc-gold .vc-icon{
-  color:#f3d489;
-  background:linear-gradient(135deg,rgba(232,197,103,.22),rgba(255,224,140,.07));
-  border:1px solid rgba(232,197,103,.38);
-}
-.vc-gold .vc-title{color:var(--text);}
-.vc-gold .vc-price{color:#f3d489;text-shadow:0 0 16px rgba(232,197,103,.35);}
-.vc-gold .vc-list li svg{color:#e8c567;}
-.vc-gold .vc-cta-primary{
-  background:linear-gradient(135deg,#f3d489,#c89a3f);color:#241a05;
-  box-shadow:0 6px 20px rgba(232,197,103,.25);
-}
-.vc-gold .vc-cta-primary:active{filter:brightness(.94);}
-
-/* ── responsif: layar sempit tetap 1 baris, cuma dipadatkan ── */
-@media(max-width:560px){
-  .vippg-cards-grid{gap:9px;--vc-pad-x:11px;--vc-pad-top:18px;--vc-pad-bottom:14px;}
-  .vc-icon{width:38px;height:38px;border-radius:11px;margin-bottom:11px;}
-  .vc-icon svg{width:17px;height:17px;}
-  .vc-badge{font-size:7.5px;padding:3px 8px;margin-bottom:11px;}
-  .vc-title{font-size:.7rem;margin-bottom:3px;}
-  .vc-price{font-size:1.18rem;}
-  .vc-divider{margin-bottom:12px;}
-  .vc-list{gap:7px;margin-bottom:14px;}
-  .vc-list li{font-size:9px;gap:6px;}
-  .vc-list li svg{width:11px;height:11px;}
-  .vc-cta{font-size:9px;padding:9px 6px;gap:5px;}
-  .vc-cta svg{width:12px;height:12px;}
-}
-@media(max-width:380px){
-  .vc-title{font-size:.64rem;}
-  .vc-price{font-size:1.05rem;}
-  .vc-cta{font-size:8px;padding:8px 4px;}
-}
-
-/* ══ STATE: SUDAH VIP — kartu berubah jadi tema emas + ucapan selamat ══ */
+/* ══ STATE: SUDAH VIP — kartu jadi kecil & simple, tema emas flat ══ */
 .vippg-card.is-vip{
-  background:linear-gradient(165deg,rgba(232,197,103,.14),rgba(120,95,30,.04) 55%,rgba(232,197,103,.08));
+  aspect-ratio:auto;
+  max-width:220px;
+  padding:28px 24px 26px;
+  background:rgba(232,197,103,.08);
   border-color:rgba(232,197,103,.35);
-  box-shadow:0 20px 50px rgba(0,0,0,.4),0 0 40px rgba(232,197,103,.08),inset 0 1px 0 rgba(255,255,255,.08);
-}
-.vippg-card.is-vip .vippg-card-glow{
-  background:radial-gradient(circle,rgba(232,197,103,.28),transparent 70%);
-}
-.vippg-card.is-vip::before{
-  background:linear-gradient(135deg,rgba(255,224,140,.65),transparent 30%,transparent 70%,rgba(255,224,140,.3));
-  opacity:.7;
 }
 .vippg-card.is-vip .vippg-icon{
+  width:44px;height:44px;margin-bottom:14px;
   color:#f3d489;
-  background:linear-gradient(135deg,rgba(232,197,103,.22),rgba(255,224,140,.08));
+  background:rgba(232,197,103,.14);
   border-color:rgba(232,197,103,.4);
 }
-.vippg-card.is-vip .vippg-title{color:#f3d489;}
-.vippg-card.is-vip .vippg-price{
-  color:#f3d489;
-  text-shadow:0 0 20px rgba(232,197,103,.4);
-}
-.vippg-card.is-vip .vippg-list li svg{color:#e8c567;}
-.vippg-card.is-vip .vippg-cta-primary{
-  background:linear-gradient(135deg,#f3d489,#c89a3f);color:#241a05;
-  box-shadow:0 6px 24px rgba(232,197,103,.25);
+.vippg-card.is-vip .vippg-title{font-size:1rem;margin-bottom:10px;color:#f3d489;}
+.vippg-card.is-vip .vippg-price{font-size:1.4rem;margin-bottom:0;color:#f3d489;}
+
+@media(max-width:380px){
+  .vippg-card{max-width:270px;padding:30px 22px 24px;}
+  .vippg-title{font-size:1.05rem;}
+  .vippg-price{font-size:2.1rem;}
 }
 
 /* ── PRODUCTS ── */
@@ -1556,72 +1488,6 @@ body.scroll-tabbar-hide .bottom-tab-bar{
   display:block;
 }
 
-/* ── DUAL POSTER PREVIEW (2:3, sebaris, panah kanan — mode CONFIG FF) ── */
-.dual-poster-wrap{
-  margin-top:15;
-  display:flex;
-  align-items:flex-start;
-  justify-content:center;
-  gap:12px;
-}
-.dual-poster-col{
-  flex:1 1 0;
-  max-width:150px;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-}
-.dual-poster-label{
-  font-family:'Space Grotesk',sans-serif;
-  font-size:.68rem;font-weight:700;
-  letter-spacing:1.2px;text-transform:uppercase;
-  text-align:center;color:var(--text2);
-}
-.dual-poster-col:last-child .dual-poster-label{
-  color:#fff;
-}
-.dual-poster-frame{
-  width:100%;
-  aspect-ratio:2/3;
-  border-radius:14px;
-  border:1px solid rgba(255,255,255,.12);
-  background:#000;
-  overflow:hidden;
-  position:relative;
-}
-.dual-poster-col:last-child .dual-poster-frame{
-  border-color:rgba(255,255,255,.35);
-}
-.dual-poster-frame img{
-  width:100%;height:100%;
-  object-fit:cover;
-  display:block;
-}
-.dual-poster-arrow{
-  flex:0 0 auto;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  width:26px;height:26px;
-  border-radius:50%;
-  background:#fff;
-  color:#000;
-  align-self:center;
-  margin-top:30px;
-}
-.dual-poster-arrow svg{
-  width:14px;height:14px;
-  display:block;
-  stroke:#000;
-}
-
-/* ── BARIS TOMBOL AKSI (mode CONFIG FF) ── */
-.configff-btn-row{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  margin-top:44px;
-}
 .fitur-chip-dot{
   width:6px;height:6px;border-radius:50%;
   background:var(--gold);flex-shrink:0;
@@ -1718,22 +1584,36 @@ background:linear-gradient(135deg,#1e2a47,#2563eb);
 .buy-btn:hover{filter:brightness(1.1);transform:translate3d(0,-2px,0);background:linear-gradient(135deg,#2563eb,#60a5fa);color:#fff;box-shadow:0 8px 26px rgba(37,99,235,.25);}
 .buy-btn:active{transform:translate3d(0,0,0) scale(.97);filter:brightness(.95);transition-duration:.1s;}
 
-/* ── TOAST ── */
+/* ── TOAST — abu gelap senada situs, kecil, clean ── */
 .toast{
-  position:fixed;bottom:calc(24px + 64px + env(safe-area-inset-bottom));left:50%;
-  transform:translate3d(-50%,70px,0);
-  background:rgba(8,13,26,.98);
-  border:1px solid rgba(230,230,238,.28);
-  border-radius:12px;padding:11px 20px;
-  font-size:13px;font-weight:600;color:var(--text);
+  position:fixed;bottom:calc(20px + 64px + env(safe-area-inset-bottom));left:50%;
+  transform:translate3d(-50%,60px,0) scale(.96);
+  display:flex;align-items:center;gap:8px;
+  max-width:calc(100% - 56px);
+  background:var(--card2);
+  border:1px solid var(--border-strong);
+  border-radius:11px;padding:9px 14px 9px 10px;
+  font-size:12px;font-weight:600;color:var(--text);
   z-index:9999;
+  box-shadow:0 10px 28px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.04);
   transition:transform var(--t-mid) var(--ease-out),opacity var(--t-mid) var(--ease-soft);
-  white-space:nowrap;pointer-events:none;
+  pointer-events:none;
   will-change:transform;opacity:0;
 }
-.toast.show{transform:translate3d(-50%,0,0);opacity:1;}
-.toast.error{border-color:rgba(245,80,80,.35);color:#ff6b6b;}
-.toast.success{border-color:rgba(59,130,246,.35);color:#fff;}
+.toast.show{transform:translate3d(-50%,0,0) scale(1);opacity:1;}
+.toast-icon{
+  flex-shrink:0;width:16px;height:16px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.1);color:var(--text);
+}
+.toast-icon svg{width:9px;height:9px;}
+.toast-msg{line-height:1.3;}
+.toast.error{border-color:rgba(255,80,80,.45);}
+.toast.error .toast-icon{background:rgba(245,80,80,.18);color:#ff6b6b;}
+.toast.success{border-color:rgba(0,229,160,.45);}
+.toast.success .toast-icon{background:rgba(0,229,160,.18);color:var(--green);}
+.toast.info{border-color:rgba(120,170,255,.45);}
+.toast.info .toast-icon{background:rgba(120,170,255,.18);color:#7aa8ff;}
 
 /* ── VIP CELEBRATION OVERLAY — EDISI HITAM PUTIH ── */
 .vip-celebrate-overlay{
@@ -1938,6 +1818,9 @@ footer::before{
 /* ── MOBILE ── */
 @media(max-width:640px){
   header{padding:13px 4%;}
+  .diamond-btn{width:34px;height:34px;}
+  .diamond-btn svg{width:17px;height:17px;}
+  .header-actions{gap:6px;}
   .logo-name{font-size:1.15rem;}
   .hero{padding:28px 4% 36px;}
   .hero h2{font-size:1.9rem;}
@@ -2082,11 +1965,6 @@ footer::before{
 .key-input-wrap{
   position:relative;margin-bottom:10px;
 }
-.key-input-label{
-  font-family:'Space Grotesk',sans-serif;
-  font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
-  color:var(--text2);margin-bottom:6px;display:block;
-}
 .key-input{
   width:100%;
   background:rgba(255,255,255,.03);
@@ -2147,38 +2025,6 @@ footer::before{
 .key-btn-login.loading .key-spinner{display:inline-block;}
 .key-btn-login.loading .key-btn-label{display:none;}
 @keyframes key-spin{to{transform:rotate(360deg);}}
-
-/* ── LOGIN WITH GOOGLE ── */
-.key-divider{
-  display:flex;align-items:center;gap:10px;
-  margin:14px 0;
-  color:var(--text2);font-family:'Space Mono',monospace;
-  font-size:10.5px;letter-spacing:1px;text-transform:uppercase;
-}
-.key-divider::before,.key-divider::after{
-  content:'';flex:1;height:1px;background:var(--border-strong);
-}
-.key-btn-google{
-  width:100%;border:1px solid var(--border-strong);border-radius:9px;padding:11px 14px;
-  background:#fff;
-  color:#1f1f1f;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.82rem;
-  letter-spacing:.1px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  -webkit-tap-highlight-color:transparent;
-  outline:none;-webkit-appearance:none;appearance:none;
-  margin-bottom:0;position:relative;
-}
-.key-btn-google.loading{pointer-events:none;opacity:.7;}
-.key-btn-google svg{width:16px;height:16px;flex-shrink:0;}
-.key-btn-google .g-spinner{
-  width:14px;height:14px;border-radius:50%;
-  border:2px solid rgba(0,0,0,.15);
-  border-top-color:#1f1f1f;
-  animation:key-spin .6s linear infinite;
-  display:none;
-}
-.key-btn-google.loading .g-spinner{display:inline-block;}
-.key-btn-google.loading .key-btn-google-label,.key-btn-google.loading svg:not(.g-spinner){display:none;}
 
 .key-success-wrap{
   display:none;
@@ -2552,15 +2398,93 @@ footer::before{
   align-items:center;
   gap:5px;
   width:38px;height:38px;
-  background:transparent;
-  border:none;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:var(--radius-sm);
   cursor:pointer;
   padding:0;
   flex-shrink:0;
-  border-radius:var(--radius-sm);
-  transition:background var(--t-fast) var(--ease);
+  transition:background var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease);
 }
-.hamburger-btn:active{background:rgba(255,255,255,.08);}
+.hamburger-btn:active{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.3);}
+
+/* ── HEADER RIGHT GROUP (diamond VIP + hamburger sejajar) ── */
+.header-actions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-shrink:0;
+}
+
+/* ── DIAMOND VIP BUTTON — akses cepat ke halaman VIP/membership ── */
+.diamond-btn{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:38px;height:38px;
+  border-radius:var(--radius-sm);
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.18);
+  cursor:pointer;
+  padding:0;
+  flex-shrink:0;
+  color:var(--text);
+  overflow:hidden;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform var(--t-fast) var(--ease-out),
+             background var(--t-mid) var(--ease-soft),
+             border-color var(--t-mid) var(--ease-soft),
+             box-shadow var(--t-mid) var(--ease-soft);
+}
+.diamond-btn svg{
+  width:19px;height:19px;
+  position:relative;z-index:1;
+}
+.diamond-btn:active{
+  transform:scale(.9);
+  background:rgba(255,255,255,.12);
+  border-color:rgba(255,255,255,.3);
+}
+@media(hover:none){
+  .diamond-btn:hover{transform:none;}
+}
+
+/* ── VIP MODAL — dibuka lewat icon diamond di header.
+   Sama pola dengan modal lain (overlay + sheet), tapi contentnya
+   memuat profil + card VIP + card reseller + statistik, jadi dibuat
+   agak lebih lebar & scrollable. ── */
+.vip-modal-overlay{
+  position:fixed;inset:0;z-index:9997;
+  background:rgba(0,0,0,.74);
+  display:flex;align-items:center;justify-content:center;
+  padding:16px;
+  opacity:0;visibility:hidden;
+  transition:opacity .38s cubic-bezier(.22,1,.36,1),visibility .38s cubic-bezier(.22,1,.36,1),backdrop-filter .38s cubic-bezier(.22,1,.36,1);
+  -webkit-backdrop-filter:blur(0px);backdrop-filter:blur(0px);
+}
+.vip-modal-overlay.show{
+  opacity:1;visibility:visible;
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+}
+.vip-modal-scroll{
+  position:relative;
+  width:100%;max-width:760px;
+  max-height:92vh;
+  transform:scale(.92) translateY(24px);
+  opacity:0;
+  transition:transform .4s cubic-bezier(.22,1,.36,1),opacity .4s cubic-bezier(.22,1,.36,1);
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  padding-right:2px;
+  scrollbar-width:thin;scrollbar-color:rgba(230,230,238,.3) transparent;
+}
+.vip-modal-scroll::-webkit-scrollbar{width:3px;}
+.vip-modal-scroll::-webkit-scrollbar-thumb{background:rgba(230,230,238,.3);border-radius:99px;}
+.vip-modal-overlay.show .vip-modal-scroll{transform:scale(1) translateY(0);opacity:1;}
+@media(max-width:640px){
+  .vip-modal-scroll{padding:4px 2px;}
+}
 .hamburger-line{
   display:block;
   width:20px;height:2px;
@@ -2652,45 +2576,7 @@ footer::before{
   flex-shrink:0;
 }
 
-/* ── PROFIL MODAL (login Google, dibuka dari sidebar) ── */
-.profile-modal-overlay{
-  position:fixed;inset:0;z-index:420;
-  background:rgba(0,0,0,.6);
-  backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
-  display:flex;align-items:center;justify-content:center;
-  padding:20px;
-  opacity:0;pointer-events:none;
-  transition:opacity var(--t-mid) var(--ease);
-}
-.profile-modal-overlay.open{opacity:1;pointer-events:auto;}
-.profile-modal{
-  width:100%;max-width:360px;
-  background:var(--surface);
-  border:1px solid var(--border-strong);
-  border-radius:var(--radius-lg);
-  padding:26px 22px 24px;
-  position:relative;
-  box-shadow:0 24px 60px rgba(0,0,0,.5);
-  transform:translateY(10px) scale(.97);
-  transition:transform var(--t-mid) var(--ease);
-}
-.profile-modal-overlay.open .profile-modal{transform:translateY(0) scale(1);}
-.profile-modal-close{
-  position:absolute;top:14px;right:14px;
-  width:30px;height:30px;border-radius:50%;
-  background:rgba(255,255,255,.05);border:1px solid var(--border);
-  color:var(--text2);display:flex;align-items:center;justify-content:center;
-  cursor:pointer;-webkit-tap-highlight-color:transparent;
-}
-.profile-modal-close svg{width:16px;height:16px;}
-.profile-modal-close:active{background:rgba(255,255,255,.1);transform:scale(.9);}
-.profile-modal-title{
-  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.05rem;
-  color:var(--text);margin-bottom:18px;
-}
-
-/* status: sudah login */
-.profile-signed-in{text-align:center;padding:6px 0 2px;}
+/* ── PROFIL: avatar, nama, email, badge (dipakai di tab Profil) ── */
 .profile-avatar-wrap{
   width:66px;height:66px;margin:0 auto 14px;position:relative;
 }
@@ -2705,19 +2591,6 @@ footer::before{
     linear-gradient(var(--surface),var(--surface)) padding-box,
     conic-gradient(from 0deg,#5fb3ff,#bfe3ff,#3b82f6,#5fb3ff) border-box;
 }
-
-/* badge "MEMBER VIP" — gradient emas, sedikit glow, ikon mahkota */
-.profile-vip-badge{
-  display:inline-flex;align-items:center;gap:5px;
-  margin:0 auto 10px;padding:5px 14px;
-  border-radius:999px;
-  background:linear-gradient(135deg,#ffe9a8,#e8b64a 55%,#ffd76a);
-  box-shadow:0 2px 14px rgba(232,182,74,.35),inset 0 1px 0 rgba(255,255,255,.5);
-  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.68rem;
-  letter-spacing:.8px;color:#1a1200;
-  width:fit-content;
-}
-.profile-vip-badge svg{width:13px;height:13px;flex-shrink:0;color:#1a1200;}
 .profile-name{
   font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1rem;
   color:var(--text);margin-bottom:3px;
@@ -2727,24 +2600,9 @@ footer::before{
   color:var(--text2);margin-bottom:20px;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
-/* status: belum login */
-.profile-signed-out{text-align:center;padding:4px 0 0;}
-.profile-gate-icon{
-  width:56px;height:56px;margin:0 auto 16px;
-  border-radius:16px;
-  display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(150deg,rgba(255,255,255,.08),rgba(255,255,255,.02));
-  border:1px solid var(--border-strong);
-  color:var(--text2);
-}
-.profile-gate-icon svg{width:24px;height:24px;}
 .profile-gate-title{
   font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.1rem;
   color:var(--text);margin-bottom:9px;
-}
-.profile-gate-sub{
-  font-family:'Space Grotesk',sans-serif;font-size:.82rem;line-height:1.5;
-  color:var(--text2);max-width:280px;margin:0 auto 22px;
 }
 .profile-google-btn{
   width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
@@ -2772,53 +2630,63 @@ footer::before{
 
 .side-menu-list{
   list-style:none;
-  padding:6px 10px 10px;
+  padding:2px 12px 10px;
   display:flex;
   flex-direction:column;
-  gap:0;
+  gap:6px;
   flex:none;
 }
 .side-menu-list a{
   position:relative;
   display:flex;
   align-items:center;
-  gap:12px;
-  padding:7px 12px;
-  border-radius:12px;
+  gap:13px;
+  padding:8px 14px;
+  border-radius:14px;
+  background:rgba(255,255,255,.03);
+  border:1px solid var(--border);
   color:var(--text2);
   text-decoration:none;
   font-size:.86rem;
   font-weight:600;
   letter-spacing:.2px;
-  transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease);
+  overflow:hidden;
+  transition:background var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease),color var(--t-fast) var(--ease),transform var(--t-fast) var(--ease-out);
 }
-.side-menu-list a::before{
-  content:"";
-  position:absolute;left:-10px;top:50%;transform:translateY(-50%);
-  width:3px;height:0;
-  border-radius:0 3px 3px 0;
-  background:var(--text);
-  transition:height var(--t-fast) var(--ease-soft);
+/* sapuan highlight tipis di tepi kartu, senada gaya premium card lain di situs */
+.side-menu-list a::after{
+  content:'';
+  position:absolute;inset:0;border-radius:inherit;
+  padding:1px;
+  background:linear-gradient(135deg,rgba(255,255,255,.16),transparent 35%,transparent 65%,rgba(255,255,255,.06));
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  pointer-events:none;opacity:0;
+  transition:opacity var(--t-fast) var(--ease);
 }
 .side-menu-list a .side-menu-icon{
   display:flex;align-items:center;justify-content:center;
-  width:32px;height:32px;flex-shrink:0;
+  width:30px;height:30px;flex-shrink:0;
   border-radius:9px;
-  background:rgba(255,255,255,.04);
+  background:rgba(255,255,255,.05);
   border:1px solid var(--border);
   transition:background var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease),color var(--t-fast) var(--ease);
 }
 .side-menu-list a svg{width:16px;height:16px;flex-shrink:0;opacity:.9;}
-.side-menu-list a:active{background:rgba(255,255,255,.08);}
-.side-menu-list a:hover{color:var(--text);background:rgba(255,255,255,.05);}
+.side-menu-list a:active{transform:scale(.98);background:rgba(255,255,255,.07);}
+.side-menu-list a:hover{
+  color:var(--text);
+  background:rgba(255,255,255,.06);
+  border-color:var(--border-strong);
+}
+.side-menu-list a:hover::after,
+.side-menu-list a:active::after{opacity:1;}
 .side-menu-list a:hover .side-menu-icon,
 .side-menu-list a:active .side-menu-icon{
-  background:rgba(255,255,255,.09);
+  background:rgba(255,255,255,.1);
   border-color:var(--border-strong);
   color:var(--text);
 }
-.side-menu-list a:hover::before,
-.side-menu-list a:active::before{height:18px;}
 
 .side-menu-list a.side-menu-signout{color:#ff4d4d;}
 .side-menu-list a.side-menu-signout .side-menu-icon{
@@ -2826,8 +2694,7 @@ footer::before{
   border-color:rgba(255,77,77,.25);
   color:#ff4d4d;
 }
-.side-menu-list a.side-menu-signout::before{background:#ff4d4d;}
-.side-menu-list a.side-menu-signout:hover{color:#ff6b6b;background:rgba(255,77,77,.08);}
+.side-menu-list a.side-menu-signout:hover{color:#ff6b6b;background:rgba(255,77,77,.08);border-color:rgba(255,77,77,.3);}
 .side-menu-list a.side-menu-signout:hover .side-menu-icon,
 .side-menu-list a.side-menu-signout:active .side-menu-icon{
   background:rgba(255,77,77,.14);
@@ -2838,7 +2705,7 @@ footer::before{
 .side-menu-signout-wrap{
   position:relative;
   margin-top:auto;
-  padding:10px 10px 14px;
+  padding:10px 12px 14px;
   flex-shrink:0;
 }
 .side-menu-signout-wrap::before{
@@ -2850,19 +2717,21 @@ footer::before{
   position:relative;
   display:flex;
   align-items:center;
-  gap:12px;
-  padding:7px 12px;
-  border-radius:12px;
+  gap:13px;
+  padding:8px 14px;
+  border-radius:14px;
+  background:rgba(255,77,77,.05);
+  border:1px solid rgba(255,77,77,.18);
   text-decoration:none;
   font-size:.86rem;
   font-weight:600;
   letter-spacing:.2px;
   color:#ff4d4d;
-  transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease);
+  transition:background var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease),color var(--t-fast) var(--ease),transform var(--t-fast) var(--ease-out);
 }
 .side-menu-signout-wrap .side-menu-signout .side-menu-icon{
   display:flex;align-items:center;justify-content:center;
-  width:32px;height:32px;flex-shrink:0;
+  width:30px;height:30px;flex-shrink:0;
   border-radius:9px;
   background:rgba(255,77,77,.08);
   border:1px solid rgba(255,77,77,.25);
@@ -2870,15 +2739,17 @@ footer::before{
   transition:background var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease),color var(--t-fast) var(--ease);
 }
 .side-menu-signout-wrap .side-menu-signout svg{width:16px;height:16px;flex-shrink:0;opacity:.9;}
+.side-menu-signout-wrap .side-menu-signout:active{transform:scale(.98);}
 .side-menu-signout-wrap .side-menu-signout:hover,
 .side-menu-signout-wrap .side-menu-signout:active{
   color:#ff6b6b;
-  background:rgba(255,77,77,.08);
+  background:rgba(255,77,77,.1);
+  border-color:rgba(255,77,77,.35);
 }
 .side-menu-signout-wrap .side-menu-signout:hover .side-menu-icon,
 .side-menu-signout-wrap .side-menu-signout:active .side-menu-icon{
-  background:rgba(255,77,77,.14);
-  border-color:rgba(255,77,77,.4);
+  background:rgba(255,77,77,.16);
+  border-color:rgba(255,77,77,.45);
   color:#ff6b6b;
 }
 
@@ -3675,15 +3546,6 @@ body.side-menu-open{overflow:hidden;}
   cursor:pointer;-webkit-tap-highlight-color:transparent;
 }
 .gapi-quality-chip.active{border-color:var(--blue);color:var(--text);background:rgba(255,255,255,.08);}
-/* fake loby free fire v2 preview */
-.gapi-duo-row{display:flex;gap:6px;margin-top:4px;}
-.gapi-duo-row .gapi-input{flex:1;}
-.gapi-duo-preview{
-  margin-top:12px;padding:12px;border-radius:var(--radius-md);
-  background:rgba(255,255,255,.03);border:1px solid var(--border);
-  text-align:center;font-family:'Space Grotesk',sans-serif;font-weight:700;
-  font-size:.82rem;color:var(--text);word-break:break-word;
-}
 
 /* ══════════════════════════════════════════
    AUTH GATE — layar login penuh sebelum masuk situs
@@ -3837,6 +3699,7 @@ body.auth-locked{overflow:hidden;}
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:30px;
   background:none;border:none;box-shadow:none;padding:0;
+  margin-top:-56px;
   animation:authgate-boot-fade .6s var(--ease-out);
 }
 @keyframes authgate-boot-fade{from{opacity:0;}to{opacity:1;}}
@@ -3850,76 +3713,6 @@ body.auth-locked{overflow:hidden;}
    supaya tracer tidak "bocor" ke luar tepi saat rotasi -- ini yang
    sebelumnya bikin animasinya kelihatan patah/kedip di sudut.
    ══════════════════════════════════════════ */
-.authgate-boot-loader{
-  position:relative;
-  width:88px;height:88px;
-  display:flex;align-items:center;justify-content:center;
-}
-
-/* frame heksagon dasar, statis, jadi anchor bentuk */
-.authgate-boot-hex{
-  position:absolute;inset:0;
-  clip-path:polygon(50% 0%,93.3% 25%,93.3% 75%,50% 100%,6.7% 75%,6.7% 25%);
-  background:rgba(255,255,255,.05);
-}
-
-/* wrapper tracer: clip ke bentuk heksagon SEKALI di sini, lalu isinya
-   (conic-gradient) yang berputar di dalam wrapper -- rotasi jadi mulus
-   karena tidak perlu re-clip tiap frame. */
-.authgate-boot-tracer{
-  position:absolute;inset:0;
-  clip-path:polygon(50% 0%,93.3% 25%,93.3% 75%,50% 100%,6.7% 75%,6.7% 25%);
-  overflow:hidden;
-}
-.authgate-boot-tracer i{
-  position:absolute;inset:-25%;
-  display:block;
-  background:conic-gradient(from 0deg,
-    transparent 0deg,
-    transparent 300deg,
-    var(--text) 336deg,
-    var(--cyan) 352deg,
-    var(--cyan) 360deg);
-  animation:authgate-tracer-spin 2.2s linear infinite;
-  will-change:transform;
-}
-@keyframes authgate-tracer-spin{to{transform:rotate(360deg);}}
-
-/* lapisan gelap di dalam tracer supaya cuma tepi tipis yang kelihatan
-   menyala, isi tengah tetap transparan/gelap */
-.authgate-boot-inner{
-  position:absolute;inset:3px;
-  clip-path:polygon(50% 0%,93.3% 25%,93.3% 75%,50% 100%,6.7% 75%,6.7% 25%);
-  background:var(--bg);
-}
-
-/* monogram di tengah + sapuan scan-line horizontal yang lewat berkala.
-   Ditaruh dalam kotak fixed-size supaya scan-line punya batas jelas
-   dan tidak overflow keluar bentuk heksagon. */
-.authgate-boot-mono{
-  position:relative;z-index:1;
-  width:48px;height:48px;
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Space Grotesk',sans-serif;
-  font-weight:700;font-size:1.1rem;letter-spacing:1px;
-  color:var(--text);
-  overflow:hidden;
-  border-radius:4px;
-}
-.authgate-boot-mono::after{
-  content:'';
-  position:absolute;left:-15%;right:-15%;height:2px;
-  background:linear-gradient(90deg,transparent,var(--cyan) 50%,transparent);
-  box-shadow:0 0 8px 1px rgba(255,255,255,.45);
-  animation:authgate-scan-move 2.2s cubic-bezier(.45,0,.55,1) infinite;
-}
-@keyframes authgate-scan-move{
-  0%{top:-10%;opacity:0;}
-  10%{opacity:1;}
-  50%{top:100%;opacity:1;}
-  60%{opacity:0;}
-  100%{top:100%;opacity:0;}
-}
 
 .authgate-boot-status{
   display:flex;flex-direction:column;align-items:center;gap:10px;
@@ -3986,7 +3779,7 @@ body.auth-locked{overflow:hidden;}
 }
 
 @media (prefers-reduced-motion: reduce){
-  .authgate-boot-tracer i,.authgate-boot-mono::after,.authgate-boot-text span,
+  .authgate-boot-text span,
   .authgate-boot-segbar i::after{
     animation:none!important;
   }
@@ -3996,7 +3789,10 @@ body.auth-locked{overflow:hidden;}
 </style>
 </head>
 <body><a href="#main-content" class="skip-link">Lewati ke konten utama</a>
-<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<div id="toast" class="toast" role="status" aria-live="polite">
+  <span class="toast-icon" id="toastIcon"></span>
+  <span class="toast-msg" id="toastMsg"></span>
+</div>
 
 <!-- ══════════════════════════════════════════
      AUTH GATE — wajib login sebelum bisa akses situs.
@@ -4021,12 +3817,6 @@ body.auth-locked{overflow:hidden;}
 
   <!-- state: sedang mengecek session tersimpan -->
   <div class="authgate-boot" id="authBootState">
-    <div class="authgate-boot-loader">
-      <div class="authgate-boot-hex"></div>
-      <div class="authgate-boot-tracer"><i></i></div>
-      <div class="authgate-boot-inner"></div>
-      <div class="authgate-boot-mono">TR</div>
-    </div>
     <div class="authgate-boot-status">
       <div class="authgate-boot-text">
         <span>Memeriksa sesi</span>
@@ -4141,11 +3931,16 @@ body.auth-locked{overflow:hidden;}
       <div class="logo-name" aria-label="Tarz Store">TARZ <span class="logo-name-accent">STORE</span></div>
     </div>
   </div>
-  <button class="hamburger-btn" id="hamburgerBtn" aria-label="Buka menu" aria-expanded="false" aria-controls="sideMenu" onclick="toggleSideMenu()">
-    <span class="hamburger-line"></span>
-    <span class="hamburger-line"></span>
-    <span class="hamburger-line"></span>
-  </button>
+  <div class="header-actions">
+    <button class="diamond-btn" id="diamondVipBtn" aria-label="Buka VIP Membership" onclick="openVipModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 3 8 9l4 13 4-13-2.5-6"/><path d="M17 3a2 2 0 0 1 1.6.8l3 4a2 2 0 0 1 .013 2.382l-7.99 10.986a2 2 0 0 1-3.247 0l-7.99-10.986A2 2 0 0 1 2.4 7.8l2.998-3.997A2 2 0 0 1 7 3z"/><path d="M2 9h20"/></svg>
+    </button>
+    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Buka menu" aria-expanded="false" aria-controls="sideMenu" onclick="toggleSideMenu()">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
+  </div>
 </header>
 
 <!-- SIDE MENU OVERLAY -->
@@ -4164,7 +3959,23 @@ body.auth-locked{overflow:hidden;}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
   </div>
-  <div class="side-menu-section-label">SIDEBAR ACCES</div>
+  <!-- WIDGET STATISTIK MINI — live, ikut angka yang sama dengan halaman utama -->
+  <div class="side-stats-widget" aria-label="Statistik toko">
+    <div class="side-stats-live"><span class="stats-live-dot"></span>Live Statistik</div>
+    <div class="side-stats-item">
+      <div class="side-stats-item-value is-loading js-stat-visitors">···</div>
+      <div class="side-stats-item-label">Pengunjung</div>
+    </div>
+    <div class="side-stats-item">
+      <div class="side-stats-item-value is-loading js-stat-downloads">···</div>
+      <div class="side-stats-item-label">Download</div>
+    </div>
+    <div class="side-stats-item">
+      <div class="side-stats-item-value is-loading js-stat-purchases">···</div>
+      <div class="side-stats-item-label">Terjual</div>
+    </div>
+  </div>
+
   <ul class="side-menu-list">
     <li><a href="#main-content" onclick="switchTabFromSideMenu('tab-cheat');">
       <span class="side-menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
@@ -4755,19 +4566,15 @@ body.auth-locked{overflow:hidden;}
     </button>
     <button class="btb-item" id="tab-allgame" data-tab="allgame" type="button" role="tab" aria-selected="false" aria-controls="allgame">
       <svg class="btb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/></svg>
-      <span class="btb-label">GAMES</span>
-    </button>
-    <button class="btb-item" id="tab-configff" data-tab="configff" type="button" role="tab" aria-selected="false" aria-controls="configff">
-      <svg class="btb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4a2 2 0 0 0 4 0V3h4v3c0 1.7 1.3 3 3 3v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9c1.7 0 3-1.3 3-3V3h4Z"/></svg>
-      <span class="btb-label">CONFIG</span>
+      <span class="btb-label">UNIVERSAL</span>
     </button>
     <button class="btb-item" id="tab-tools" data-tab="tools" type="button" role="tab" aria-selected="false" aria-controls="tools">
       <svg class="btb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"/></svg>
       <span class="btb-label">TOOLS</span>
     </button>
-    <button class="btb-item btb-item-vip" id="tab-vip" data-tab="vip" type="button" role="tab" aria-selected="false" aria-controls="vip">
-      <svg class="btb-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 3 8 9l4 13 4-13-2.5-6"/><path d="M17 3a2 2 0 0 1 1.6.8l3 4a2 2 0 0 1 .013 2.382l-7.99 10.986a2 2 0 0 1-3.247 0l-7.99-10.986A2 2 0 0 1 2.4 7.8l2.998-3.997A2 2 0 0 1 7 3z"/><path d="M2 9h20"/></svg>
-      <span class="btb-label">VIP</span>
+    <button class="btb-item" id="tab-profil" data-tab="profil" type="button" role="tab" aria-selected="false" aria-controls="profil">
+      <svg class="btb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span class="btb-label">PROFIL</span>
     </button>
   </div>
   <div class="btb-home-indicator"></div>
@@ -4790,13 +4597,6 @@ body.auth-locked{overflow:hidden;}
     </div>
   </div>
 
-  <!-- CONFIG FF TAB -->
-  <div class="tab-content" id="configff" role="tabpanel" aria-labelledby="tab-configff">
-    <div class="section-divider"><span>CONFIG FREE FIRE</span></div>
-    <div class="product-grid product-grid-2col" id="configffGrid">
-        
-    </div>
-  </div>
   <script>
   /* Render skeleton placeholder SEGERA (sebelum script Supabase di bawah
      sempat jalan), supaya user tidak pernah melihat grid kosong sesaat
@@ -4821,7 +4621,6 @@ body.auth-locked{overflow:hidden;}
     }
     fill('cheatGrid', 6);
     fill('allgameGrid', 6);
-    fill('configffGrid', 4);
   })();
   </script>
 
@@ -4884,163 +4683,131 @@ body.auth-locked{overflow:hidden;}
     </div>
   </div>
 
-  <!-- VIP MEMBERSHIP TAB — halaman khusus jual VIP, tanpa thumbnail/video, tanpa grid produk -->
-  <div class="tab-content vip-page" id="vip" role="tabpanel" aria-labelledby="tab-vip">
+  <!-- PROFIL TAB -->
+  <div class="tab-content" id="profil" role="tabpanel" aria-labelledby="tab-profil" style="padding-top:16px;">
 
-    <!-- PROFIL — dipindah ke tab VIP, tampil di atas card membership.
-         Ukuran & posisi mengikuti gaya banner video: lebar penuh, landscape. -->
+    <!-- PROFIL — tampil kalau sudah login Google -->
     <div class="profilepg-signed-in" id="profileSignedIn" style="display:none;">
-      <div class="profilepg-hero">
-        <div class="profilepg-hero-glow"></div>
-        <div class="profile-avatar-wrap" id="profileAvatarWrap">
-          <img id="profileAvatar" src="" alt="Foto profil Google" class="profile-avatar">
-        </div>
-        <div class="profilepg-hero-info">
-          <div class="profile-name-row">
-            <span class="profile-name" id="profileName">—</span>
-            <svg class="profile-verified-badge" viewBox="0 0 24 24" fill="none" aria-label="Terverifikasi"><path d="M12 2.5l2.3 1.6 2.7-.4 1.2 2.5 2.5 1.2-.4 2.7L22 12.5l-1.6 2.3.4 2.7-2.5 1.2-1.2 2.5-2.7-.4L12 22.5l-2.3-1.6-2.7.4-1.2-2.5-2.5-1.2.4-2.7L2 12.5l1.6-2.3-.4-2.7 2.5-1.2 1.2-2.5 2.7.4L12 2.5z" fill="#3b82f6"/><path d="M8.5 12.5l2.4 2.4 4.6-5.3" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <svg class="profile-vip-mini-badge" id="profileVipMiniBadge" viewBox="0 0 24 24" fill="none" aria-label="VIP" style="display:none;">
-              <defs>
-                <linearGradient id="vipMiniGrad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
-                  <stop offset="0" stop-color="#ffe9a8"/>
-                  <stop offset=".55" stop-color="#e8b64a"/>
-                  <stop offset="1" stop-color="#ffd76a"/>
-                </linearGradient>
-              </defs>
-              <path d="M12 2.5l2.3 1.6 2.7-.4 1.2 2.5 2.5 1.2-.4 2.7L22 12.5l-1.6 2.3.4 2.7-2.5 1.2-1.2 2.5-2.7-.4L12 22.5l-2.3-1.6-2.7.4-1.2-2.5-2.5-1.2.4-2.7L2 12.5l1.6-2.3-.4-2.7 2.5-1.2 1.2-2.5 2.7.4L12 2.5z" fill="url(#vipMiniGrad)"/>
-              <text x="12" y="16" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="11" fill="#1a1200">V</text>
-            </svg>
+      <div class="profilepg-cover"></div>
+      <div class="profilepg-body">
+        <div class="profilepg-hero">
+          <div class="profile-avatar-wrap" id="profileAvatarWrap">
+            <img id="profileAvatar" src="" alt="Foto profil Google" class="profile-avatar">
           </div>
-          <div class="profile-email" id="profileEmail">—</div>
+          <div class="profilepg-hero-info">
+            <div class="profile-name-row">
+              <span class="profile-name" id="profileName">—</span>
+              <svg class="profile-verified-badge" viewBox="0 0 24 24" fill="none" aria-label="Terverifikasi"><path d="M12 2.5l2.3 1.6 2.7-.4 1.2 2.5 2.5 1.2-.4 2.7L22 12.5l-1.6 2.3.4 2.7-2.5 1.2-1.2 2.5-2.7-.4L12 22.5l-2.3-1.6-2.7.4-1.2-2.5-2.5-1.2.4-2.7L2 12.5l1.6-2.3-.4-2.7 2.5-1.2 1.2-2.5 2.7.4L12 2.5z" fill="#3b82f6"/><path d="M8.5 12.5l2.4 2.4 4.6-5.3" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <svg class="profile-vip-mini-badge" id="profileVipMiniBadge" viewBox="0 0 24 24" fill="none" aria-label="VIP" style="display:none;">
+                <defs>
+                  <linearGradient id="vipMiniGrad2" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+                    <stop offset="0" stop-color="#ffe9a8"/>
+                    <stop offset=".55" stop-color="#e8b64a"/>
+                    <stop offset="1" stop-color="#ffd76a"/>
+                  </linearGradient>
+                </defs>
+                <path d="M12 2.5l2.3 1.6 2.7-.4 1.2 2.5 2.5 1.2-.4 2.7L22 12.5l-1.6 2.3.4 2.7-2.5 1.2-1.2 2.5-2.7-.4L12 22.5l-2.3-1.6-2.7.4-1.2-2.5-2.5-1.2.4-2.7L2 12.5l1.6-2.3-.4-2.7 2.5-1.2 1.2-2.5 2.7.4L12 2.5z" fill="url(#vipMiniGrad2)"/>
+                <text x="12" y="16" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="11" fill="#1a1200">V</text>
+              </svg>
+            </div>
+            <div class="profile-email" id="profileEmail">—</div>
+          </div>
+        </div>
+
+        <!-- MENU FITUR PROFIL — Edit Profil, Password, Dark Mode -->
+        <div class="profile-menu-list" id="profileFeatureMenu" style="display:none;">
+          <button type="button" class="profile-menu-item" onclick="void 0;">
+            <span class="profile-menu-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            </span>
+            <span class="profile-menu-label">Edit Profil</span>
+            <svg class="profile-menu-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+
+          <button type="button" class="profile-menu-item" onclick="void 0;">
+            <span class="profile-menu-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </span>
+            <span class="profile-menu-label">Password</span>
+            <svg class="profile-menu-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+
+        <!-- CARD PENGHUBUNG PROFIL — Account, Share, Review, Info, Settings -->
+        <div class="profile-menu-list2" id="profileLinkCard">
+          <button type="button" class="profile-menu-item2" onclick="void 0;">
+            <span class="profile-menu-icon2">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </span>
+            <span class="profile-menu-label2">Account</span>
+            <svg class="profile-menu-chevron2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+
+          <button type="button" class="profile-menu-item2" onclick="void 0;">
+            <span class="profile-menu-icon2">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-7-7 18-2-8-8-3z"/></svg>
+            </span>
+            <span class="profile-menu-label2">Share with friends</span>
+            <svg class="profile-menu-chevron2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+
+          <button type="button" class="profile-menu-item2" onclick="void 0;">
+            <span class="profile-menu-icon2">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+            </span>
+            <span class="profile-menu-label2">Review</span>
+            <svg class="profile-menu-chevron2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+
+          <button type="button" class="profile-menu-item2" onclick="void 0;">
+            <span class="profile-menu-icon2">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            </span>
+            <span class="profile-menu-label2">Info</span>
+            <svg class="profile-menu-chevron2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+
+          <button type="button" class="profile-menu-item2" onclick="void 0;">
+            <span class="profile-menu-icon2">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </span>
+            <span class="profile-menu-label2">Settings</span>
+            <svg class="profile-menu-chevron2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+
+          <button type="button" class="profile-menu-item2 profile-menu-item2-danger" onclick="googleSignOut();">
+            <span class="profile-menu-icon2">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            </span>
+            <span class="profile-menu-label2">Log out</span>
+          </button>
         </div>
       </div>
     </div>
 
     <!-- Tampil kalau BELUM login Google -->
     <div class="profilepg-signed-out" id="profileSignedOut">
-      <div class="profilepg-gate-glow"></div>
-      <div class="profile-gate-text">
-        <div class="profile-gate-title">Kamu Belum Login</div>
-      </div>
-      <button type="button" class="profile-google-btn" id="profileLoginBtn" onclick="googleSignIn()">
-        <span class="pg-spinner"></span>
-        <svg class="profile-google-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.52 12.27c0-.85-.08-1.67-.22-2.45H12v4.64h6.47c-.28 1.5-1.13 2.77-2.4 3.62v3h3.88c2.27-2.09 3.57-5.17 3.57-8.81z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.95-2.92l-3.88-3c-1.08.72-2.45 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.96H1.26v3.1C3.24 21.3 7.28 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.27A7.2 7.2 0 0 1 4.89 12c0-.79.14-1.55.38-2.27v-3.1H1.26A11.98 11.98 0 0 0 0 12c0 1.94.46 3.77 1.26 5.37l4.01-3.1z"/><path fill="#EA4335" d="M12 4.77c1.76 0 3.34.6 4.58 1.79l3.44-3.44C17.95 1.19 15.24 0 12 0 7.28 0 3.24 2.7 1.26 6.63l4.01 3.1c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
-        <span class="profile-google-btn-label">Lanjutkan dengan Google</span>
-      </button>
-    </div>
-
-    <div class="vippg-cards-grid">
-
-    <div class="vippg-card vc-card vc-silver" id="vippgCard">
-      <div class="vippg-card-glow vc-glow"></div>
-
-      <div class="vc-badge">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-flame-icon lucide-flame"><path d="M12 3q1 4 4 6.5t3 5.5a1 1 0 0 1-14 0 5 5 0 0 1 1-3 1 1 0 0 0 5 0c0-2-1.5-3-1.5-5q0-2 2.5-4"/></svg>
-        <span>bestseller</span>
-      </div>
-
-      <div class="vippg-icon vc-icon" id="vippgIcon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 3 8 9l4 13 4-13-2.5-6"/><path d="M17 3a2 2 0 0 1 1.6.8l3 4a2 2 0 0 1 .013 2.382l-7.99 10.986a2 2 0 0 1-3.247 0l-7.99-10.986A2 2 0 0 1 2.4 7.8l2.998-3.997A2 2 0 0 1 7 3z"/><path d="M2 9h20"/></svg>
-      </div>
-
-      <h2 class="vippg-title vc-title" id="vippgTitle">TARZ STORE MEMBERSHIP</h2>
-      <div class="vc-price-row">
-        <div class="vippg-price vc-price" id="vippgPriceValue">Rp10.000</div>
-      </div>
-      <div class="vippg-divider vc-divider"></div>
-
-      <ul class="vippg-list vc-list">
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Akses permanen</li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Tersedia cheat all game</li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Cheat selalu update terbaru</li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Semua cheat &amp; config terbuka</li>
-      </ul>
-
-      <div class="vippg-cta-wrap vc-cta-wrap" id="vippgCtaWrap">
-        <button type="button" class="vippg-cta vippg-cta-primary vc-cta vc-cta-primary" id="vippgBuyQris" onclick="openVipPaymentDirect()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM21 14v3M17 21h4M14 21h.01"/></svg>
-          <span>Buy via QRIS</span>
-        </button>
-        <button type="button" class="vippg-cta vippg-cta-secondary vc-cta vc-cta-secondary" onclick="openVipWhatsApp()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/></svg>
-          <span>Order via WhatsApp</span>
-        </button>
-      </div>
-    </div>
-
-    <div class="vippg-card-reseller vc-card vc-gold">
-      <div class="vippg-card-reseller-glow vc-glow"></div>
-
-      <div class="vc-badge">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        <span>Reseller</span>
-      </div>
-
-      <div class="vippg-icon vc-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f3d489" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-key-icon lucide-user-key"><path d="M20 11v6"/><path d="M20 13h2"/><path d="M3 21v-2a4 4 0 0 1 4-4h6a4 4 0 0 1 2.072.578"/><circle cx="10" cy="7" r="4"/><circle cx="20" cy="19" r="2"/></svg>
-      </div>
-
-      <h2 class="vippg-title vc-title">TARZ STORE RESELLER</h2>
-
-
-      <div class="vc-price-row">
-        <div class="vippg-price vc-price">Rp25.000</div>
-      </div>
-      <div class="vippg-divider vc-divider"></div>
-
-      <ul class="vippg-card-reseller-list vc-list">
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Unlimited Key</li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Akses permanen</li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Aman Terpercaya</li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Bebas Generate Key</li>
-      </ul>
-
-      <div class="vc-cta-wrap">
-        <button type="button" class="vippg-cta vippg-cta-primary vc-cta vc-cta-primary" aria-disabled="true" onclick="return false;" style="opacity:.55;cursor:not-allowed;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM21 14v3M17 21h4M14 21h.01"/></svg>
-          <span>Buy via QRIS</span>
-        </button>
-        <button type="button" class="vippg-cta vc-cta vc-cta-primary" onclick="openResellerWhatsApp()">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/></svg>
-          <span>Order via Whatsapp</span>
-        </button>
-      </div>
-    </div>
-
-    </div>
-
-    <!-- WIDGET STATISTIK OTOMATIS — dipindah ke bawah card VIP -->
-    <div class="stats-widget" aria-label="Statistik toko">
-      <div class="stats-widget-live"><span class="stats-live-dot"></span>Live Statistik</div>
-      <div class="stats-item">
-        <div class="stats-item-icon-wrap">
-          <svg class="stats-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+      <div class="profilepg-cover"></div>
+      <div class="profilepg-body">
+        <div class="profile-avatar-wrap">
+          <svg class="profilepg-guest-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         </div>
-        <div class="stats-item-value is-loading" id="statVisitors">···</div>
-        <div class="stats-item-label">Pengunjung</div>
-      </div>
-      <div class="stats-item">
-        <div class="stats-item-icon-wrap">
-          <svg class="stats-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <div class="profile-gate-text">
+          <div class="profile-gate-title">Kamu Belum Login</div>
+          <div class="profile-gate-sub">Masuk untuk lihat profil, status membership, dan riwayat kamu di Tarz Store.</div>
         </div>
-        <div class="stats-item-value is-loading" id="statDownloads">···</div>
-        <div class="stats-item-label">Download</div>
-      </div>
-      <div class="stats-item">
-        <div class="stats-item-icon-wrap">
-          <svg class="stats-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-        </div>
-        <div class="stats-item-value is-loading" id="statPurchases">···</div>
-        <div class="stats-item-label">Terjual</div>
+        <button type="button" class="profile-google-btn" id="profileLoginBtn" onclick="googleSignIn()">
+          <span class="pg-spinner"></span>
+          <svg class="profile-google-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.52 12.27c0-.85-.08-1.67-.22-2.45H12v4.64h6.47c-.28 1.5-1.13 2.77-2.4 3.62v3h3.88c2.27-2.09 3.57-5.17 3.57-8.81z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.95-2.92l-3.88-3c-1.08.72-2.45 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.96H1.26v3.1C3.24 21.3 7.28 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.27A7.2 7.2 0 0 1 4.89 12c0-.79.14-1.55.38-2.27v-3.1H1.26A11.98 11.98 0 0 0 0 12c0 1.94.46 3.77 1.26 5.37l4.01-3.1z"/><path fill="#EA4335" d="M12 4.77c1.76 0 3.34.6 4.58 1.79l3.44-3.44C17.95 1.19 15.24 0 12 0 7.28 0 3.24 2.7 1.26 6.63l4.01 3.1c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
+          <span class="profile-google-btn-label">Lanjutkan dengan Google</span>
+        </button>
       </div>
     </div>
-
-  </div>
 
 </section>
 
 <!-- SOCIAL MEDIA -->
-<section class="social-section" aria-label="Media sosial">
+<section class="social-section" id="socialSection" aria-label="Media sosial">
   <div class="social-title">Ikuti &amp; Hubungi Kami</div>
   <div class="social-links">
 
@@ -5072,7 +4839,7 @@ body.auth-locked{overflow:hidden;}
 
 </main>
 
-<footer>
+<footer id="siteFooter">
   © 2026 <strong style="color:var(--blue2)">Tarz Store</strong> — All Rights Reserved
 </footer>
 
@@ -5202,6 +4969,48 @@ body.auth-locked{overflow:hidden;}
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════
+     VIP MODAL — dibuka lewat icon diamond di header.
+     Berisi profil, card membership, card reseller & statistik toko
+     yang sebelumnya jadi tab tersendiri.
+     ══════════════════════════════════════════ -->
+<div class="vip-modal-overlay" id="vipModalOverlay" role="dialog" aria-modal="true" aria-label="VIP Membership" aria-hidden="true" inert onclick="handleVipModalOverlayClick(event)">
+  <div class="vip-modal-scroll" id="vipModal">
+
+      <div class="vippg-cards-grid">
+
+      <div class="vippg-card" id="vippgCard">
+
+        <div class="vippg-icon" id="vippgIcon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 3 8 9l4 13 4-13-2.5-6"/><path d="M17 3a2 2 0 0 1 1.6.8l3 4a2 2 0 0 1 .013 2.382l-7.99 10.986a2 2 0 0 1-3.247 0l-7.99-10.986A2 2 0 0 1 2.4 7.8l2.998-3.997A2 2 0 0 1 7 3z"/><path d="M2 9h20"/></svg>
+        </div>
+
+        <h2 class="vippg-title" id="vippgTitle">TARZ STORE VIP</h2>
+
+        <div class="vippg-price" id="vippgPriceValue">Rp10.000</div>
+
+        <ul class="vippg-list" id="vippgList">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Akses permanen</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Tersedia cheat all game</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Cheat selalu update terbaru</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Dapat akses semua produk</li>
+        </ul>
+
+        <div class="vippg-cta-wrap" id="vippgCtaWrap">
+          <button type="button" class="vippg-cta vippg-cta-primary" id="vippgBuyQris" onclick="openVipPaymentDirect()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM21 14v3M17 21h4M14 21h.01"/></svg>
+            <span>Buy via QRIS</span>
+          </button>
+          <button type="button" class="vippg-cta vippg-cta-secondary" onclick="openVipWhatsApp()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/></svg>
+            <span>Order via WhatsApp</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+</div>
+
 <script>
 'use strict';
 
@@ -5236,29 +5045,6 @@ function setBannerAssets(){
 
 function initTheme(){
   setBannerAssets();
-}
-
-/* Toast kecil buat notifikasi; no-op elegan kalau container tidak ada */
-function showToast(msg){
-  try{
-    let toast = document.getElementById('tarzToast');
-    if(!toast){
-      toast = document.createElement('div');
-      toast.id = 'tarzToast';
-      toast.style.cssText = 'position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);background:var(--card,#161616);color:var(--text,#f2f2f5);border:1px solid var(--border-strong,rgba(255,255,255,.1));padding:10px 18px;border-radius:999px;font-size:.85rem;font-family:inherit;z-index:99999;opacity:0;transition:opacity .3s ease,transform .3s ease;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.4);';
-      document.body.appendChild(toast);
-    }
-    toast.textContent = msg;
-    requestAnimationFrame(function(){
-      toast.style.opacity = '1';
-      toast.style.transform = 'translateX(-50%) translateY(0)';
-    });
-    clearTimeout(toast._hideTimer);
-    toast._hideTimer = setTimeout(function(){
-      toast.style.opacity = '0';
-      toast.style.transform = 'translateX(-50%) translateY(20px)';
-    }, 2200);
-  }catch(e){}
 }
 
 document.addEventListener('DOMContentLoaded', initTheme);
@@ -5309,7 +5095,7 @@ function closeSideMenu(){
   document.body.classList.remove('side-menu-open');
 }
 document.addEventListener('keydown', function(e){
-  if(e.key === 'Escape'){ closeSideMenu(); closeProfilePanel(); }
+  if(e.key === 'Escape'){ closeSideMenu(); }
 });
 
 /* ── TABS — with ARIA & keyboard support ── */
@@ -5323,13 +5109,20 @@ function activateTab(btn){
   btn.setAttribute('aria-selected','true');
   const target = document.getElementById(btn.dataset.tab);
   target.classList.add('active');
-  /* Halaman VIP tidak pakai banner/poster video -- sembunyikan section
+  /* Halaman VIP/Profil tidak pakai banner/poster video -- sembunyikan section
      hero video saat tab itu aktif, tampilkan lagi untuk tab produk lainnya. */
   const heroBanner = document.getElementById('heroBanner');
-  if(heroBanner) heroBanner.style.display = (btn.dataset.tab === 'vip') ? 'none' : '';
-  /* Setiap kali tab VIP dibuka, refresh kartu profil di dalamnya supaya
-     status login/VIP yang ditampilkan selalu terbaru. */
-  if(btn.dataset.tab === 'vip' && typeof renderProfilePanel === 'function') renderProfilePanel();
+  if(heroBanner) heroBanner.style.display = (btn.dataset.tab === 'vip' || btn.dataset.tab === 'profil') ? 'none' : '';
+  /* Setiap kali tab Profil (atau VIP) dibuka, refresh kartu profil di
+     dalamnya supaya status login/VIP yang ditampilkan selalu terbaru. */
+  if((btn.dataset.tab === 'vip' || btn.dataset.tab === 'profil') && typeof renderProfilePanel === 'function') renderProfilePanel();
+  /* Khusus tab Profil: sembunyikan section sosial media & footer supaya
+     halaman profil lebih ringkas, tanpa mempengaruhi tab lain. */
+  const socialSection = document.getElementById('socialSection');
+  const siteFooter = document.getElementById('siteFooter');
+  const hideOnProfil = (btn.dataset.tab === 'profil') ? 'none' : '';
+  if(socialSection) socialSection.style.display = hideOnProfil;
+  if(siteFooter) siteFooter.style.display = hideOnProfil;
   /* Otomatis geser balik ke paling atas halaman tiap ganti tab, supaya
      user tidak "kejauhan" scroll-nya waktu pindah ke tab lain. */
   window.scrollTo({top:0, behavior:'smooth'});
@@ -5339,6 +5132,34 @@ function switchTabFromSideMenu(tabId){
   const btn = document.getElementById(tabId);
   if(btn) activateTab(btn);
   closeSideMenu();
+}
+/* ── VIP MODAL — dibuka lewat icon diamond di header (menggantikan tab VIP lama). ── */
+function openVipModal(){
+  closeSideMenu();
+  const overlay = document.getElementById('vipModalOverlay');
+  const modal = document.getElementById('vipModal');
+  if(!overlay || !modal) return;
+  overlay.classList.add('show');
+  overlay.setAttribute('aria-hidden','false');
+  overlay.removeAttribute('inert');
+  document.body.classList.add('side-menu-open');
+  if(typeof renderProfilePanel === 'function') renderProfilePanel();
+}
+function closeVipModal(){
+  const overlay = document.getElementById('vipModalOverlay');
+  if(!overlay) return;
+  overlay.classList.remove('show');
+  overlay.setAttribute('aria-hidden','true');
+  overlay.setAttribute('inert','');
+  document.body.classList.remove('side-menu-open');
+}
+function handleVipModalOverlayClick(e){
+  if(e.target && e.target.id === 'vipModalOverlay') closeVipModal();
+}
+/* Dipertahankan sebagai alias supaya kode lama yang masih memanggil
+   goToVipTab() (dari tempat lain di skrip ini) tetap berfungsi. */
+function goToVipTab(){
+  openVipModal();
 }
 tabBtns.forEach((btn, idx)=>{
   btn.addEventListener('click', ()=>{
@@ -5411,11 +5232,19 @@ document.querySelectorAll('[data-count]').forEach(el=>statIO.observe(el));
 
 /* ── TOAST — no reflow ── */
 let _toastTimer = null;
+const TOAST_ICONS = {
+  success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+  error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+  info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'
+};
 function showToast(msg, type=''){
   const toast = document.getElementById('toast');
   if(!toast) return;
-  toast.textContent = msg;
-  toast.className = 'toast show' + (type ? ' ' + type : '');
+  const iconEl = document.getElementById('toastIcon');
+  const msgEl = document.getElementById('toastMsg');
+  if(msgEl) msgEl.textContent = msg; else toast.textContent = msg;
+  if(iconEl) iconEl.innerHTML = TOAST_ICONS[type] || TOAST_ICONS.info;
+  toast.className = 'toast show' + (type ? ' ' + type : ' info');
   clearTimeout(_toastTimer);
   _toastTimer = setTimeout(()=>{ toast.classList.remove('show'); }, 2600);
 }
@@ -6149,81 +5978,6 @@ function openModal(btn){
       featureGrid.appendChild(posterWrapNk);
     }
 
-  } else if(_specialMode === 'configff-empty'){
-    /* ── MODE SPESIAL CONFIG FF: KOSONG total, terpisah dari mode lain.
-       Logo ditampilkan besar (mengikuti foto premium), nama produk
-       disembunyikan di popup, badge/label/footer tetap disembunyikan
-       — supaya tidak ikut mengubah tampilan modal produk
-       FREE FIRE / ALL GAME yang lain. Tombol X (tutup) tetap tampil normal. ── */
-    grid.style.display = 'none';
-    featureGrid.style.display = 'flex';
-    sectionLabel.textContent = '';
-    footer.style.display = 'none';
-    badgeWrap.innerHTML = '';
-    document.getElementById('modalProductName').textContent = '';
-    document.getElementById('modalHeader').style.display = 'none';
-    iconEl.classList.remove('modal-header-icon-lg');
-    iconEl.innerHTML = '';
-    iconEl.textContent = '';
-    iconEl.style.display = 'none';
-
-    /* ── DUA FOTO SEBARIS (2:3) + PANAH KANAN: Original -> Premium ── */
-    if(d.posterOriginal && d.posterPremium){
-      const dualWrapCf = document.createElement('div');
-      dualWrapCf.className = 'dual-poster-wrap';
-      dualWrapCf.innerHTML = `
-        <div class="dual-poster-col">
-          <div class="dual-poster-label">SEBELUM</div>
-          <div class="dual-poster-frame">
-            <img src="${d.posterOriginal}" alt="Original" loading="lazy" decoding="async" onerror="this.closest('.dual-poster-frame').style.display='none'">
-          </div>
-        </div>
-        <div class="dual-poster-arrow" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0l-6-6m6 6l-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-        <div class="dual-poster-col">
-          <div class="dual-poster-label">SESUDAH</div>
-          <div class="dual-poster-frame">
-            <img src="${d.posterPremium}" alt="Premium" loading="lazy" decoding="async" onerror="this.closest('.dual-poster-frame').style.display='none'">
-          </div>
-        </div>
-      `;
-      featureGrid.appendChild(dualWrapCf);
-    }
-
-    /* ── TOMBOL DOWNLOAD CONFIG & TUTORIAL PASANG (mode CONFIG FF) ──
-       Sama seperti produk lain: harus JOIN VIP dulu (lewat openKeyModal)
-       sebelum link download/tutorial dibuka. ── */
-    const cfBtnRow = document.createElement('div');
-    cfBtnRow.className = 'configff-btn-row';
-
-    const dlConfigOpt = document.createElement('button');
-    dlConfigOpt.type = 'button';
-    dlConfigOpt.className = 'simple-btn simple-btn-download';
-    dlConfigOpt.innerHTML = `
-      <span class="simple-btn-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M5 19h14" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-      Download Config
-    `;
-    dlConfigOpt.addEventListener('click', () => {
-      openKeyModal(productName, d.configDownloadLink || '', 'cheat');
-    });
-    cfBtnRow.appendChild(dlConfigOpt);
-
-    const tutorialOpt = document.createElement('button');
-    tutorialOpt.type = 'button';
-    tutorialOpt.className = 'simple-btn simple-btn-tutorial';
-    tutorialOpt.innerHTML = `
-      <span class="simple-btn-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H17l3 3v11.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5v-13Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M8 11h8M8 15h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-      Tutorial Pasang
-    `;
-    tutorialOpt.addEventListener('click', () => {
-      // Link tutorial pasang CONFIG FF permanen (sama untuk semua config, tidak diisi lewat admin)
-      openKeyModal(productName, 'https://www.mediafire.com/file/jgd1w82c4b77qxa/Tutorial_Pasang_Config.mp4/file', 'cheat');
-    });
-    cfBtnRow.appendChild(tutorialOpt);
-
-    featureGrid.appendChild(cfBtnRow);
-
   } else {
     /* ── MODE NORMAL: pilihan paket harga ── */
     grid.style.display = 'grid';
@@ -6764,19 +6518,28 @@ async function googleSignOut(){
 function renderProfilePanel(){
   const signedIn = document.getElementById('profileSignedIn');
   const signedOut = document.getElementById('profileSignedOut');
+  const featureMenu = document.getElementById('profileFeatureMenu');
   if(!signedIn || !signedOut) return;
   if(_googleUser){
     document.getElementById('profileName').textContent = _googleUser.displayName || (_googleUser.email ? _googleUser.email.split('@')[0] : 'Akun');
-    /* akun yang daftar pakai Username & Password sebenarnya punya email
-       internal (mis. tarzx@tarzstore.local) di belakang layar -- ini cuma
-       dipakai teknis oleh Firebase Auth dan tidak pernah dimaksudkan untuk
-       dilihat user. Supaya tampilan tetap rapi & terlihat seperti email
-       biasa, domain internal ini disamarkan jadi "<username>@gmail.com" di
-       UI (hanya kosmetik, tidak mengubah data asli di Firebase). */
+    /* akun yang daftar pakai Username & Password punya email internal
+       teknis (mis. tarzx@tarzstore.local) di belakang layar -- ini cuma
+       dipakai oleh Firebase Auth dan tidak pernah dimaksudkan untuk
+       dilihat user. Untuk akun jenis ini, baris email di profil
+       DISEMBUNYIKAN (hanya nama yang tampil). Akun yang login pakai
+       Google tetap menampilkan email aslinya seperti biasa. */
     const _rawEmail = _googleUser.email || '';
-    document.getElementById('profileEmail').textContent = _rawEmail.endsWith('@tarzstore.local')
-      ? _rawEmail.split('@')[0] + '@gmail.com'
-      : _rawEmail;
+    const _emailEl = document.getElementById('profileEmail');
+    const _isUsernamePasswordAccount = _rawEmail.endsWith('@tarzstore.local');
+    if(_emailEl){
+      if(_isUsernamePasswordAccount){
+        _emailEl.textContent = '';
+        _emailEl.style.display = 'none';
+      } else {
+        _emailEl.textContent = _rawEmail;
+        _emailEl.style.display = '';
+      }
+    }
     /* akun Google punya photoURL asli dari Google -- dipakai apa adanya.
        Akun yang daftar/login pakai Username & Password (Firebase email/
        password) TIDAK punya photoURL (selalu null), jadi otomatis pakai
@@ -6784,6 +6547,7 @@ function renderProfilePanel(){
     document.getElementById('profileAvatar').src = _googleUser.photoURL || 'https://apmxdcwebivmusqcuzcv.supabase.co/storage/v1/object/public/Tarzx/anime.png';
     signedIn.style.display = 'block';
     signedOut.style.display = 'none';
+    if(featureMenu) featureMenu.style.display = 'flex';
 
     /* tampilkan badge "MEMBER VIP" + ring emas di avatar kalau akun ini VIP */
     const isVip = isVipUnlocked();
@@ -6796,21 +6560,11 @@ function renderProfilePanel(){
   } else {
     signedIn.style.display = 'none';
     signedOut.style.display = 'block';
+    if(featureMenu) featureMenu.style.display = 'none';
     const loginBtn = document.getElementById('profileLoginBtn');
     if(loginBtn) loginBtn.classList.remove('loading');
   }
 }
-
-/* buka panel Profil: sekarang berupa tab "PROFIL" di tab bar bawah,
-   bukan modal lagi. Fungsi ini tetap dipertahankan (dipanggil dari
-   beberapa titik lain) supaya cukup pindah ke tab tersebut. */
-function openProfilePanel(){
-  closeSideMenu();
-  renderProfilePanel();
-  const btn = document.getElementById('tab-vip');
-  if(btn) activateTab(btn);
-}
-function closeProfilePanel(){ /* no-op: Profil kini tab, bukan modal yang perlu ditutup */ }
 
 /* ── Dipanggil langsung dari tombol "MASUKKAN KEY VIP" / "BUY VIA QRIS" / "BUY VIA WHATSAPP".
    Tidak perlu cek login Google lagi di sini -- user sudah wajib login lewat
@@ -7041,14 +6795,13 @@ function refreshVipHeaderBadge(){
    device saat ini -- dipanggil bersamaan dengan refreshVipHeaderBadge(). */
 function refreshVipPageCard(){
   const priceValue = document.getElementById('vippgPriceValue');
-  const priceNote = document.getElementById('vippgPriceNote');
   const buyBtn = document.getElementById('vippgBuyQris');
   const ctaWrap = document.getElementById('vippgCtaWrap');
   const card = document.getElementById('vippgCard');
   const titleEl = document.getElementById('vippgTitle');
-  const subEl = document.getElementById('vippgSub');
   const iconEl = document.getElementById('vippgIcon');
-  if(!priceValue || !priceNote) return;
+  const listEl = document.getElementById('vippgList');
+  if(!priceValue) return;
 
   let isPermanent = false;
   let expiry = null;
@@ -7069,19 +6822,13 @@ function refreshVipPageCard(){
 
   if(isActive){
     if(titleEl) titleEl.textContent = 'Selamat, Kamu VIP!';
-    if(subEl) subEl.textContent = isPermanent
-      ? 'Terima kasih sudah jadi member VIP Tarz Store.'
-      : 'Trial VIP kamu sedang aktif';
     priceValue.textContent = isPermanent ? 'AKTIF' : 'TRIAL AKTIF';
-    priceNote.textContent = isPermanent
-      ? ''
-      : 'Trial VIP sedang berjalan di device ini';
+    if(listEl) listEl.style.display = 'none';
     if(ctaWrap) ctaWrap.style.display = 'none';
   } else {
     if(titleEl) titleEl.textContent = 'TARZ STORE VIP';
-    if(subEl) subEl.textContent = 'Dapat akses semua produk';
     priceValue.textContent = VIP_PAGE_PRICE_TEXT;
-    priceNote.textContent = '';
+    if(listEl) listEl.style.display = '';
     if(ctaWrap) ctaWrap.style.display = '';
     if(buyBtn){
       buyBtn.querySelector('span').textContent = 'Buy via QRIS';
@@ -7102,11 +6849,10 @@ function downloadUnlockedProduct(){
   }
 }
 
-/* Dipanggil saat produk yang masih terkunci diklik: pindah otomatis ke
-   halaman VIP dan tampilkan toast "Access Terkunci". */
+/* Dipanggil saat produk yang masih terkunci diklik: buka otomatis modal
+   VIP dan tampilkan toast "Access Terkunci". */
 function redirectToVipLocked(){
-  const vipTabBtn = document.getElementById('tab-vip');
-  if(vipTabBtn) activateTab(vipTabBtn);
+  openVipModal();
   showToast('Access Terkunci', 'error');
 }
 
@@ -7134,15 +6880,14 @@ function openKeyModal(productName, downloadLink, sourceTab){
   redirectToVipLocked();
 }
 
-/* Dipanggil dari sidebar "Input Key" — kalau belum login Google, redirect ke
-   halaman VIP + toast "Kamu Belum Login" (tanpa membuka modal key sama sekali).
+/* Dipanggil dari sidebar "Input Key" — kalau belum login Google, buka modal
+   VIP + toast "Kamu Belum Login" (tanpa membuka modal key sama sekali).
    Kalau sudah login, buka modal key langsung ke form input. */
 function openKeyModalFromSideMenu(){
   closeSideMenu();
 
   if(!_googleUser){
-    const vipTabBtn = document.getElementById('tab-vip');
-    if(vipTabBtn) activateTab(vipTabBtn);
+    openVipModal();
     showToast('Kamu Belum Login', 'error');
     return;
   }
@@ -7182,12 +6927,6 @@ function showVipGate(){
   if(joinVipWaBtn){
     joinVipWaBtn.style.display = (_keySourceTab === 'cheat' || _keySourceTab === 'file' || _keySourceTab === 'newproduct') ? 'flex' : 'none';
   }
-}
-
-function escapeHtml(str){
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
 }
 
 /* markup asli form input key VIP — dipakai untuk restore jika sebelumnya body ini
@@ -9774,14 +9513,13 @@ window.addEventListener('npFirebaseReady', fbInitOnce, {once:true});
   async function loadDbProducts(){
     const cheatGrid = document.getElementById('cheatGrid');
     const allgameGrid = document.getElementById('allgameGrid');
-    const configffGrid = document.getElementById('configffGrid');
     if(!cheatGrid || !allgameGrid) return;
 
-    /* Hapus skeleton loading di ketiga grid. Dipanggil di jalur SUKSES
+    /* Hapus skeleton loading di kedua grid. Dipanggil di jalur SUKSES
        maupun GAGAL/kosong supaya skeleton tidak pernah nyangkut selamanya
        kalau fetch Firestore error atau memang belum ada produk. */
     function clearSkeletons(){
-      [cheatGrid, allgameGrid, configffGrid].forEach(grid=>{
+      [cheatGrid, allgameGrid].forEach(grid=>{
         if(!grid) return;
         grid.querySelectorAll('.skeleton-card').forEach(el => el.remove());
       });
@@ -9850,45 +9588,15 @@ window.addEventListener('npFirebaseReady', fbInitOnce, {once:true});
 
     let cheatHtml = '';
     let allgameHtml = '';
-    let configffHtml = '';
     /* Hitung index per-grid supaya kartu PERTAMA di tiap grid (yang tampil
        above-the-fold, biasanya jadi elemen LCP) di-load eager + fetchpriority
        tinggi, bukan lazy -- sisanya (di bawah layar) tetap lazy untuk hemat
        bandwidth. Tanpa ini, semua kartu (termasuk yang pertama) lazy-load,
        sehingga PageSpeed menandai gambar LCP "tidak ditemukan di dokumen awal". */
-    let cheatIdx = 0, allgameIdx = 0, configffIdx = 0;
+    let cheatIdx = 0, allgameIdx = 0;
 
     data.forEach(p => {
       const name = p.name || '';
-
-      /* ── PRODUK TAB CONFIG FF: kartu spesial dual-poster (sebelum/sesudah),
-         tidak pakai fitur/platform/key seperti produk biasa. ── */
-      if(p.tab === 'configff'){
-        const imgUrl = p.image_url || ''; // foto SESUDAH / foto config
-        const imgBefore = p.download_link_2 || ''; // foto SEBELUM (dititipkan di kolom download_link_2)
-        const dlLink = npAttr(p.download_link || '');
-
-        const isFirstCf = configffIdx === 0;
-        configffIdx++;
-        const cfLoadAttr = isFirstCf ? 'loading="eager" fetchpriority="high"' : 'loading="lazy"';
-        const cfCardHtml = `
-      <div class="card"
-        data-special="configff-empty"
-        data-img="${npAttr(imgUrl)}" data-label="CONFIG FF"
-        data-icon="" data-platform=""
-        data-fitur='[]'
-        data-poster=""
-        data-config-download-link="${dlLink}"
-        data-poster-original="${npAttr(imgBefore)}" data-poster-premium="${npAttr(imgUrl)}">
-        <div class="product-image" data-label="CONFIG FF">
-          <img src="${npAttr(imgUrl)}" alt="${npAttr(name)}" onerror="this.classList.add('img-error')" ${cfLoadAttr} decoding="async" width="300" height="450">
-        </div>
-        <h3>${npEscape(name)}</h3>        <button class="buy-btn" onclick="openModal(this)" style="display:flex;align-items:center;justify-content:center;gap:6px;"><span class="js-icon" data-icon-key="installBtn"></span>INSTALL</button>
-      </div>`;
-
-        configffHtml += cfCardHtml;
-        return;
-      }
 
       let features = [];
       if(Array.isArray(p.features)) features = p.features;
@@ -9933,7 +9641,6 @@ window.addEventListener('npFirebaseReady', fbInitOnce, {once:true});
     clearSkeletons();
     if(cheatHtml) cheatGrid.insertAdjacentHTML('afterbegin', cheatHtml);
     if(allgameHtml) allgameGrid.insertAdjacentHTML('afterbegin', allgameHtml);
-    if(configffHtml && configffGrid) configffGrid.insertAdjacentHTML('afterbegin', configffHtml);
 
     /* Icon (installBtn dll) dan status produk perlu di-render ulang untuk kartu yang baru ditambahkan */
     if(typeof renderStaticIcons === 'function') renderStaticIcons();
@@ -10043,6 +9750,19 @@ window.addEventListener('npFirebaseReady', fbInitOnce, {once:true});
     animateStat(el, prev, Number(value) || 0, wasLoading ? 900 : 500);
   }
 
+  /* Sama seperti setStat, tapi mengisi SEMUA elemen dengan class yang sama
+     (dipakai buat widget statistik versi kecil yang ada beberapa salinan,
+     misalnya di halaman utama & sidebar). */
+  function setStatAll(className, value){
+    document.querySelectorAll('.' + className).forEach(el => {
+      const wasLoading = el.classList.contains('is-loading');
+      el.classList.remove('is-loading');
+      const prev = wasLoading ? 0 : (Number(el.dataset.rawValue) || 0);
+      el.dataset.rawValue = value;
+      animateStat(el, prev, Number(value) || 0, wasLoading ? 900 : 500);
+    });
+  }
+
   /* Catatan: security rules Firestore untuk koleksi `stats` mengizinkan
      WRITE oleh siapa saja tapi READ hanya oleh yang sudah login
      (allow read: if request.auth != null). Karena auth gate situs ini
@@ -10055,9 +9775,9 @@ window.addEventListener('npFirebaseReady', fbInitOnce, {once:true});
       const snap = await window.fbDb.collection('stats').get();
       snap.forEach(doc => {
         const value = doc.data().value;
-        if(doc.id === 'visitors') setStat('statVisitors', value);
-        if(doc.id === 'downloads') setStat('statDownloads', value);
-        if(doc.id === 'purchases') setStat('statPurchases', value);
+        if(doc.id === 'visitors'){ setStat('statVisitors', value); setStatAll('js-stat-visitors', value); }
+        if(doc.id === 'downloads'){ setStat('statDownloads', value); setStatAll('js-stat-downloads', value); }
+        if(doc.id === 'purchases'){ setStat('statPurchases', value); setStatAll('js-stat-purchases', value); }
       });
     }catch(e){ /* diamkan, widget tetap tampil "···" */ }
   }
