@@ -923,7 +923,8 @@
    ═══════════════════════════════════════════════════ */
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js';
 import {
-  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged
+  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged,
+  setPersistence, browserSessionPersistence
 } from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js';
 import {
   getFirestore, collection, doc, addDoc, updateDoc, deleteDoc,
@@ -944,6 +945,17 @@ const auth = getAuth(firebaseApp);
 const dbFs = getFirestore(firebaseApp);
 const productsCol = collection(dbFs, 'products');
 
+/* Hanya email ini yang boleh masuk ke admin panel. Email lain, walau
+   berhasil login lewat Firebase Auth (mis. akun customer dari website
+   utama), akan langsung ditolak dan otomatis di-logout. */
+const ADMIN_EMAIL = 'tarz2642008@gmail.com';
+
+/* Sesi login TIDAK disimpan permanen -- otomatis hilang begitu tab/browser
+   ditutup, supaya device yang dipakai bersama tidak "nyangkut" sesi admin. */
+setPersistence(auth, browserSessionPersistence).catch(err => {
+  console.error('Gagal set persistence:', err);
+});
+
 /* Semua fungsi di bawah dipanggil langsung dari atribut onclick="..." di HTML
    (mis. onclick="doLogin()"). Karena script ini type="module", fungsi TIDAK
    otomatis jadi global -- makanya di-expose manual ke window di sini. */
@@ -963,8 +975,15 @@ window.deleteProduct = deleteProduct;
    AUTH: LOGIN / LOGOUT / CEK SESSION
    ═══════════════════════════════════════════════════ */
 onAuthStateChanged(auth, (user) => {
-  if(user){
+  if(user && user.email === ADMIN_EMAIL){
     showAdminView(user.email);
+  } else if(user){
+    // Login berhasil di Firebase Auth, tapi bukan email owner -- tolak akses.
+    signOut(auth);
+    showLoginView();
+    const msg = document.getElementById('loginMsg');
+    msg.textContent = 'Akses ditolak. Akun ini bukan akun admin.';
+    msg.classList.add('show','error');
   } else {
     showLoginView();
   }
@@ -1002,6 +1021,13 @@ async function doLogin(){
 
   try{
     const cred = await signInWithEmailAndPassword(auth, email, password);
+
+    if(cred.user.email !== ADMIN_EMAIL){
+      await signOut(auth);
+      msg.textContent = 'Akses ditolak. Akun ini bukan akun admin.';
+      msg.classList.add('show','error');
+      return;
+    }
 
     try{
       if(remember){
