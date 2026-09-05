@@ -975,14 +975,12 @@ window.deleteProduct = deleteProduct;
 onAuthStateChanged(auth, (user) => {
   if(user && user.email === ADMIN_EMAIL){
     showAdminView(user.email);
-  } else if(user){
-    // Login berhasil di Firebase Auth, tapi bukan email owner -- tolak akses.
-    signOut(auth);
-    showLoginView();
-    const msg = document.getElementById('loginMsg');
-    msg.textContent = 'Akses ditolak. Akun ini bukan akun admin.';
-    msg.classList.add('show','error');
   } else {
+    // Kalau tidak ada yang login, ATAU yang login bukan email admin (mis.
+    // sedang login sebagai customer di index.html), admin.html cukup
+    // menampilkan form login -- TIDAK memaksa logout dari sesi tsb, supaya
+    // sesi customer di index.html tidak ikut terganggu hanya karena
+    // membuka halaman admin.html.
     showLoginView();
   }
 });
