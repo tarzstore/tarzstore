@@ -10446,6 +10446,8 @@ window.addEventListener('npFirebaseReady', fbInitOnce, {once:true});
     let cheatIdx = 0, allgameIdx = 0;
 
     data.forEach(p => {
+      if(p.is_hidden) return; // produk disembunyikan lewat toggle di admin -> jangan render di website
+
       const name = p.name || '';
 
       let features = [];
