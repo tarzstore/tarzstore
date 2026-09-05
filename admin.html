@@ -230,8 +230,44 @@
   }
   .badge-tab{background:rgba(0,229,160,.1);color:var(--green);border:1px solid rgba(0,229,160,.22);}
   .badge-platform{background:rgba(255,255,255,.06);color:var(--text2);border:1px solid var(--border);}
-  .product-item .actions{display:flex;gap:6px;flex-shrink:0;}
+  .product-item .actions{display:flex;gap:6px;flex-shrink:0;align-items:center;}
   .product-item .actions button{padding:9px 11px;font-size:12px;}
+  .btn-icon-only{
+    display:inline-flex;align-items:center;justify-content:center;
+  }
+  .btn-icon-only svg{width:14px;height:14px;flex-shrink:0;pointer-events:none;}
+
+  /* ── VISIBILITY BUTTON (tampil/sembunyikan produk di website) ──
+     Ikon mata seperti tombol Edit/Hapus lain, sama persis tinggi/lebar
+     paddingnya (9px 11px) supaya sejajar rapi dalam satu baris actions. */
+  .btn-visibility{
+    display:inline-flex;align-items:center;justify-content:center;
+    padding:9px 11px;flex-shrink:0;
+    border-radius:var(--radius-sm);border:1px solid var(--border);
+    background:var(--card2);color:var(--text2);cursor:pointer;
+    transition:background var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease),color var(--t-fast) var(--ease),transform var(--t-fast) var(--ease-out);
+  }
+  .btn-visibility svg{width:14px;height:14px;flex-shrink:0;pointer-events:none;}
+  .btn-visibility:active{transform:scale(.93);}
+  /* status TAMPIL: mata terbuka, aksen hijau */
+  .btn-visibility[data-visible="true"]{
+    color:var(--green);background:rgba(0,229,160,.08);border-color:rgba(0,229,160,.22);
+  }
+  .btn-visibility[data-visible="true"]:hover{
+    background:rgba(0,229,160,.16);border-color:rgba(0,229,160,.38);
+  }
+  /* status SEMBUNYI: mata tercoret, aksen merah redup */
+  .btn-visibility[data-visible="false"]{
+    color:var(--text3);background:rgba(255,92,92,.06);border-color:rgba(255,92,92,.18);
+  }
+  .btn-visibility[data-visible="false"]:hover{
+    color:var(--red);background:rgba(255,92,92,.14);border-color:rgba(255,92,92,.32);
+  }
+  .btn-visibility .icon-eye-open{display:block;}
+  .btn-visibility .icon-eye-off{display:none;}
+  .btn-visibility[data-visible="false"] .icon-eye-open{display:none;}
+  .btn-visibility[data-visible="false"] .icon-eye-off{display:block;}
+
 
   .msg{
     display:flex;align-items:center;gap:8px;
@@ -269,10 +305,8 @@
   .tab-section-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
   .tab-dot-freefire{background:var(--green);box-shadow:0 0 8px rgba(0,229,160,.6);}
   .tab-dot-allgame{background:#6fc3ff;box-shadow:0 0 8px rgba(111,195,255,.6);}
-  .tab-dot-configff{background:#ffb84d;box-shadow:0 0 8px rgba(255,184,77,.6);}
   #tabSectionFreefire .tab-section-head{border-left-color:var(--green);}
   #tabSectionAllgame .tab-section-head{border-left-color:#6fc3ff;}
-  #tabSectionConfigff .tab-section-head{border-left-color:#ffb84d;}
   .tab-section-name{
     font-size:12.5px;font-weight:700;color:var(--text);
     text-transform:uppercase;letter-spacing:.06em;flex:1;
@@ -296,21 +330,6 @@
   .fab:active{transform:scale(.97);}
   .fab svg{width:24px;height:24px;}
   .fab.hidden{transform:scale(0);opacity:0;pointer-events:none;}
-
-  /* ── FAB KHUSUS CONFIG FF — bulat, ditumpuk di atas FAB utama ── */
-  .fab-configff{
-    position:fixed;right:18px;bottom:88px;z-index:90;
-    width:48px;height:48px;border-radius:50%;
-    background:linear-gradient(135deg,#1b1b1b,#111111);color:var(--green);
-    display:flex;align-items:center;justify-content:center;
-    box-shadow:0 8px 20px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.3);
-    border:1px solid rgba(0,229,160,.3);cursor:pointer;will-change:transform,opacity;
-    transition:transform var(--t-mid) var(--ease-soft),box-shadow var(--t-mid) var(--ease-soft),opacity var(--t-mid) var(--ease-soft);
-  }
-  .fab-configff:hover{transform:scale(1.06) translateY(-1px);box-shadow:0 10px 26px rgba(0,229,160,.28);}
-  .fab-configff:active{transform:scale(.97);}
-  .fab-configff svg{width:20px;height:20px;}
-  .fab-configff.hidden{transform:scale(0);opacity:0;pointer-events:none;}
 
   /* ── BOTTOM TAB BAR ── */
   .bottom-tabbar{
@@ -345,8 +364,6 @@
   .tabbar-btn.tabbar-produk:hover{background:rgba(0,229,160,.1);border-color:rgba(0,229,160,.3);}
   .tabbar-btn.tabbar-foto{color:#6fc3ff;}
   .tabbar-btn.tabbar-foto:hover{background:rgba(111,195,255,.1);border-color:rgba(111,195,255,.3);}
-  .tabbar-btn.tabbar-configff{color:#ffb84d;}
-  .tabbar-btn.tabbar-configff:hover{background:rgba(255,184,77,.1);border-color:rgba(255,184,77,.3);}
   /* beri ruang di bawah supaya konten terakhir tidak ketutup tab bar */
   body:has(#adminView.show){padding-bottom:84px;}
 
@@ -692,10 +709,6 @@
         <div class="stat-num" id="statAllgame">0</div>
         <div class="stat-label">All Game</div>
       </div>
-      <div class="stat-box">
-        <div class="stat-num" id="statConfigff">0</div>
-        <div class="stat-label">Config FF</div>
-      </div>
     </div>
 
     <div id="formMsg" class="msg"></div>
@@ -819,35 +832,7 @@
       </div>
     </div>
 
-    <!-- ═══ FORM CONFIG FF — form terpisah, khusus tab Config FF ═══ -->
-    <div class="card form-card" id="formCardCf">
-      <div class="form-card-header">
-        <div id="formTitleCf" style="font-weight:700;font-size:16px;">Tambah Config FF Baru</div>
-        <button type="button" class="form-card-close" onclick="closeFormCf()" title="Tutup form" aria-label="Tutup form">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
-      <input type="hidden" id="cfEditId" value="">
-
-      <label>Nama Config</label>
-      <input type="text" id="cfName" placeholder="">
-
-      <label>URL Foto Config <span class="hint"></span></label>
-      <input type="text" id="cfImageUrl" placeholder="" oninput="onCfImageUrlInput()">
-      <img id="cfImagePreview" class="preview-thumb">
-
-      <label>URL Foto Sebelum <span class="hint"></span></label>
-      <input type="text" id="cfImageUrlBefore" placeholder="" oninput="onCfImageUrlBeforeInput()">
-      <img id="cfImagePreviewBefore" class="preview-thumb">
-
-      <label>Link Download Config</label>
-      <input type="text" id="cfDownloadLink" placeholder="">
-
-      <button class="btn-primary" id="saveBtnCf" onclick="saveConfigFf()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        Simpan Config FF
-      </button>
-    </div>
+    <!-- ═══ FORM CONFIG FF dihapus — fitur tidak dipakai lagi ═══ -->
 
     <div id="productListSection">
       <div class="section-title">
@@ -872,15 +857,6 @@
         </div>
         <div id="productListAllgame"></div>
       </div>
-
-      <div class="tab-section" id="tabSectionConfigff">
-        <div class="tab-section-head">
-          <span class="tab-section-dot tab-dot-configff"></span>
-          <span class="tab-section-name">Config FF</span>
-          <span class="count-chip" id="countConfigff">0</span>
-        </div>
-        <div id="productListConfigff"></div>
-      </div>
     </div>
   </div>
 
@@ -895,11 +871,6 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
       <span>Upload Foto Dll</span>
     </a>
-
-    <button class="tabbar-btn tabbar-configff" onclick="openFormCf()" title="Tambah Config FF" aria-label="Tambah Config FF baru">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      <span>Upload Config FF</span>
-    </button>
   </nav>
 
 </div>
@@ -939,12 +910,6 @@ window.doLogout = doLogout;
 window.togglePasswordVisibility = togglePasswordVisibility;
 window.openForm = openForm;
 window.closeForm = closeForm;
-window.openFormCf = openFormCf;
-window.closeFormCf = closeFormCf;
-window.onCfImageUrlInput = onCfImageUrlInput;
-window.onCfImageUrlBeforeInput = onCfImageUrlBeforeInput;
-window.saveConfigFf = saveConfigFf;
-window.editConfigFf = editConfigFf;
 window.goStep = goStep;
 window.toggleAdvanced = toggleAdvanced;
 window.onImageUrlInput = onImageUrlInput;
@@ -1062,119 +1027,6 @@ function closeForm(){
   document.getElementById('bottomTabbar').classList.remove('hidden');
   document.getElementById('productListSection').style.display = '';
   resetForm();
-}
-
-/* ═══════════════════════════════════════════════════
-   FORM CONFIG FF (terpisah dari form produk biasa)
-   ═══════════════════════════════════════════════════ */
-function openFormCf(){
-  document.getElementById('formCardCf').classList.add('open');
-  document.getElementById('bottomTabbar').classList.add('hidden');
-  document.getElementById('productListSection').style.display = 'none';
-  setTimeout(()=> document.getElementById('cfName').focus(), 250);
-  document.getElementById('formCardCf').scrollIntoView({ behavior:'smooth', block:'start' });
-}
-
-function closeFormCf(){
-  document.getElementById('formCardCf').classList.remove('open');
-  document.getElementById('bottomTabbar').classList.remove('hidden');
-  document.getElementById('productListSection').style.display = '';
-  resetFormCf();
-}
-
-function resetFormCf(){
-  document.getElementById('cfEditId').value = '';
-  document.getElementById('cfName').value = '';
-  document.getElementById('cfImageUrl').value = '';
-  document.getElementById('cfImageUrlBefore').value = '';
-  document.getElementById('cfDownloadLink').value = '';
-  document.getElementById('cfImagePreview').style.display = 'none';
-  document.getElementById('cfImagePreviewBefore').style.display = 'none';
-  document.getElementById('formTitleCf').textContent = 'Tambah Config FF Baru';
-}
-
-function onCfImageUrlInput(){
-  const url = document.getElementById('cfImageUrl').value.trim();
-  const preview = document.getElementById('cfImagePreview');
-  if(url){ preview.src = url; preview.style.display = 'block'; }
-  else preview.style.display = 'none';
-}
-
-function onCfImageUrlBeforeInput(){
-  const url = document.getElementById('cfImageUrlBefore').value.trim();
-  const preview = document.getElementById('cfImagePreviewBefore');
-  if(url){ preview.src = url; preview.style.display = 'block'; }
-  else preview.style.display = 'none';
-}
-
-async function saveConfigFf(){
-  const btn = document.getElementById('saveBtnCf');
-  const name = document.getElementById('cfName').value.trim();
-  const image_url = document.getElementById('cfImageUrl').value.trim();
-  const image_url_before = document.getElementById('cfImageUrlBefore').value.trim();
-  const download_link = document.getElementById('cfDownloadLink').value.trim();
-  const editId = document.getElementById('cfEditId').value;
-
-  if(!name){
-    showFormMsg('Nama config wajib diisi.', 'error');
-    return;
-  }
-
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Menyimpan...';
-
-  try{
-    const payload = {
-      name,
-      tab: 'configff',
-      image_url: image_url || null,
-      // URL foto SEBELUM dititipkan di kolom download_link_2 (sudah ada di skema,
-      // tidak dipakai lagi untuk arti "link" pada tab configff)
-      download_link_2: image_url_before || null,
-      download_link,
-      features: [],
-      platform: 'android',
-      price: ''
-    };
-
-    if(editId){
-      await updateDoc(doc(dbFs, 'products', editId), payload);
-    } else {
-      // config baru: taruh di posisi PALING ATAS pada tab configff
-      payload.sort_order = getNextSortOrder('configff');
-      payload.created_at = serverTimestamp();
-      await addDoc(productsCol, payload);
-    }
-
-    showFormMsg(editId ? 'Config FF berhasil diperbarui.' : 'Config FF berhasil ditambahkan.', 'success');
-    closeFormCf();
-    loadProducts();
-  } catch(err){
-    showFormMsg(err.message, 'error');
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Simpan Config FF';
-  }
-}
-
-function editConfigFf(id){
-  const p = (window._productsCache || []).find(x => x.id === id);
-  if(!p) return;
-
-  document.getElementById('cfEditId').value = p.id;
-  document.getElementById('cfName').value = p.name || '';
-  document.getElementById('cfImageUrl').value = p.image_url || '';
-  document.getElementById('cfImageUrlBefore').value = p.download_link_2 || '';
-  document.getElementById('cfDownloadLink').value = p.download_link || '';
-
-  onCfImageUrlInput();
-  onCfImageUrlBeforeInput();
-
-  document.getElementById('formTitleCf').textContent = 'Edit Config FF: ' + p.name;
-  document.getElementById('formCardCf').classList.add('open');
-  document.getElementById('bottomTabbar').classList.add('hidden');
-  document.getElementById('productListSection').style.display = 'none';
-  document.getElementById('formCardCf').scrollIntoView({ behavior:'smooth', block:'start' });
 }
 
 function goStep(n){
@@ -1350,10 +1202,8 @@ function getNextSortOrder(tab){
 async function loadProducts(){
   const listFreefireEl = document.getElementById('productListFreefire');
   const listAllgameEl = document.getElementById('productListAllgame');
-  const listConfigffEl = document.getElementById('productListConfigff');
   listFreefireEl.innerHTML = '<p class="empty">Memuat produk...</p>';
   listAllgameEl.innerHTML = '';
-  listConfigffEl.innerHTML = '';
 
   let data;
   try{
@@ -1380,16 +1230,14 @@ async function loadProducts(){
   document.getElementById('productCount').textContent = data.length;
 
   const freefireItems = data.filter(p => (p.tab || 'freefire') === 'freefire');
-  const allgameItems = data.filter(p => p.tab === 'allgame');
-  const configffItems = data.filter(p => p.tab === 'configff');
+  // produk lama bertab 'configff' (fitur sudah dihapus) ikut ditampilkan di grup All Game supaya tidak "hilang" dari admin
+  const allgameItems = data.filter(p => p.tab === 'allgame' || p.tab === 'configff');
 
   document.getElementById('statTotal').textContent = data.length;
   document.getElementById('statFreefire').textContent = freefireItems.length;
   document.getElementById('statAllgame').textContent = allgameItems.length;
-  document.getElementById('statConfigff').textContent = configffItems.length;
   document.getElementById('countFreefire').textContent = freefireItems.length;
   document.getElementById('countAllgame').textContent = allgameItems.length;
-  document.getElementById('countConfigff').textContent = configffItems.length;
 
   window._productsCache = data;
 
@@ -1413,8 +1261,16 @@ async function loadProducts(){
         </div>
       </div>
       <div class="actions">
-        <button class="btn-ghost" onclick="editProduct('${p.id}')">Edit</button>
-        <button class="btn-danger" onclick="deleteProduct('${p.id}')">Hapus</button>
+        <button class="btn-visibility" data-visible="${p.is_hidden ? 'false' : 'true'}" onclick="toggleProductVisibility('${p.id}', this)" title="${p.is_hidden ? 'Tampilkan produk di website' : 'Sembunyikan produk dari website'}" aria-label="Toggle visibilitas produk">
+          <svg class="icon-eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a20.6 20.6 0 0 1 5.06-6.06M9.9 4.24A10.4 10.4 0 0 1 12 4c7 0 11 8 11 8a20.4 20.4 0 0 1-3.22 4.53M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+        </button>
+        <button class="btn-ghost btn-icon-only" onclick="editProduct('${p.id}')" title="Edit produk" aria-label="Edit produk">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
+        </button>
+        <button class="btn-danger btn-icon-only" onclick="deleteProduct('${p.id}')" title="Hapus produk" aria-label="Hapus produk">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        </button>
       </div>
     </div>
   `;
@@ -1426,10 +1282,6 @@ async function loadProducts(){
   listAllgameEl.innerHTML = allgameItems.length
     ? allgameItems.map(renderItem).join('')
     : '<p class="empty">Belum ada produk All Game.</p>';
-
-  listConfigffEl.innerHTML = configffItems.length
-    ? configffItems.map(renderItem).join('')
-    : '<p class="empty">Belum ada Config FF.</p>';
 
   initReorder();
 }
@@ -1444,7 +1296,7 @@ const LONG_PRESS_MS = 380;
 let _dragState = null;
 
 function initReorder(){
-  ['productListFreefire', 'productListAllgame', 'productListConfigff'].forEach(id => {
+  ['productListFreefire', 'productListAllgame'].forEach(id => {
     const listEl = document.getElementById(id);
     if(!listEl) return;
     listEl.querySelectorAll('.product-item').forEach(item => {
@@ -1600,12 +1452,6 @@ function editProduct(id){
   const p = (window._productsCache || []).find(x => x.id === id);
   if(!p) return;
 
-  // produk Config FF punya form terpisah, bukan wizard produk biasa
-  if(p.tab === 'configff'){
-    editConfigFf(id);
-    return;
-  }
-
   document.getElementById('editId').value = p.id;
   document.getElementById('fName').value = p.name || '';
   document.getElementById('fTab').value = p.tab || 'freefire';
@@ -1655,6 +1501,36 @@ function editProduct(id){
     advBody.style.maxHeight = '0px';
   }
 }
+
+async function toggleProductVisibility(id, btnEl){
+  // status baru = kebalikan dari status tombol saat ini (data-visible saat ini)
+  const wasVisible = btnEl.dataset.visible === 'true';
+  const isHidden = wasVisible; // kalau tadinya tampil, sekarang mau disembunyikan
+
+  // update tampilan tombol secara instan biar terasa responsif
+  btnEl.dataset.visible = isHidden ? 'false' : 'true';
+  btnEl.title = isHidden ? 'Tampilkan produk di website' : 'Sembunyikan produk dari website';
+
+  // update cache lokal dulu biar UI responsif kalau list di-render ulang sebelum request selesai
+  if(window._productsCache){
+    const p = window._productsCache.find(x => x.id === id);
+    if(p) p.is_hidden = isHidden;
+  }
+
+  try{
+    await updateDoc(doc(dbFs, 'products', id), { is_hidden: isHidden });
+  } catch(err){
+    showFormMsg('Gagal mengubah visibilitas produk: ' + err.message, 'error');
+    // gagal -> balikin cache & tombol ke kondisi semula
+    btnEl.dataset.visible = wasVisible ? 'true' : 'false';
+    btnEl.title = wasVisible ? 'Sembunyikan produk dari website' : 'Tampilkan produk di website';
+    if(window._productsCache){
+      const p = window._productsCache.find(x => x.id === id);
+      if(p) p.is_hidden = !isHidden;
+    }
+  }
+}
+window.toggleProductVisibility = toggleProductVisibility;
 
 async function deleteProduct(id){
   if(!confirm('Yakin mau hapus produk ini? Tindakan ini tidak bisa dibatalkan.')) return;

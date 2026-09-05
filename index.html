@@ -1360,7 +1360,7 @@ button.profile-menu-item2:active{background:rgba(255,255,255,.07);}
 .inline-copykey-row{
   display:flex;align-items:center;gap:8px;
   background:rgba(0,0,0,.25);border:1.5px solid var(--border-strong);border-radius:var(--radius-sm);
-  padding:11px 8px 11px 14px;
+  padding:7px 7px 7px 14px;
 }
 .inline-copykey-value{
   flex:1;min-width:0;
@@ -1368,15 +1368,22 @@ button.profile-menu-item2:active{background:rgba(255,255,255,.07);}
   white-space:nowrap;overflow-x:auto;
 }
 .inline-copykey-btn{
-  flex-shrink:0;border:1.5px solid rgba(230,230,238,.35);border-radius:8px;
-  padding:8px 12px;background:rgba(230,230,238,.1);color:var(--blue2);
-  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.75rem;letter-spacing:.2px;
-  cursor:pointer;display:flex;align-items:center;gap:6px;
-  transition:background var(--t-fast),border-color var(--t-fast),transform var(--t-fast);
+  flex-shrink:0;border:1.5px solid rgba(230,230,238,.35);border-radius:9px;
+  width:32px;height:32px;padding:0;background:rgba(230,230,238,.1);color:var(--blue2);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background var(--t-fast),border-color var(--t-fast),transform var(--t-fast),color var(--t-fast);
   -webkit-tap-highlight-color:transparent;outline:none;-webkit-appearance:none;appearance:none;
+  position:relative;
 }
+.inline-copykey-btn svg{width:14px;height:14px;flex-shrink:0;transition:opacity .15s ease,transform .15s ease;}
+.inline-copykey-btn .icon-check{
+  position:absolute;opacity:0;transform:scale(.5);color:var(--green);
+}
+.inline-copykey-btn.copied .icon-copy{opacity:0;transform:scale(.5);}
+.inline-copykey-btn.copied .icon-check{opacity:1;transform:scale(1);}
 .inline-copykey-btn:hover{background:rgba(230,230,238,.18);border-color:rgba(230,230,238,.55);}
-.inline-copykey-btn:active{transform:scale(.95);}
+.inline-copykey-btn:active{transform:scale(.92);}
+.inline-copykey-btn.copied{border-color:rgba(0,229,160,.5);background:rgba(0,229,160,.12);}
 
 /* ── FITUR LIST (dibawah Buy Key, mode special) ── */
 .fitur-list-wrap{
@@ -4408,10 +4415,6 @@ body.auth-locked{overflow:hidden;}
       <div class="inline-copykey-label">Email</div>
       <div class="inline-copykey-row" style="margin-bottom:12px;">
         <span class="inline-copykey-value" id="accountDetailEmail">-</span>
-        <button type="button" class="inline-copykey-btn" id="accountDetailEmailCopyBtn" aria-label="Salin Email" onclick="copyTextInline(document.getElementById('accountDetailEmail').textContent, this)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-          <span class="copykey-btn-text">Salin</span>
-        </button>
       </div>
 
       <div class="inline-copykey-label">Metode Login</div>
@@ -5749,13 +5752,9 @@ function copyProductKeyInline(productName, btnEl){
 /* Salin teks generik ke clipboard + tampilkan feedback pada tombol/toast */
 function copyTextInline(text, btnEl){
   const done = () => {
-    if(btnEl){
-      const label = btnEl.querySelector('.copykey-btn-text');
-      if(label){
-        const original = label.textContent;
-        label.textContent = 'Tersalin!';
-        setTimeout(()=>{ label.textContent = original; }, 1800);
-      }
+    if(btnEl && !btnEl.classList.contains('copied')){
+      btnEl.classList.add('copied');
+      setTimeout(()=>{ btnEl.classList.remove('copied'); }, 1600);
     }
   };
 
@@ -5791,17 +5790,14 @@ function openAccountDetailModal(){
   const isUsernamePasswordAccount = rawEmail.endsWith('@tarzstore.local');
 
   const emailEl = document.getElementById('accountDetailEmail');
-  const emailCopyBtn = document.getElementById('accountDetailEmailCopyBtn');
   if(emailEl){
     if(isUsernamePasswordAccount){
       /* email internal @tarzstore.local cuma dipakai Firebase Auth di
          belakang layar, tidak pernah dimaksudkan untuk dilihat user --
          tampilkan username saja (sama seperti renderProfilePanel()). */
       emailEl.textContent = user.displayName || rawEmail.split('@')[0] || '-';
-      if(emailCopyBtn) emailCopyBtn.style.display = 'none';
     } else {
       emailEl.textContent = rawEmail || '-';
-      if(emailCopyBtn) emailCopyBtn.style.display = '';
     }
   }
 
@@ -6021,8 +6017,8 @@ function openModal(btn){
         <div class="inline-copykey-row">
           <span class="inline-copykey-value">${String(copyKeyBs).replace(/</g,'&lt;')}</span>
           <button type="button" class="inline-copykey-btn" aria-label="Salin ${String(keyLabelBs).replace(/"/g,'&quot;')}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            <span class="copykey-btn-text">Salin</span>
+            <svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           </button>
         </div>
       `;
@@ -6043,8 +6039,8 @@ function openModal(btn){
         <div class="inline-copykey-row">
           <span class="inline-copykey-value">${String(userFieldBs).replace(/</g,'&lt;')}</span>
           <button type="button" class="inline-copykey-btn" aria-label="Salin ${String(userLabelBs).replace(/"/g,'&quot;')}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            <span class="copykey-btn-text">Salin</span>
+            <svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           </button>
         </div>
       `;
@@ -6064,16 +6060,16 @@ function openModal(btn){
         <div class="inline-copykey-row" style="margin-bottom:12px;">
           <span class="inline-copykey-value">${String(accountBs.username||'').replace(/</g,'&lt;')}</span>
           <button type="button" class="inline-copykey-btn" data-field="username" aria-label="Salin Username">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            <span class="copykey-btn-text">Salin</span>
+            <svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           </button>
         </div>
         <div class="inline-copykey-label">Password</div>
         <div class="inline-copykey-row">
           <span class="inline-copykey-value">${String(accountBs.password||'').replace(/</g,'&lt;')}</span>
           <button type="button" class="inline-copykey-btn" data-field="password" aria-label="Salin Password">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            <span class="copykey-btn-text">Salin</span>
+            <svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           </button>
         </div>
       `;
@@ -6159,7 +6155,7 @@ function openModal(btn){
       ffOptAc.setAttribute('role','button');
       ffOptAc.setAttribute('tabindex','0');
       ffOptAc.innerHTML = `
-        <div class="feature-icon">${productFeatureIcon(d.img, productName, 'downloadApk')}</div>
+        <div class="feature-icon">${productFeatureIcon('https://i.ibb.co.com/4nGVvmPV/112882-11zon-1.jpg', productName, 'downloadApk')}</div>
         <div class="feature-text">
           <div class="feature-title">${String(getProductFreefireLabel(productName)).replace(/</g,'&lt;')}</div>
           <div class="feature-desc">DOWNLOAD APLIKASI FREE FIRE</div>
@@ -6221,8 +6217,8 @@ function openModal(btn){
         <div class="inline-copykey-row">
           <span class="inline-copykey-value">${String(copyKeyAc).replace(/</g,'&lt;')}</span>
           <button type="button" class="inline-copykey-btn" aria-label="Salin ${String(keyLabelAc).replace(/"/g,'&quot;')}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            <span class="copykey-btn-text">Salin</span>
+            <svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           </button>
         </div>
       `;
@@ -6243,8 +6239,8 @@ function openModal(btn){
         <div class="inline-copykey-row">
           <span class="inline-copykey-value">${String(userFieldAc).replace(/</g,'&lt;')}</span>
           <button type="button" class="inline-copykey-btn" aria-label="Salin ${String(userLabelAc).replace(/"/g,'&quot;')}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            <span class="copykey-btn-text">Salin</span>
+            <svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           </button>
         </div>
       `;
@@ -6342,7 +6338,7 @@ function openModal(btn){
       ffOptNk.setAttribute('role','button');
       ffOptNk.setAttribute('tabindex','0');
       ffOptNk.innerHTML = `
-        <div class="feature-icon">${productFeatureIcon(d.img, productName, 'downloadApk')}</div>
+        <div class="feature-icon">${productFeatureIcon('https://i.ibb.co.com/4nGVvmPV/112882-11zon-1.jpg', productName, 'downloadApk')}</div>
         <div class="feature-text">
           <div class="feature-title">${String(getProductFreefireLabel(productName)).replace(/</g,'&lt;')}</div>
           <div class="feature-desc">DOWNLOAD APLIKASI FREE FIRE</div>
@@ -6366,8 +6362,8 @@ function openModal(btn){
         <div class="inline-copykey-row">
           <span class="inline-copykey-value">${String(copyKeyNk).replace(/</g,'&lt;')}</span>
           <button type="button" class="inline-copykey-btn" aria-label="Salin ${String(keyLabelNk).replace(/"/g,'&quot;')}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            <span class="copykey-btn-text">Salin</span>
+            <svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           </button>
         </div>
       `;
@@ -6388,8 +6384,8 @@ function openModal(btn){
         <div class="inline-copykey-row">
           <span class="inline-copykey-value">${String(userFieldNk).replace(/</g,'&lt;')}</span>
           <button type="button" class="inline-copykey-btn" aria-label="Salin ${String(userLabelNk).replace(/"/g,'&quot;')}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            <span class="copykey-btn-text">Salin</span>
+            <svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           </button>
         </div>
       `;
