@@ -779,7 +779,6 @@
         </select>
 
         <label>Upload Foto</label>
-        <input type="hidden" id="fImageUrl" value="">
         <label class="upload-box" id="fImageUploadBox" for="fImageFile">
           <input type="file" id="fImageFile" accept="image/*" onchange="handleImageFileSelect(this.files[0])">
           <img id="fImagePreview" class="upload-box-thumb">
@@ -791,6 +790,8 @@
             <div class="upload-box-sub" id="fImageUploadSub">JPG, PNG, atau WEBP</div>
           </div>
         </label>
+        <input type="text" id="fImageUrl" placeholder="URL foto" style="margin-top:8px;">
+        <div class="hint" style="margin-top:4px;"></div>
 
         <label>List Fitur <span class="hint"></span></label>
         <textarea id="fFeatures" placeholder=""></textarea>
@@ -808,14 +809,17 @@
         <label>Link Mediafire</label>
         <input type="text" id="fDownloadLink" placeholder="">
 
-        <label>Get Key <span class="hint"></span></label>
-        <input type="text" id="fGetKeyLink" placeholder="">
+        <label>Key</label>
+        <input type="text" id="fCopyKey" placeholder="">
 
-        <label>Tutorial Get Key <span class="hint"></span></label>
-        <input type="text" id="fGetKeyTutorialLink" placeholder="">
+        <label>Label Key <span class="hint"></span></label>
+        <input type="text" id="fKeyLabel" placeholder="Default: Key">
 
-        <label>Tombol Tutorial Get Key <span class="hint"></span></label>
-        <input type="text" id="fGetKeyTutorialLabel" placeholder="Default: TUTORIAL GET KEY">
+        <label>User</label>
+        <input type="text" id="fUserField" placeholder="">
+
+        <label>Label User <span class="hint"></span></label>
+        <input type="text" id="fUserLabel" placeholder="Default: User">
 
         <label>Note <span class="hint">(opsional)</span></label>
         <textarea id="fNote" placeholder=""></textarea>
@@ -847,17 +851,14 @@
             <label>Teks Tombol APK FREE FIRE <span class="hint">(opsional)</span></label>
             <input type="text" id="fFreefireLabel" placeholder="Default: APK FREE FIRE">
 
-            <label>Key</label>
-            <input type="text" id="fCopyKey" placeholder="">
+            <label>Get Key <span class="hint"></span></label>
+            <input type="text" id="fGetKeyLink" placeholder="">
 
-            <label>Label Key <span class="hint"></span></label>
-            <input type="text" id="fKeyLabel" placeholder="Default: Key">
+            <label>Tutorial Get Key <span class="hint"></span></label>
+            <input type="text" id="fGetKeyTutorialLink" placeholder="">
 
-            <label>User</label>
-            <input type="text" id="fUserField" placeholder="">
-
-            <label>Label User <span class="hint"></span></label>
-            <input type="text" id="fUserLabel" placeholder="Default: User">
+            <label>Tombol Tutorial Get Key <span class="hint"></span></label>
+            <input type="text" id="fGetKeyTutorialLabel" placeholder="Default: TUTORIAL GET KEY">
           </div>
         </div>
 
@@ -1162,8 +1163,12 @@ async function handleImageFileSelect(file){
     const url = await uploadImageToImgbb(compressedBlob);
     document.getElementById('fImageUrl').value = url;
     const sizeKb = Math.round(compressedBlob.size / 1024);
+    // preview pakai file lokal (localPreviewUrl), bukan URL imgbb -- karena
+    // di localhost, ImgBB kadang menolak menampilkan gambar balik meski URL-nya
+    // valid dan akan tampil normal di domain publik. Kolom URL foto di atas
+    // sudah otomatis terisi URL imgbb yang benar, itu yang dipakai saat disimpan.
     setUploadBoxState({
-      thumbUrl: url,
+      thumbUrl: localPreviewUrl,
       title: 'Foto berhasil diupload',
       sub: `360×360 · ${sizeKb}KB · Klik untuk ganti foto`
     });
@@ -1263,13 +1268,47 @@ async function uploadImageToImgbb(file){
     throw new Error(msg);
   }
 
-  // imgbb kadang menyediakan beberapa varian URL -- pakai display_url/url
-  // sebagai utama (direct image link), url_viewer BUKAN direct link jadi dihindari.
+  // imgbb menyediakan beberapa varian URL -- ambil url utama (direct image link)
   const d = data.data || {};
-  const directUrl = d.url || d.display_url || (d.image && d.image.url) || '';
-  console.log('imgbb directUrl dipakai:', directUrl);
-  if(!directUrl) throw new Error('Upload berhasil tapi URL gambar tidak ditemukan di respons imgbb.');
+  let directUrl = d.url || d.display_url || (d.image && d.image.url) || '';
+  if(!directUrl){
+    throw new Error('Upload berhasil tapi URL gambar tidak ditemukan di respons imgbb.');
+  }
+
+  // Paksa selalu pakai domain i.ibb.co.com (bukan i.ibb.co) supaya semua URL
+  // yang tersimpan konsisten dari awal, apapun domain yang dikembalikan API.
+  directUrl = directUrl.replace('https://i.ibb.co/', 'https://i.ibb.co.com/');
+
+  console.log('imgbb URL dipakai (otomatis ditempel ke kolom URL foto):', directUrl);
   return directUrl;
+}
+
+/* Kalau <img> gagal dimuat pertama kali, coba dua fallback berurutan sebelum
+   benar-benar disembunyikan:
+   1. Muat ulang dengan query string unik (kadang cuma cache/koneksi lambat)
+   2. Ganti domain i.ibb.co -> i.ibb.co.com (keduanya domain resmi ImgBB,
+      tapi salah satu kadang lebih mudah diakses tergantung jaringan/DNS) */
+function retryImageOnce(imgEl){
+  const stage = Number(imgEl.dataset.retryStage || '0');
+
+  if(stage === 0){
+    imgEl.dataset.retryStage = '1';
+    const original = imgEl.dataset.originalSrc || imgEl.src.split('?')[0];
+    imgEl.dataset.originalSrc = original;
+    imgEl.src = original + (original.includes('?') ? '&' : '?') + '_r=' + Date.now();
+    return;
+  }
+
+  if(stage === 1){
+    imgEl.dataset.retryStage = '2';
+    const original = imgEl.dataset.originalSrc || '';
+    if(original.includes('i.ibb.co.com')){
+      imgEl.src = original.replace('i.ibb.co.com', 'i.ibb.co');
+      return;
+    }
+  }
+
+  imgEl.style.opacity = 0;
 }
 
 /* ═══════════════════════════════════════════════════
@@ -1455,7 +1494,7 @@ async function loadProducts(){
       <div class="drag-handle" title="Tahan &amp; geser untuk ubah urutan">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="9" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="9" cy="18" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg>
       </div>
-      <img src="${p.image_url || ''}" onerror="this.style.opacity=0">
+      <img src="${p.image_url || ''}" onerror="retryImageOnce(this)">
       <div class="info">
         <h4>${escapeHtml(p.name)}</h4>
         <div class="meta">
