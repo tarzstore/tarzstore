@@ -923,8 +923,7 @@
    ═══════════════════════════════════════════════════ */
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js';
 import {
-  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged,
-  setPersistence, browserSessionPersistence
+  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged
 } from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js';
 import {
   getFirestore, collection, doc, addDoc, updateDoc, deleteDoc,
@@ -950,11 +949,10 @@ const productsCol = collection(dbFs, 'products');
    utama), akan langsung ditolak dan otomatis di-logout. */
 const ADMIN_EMAIL = 'tarz2642008@gmail.com';
 
-/* Sesi login TIDAK disimpan permanen -- otomatis hilang begitu tab/browser
-   ditutup, supaya device yang dipakai bersama tidak "nyangkut" sesi admin. */
-setPersistence(auth, browserSessionPersistence).catch(err => {
-  console.error('Gagal set persistence:', err);
-});
+/* Catatan: sesi login memakai persistence default Firebase (tetap tersambung
+   antar tab/halaman, termasuk saat pindah ke index.html). Keamanan admin
+   panel diamankan lewat pengecekan ADMIN_EMAIL di bawah, bukan lewat
+   membatasi persistence sesi. */
 
 /* Semua fungsi di bawah dipanggil langsung dari atribut onclick="..." di HTML
    (mis. onclick="doLogin()"). Karena script ini type="module", fungsi TIDAK
