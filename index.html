@@ -47,12 +47,17 @@
 <link rel="preload" as="image" href="https://apmxdcwebivmusqcuzcv.supabase.co/storage/v1/object/public/Tarzx/Ts.png" fetchpriority="high">
 <!-- Font: preconnect + async load untuk hindari render-blocking -->
 <link rel="dns-prefetch" href="https://wa.me">
-<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
-<link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
+<!-- Preconnect dibatasi maks 4 origin paling kritis (rekomendasi PageSpeed).
+     Origin lain yang jarang dipakai di awal cukup dns-prefetch (lebih murah,
+     tidak buka koneksi TLS penuh di muka). -->
 <link rel="preconnect" href="https://apmxdcwebivmusqcuzcv.supabase.co" crossorigin>
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+<link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com">
+<link rel="dns-prefetch" href="https://tarz-80183.firebaseapp.com">
+<link rel="dns-prefetch" href="https://apis.google.com">
+<link rel="dns-prefetch" href="https://www.googleapis.com">
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Space+Mono:wght@400;700&family=Rajdhani:wght@600;700&display=swap">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Space+Mono:wght@400;700&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Space+Mono:wght@400;700&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet"></noscript>
