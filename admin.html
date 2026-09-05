@@ -313,6 +313,37 @@
   }
   .tab-section .empty{padding:22px 16px;font-size:12.5px;}
   .preview-thumb{margin-top:10px;width:84px;height:84px;border-radius:var(--radius-xs);object-fit:cover;display:none;background:#222;border:1px solid var(--border);}
+
+  /* ── UPLOAD FOTO (imgbb) ── */
+  .upload-box{
+    display:flex;align-items:center;gap:12px;
+    border:1.5px dashed var(--border-strong);border-radius:var(--radius-sm);
+    background:var(--surface);padding:12px;cursor:pointer;
+    transition:border-color var(--t-fast) var(--ease),background var(--t-fast) var(--ease);
+  }
+  .upload-box:hover{border-color:var(--green);background:#0f0f0f;}
+  .upload-box.dragover{border-color:var(--green);background:rgba(0,229,160,.06);}
+  .upload-box input[type="file"]{display:none;}
+  .upload-box-thumb{
+    width:56px;height:56px;border-radius:var(--radius-xs);object-fit:cover;flex-shrink:0;
+    background:#1a1a1a;border:1px solid var(--border);display:none;
+  }
+  .upload-box-icon{
+    width:56px;height:56px;border-radius:var(--radius-xs);flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(0,229,160,.08);border:1px solid rgba(0,229,160,.2);color:var(--green);
+  }
+  .upload-box-icon svg{width:22px;height:22px;}
+  .upload-box-text{flex:1;min-width:0;}
+  .upload-box-title{font-size:13px;font-weight:600;color:var(--text);}
+  .upload-box-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+  .upload-box-sub.uploading{color:var(--green);}
+  .upload-box-sub.error{color:var(--red);}
+  .upload-spinner{
+    display:inline-block;width:12px;height:12px;flex-shrink:0;
+    border:2px solid rgba(0,229,160,.25);border-top-color:var(--green);border-radius:50%;
+    animation:spin .6s linear infinite;vertical-align:middle;margin-right:5px;
+  }
   .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(5,23,15,.25);border-top-color:#05170f;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;}
   @keyframes spin{to{transform:rotate(360deg);}}
 
@@ -747,9 +778,19 @@
           <option value="allgame">All Game</option>
         </select>
 
-        <label>URL Foto</label>
-        <input type="text" id="fImageUrl" placeholder="" oninput="onImageUrlInput()">
-        <img id="fImagePreview" class="preview-thumb">
+        <label>Upload Foto</label>
+        <input type="hidden" id="fImageUrl" value="">
+        <label class="upload-box" id="fImageUploadBox" for="fImageFile">
+          <input type="file" id="fImageFile" accept="image/*" onchange="handleImageFileSelect(this.files[0])">
+          <img id="fImagePreview" class="upload-box-thumb">
+          <div class="upload-box-icon" id="fImageUploadIcon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <div class="upload-box-text">
+            <div class="upload-box-title" id="fImageUploadTitle">Pilih foto produk</div>
+            <div class="upload-box-sub" id="fImageUploadSub">JPG, PNG, atau WEBP</div>
+          </div>
+        </label>
 
         <label>List Fitur <span class="hint"></span></label>
         <textarea id="fFeatures" placeholder=""></textarea>
@@ -912,7 +953,7 @@ window.openForm = openForm;
 window.closeForm = closeForm;
 window.goStep = goStep;
 window.toggleAdvanced = toggleAdvanced;
-window.onImageUrlInput = onImageUrlInput;
+window.handleImageFileSelect = handleImageFileSelect;
 window.saveProduct = saveProduct;
 window.editProduct = editProduct;
 window.deleteProduct = deleteProduct;
@@ -1063,17 +1104,172 @@ function toggleAdvanced(){
 }
 
 /* ═══════════════════════════════════════════════════
-   PREVIEW GAMBAR DARI URL
+   UPLOAD FOTO KE IMGBB
    ═══════════════════════════════════════════════════ */
-function onImageUrlInput(){
-  const url = document.getElementById('fImageUrl').value.trim();
+const IMGBB_API_KEY = 'babf3f6a30b58e7b1469f20a3d869813';
+
+/* Update tampilan upload-box: thumbnail, judul, dan sub-teks status */
+function setUploadBoxState({ thumbUrl, title, sub, subClass, showIcon }){
   const preview = document.getElementById('fImagePreview');
-  if(url){
-    preview.src = url;
+  const icon = document.getElementById('fImageUploadIcon');
+  const titleEl = document.getElementById('fImageUploadTitle');
+  const subEl = document.getElementById('fImageUploadSub');
+
+  if(thumbUrl){
+    // kalau gambar gagal dimuat (mis. jaringan lambat/CORS), jangan diam-diam
+    // kosong -- tampilkan lagi ikon default supaya user tetap tahu ada isinya.
+    preview.onerror = () => {
+      preview.style.display = 'none';
+      icon.style.display = 'flex';
+    };
+    preview.src = thumbUrl;
     preview.style.display = 'block';
+    icon.style.display = 'none';
   } else {
+    preview.removeAttribute('src');
     preview.style.display = 'none';
+    icon.style.display = showIcon === false ? 'none' : 'flex';
   }
+  if(title !== undefined) titleEl.textContent = title;
+  if(sub !== undefined){
+    subEl.textContent = sub;
+    subEl.className = 'upload-box-sub' + (subClass ? ' ' + subClass : '');
+  }
+}
+
+/* Dipanggil saat user pilih file dari <input type="file">. Kompres ke 360x360
+   & maks ~70KB dulu, baru upload hasil kompresnya ke imgbb, lalu simpan URL
+   hasil upload di hidden input #fImageUrl (dipakai saveProduct). */
+async function handleImageFileSelect(file){
+  if(!file) return;
+
+  if(!file.type.startsWith('image/')){
+    setUploadBoxState({ title: 'File bukan gambar', sub: 'Pilih file JPG, PNG, atau WEBP', subClass: 'error' });
+    return;
+  }
+
+  // preview instan dari file lokal sambil menunggu proses kompres+upload selesai
+  const localPreviewUrl = URL.createObjectURL(file);
+  setUploadBoxState({ thumbUrl: localPreviewUrl, title: file.name });
+  document.getElementById('fImageUploadSub').innerHTML = '<span class="upload-spinner"></span>Mengompres foto...';
+  document.getElementById('fImageUploadSub').className = 'upload-box-sub uploading';
+
+  try{
+    const compressedBlob = await compressImage(file, { size: 360, maxBytes: 70 * 1024 });
+
+    document.getElementById('fImageUploadSub').innerHTML = '<span class="upload-spinner"></span>Mengupload...';
+
+    const url = await uploadImageToImgbb(compressedBlob);
+    document.getElementById('fImageUrl').value = url;
+    const sizeKb = Math.round(compressedBlob.size / 1024);
+    setUploadBoxState({
+      thumbUrl: url,
+      title: 'Foto berhasil diupload',
+      sub: `360×360 · ${sizeKb}KB · Klik untuk ganti foto`
+    });
+  } catch(err){
+    setUploadBoxState({
+      thumbUrl: localPreviewUrl,
+      title: 'Gagal upload',
+      sub: err.message || 'Coba lagi',
+      subClass: 'error'
+    });
+  }
+}
+
+/* Resize gambar jadi persegi (crop tengah) berukuran size x size, lalu
+   kompres JPEG dengan quality diturunkan bertahap sampai <= maxBytes.
+   Dimulai dari quality tinggi supaya hasil tetap tajam/HD, hanya diturunkan
+   secukupnya kalau ukuran file masih di atas batas. */
+async function compressImage(file, { size = 360, maxBytes = 70 * 1024 } = {}){
+  const img = await loadImageFromFile(file);
+
+  // crop tengah jadi persegi dulu (supaya subjek foto tetap di tengah, tidak gepeng)
+  const srcSize = Math.min(img.naturalWidth || img.width, img.naturalHeight || img.height);
+  const srcX = ((img.naturalWidth || img.width) - srcSize) / 2;
+  const srcY = ((img.naturalHeight || img.height) - srcSize) / 2;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(img, srcX, srcY, srcSize, srcSize, 0, 0, size, size);
+
+  URL.revokeObjectURL(img.src);
+
+  // turunkan quality bertahap sampai muat di bawah maxBytes, mulai dari kualitas tinggi
+  const qualities = [0.92, 0.85, 0.78, 0.7, 0.62, 0.55, 0.48, 0.4, 0.32, 0.25];
+  let bestBlob = null;
+  for(const q of qualities){
+    const blob = await canvasToBlob(canvas, 'image/jpeg', q);
+    if(!bestBlob || blob.size < bestBlob.size) bestBlob = blob;
+    if(blob.size <= maxBytes) return blob;
+  }
+  // kalaupun quality terendah masih di atas maxBytes, pakai hasil terkecil yang didapat
+  return bestBlob;
+}
+
+function loadImageFromFile(file){
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Gagal membaca gambar.')); };
+    img.src = url;
+  });
+}
+
+function canvasToBlob(canvas, type, quality){
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(blob => {
+      if(blob) resolve(blob); else reject(new Error('Gagal memproses gambar.'));
+    }, type, quality);
+  });
+}
+
+/* Upload satu file/blob gambar ke imgbb, return URL gambar (image_url). */
+async function uploadImageToImgbb(file){
+  const formData = new FormData();
+  formData.append('image', file, 'product.jpg');
+
+  let res;
+  try{
+    res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+      method: 'POST',
+      body: formData
+    });
+  } catch(networkErr){
+    // request tidak sampai sama sekali ke imgbb (offline, diblokir CORS, dll)
+    throw new Error('Tidak bisa terhubung ke imgbb. Cek koneksi internet atau coba lagi.');
+  }
+
+  let data;
+  const rawText = await res.text();
+  try{
+    data = JSON.parse(rawText);
+  } catch(parseErr){
+    // server membalas bukan JSON (mis. halaman error HTML) -- biasanya tanda
+    // API key salah/expired, kena rate limit, atau request diblokir sebelum sampai ke imgbb.
+    console.error('imgbb non-JSON response:', rawText.slice(0, 300));
+    throw new Error(`imgbb membalas respons tidak dikenal (status ${res.status}). Kemungkinan API key salah/expired.`);
+  }
+
+  console.log('imgbb response:', JSON.stringify(data));
+
+  if(!res.ok || !data.success){
+    const msg = (data && data.error && data.error.message) || `Upload ke imgbb gagal (status ${res.status}).`;
+    throw new Error(msg);
+  }
+
+  // imgbb kadang menyediakan beberapa varian URL -- pakai display_url/url
+  // sebagai utama (direct image link), url_viewer BUKAN direct link jadi dihindari.
+  const d = data.data || {};
+  const directUrl = d.url || d.display_url || (d.image && d.image.url) || '';
+  console.log('imgbb directUrl dipakai:', directUrl);
+  if(!directUrl) throw new Error('Upload berhasil tapi URL gambar tidak ditemukan di respons imgbb.');
+  return directUrl;
 }
 
 /* ═══════════════════════════════════════════════════
@@ -1180,7 +1376,13 @@ function resetForm(){
   document.getElementById('fGetKeyTutorialLink').value = '';
   document.getElementById('fGetKeyTutorialLabel').value = '';
   document.getElementById('fNote').value = '';
-  document.getElementById('fImagePreview').style.display = 'none';
+  document.getElementById('fImageFile').value = '';
+  setUploadBoxState({
+    thumbUrl: null,
+    title: 'Pilih foto produk',
+    sub: 'JPG, PNG, atau WEBP',
+    subClass: ''
+  });
   document.getElementById('formTitle').textContent = 'Tambah Produk Baru';
   document.getElementById('advBody').classList.remove('open');
   document.getElementById('advToggle').classList.remove('open');
@@ -1469,12 +1671,20 @@ function editProduct(id){
   document.getElementById('fGetKeyTutorialLink').value = p.get_key_tutorial_link || '';
   document.getElementById('fGetKeyTutorialLabel').value = p.get_key_tutorial_label || '';
   document.getElementById('fNote').value = p.note || '';
-  const preview = document.getElementById('fImagePreview');
+  document.getElementById('fImageFile').value = '';
   if(p.image_url){
-    preview.src = p.image_url;
-    preview.style.display = 'block';
+    setUploadBoxState({
+      thumbUrl: p.image_url,
+      title: 'Foto produk saat ini',
+      sub: 'Klik untuk ganti foto'
+    });
   } else {
-    preview.style.display = 'none';
+    setUploadBoxState({
+      thumbUrl: null,
+      title: 'Pilih foto produk',
+      sub: 'JPG, PNG, atau WEBP',
+      subClass: ''
+    });
   }
   document.getElementById('formTitle').textContent = 'Edit Produk: ' + p.name;
 
