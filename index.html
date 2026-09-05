@@ -100,6 +100,47 @@ img,video{
   --ease-soft:cubic-bezier(.25,.46,.45,.94);
 }
 
+/* ── PINK MODE (bubblegum) — aktif saat body.pink-mode.
+   Sama seperti Light Mode: HANYA mengganti warna tombol Install, warna
+   Tools (kartu + ikon), border kartu Tools, badge centang (verified),
+   dan ring avatar profil jadi palet pink. Elemen lain di luar ini TIDAK
+   disentuh sama sekali. ── */
+body.pink-mode .tool-card{border-color:rgba(255,111,201,.22);}
+body.pink-mode .tool-card::after{background:linear-gradient(90deg,transparent,#ff6fc9,transparent);}
+body.pink-mode .tool-card::before{background:radial-gradient(circle at 50% 0%,rgba(255,111,201,.14),transparent 65%);}
+body.pink-mode .tool-card:hover{border-color:rgba(255,111,201,.4);box-shadow:0 16px 38px rgba(0,0,0,.45),0 0 0 1px rgba(255,111,201,.08) inset;}
+body.pink-mode .tool-card-icon{background:rgba(255,111,201,.1);border:1px solid rgba(255,111,201,.28);color:#ff6fc9;}
+body.pink-mode .tool-card:hover .tool-card-icon{box-shadow:0 0 16px rgba(255,111,201,.35);}
+body.pink-mode .buy-btn{background:linear-gradient(135deg,#5a1a3d,#ff4fb8);}
+body.pink-mode .buy-btn:hover{background:linear-gradient(135deg,#ff4fb8,#ffa3dd);box-shadow:0 8px 26px rgba(255,79,184,.25);}
+body.pink-mode .profile-verified-badge path:first-child{fill:#ff6fc9;}
+/* Ring avatar profil pakai hex literal, di-override terpisah saat Pink Mode aktif */
+body.pink-mode .profile-avatar{
+  background:
+    linear-gradient(var(--surface),var(--surface)) padding-box,
+    conic-gradient(from 0deg,#ff8fd4,#ffd9f0,#ff4fb8,#ff8fd4) border-box;
+}
+
+/* ── LIGHT MODE (abu-abu) — aktif saat body.light-mode.
+   Sesuai permintaan: HANYA mengganti warna tombol Install, warna Tools
+   (kartu + ikon), border kartu Tools, dan badge centang (verified) jadi
+   abu-abu netral. Elemen lain di luar ini TIDAK disentuh sama sekali. ── */
+body.light-mode .tool-card{border-color:rgba(160,160,168,.22);}
+body.light-mode .tool-card::after{background:linear-gradient(90deg,transparent,#9a9aa4,transparent);}
+body.light-mode .tool-card::before{background:radial-gradient(circle at 50% 0%,rgba(154,154,164,.14),transparent 65%);}
+body.light-mode .tool-card:hover{border-color:rgba(154,154,164,.4);box-shadow:0 16px 38px rgba(0,0,0,.45),0 0 0 1px rgba(154,154,164,.08) inset;}
+body.light-mode .tool-card-icon{background:rgba(154,154,164,.12);border:1px solid rgba(154,154,164,.3);color:#9a9aa4;}
+body.light-mode .tool-card:hover .tool-card-icon{box-shadow:0 0 16px rgba(154,154,164,.35);}
+body.light-mode .buy-btn{background:linear-gradient(135deg,#3a3a40,#71717a);border-color:rgba(255,255,255,.3);}
+body.light-mode .buy-btn:hover{background:linear-gradient(135deg,#52525b,#a1a1aa);box-shadow:0 8px 26px rgba(113,113,122,.25);}
+body.light-mode .profile-verified-badge path:first-child{fill:#9a9aa4;}
+/* Ring avatar profil (foto profil) pakai hex literal, di-override terpisah saat Light Mode aktif */
+body.light-mode .profile-avatar{
+  background:
+    linear-gradient(var(--surface),var(--surface)) padding-box,
+    conic-gradient(from 0deg,#a0a0aa,#d4d4d8,#71717a,#a0a0aa) border-box;
+}
+
 html{scroll-behavior:smooth;overscroll-behavior-y:none;}
 /* Hormati preferensi reduced-motion + jadi fallback aman kalau device lemot */
 @media (prefers-reduced-motion: reduce){
@@ -423,17 +464,9 @@ body.scroll-tabbar-hide .btb-active-pill{transition:none;}
   .tool-card-label{font-size:.66rem;}
 }
 
-/* ── TAB ICON VIP DI BOTTOM BAR — sedikit ditonjolkan dengan aksen emas ── */
-/* Tab VIP: sama seperti tab lain (icon netral currentColor), hanya menyala saat aktif/diklik */
-.btb-item-vip.active{color:var(--gold);}
-.btb-item-vip.active .btb-icon{filter:drop-shadow(0 0 6px rgba(232,232,238,.5));}
-
 /* ══════════════════════════════════════════
    VIP MEMBERSHIP PAGE — simple, satu kartu, tanpa video/thumbnail
    ══════════════════════════════════════════ */
-.vip-page{display:none;align-items:center;justify-content:center;padding-top:24px;}
-.vip-page.active{display:flex;flex-direction:column;}
-
 /* ══════════════════════════════════════════
    PROFIL — FULL BANNER, gaya aplikasi modern:
    cover photo full-bleed + avatar besar overlap + info + stats row.
@@ -445,37 +478,42 @@ body.scroll-tabbar-hide .btb-active-pill{transition:none;}
   background:transparent;
 }
 
-/* ── COVER PHOTO — sekarang jadi bagian atas card yang sama dengan body ── */
+/* ── COVER PHOTO — bagian atas card, dengan gradient fade ke card di bawahnya
+   supaya transisi cover→body terasa menyatu, bukan garis potong tegas ── */
 .profilepg-cover{
-  position:relative;width:auto;height:150px;overflow:hidden;
+  position:relative;width:auto;height:160px;overflow:hidden;
   margin:0;
   border-radius:24px 24px 0 0;
-  background-image:url('https://apmxdcwebivmusqcuzcv.supabase.co/storage/v1/object/public/Tarzx/gojo.png');
-  background-size:cover;background-position:center 30%;background-repeat:no-repeat;
+  background-image:
+    linear-gradient(180deg,rgba(5,5,6,0) 45%,rgba(13,13,14,.94) 100%),
+    url('https://apmxdcwebivmusqcuzcv.supabase.co/storage/v1/object/public/Tarzx/gojo.png');
+  background-size:cover,cover;background-position:center,center 30%;background-repeat:no-repeat,no-repeat;
   border:1px solid var(--border-strong);border-bottom:none;
 }
-.profilepg-signed-out .profilepg-cover{height:120px;}
+.profilepg-signed-out .profilepg-cover{height:130px;}
 
 /* ── BODY (avatar overlap + info) ── */
 /* Card tunggal: separuh menutupi avatar, lalu nama + menu fitur menyatu di dalamnya */
 .profilepg-body{
-  position:relative;padding:30px 0 6px;margin:0;
+  position:relative;padding:0 0 6px;margin:0;
   display:flex;flex-direction:column;align-items:center;text-align:center;
   border-radius:0 0 24px 24px;
   background:linear-gradient(180deg,#161617,#0d0d0e);
   border:1px solid var(--border-strong);border-top:none;
-  box-shadow:0 8px 30px rgba(0,0,0,.35);
+  box-shadow:0 10px 34px rgba(0,0,0,.4);
 }
 .profilepg-hero{
   position:relative;display:flex;flex-direction:column;align-items:center;gap:0;width:100%;
+  padding-top:30px;
 }
-.profilepg-hero-glow{display:none;}
 .profilepg-hero .profile-avatar-wrap{
-  width:84px;height:84px;margin:-72px 0 12px;flex-shrink:0;
-  border-radius:50%;box-shadow:0 6px 24px rgba(0,0,0,.5);
+  width:88px;height:88px;margin:-76px 0 14px;flex-shrink:0;
+  border-radius:50%;
+  box-shadow:0 8px 26px rgba(0,0,0,.55),0 0 0 5px #0d0d0e;
+  transition:transform var(--t-fast) var(--ease-out);
 }
-.profilepg-hero .profile-avatar{width:84px;height:84px;border-width:3px;}
-.profilepg-hero-info{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-align:center;min-width:0;width:100%;padding-bottom:20px;}
+.profilepg-hero .profile-avatar{width:88px;height:88px;border-width:3px;}
+.profilepg-hero-info{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;min-width:0;width:100%;padding-bottom:16px;}
 .profile-name-row{display:flex;align-items:center;justify-content:center;gap:5px;min-width:0;}
 .profile-verified-badge{width:16px;height:16px;flex-shrink:0;}
 .profile-vip-mini-badge{
@@ -490,47 +528,54 @@ body.scroll-tabbar-hide .btb-active-pill{transition:none;}
   100%{transform:scale(1);opacity:1;}
 }
 .profilepg-hero .profile-name{
-  margin-bottom:0;font-size:1.15rem;max-width:80vw;
+  margin-bottom:0;font-size:1.2rem;font-weight:700;letter-spacing:-.01em;max-width:80vw;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;
 }
-.profilepg-hero .profile-email{margin-bottom:0;font-size:.82rem;max-width:80vw;}
-/* garis pemisah antara info profil & daftar menu, dalam card yang sama */
+.profilepg-hero .profile-email{margin-bottom:0;font-size:.82rem;color:var(--text2);max-width:80vw;}
+/* garis pemisah antara info profil & daftar menu, dalam card yang sama —
+   pakai gradient supaya ujung kiri/kanan memudar, bukan garis kaku penuh lebar */
 .profilepg-hero::after{
-  content:'';position:absolute;left:0;right:0;bottom:0;height:1px;
-  background:var(--border);
+  content:'';position:absolute;left:6%;right:6%;bottom:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--border-strong) 20%,var(--border-strong) 80%,transparent);
 }
 
 @media(min-width:520px){
-  .profilepg-cover{height:190px;}
+  .profilepg-cover{height:200px;}
   .profilepg-body,.profilepg-cover{max-width:488px;margin-left:auto;margin-right:auto;}
 }
 
 /* ── MENU FITUR PROFIL (Edit Profil / Password / Dark Mode) ── */
 .profile-menu-list{
   display:flex;flex-direction:column;gap:0;
-  margin:0;width:100%;
+  margin:4px 0 0;width:100%;
 }
 .profile-menu-item{
   display:flex;align-items:center;gap:12px;width:100%;
-  padding:13px 18px;
+  padding:10px 20px;
   background:transparent;border:none;border-bottom:1px solid var(--border);
   color:var(--text);font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.85rem;
   cursor:pointer;-webkit-tap-highlight-color:transparent;outline:none;-webkit-appearance:none;appearance:none;
   text-align:left;border-radius:0;
-  transition:background var(--t-fast) var(--ease-soft);
+  transition:background var(--t-fast) var(--ease-soft),padding-left var(--t-fast) var(--ease-out);
 }
-.profile-menu-list .profile-menu-item:last-child{border-bottom:none;}
-button.profile-menu-item:hover{background:rgba(255,255,255,.045);}
+.profile-menu-list .profile-menu-item:last-child{
+  border-bottom:1px solid var(--border-strong);
+}
+button.profile-menu-item:hover{background:rgba(255,255,255,.045);padding-left:23px;}
 button.profile-menu-item:active{background:rgba(255,255,255,.07);}
 .profile-menu-icon{
-  width:19px;height:19px;flex-shrink:0;
+  width:28px;height:28px;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
   color:var(--text2);
+  background:rgba(255,255,255,.05);border-radius:9px;
+  transition:background var(--t-fast) var(--ease-soft),color var(--t-fast) var(--ease-soft);
 }
-.profile-menu-icon svg{width:18px;height:18px;}
+button.profile-menu-item:hover .profile-menu-icon{background:rgba(255,255,255,.09);color:var(--text);}
+.profile-menu-icon svg{width:15px;height:15px;}
 .profile-menu-label{flex:1;min-width:0;}
 .profile-menu-chevron{width:14px;height:14px;flex-shrink:0;color:var(--text2);opacity:.55;}
 .profile-menu-item-toggle{cursor:default;}
+.profile-menu-item-toggle:hover{padding-left:20px;}
 
 /* toggle switch ala iOS, dipakai untuk Dark Mode */
 .profile-toggle-switch{
@@ -558,22 +603,25 @@ button.profile-menu-item:active{background:rgba(255,255,255,.07);}
 }
 .profile-menu-item2{
   display:flex;align-items:center;gap:12px;width:100%;
-  padding:13px 18px;
+  padding:10px 20px;
   background:transparent;border:none;border-bottom:1px solid var(--border);
   color:var(--text);font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.85rem;
   cursor:pointer;-webkit-tap-highlight-color:transparent;outline:none;-webkit-appearance:none;appearance:none;
   text-align:left;border-radius:0;
-  transition:background var(--t-fast) var(--ease-soft);
+  transition:background var(--t-fast) var(--ease-soft),padding-left var(--t-fast) var(--ease-out);
 }
 .profile-menu-list2 .profile-menu-item2:last-child{border-bottom:none;border-radius:0 0 23px 23px;}
-button.profile-menu-item2:hover{background:rgba(255,255,255,.045);}
+button.profile-menu-item2:hover{background:rgba(255,255,255,.045);padding-left:23px;}
 button.profile-menu-item2:active{background:rgba(255,255,255,.07);}
 .profile-menu-icon2{
-  width:19px;height:19px;flex-shrink:0;
+  width:28px;height:28px;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
   color:var(--text2);
+  background:rgba(255,255,255,.05);border-radius:9px;
+  transition:background var(--t-fast) var(--ease-soft);
 }
-.profile-menu-icon2 svg{width:18px;height:18px;}
+button.profile-menu-item2:hover .profile-menu-icon2{background:rgba(255,255,255,.09);}
+.profile-menu-icon2 svg{width:15px;height:15px;}
 .profile-menu-label2{flex:1;min-width:0;}
 .profile-menu-chevron2{width:14px;height:14px;flex-shrink:0;color:var(--text2);opacity:.55;}
 
@@ -582,28 +630,29 @@ button.profile-menu-item2:active{background:rgba(255,255,255,.07);}
 .profile-menu-item2-danger .profile-menu-icon2{
   color:#ef4444;
 }
+.profile-menu-item2-danger .profile-menu-icon2{background:rgba(239,68,68,.08);}
 .profile-menu-item2-danger:hover{background:rgba(239,68,68,.08);}
 .profile-menu-item2-danger:active{background:rgba(239,68,68,.14);}
 
 /* ── SIGNED OUT STATE ── */
-.profilepg-gate-glow{display:none;}
 .profilepg-signed-out .profilepg-body{
   display:flex;flex-direction:column;align-items:center;text-align:center;gap:0;
+  padding:0 24px 26px;
 }
 .profilepg-signed-out .profile-gate-text{
-  display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:18px;
+  display:flex;flex-direction:column;align-items:center;gap:7px;margin-bottom:20px;
 }
-.profilepg-signed-out .profile-gate-title{margin-bottom:0;font-size:1.15rem;}
-.profilepg-signed-out .profile-gate-sub{margin:0 auto;max-width:280px;font-size:.8rem;color:var(--text2);}
+.profilepg-signed-out .profile-gate-title{margin-bottom:0;font-size:1.2rem;font-weight:700;}
+.profilepg-signed-out .profile-gate-sub{margin:0 auto;max-width:280px;font-size:.83rem;line-height:1.5;color:var(--text2);}
 .profilepg-signed-out .profile-avatar-wrap{
-  width:76px;height:76px;margin:0 0 14px;
+  width:78px;height:78px;margin:-52px 0 16px;
   border-radius:50%;display:flex;align-items:center;justify-content:center;
   background:rgba(255,255,255,.06);border:2px dashed var(--border-strong);
-  box-shadow:0 6px 24px rgba(0,0,0,.4);
+  box-shadow:0 8px 26px rgba(0,0,0,.45),0 0 0 5px #0d0d0e;
 }
 .profilepg-signed-out .profilepg-guest-icon{width:34px;height:34px;color:var(--text2);}
 .profilepg-signed-out .profile-google-btn{
-  width:100%;max-width:300px;flex-shrink:0;white-space:nowrap;padding:13px 18px;font-size:.85rem;
+  width:100%;max-width:300px;flex-shrink:0;white-space:nowrap;padding:14px 18px;font-size:.85rem;
 }
 @media(min-width:520px){
   .profilepg-signed-out .profilepg-body{max-width:400px;margin-left:auto;margin-right:auto;}
@@ -624,7 +673,6 @@ button.profile-menu-item2:active{background:rgba(255,255,255,.07);}
   transition:background var(--t-slow) var(--ease-soft),
              border-color var(--t-slow) var(--ease-soft);
 }
-.vippg-card-glow{display:none;}
 .vippg-icon{
   position:relative;z-index:1;
   width:52px;height:52px;border-radius:16px;margin-bottom:16px;
@@ -647,8 +695,6 @@ button.profile-menu-item2:active{background:rgba(255,255,255,.07);}
   letter-spacing:-.3px;line-height:1;margin-bottom:22px;
   transition:color var(--t-slow) var(--ease-soft);
 }
-.vippg-divider{display:none;}
-
 .vippg-list{
   position:relative;z-index:1;list-style:none;width:100%;
   display:flex;flex-direction:column;gap:10px;margin-bottom:24px;text-align:left;
@@ -709,32 +755,11 @@ button.profile-menu-item2:active{background:rgba(255,255,255,.07);}
   pointer-events:none;filter:blur(14px);z-index:0;
 }
 
-/* label "LIVE" kecil di pojok atas widget */
-.stats-widget-live{
-  grid-column:1 / -1;
-  display:flex;align-items:center;justify-content:center;gap:6px;
-  padding:9px 0 7px;
-  font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
-  color:var(--green);position:relative;z-index:1;
-  border-bottom:1px solid rgba(255,255,255,.06);
-}
-.stats-widget-live .stats-live-dot{
-  width:5px;height:5px;border-radius:50%;background:var(--green);
-  animation:dot-blink 2s ease-in-out infinite;
-}
-
 .stats-item{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:5px;padding:16px 6px 18px;position:relative;z-index:1;
 }
 .stats-item + .stats-item{border-left:1px solid rgba(255,255,255,.06);}
-.stats-item-icon-wrap{
-  width:30px;height:30px;border-radius:9px;margin-bottom:2px;
-  display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(135deg,rgba(220,224,232,.14),rgba(255,255,255,.03));
-  border:1px solid rgba(220,224,232,.2);
-}
-.stats-item-icon{width:15px;height:15px;color:#d5d8de;}
 .stats-item-value{
   font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.28rem;
   color:var(--text);line-height:1.1;font-variant-numeric:tabular-nums;
@@ -784,8 +809,6 @@ button.profile-menu-item2:active{background:rgba(255,255,255,.07);}
 }
 @media(max-width:380px){
   .stats-item{padding:13px 4px 15px;}
-  .stats-item-icon-wrap{width:26px;height:26px;}
-  .stats-item-icon{width:13px;height:13px;}
   .stats-item-value{font-size:1.1rem;}
 }
 
@@ -1086,23 +1109,8 @@ button.profile-menu-item2:active{background:rgba(255,255,255,.07);}
 .skeleton-card .skeleton-line.w-full{width:100%;}
 .skeleton-card .skeleton-line.w-70{width:70%;}
 .skeleton-card .skeleton-btn{height:30px;border-radius:8px;margin-top:6px;}
-.product-grid-2col .skeleton-card{aspect-ratio:2/3;}
-.product-grid-2col .skeleton-card .skeleton-image{flex:1;height:auto;margin-bottom:8px;}
 @media(prefers-reduced-motion:reduce){
   .skeleton-shimmer::after{animation:none;}
-}
-
-/* ── CONFIG FF TAB — grid khusus: SELALU 2 kartu per baris di semua ukuran layar,
-   dan setiap kartu berbentuk portrait dengan rasio 2:3 (lebar:tinggi). ── */
-.product-grid-2col{
-  grid-template-columns:repeat(2,1fr)!important;
-}
-.product-grid-2col .card{
-  aspect-ratio:2/3;
-}
-.product-grid-2col .product-image{
-  flex:1;
-  height:auto;
 }
 
 /* ══════════════════════════════════════
@@ -1194,9 +1202,6 @@ button.profile-menu-item2:active{background:rgba(255,255,255,.07);}
 .modal-badge.android{background:rgba(255,255,255,.18);color:#ffffff;border:1px solid rgba(255,255,255,.25);}
 .modal-badge.ios{background:rgba(255,255,255,.18);color:#ffffff;border:1px solid rgba(255,255,255,.25);}
 .modal-badge.pc{background:rgba(255,255,255,.18);color:#ffffff;border:1px solid rgba(255,255,255,.25);}
-.modal-badge.status-open{background:rgba(0,229,160,.12);color:var(--green);border:1px solid rgba(0,229,160,.25);}
-.modal-badge.status-close{background:rgba(245,80,80,.1);color:#ff7070;border:1px solid rgba(245,80,80,.2);}
-.modal-badge.status-update{background:rgba(230,230,238,.12);color:#b8b8c4;border:1px solid rgba(230,230,238,.25);}
 .modal-product-desc{
   font-size:11.5px;color:var(--text2);line-height:1.6;
 }
@@ -1565,45 +1570,6 @@ button.profile-menu-item2:active{background:rgba(255,255,255,.07);}
 }
 .modal-cta:hover{filter:brightness(1.08);transform:translate3d(0,-2px,0);box-shadow:0 8px 26px rgba(29,185,84,.3);}
 .modal-cta:active{transform:translate3d(0,0,0) scale(.98);filter:brightness(.95);transition-duration:.1s;}
-
-/* ── TOMBOL SEDERHANA: teks + icon center (mode CONFIG FF) ── */
-.simple-btn{
-  width:100%;border-radius:14px;padding:14px 20px;
-  background:rgba(255,255,255,.05);
-  border:1px solid rgba(230,230,238,.14);
-  color:#fff;text-decoration:none;
-  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.85rem;
-  letter-spacing:.3px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:9px;
-  transition:background var(--t-fast) var(--ease-soft);
-  -webkit-tap-highlight-color:transparent;
-}
-.simple-btn:active{background:rgba(255,255,255,.09);}
-.simple-btn .feature-icon{
-  width:22px;height:22px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  background:none;border:none;
-}
-.simple-btn .simple-btn-icon{
-  width:19px;height:19px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-}
-.simple-btn .simple-btn-icon svg{width:100%;height:100%;display:block;}
-
-/* Varian DOWNLOAD CONFIG — solid putih, jadi CTA utama di mode CONFIG FF */
-.simple-btn-download{
-  background:#fff;
-  border:none;color:#000;
-}
-.simple-btn-download:active{background:#e5e5e5;}
-
-/* Varian TUTORIAL PASANG — outline tipis, aksi sekunder */
-.simple-btn-tutorial{
-  background:transparent;
-  border:1px solid rgba(255,255,255,.18);
-  color:var(--text2);
-}
-.simple-btn-tutorial:active{background:rgba(255,255,255,.06);}
 
 /* BUTTON */
 .js-icon{display:inline-flex;align-items:center;justify-content:center;line-height:0;}
@@ -2502,7 +2468,7 @@ footer::before{
   display:flex;align-items:center;justify-content:center;
   padding:16px;
   opacity:0;visibility:hidden;
-  transition:opacity .38s cubic-bezier(.22,1,.36,1),visibility .38s cubic-bezier(.22,1,.36,1),backdrop-filter .38s cubic-bezier(.22,1,.36,1);
+  transition:opacity .38s cubic-bezier(.22,1,.36,1),visibility .38s cubic-bezier(.22,1,.36,1);
   -webkit-backdrop-filter:blur(0px);backdrop-filter:blur(0px);
 }
 .vip-modal-overlay.show{
@@ -2606,17 +2572,6 @@ footer::before{
   transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease),transform var(--t-fast) var(--ease-soft);
 }
 .side-menu-close:active{background:rgba(255,255,255,.12);color:var(--text);transform:scale(.88);}
-
-.side-menu-section-label{
-  padding:16px 20px 6px;
-  font-size:.65rem;
-  font-weight:700;
-  letter-spacing:1.2px;
-  text-transform:uppercase;
-  color:var(--text2);
-  opacity:.55;
-  flex-shrink:0;
-}
 
 /* ── PROFIL: avatar, nama, email, badge (dipakai di tab Profil) ── */
 .profile-avatar-wrap{
@@ -2795,30 +2750,6 @@ footer::before{
   color:#ff6b6b;
 }
 
-.side-menu-footer{
-  position:relative;
-  padding:16px 20px;
-  margin-top:auto;
-  font-size:.68rem;
-  color:var(--text2);
-  letter-spacing:.3px;
-  flex-shrink:0;
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-.side-menu-footer::before{
-  content:"";
-  position:absolute;left:20px;right:20px;top:0;height:1px;
-  background:linear-gradient(90deg,transparent,var(--border-strong) 20%,var(--border-strong) 80%,transparent);
-}
-.side-menu-footer-dot{
-  width:6px;height:6px;border-radius:50%;
-  background:var(--text2);
-  box-shadow:0 0 6px rgba(255,255,255,.35);
-  flex-shrink:0;
-}
-
 body.side-menu-open{overflow:hidden;}
 
 /* ── LOBBY FF MODAL ── */
@@ -2922,7 +2853,7 @@ body.side-menu-open{overflow:hidden;}
   display:flex;align-items:center;justify-content:center;
   padding:16px;
   opacity:0;visibility:hidden;
-  transition:opacity .38s cubic-bezier(.22,1,.36,1),visibility .38s cubic-bezier(.22,1,.36,1),backdrop-filter .38s cubic-bezier(.22,1,.36,1);
+  transition:opacity .38s cubic-bezier(.22,1,.36,1),visibility .38s cubic-bezier(.22,1,.36,1);
   -webkit-backdrop-filter:blur(0px);backdrop-filter:blur(0px);
 }
 .ttdl-modal-overlay.show{
@@ -3103,7 +3034,7 @@ body.side-menu-open{overflow:hidden;}
   display:flex;align-items:center;justify-content:center;
   padding:16px;
   opacity:0;visibility:hidden;
-  transition:opacity .38s cubic-bezier(.22,1,.36,1),visibility .38s cubic-bezier(.22,1,.36,1),backdrop-filter .38s cubic-bezier(.22,1,.36,1);
+  transition:opacity .38s cubic-bezier(.22,1,.36,1),visibility .38s cubic-bezier(.22,1,.36,1);
   -webkit-backdrop-filter:blur(0px);backdrop-filter:blur(0px);
 }
 .sff-modal-overlay.show{
@@ -3239,7 +3170,7 @@ body.side-menu-open{overflow:hidden;}
   display:flex;align-items:center;justify-content:center;
   padding:16px;
   opacity:0;visibility:hidden;
-  transition:opacity .38s cubic-bezier(.22,1,.36,1),visibility .38s cubic-bezier(.22,1,.36,1),backdrop-filter .38s cubic-bezier(.22,1,.36,1);
+  transition:opacity .38s cubic-bezier(.22,1,.36,1),visibility .38s cubic-bezier(.22,1,.36,1);
   -webkit-backdrop-filter:blur(0px);backdrop-filter:blur(0px);
 }
 .tts-modal-overlay.show{
@@ -3419,7 +3350,7 @@ body.side-menu-open{overflow:hidden;}
   display:flex;align-items:center;justify-content:center;
   padding:16px;
   opacity:0;visibility:hidden;
-  transition:opacity .38s cubic-bezier(.22,1,.36,1),visibility .38s cubic-bezier(.22,1,.36,1),backdrop-filter .38s cubic-bezier(.22,1,.36,1);
+  transition:opacity .38s cubic-bezier(.22,1,.36,1),visibility .38s cubic-bezier(.22,1,.36,1);
   -webkit-backdrop-filter:blur(0px);backdrop-filter:blur(0px);
 }
 .gapi-modal-overlay.show{
@@ -3465,18 +3396,6 @@ body.side-menu-open{overflow:hidden;}
   margin-top:12px;
 }
 .editprofil-section:first-of-type{margin-top:2px;}
-.editprofil-preview-banner{
-  position:relative;width:100%;height:110px;border-radius:var(--radius-sm);
-  overflow:hidden;background:#000;border:1px solid var(--border-strong);
-}
-.editprofil-preview-banner img{width:100%;height:100%;object-fit:cover;display:block;}
-.editprofil-preview-avatar-wrap{
-  position:relative;width:84px;height:84px;border-radius:50%;
-  margin:0 auto;overflow:hidden;
-  border:3px solid var(--card2);box-shadow:0 6px 18px rgba(0,0,0,.5);
-  background:#000;
-}
-.editprofil-preview-avatar-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
 .editprofil-block{margin-top:14px;}
 .editprofil-block:first-of-type{margin-top:2px;}
 .editprofil-block-label{
@@ -3498,10 +3417,6 @@ body.side-menu-open{overflow:hidden;}
   border:1px solid rgba(0,229,160,.35);
 }
 .editprofil-use-btn svg{width:14px;height:14px;flex-shrink:0;}
-.editprofil-divider{height:1px;background:var(--border);margin:16px 0;}
-.editprofil-note{
-  text-align:center;font-size:.62rem;color:var(--text2);margin-top:12px;line-height:1.5;
-}
 /* ── GALERI PILIHAN — grid thumbnail banner/avatar yang bisa diklik ── */
 .editprofil-gallery{
   display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;
@@ -3520,14 +3435,16 @@ body.side-menu-open{overflow:hidden;}
 }
 .editprofil-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
 .editprofil-thumb.is-selected{border-color:var(--blue);}
-.editprofil-thumb-check{
-  position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:50%;
-  background:var(--blue);color:#0a0a0a;display:none;
-  align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.4);
+/* ── THUMBNAIL THAMNEL (video) — video TIDAK diputar di galeri, hanya
+   ditampilkan sebagai frame diam + ikon play, supaya ringan. Video baru
+   diputar hanya saat benar-benar dipakai sebagai banner utama. ── */
+.editprofil-thumb.thamnel-thumb{height:64px;background:#000;}
+.editprofil-thumb.thamnel-thumb video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;}
+.editprofil-thumb-play{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.22);pointer-events:none;
 }
-.editprofil-thumb.avatar-thumb .editprofil-thumb-check{top:-2px;right:-2px;}
-.editprofil-thumb.is-selected .editprofil-thumb-check{display:flex;}
-.editprofil-thumb-check svg{width:11px;height:11px;}
+.editprofil-thumb-play svg{width:22px;height:22px;color:#fff;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));}
 .editprofil-avatar-grid{
   display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px;
   justify-items:center;
@@ -4400,6 +4317,43 @@ body.auth-locked{overflow:hidden;}
   </div>
 </div>
 
+<!-- EDIT THAMNEL MODAL — pilih video banner utama, thumbnail TIDAK diputar
+     (biar ringan), video baru dimuat & diputar hanya saat "Gunakan" ditekan -->
+<div class="gapi-modal-overlay" id="editThamnelModalOverlay">
+  <div class="gapi-modal" role="dialog" aria-modal="true" aria-label="Edit Thamnel">
+    <button class="gapi-modal-close" aria-label="Tutup" onclick="closeEditThamnelModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="gapi-modal-title">EDIT THAMNEL</div>
+    <div class="gapi-modal-sub">Pilih video banner utama</div>
+
+    <div class="editprofil-section">
+      <div class="editprofil-gallery" id="editProfilThamnelGallery" style="margin-top:0;">
+        <div class="editprofil-thumb thamnel-thumb" data-src="https://apmxdcwebivmusqcuzcv.supabase.co/storage/v1/object/public/Tarzx/Poster.mp4">
+          <video src="https://apmxdcwebivmusqcuzcv.supabase.co/storage/v1/object/public/Tarzx/Poster.mp4#t=0.1" preload="metadata" muted playsinline></video>
+          <div class="editprofil-thumb-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+        <div class="editprofil-thumb thamnel-thumb" data-src="https://memdmlpngynlugjyxhnd.supabase.co/storage/v1/object/public/Tarzs/Thamnel1.mp4">
+          <video src="https://memdmlpngynlugjyxhnd.supabase.co/storage/v1/object/public/Tarzs/Thamnel1.mp4#t=0.1" preload="metadata" muted playsinline></video>
+          <div class="editprofil-thumb-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+        <div class="editprofil-thumb thamnel-thumb" data-src="https://memdmlpngynlugjyxhnd.supabase.co/storage/v1/object/public/Tarzs/Thamnel2.mp4">
+          <video src="https://memdmlpngynlugjyxhnd.supabase.co/storage/v1/object/public/Tarzs/Thamnel2.mp4#t=0.1" preload="metadata" muted playsinline></video>
+          <div class="editprofil-thumb-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+        <div class="editprofil-thumb thamnel-thumb" data-src="https://memdmlpngynlugjyxhnd.supabase.co/storage/v1/object/public/Tarzs/Thamnel3.mp4">
+          <video src="https://memdmlpngynlugjyxhnd.supabase.co/storage/v1/object/public/Tarzs/Thamnel3.mp4#t=0.1" preload="metadata" muted playsinline></video>
+          <div class="editprofil-thumb-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+      </div>
+      <button type="button" class="editprofil-use-btn" id="editProfilThamnelUseBtn" onclick="useEditProfilThamnel()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Gunakan
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- DETAIL AKUN MODAL — ringkasan email, metode login, dan status VIP akun yang
      sedang login. Read-only, tidak ada aksi ubah data (itu tugas menu Edit
      Profil / Password terpisah). -->
@@ -4466,6 +4420,41 @@ body.auth-locked{overflow:hidden;}
           <span class="js-icon" data-icon-key="socialWhatsapp"></span>
           Hubungi via WhatsApp
         </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL — toggle Pink Mode & Light Mode (UI saja, belum ada fungsi) -->
+<div class="gapi-modal-overlay" id="settingsModalOverlay">
+  <div class="gapi-modal" role="dialog" aria-modal="true" aria-label="Settings">
+    <button class="gapi-modal-close" aria-label="Tutup" onclick="closeSettingsModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="gapi-modal-title">SETTINGS</div>
+    <div class="gapi-modal-sub">Pengaturan tampilan aplikasi</div>
+
+    <div class="profile-menu-list">
+      <div class="profile-menu-item profile-menu-item-toggle">
+        <span class="profile-menu-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 0 0 20 6 6 0 0 0 0-12 4 4 0 0 1 0-8Z"/></svg>
+        </span>
+        <span class="profile-menu-label">Pink Mode</span>
+        <label class="profile-toggle-switch">
+          <input type="checkbox" id="pinkModeToggle">
+          <span class="profile-toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="profile-menu-item profile-menu-item-toggle">
+        <span class="profile-menu-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </span>
+        <span class="profile-menu-label">Light Mode</span>
+        <label class="profile-toggle-switch">
+          <input type="checkbox" id="lightModeToggle">
+          <span class="profile-toggle-slider"></span>
+        </label>
       </div>
     </div>
   </div>
@@ -5040,6 +5029,14 @@ body.auth-locked{overflow:hidden;}
             <svg class="profile-menu-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
 
+          <button type="button" class="profile-menu-item" onclick="openEditThamnelModal();">
+            <span class="profile-menu-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="15" height="14" rx="2"/><path d="M22 8.5l-5 3.5 5 3.5v-7z"/></svg>
+            </span>
+            <span class="profile-menu-label">Edit Thamnel</span>
+            <svg class="profile-menu-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+
           <button type="button" class="profile-menu-item" id="profilePasswordMenuBtn" onclick="openChangePasswordModal();">
             <span class="profile-menu-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -5075,7 +5072,7 @@ body.auth-locked{overflow:hidden;}
             <svg class="profile-menu-chevron2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
 
-          <button type="button" class="profile-menu-item2" onclick="void 0;">
+          <button type="button" class="profile-menu-item2" onclick="openSettingsModal();">
             <span class="profile-menu-icon2">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
             </span>
@@ -5863,6 +5860,91 @@ function closeInfoModal(){
   if(overlay){
     overlay.addEventListener('click', function(e){
       if(e.target === overlay) closeInfoModal();
+    });
+  }
+})();
+
+function openSettingsModal(){
+  const overlay = document.getElementById('settingsModalOverlay');
+  if(!overlay) return;
+  overlay.style.display = 'flex'; void overlay.offsetHeight;
+  overlay.classList.add('show');
+  document.body.style.overflow = 'hidden'; document.body.classList.add('tabbar-hide');
+}
+
+function closeSettingsModal(){
+  const overlay = document.getElementById('settingsModalOverlay');
+  if(!overlay) return;
+  overlay.classList.remove('show');
+  document.body.style.overflow = ''; document.body.classList.remove('tabbar-hide');
+}
+(function(){
+  const overlay = document.getElementById('settingsModalOverlay');
+  if(overlay){
+    overlay.addEventListener('click', function(e){
+      if(e.target === overlay) closeSettingsModal();
+    });
+  }
+
+  /* ── PINK MODE — mengganti semua warna aksen biru (--blue/--blue2/--cyan)
+     jadi palet bubblegum pink lewat class body.pink-mode (lihat CSS terkait).
+     Status disimpan di localStorage supaya tetap aktif setelah reload.
+     LIGHT MODE — mengganti warna tombol Install, kartu Tools (+ikon &
+     border), dan badge centang jadi abu-abu lewat class body.light-mode.
+     Elemen lain sengaja TIDAK ikut berubah. Status disimpan di localStorage.
+     KEDUANYA SALING EKSKLUSIF — mengaktifkan salah satu otomatis mematikan
+     yang lain, supaya tidak bisa aktif berbarengan. ── */
+  const LS_PINK_MODE = 'tarz_pink_mode';
+  const pinkToggle = document.getElementById('pinkModeToggle');
+  const LS_LIGHT_MODE = 'tarz_light_mode';
+  const lightToggle = document.getElementById('lightModeToggle');
+
+  function applyPinkMode(active){
+    document.body.classList.toggle('pink-mode', !!active);
+    if(pinkToggle) pinkToggle.checked = !!active;
+  }
+
+  function applyLightMode(active){
+    document.body.classList.toggle('light-mode', !!active);
+    if(lightToggle) lightToggle.checked = !!active;
+  }
+
+  try{
+    applyPinkMode(localStorage.getItem(LS_PINK_MODE) === '1');
+  }catch(e){}
+
+  try{
+    applyLightMode(localStorage.getItem(LS_LIGHT_MODE) === '1');
+  }catch(e){}
+
+  /* Jaring pengaman: kalau (secara data lama) keduanya kebetulan aktif
+     bersamaan, prioritaskan Pink Mode dan matikan Light Mode saat load. */
+  if(document.body.classList.contains('pink-mode') && document.body.classList.contains('light-mode')){
+    applyLightMode(false);
+    try{ localStorage.setItem(LS_LIGHT_MODE, '0'); }catch(e){}
+  }
+
+  if(pinkToggle){
+    pinkToggle.addEventListener('change', function(){
+      const active = pinkToggle.checked;
+      applyPinkMode(active);
+      try{ localStorage.setItem(LS_PINK_MODE, active ? '1' : '0'); }catch(e){}
+      if(active){
+        applyLightMode(false);
+        try{ localStorage.setItem(LS_LIGHT_MODE, '0'); }catch(e){}
+      }
+    });
+  }
+
+  if(lightToggle){
+    lightToggle.addEventListener('change', function(){
+      const active = lightToggle.checked;
+      applyLightMode(active);
+      try{ localStorage.setItem(LS_LIGHT_MODE, active ? '1' : '0'); }catch(e){}
+      if(active){
+        applyPinkMode(false);
+        try{ localStorage.setItem(LS_PINK_MODE, '0'); }catch(e){}
+      }
     });
   }
 })();
@@ -7672,13 +7754,6 @@ function openVipWhatsApp(){
   }, 350);
 }
 
-/* dipanggil dari tombol "Order via WhatsApp" di card Reseller (halaman VIP) —
-   langsung arahkan ke WhatsApp admin dengan pesan khusus reseller (Rp25.000) */
-function openResellerWhatsApp(){
-  const msg = `Halo Tarz Store! Saya mau order RESELLER (Rp25.000) untuk akses generate key unlimited.\n\nMohon diproses ya, terima kasih`;
-  window.open('https://wa.me/'+VIP_WA_NUMBER+'?text='+encodeURIComponent(msg),'_blank','noopener,noreferrer');
-}
-
 /* dipanggil langsung dari tombol "Buy via QRIS" di halaman VIP (tab "vip") --
    kalau belum login Google, cukup tampilkan toast "Kamu Belum Login" tanpa
    membuka modal sama sekali (user sudah berada di tab VIP). Kalau sudah
@@ -8872,6 +8947,113 @@ document.addEventListener('dragstart', function(e){
   setupGallery('editProfilBannerGallery', 'editProfilBannerPreview', 'editProfilBannerUseBtn');
 })();
 </script>
+
+<!-- ═══════════════════════════════════════════════════
+     EDIT THAMNEL — pilih video banner utama, terpisah dari modal Edit
+     Profil. Thumbnail video TIDAK diputar di galeri (preload="metadata"
+     saja) supaya ringan; video baru dimuat & diputar hanya saat "Gunakan"
+     ditekan, lalu menggantikan BANNER_ASSET.video yang tampil di homepage.
+     ═══════════════════════════════════════════════════ -->
+<script>
+(function(){
+  const LS_THAMNEL = 'tarz_custom_thamnel';
+  const overlay = document.getElementById('editThamnelModalOverlay');
+  let selectedThamnelSrc = null;
+
+  function setUseBtnState(btn, used){
+    btn.classList.toggle('is-used', !!used);
+    btn.innerHTML = used
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Digunakan'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Gunakan';
+  }
+
+  function syncGallerySelection(galleryEl, activeSrc){
+    if(!galleryEl) return;
+    galleryEl.querySelectorAll('.editprofil-thumb').forEach(thumb=>{
+      thumb.classList.toggle('is-selected', thumb.dataset.src === activeSrc);
+    });
+  }
+
+  function getActiveThamnelSrc(){
+    try{ return localStorage.getItem(LS_THAMNEL) || (typeof BANNER_ASSET !== 'undefined' ? BANNER_ASSET.video : ''); }
+    catch(e){ return typeof BANNER_ASSET !== 'undefined' ? BANNER_ASSET.video : ''; }
+  }
+
+  function syncThamnelUseButtonState(){
+    try{
+      const btn = document.getElementById('editProfilThamnelUseBtn');
+      const gallery = document.getElementById('editProfilThamnelGallery');
+      const activeSrc = selectedThamnelSrc || getActiveThamnelSrc();
+      const saved = localStorage.getItem(LS_THAMNEL);
+      if(btn) setUseBtnState(btn, !!saved && saved === activeSrc);
+      if(gallery) syncGallerySelection(gallery, activeSrc);
+    }catch(e){}
+  }
+
+  function setupThamnelGallery(){
+    const galleryEl = document.getElementById('editProfilThamnelGallery');
+    if(!galleryEl) return;
+    galleryEl.querySelectorAll('.editprofil-thumb').forEach(thumb=>{
+      thumb.addEventListener('click', function(){
+        const src = thumb.dataset.src;
+        if(!src) return;
+        selectedThamnelSrc = src;
+        syncThamnelUseButtonState();
+      });
+    });
+  }
+
+  function applySavedThamnel(){
+    try{
+      const saved = localStorage.getItem(LS_THAMNEL);
+      if(saved && typeof BANNER_ASSET !== 'undefined'){
+        BANNER_ASSET.video = saved;
+      }
+    }catch(e){}
+  }
+
+  window.openEditThamnelModal = function(){
+    if(!overlay) return;
+    overlay.style.display = 'flex'; void overlay.offsetHeight;
+    overlay.classList.add('show');
+    document.body.style.overflow = 'hidden'; document.body.classList.add('tabbar-hide');
+    selectedThamnelSrc = null;
+    syncThamnelUseButtonState();
+  };
+  window.closeEditThamnelModal = function(){
+    if(!overlay) return;
+    overlay.classList.remove('show');
+    document.body.style.overflow = ''; document.body.classList.remove('tabbar-hide');
+  };
+  if(overlay){
+    overlay.addEventListener('click', function(e){
+      if(e.target === overlay) closeEditThamnelModal();
+    });
+  }
+
+  window.useEditProfilThamnel = function(){
+    const src = selectedThamnelSrc;
+    if(!src) return;
+    try{ localStorage.setItem(LS_THAMNEL, src); }catch(e){}
+    if(typeof BANNER_ASSET !== 'undefined') BANNER_ASSET.video = src;
+    // Video baru di-load & diputar DI SINI saja (saat "Gunakan" ditekan),
+    // bukan saat memilih thumbnail di galeri, supaya galeri tetap ringan.
+    const bannerVideo = document.querySelector('.banner-video');
+    if(bannerVideo){
+      bannerVideo.setAttribute('preload', 'auto');
+      bannerVideo.setAttribute('src', src);
+      bannerVideo.setAttribute('autoplay', '');
+      bannerVideo.load();
+      bannerVideo.play().catch(function(){ /* autoplay bisa diblokir browser, abaikan */ });
+    }
+    syncThamnelUseButtonState();
+  };
+
+  applySavedThamnel();
+  setupThamnelGallery();
+})();
+</script>
+
 
 <!-- ═══════════════════════════════════════════════════
      GANTI PASSWORD — reauthenticate dengan password lama lalu
@@ -10327,13 +10509,23 @@ function fbInitOnce(){
   window.dispatchEvent(new Event('npFirebaseFullyReady'));
 }
 window.addEventListener('npFirebaseReady', fbInitOnce, {once:true});
+/* PENTING: onload di atas cuma nandain script firebase-app SELESAI load,
+   bukan berarti auth+firestore (yang di-defer terpisah) sudah ikut siap.
+   Makanya tetap perlu polling sebagai fallback -- tapi dibikin lebih
+   hemat dari versi awal: interval sedikit lebih jarang & berhenti begitu
+   Firebase ketemu atau sudah mencoba cukup lama. */
 (function pollFirebase(){
   let tries = 0;
   const poll = setInterval(()=>{
+    if(_fbInitCalled){ clearInterval(poll); return; }
     tries++;
-    if(window.firebase && firebase.auth && firebase.firestore){ clearInterval(poll); fbInitOnce(); }
-    else if(tries > 100){ clearInterval(poll); }
-  }, 100);
+    if(window.firebase && firebase.auth && firebase.firestore){
+      clearInterval(poll);
+      fbInitOnce();
+    } else if(tries > 150){
+      clearInterval(poll);
+    }
+  }, 150);
 })();
 </script>
 
