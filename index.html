@@ -1715,36 +1715,48 @@ background:linear-gradient(135deg,#1e2a47,#2563eb);
 .buy-btn:hover{filter:brightness(1.1);transform:translate3d(0,-2px,0);background:linear-gradient(135deg,#2563eb,#60a5fa);color:#fff;box-shadow:0 8px 26px rgba(37,99,235,.25);}
 .buy-btn:active{transform:translate3d(0,0,0) scale(.97);filter:brightness(.95);transition-duration:.1s;}
 
-/* ── TOAST — abu gelap senada situs, kecil, clean ── */
+/* ── TOAST — kecil, transparan (glass), tanpa tombol close ── */
 .toast{
   position:fixed;bottom:calc(20px + 64px + env(safe-area-inset-bottom));left:50%;
   transform:translate3d(-50%,60px,0) scale(.96);
   display:flex;align-items:center;gap:8px;
-  max-width:calc(100% - 56px);
-  background:var(--card2);
-  border:1px solid var(--border-strong);
-  border-radius:11px;padding:9px 14px 9px 10px;
-  font-size:12px;font-weight:600;color:var(--text);
+  max-width:calc(100% - 32px);
+  width:max-content;
+  background:rgba(30,30,34,.55);
+  -webkit-backdrop-filter:blur(16px) saturate(1.6);
+  backdrop-filter:blur(16px) saturate(1.6);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:12px;padding:9px 14px 9px 10px;
+  font-size:12px;font-weight:600;color:#fff;
   z-index:9999;
-  box-shadow:0 10px 28px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.04);
+  box-shadow:0 10px 28px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08);
   transition:transform var(--t-mid) var(--ease-out),opacity var(--t-mid) var(--ease-soft);
   pointer-events:none;
   will-change:transform;opacity:0;
 }
 .toast.show{transform:translate3d(-50%,0,0) scale(1);opacity:1;}
 .toast-icon{
-  flex-shrink:0;width:16px;height:16px;border-radius:50%;
+  flex-shrink:0;width:18px;height:18px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
-  background:rgba(255,255,255,.1);color:var(--text);
+  background:rgba(255,255,255,.14);color:#fff;
 }
-.toast-icon svg{width:9px;height:9px;}
-.toast-msg{line-height:1.3;}
-.toast.error{border-color:rgba(255,80,80,.45);}
-.toast.error .toast-icon{background:rgba(245,80,80,.18);color:#ff6b6b;}
-.toast.success{border-color:rgba(0,229,160,.45);}
-.toast.success .toast-icon{background:rgba(0,229,160,.18);color:var(--green);}
-.toast.info{border-color:rgba(120,170,255,.45);}
-.toast.info .toast-icon{background:rgba(120,170,255,.18);color:#7aa8ff;}
+.toast-icon svg{width:10px;height:10px;}
+/* Teks toast selalu satu baris, walau panjang -- kalau melebihi lebar layar
+   (dibatasi max-width toast di atas), sisanya dipotong dengan "..." daripada
+   pindah baris (wrap) atau meluber keluar toast. */
+.toast-msg{
+  line-height:1.3;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  min-width:0;
+}
+.toast.info{background:rgba(59,91,253,.35);border-color:rgba(122,168,255,.35);}
+.toast.info .toast-icon{background:rgba(255,255,255,.18);color:#dbe6ff;}
+.toast.success{background:rgba(0,180,130,.32);border-color:rgba(0,229,160,.35);}
+.toast.success .toast-icon{background:rgba(255,255,255,.18);color:#baf5dd;}
+.toast.warning{background:rgba(216,150,20,.32);border-color:rgba(232,178,60,.35);}
+.toast.warning .toast-icon{background:rgba(255,255,255,.18);color:#ffe3ad;}
+.toast.error{background:rgba(226,72,63,.32);border-color:rgba(255,107,107,.35);}
+.toast.error .toast-icon{background:rgba(255,255,255,.18);color:#ffc9c5;}
 
 /* ── VIP CELEBRATION OVERLAY — EDISI HITAM PUTIH ── */
 .vip-celebrate-overlay{
@@ -4152,6 +4164,14 @@ body.auth-locked{overflow:hidden;}
       <span class="side-menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6M15.5 7.5l3 3L22 7l-3-3"/></svg></span>
       <span>Generate Key</span>
     </a></li>
+    <li><a href="#" onclick="shareAppWithFriends(); return false;">
+      <span class="side-menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-7-7 18-2-8-8-3z"/></svg></span>
+      <span>Share with friends</span>
+    </a></li>
+    <li><a href="#" onclick="openInfoModal(); return false;">
+      <span class="side-menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span>
+      <span>Info</span>
+    </a></li>
   </ul>
 
   <div class="side-menu-signout-wrap">
@@ -4472,6 +4492,30 @@ body.auth-locked{overflow:hidden;}
       <button type="button" class="editprofil-use-btn" id="editProfilThamnelUseBtn" onclick="useEditProfilThamnel()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         Gunakan
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT USERNAME MODAL — ubah nama tampilan (displayName) akun yang sedang
+     login. Disimpan lewat Firebase Auth updateProfile() supaya nyantol
+     permanen ke akun (bukan cuma per-perangkat lewat localStorage). -->
+<div class="gapi-modal-overlay" id="editUsernameModalOverlay">
+  <div class="gapi-modal" role="dialog" aria-modal="true" aria-label="Edit Username">
+    <button class="gapi-modal-close" aria-label="Tutup" onclick="closeEditUsernameModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="gapi-modal-title">EDIT USERNAME</div>
+    <div class="gapi-modal-sub">Ubah nama tampilan akun kamu</div>
+
+    <div class="editprofil-section">
+      <div class="key-input-wrap">
+        <input type="text" id="editUsernameInput" class="key-input" placeholder="Masukkan username baru" maxlength="30" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter'){event.preventDefault();useEditUsername();}">
+      </div>
+      <div class="key-error-msg" id="editUsernameErrorMsg">Username tidak valid.</div>
+      <button type="button" class="editprofil-use-btn" id="editUsernameUseBtn" onclick="useEditUsername()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Simpan
       </button>
     </div>
   </div>
@@ -5160,6 +5204,14 @@ body.auth-locked{overflow:hidden;}
             <svg class="profile-menu-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
 
+          <button type="button" class="profile-menu-item" onclick="openEditUsernameModal();">
+            <span class="profile-menu-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+            </span>
+            <span class="profile-menu-label">Edit Username</span>
+            <svg class="profile-menu-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+
           <button type="button" class="profile-menu-item" id="profilePasswordMenuBtn" onclick="openChangePasswordModal();">
             <span class="profile-menu-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -5176,22 +5228,6 @@ body.auth-locked{overflow:hidden;}
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             </span>
             <span class="profile-menu-label2">Account</span>
-            <svg class="profile-menu-chevron2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
-
-          <button type="button" class="profile-menu-item2" onclick="shareAppWithFriends();">
-            <span class="profile-menu-icon2">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-7-7 18-2-8-8-3z"/></svg>
-            </span>
-            <span class="profile-menu-label2">Share with friends</span>
-            <svg class="profile-menu-chevron2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
-
-          <button type="button" class="profile-menu-item2" onclick="openInfoModal();">
-            <span class="profile-menu-icon2">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-            </span>
-            <span class="profile-menu-label2">Info</span>
             <svg class="profile-menu-chevron2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
 
@@ -5708,9 +5744,10 @@ document.querySelectorAll('[data-count]').forEach(el=>statIO.observe(el));
 /* ── TOAST — no reflow ── */
 let _toastTimer = null;
 const TOAST_ICONS = {
-  success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
-  error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
-  info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'
+  success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+  error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="6.5" y1="17.5" x2="17.5" y2="6.5"/></svg>',
+  warning: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 21.5 20h-19L12 3.5Z"/><line x1="12" y1="9.5" x2="12" y2="14"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+  info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.6 6.4a8 8 0 1 0 0 11.3M15 15l3 3-3 3"/></svg>'
 };
 function showToast(msg, type=''){
   const toast = document.getElementById('toast');
@@ -7079,6 +7116,19 @@ async function authRegisterSubmit(e){
     if(cred && cred.user && typeof cred.user.updateProfile === 'function'){
       await cred.user.updateProfile({ displayName: usernameRaw }).catch(()=>{});
     }
+    /* Simpan mapping username -> uid di Firestore (koleksi `usernames`,
+       doc id = username ternormalisasi). Ini dipakai authSubmit() untuk
+       cari email internal yang BENAR saat login, dan useEditUsername()
+       untuk pindah mapping saat username diganti -- tanpa perlu mengubah
+       email asli di Firebase Auth (yang diblokir kalau Email Enumeration
+       Protection aktif, lihat auth/operation-not-allowed). */
+    if(cred && cred.user && window.fbDb){
+      await window.fbDb.collection('usernames').doc(username).set({
+        uid: cred.user.uid,
+        email: internalEmail,
+        created_at: firebase.firestore.FieldValue.serverTimestamp()
+      }).catch(()=>{});
+    }
     showToast('Akun berhasil dibuat', 'success');
     hideAuthGate();
   }catch(err){
@@ -7141,11 +7191,27 @@ async function authSubmit(e){
   }
 
   /* Kalau input tidak mengandung "@", anggap ini username (bukan email
-     asli) -- konversi ke format email internal yang sama seperti saat
-     akun dibuat lewat authRegisterSubmit(). */
-  const email = emailOrUsername.includes('@')
-    ? emailOrUsername
-    : emailOrUsername.toLowerCase().replace(/[^a-z0-9_.-]/g, '') + '@tarzstore.local';
+     asli). Cari dulu email internal TERKINI lewat mapping Firestore
+     `usernames/{username}` (diisi/diperbarui oleh authRegisterSubmit()
+     dan useEditUsername()) -- supaya kalau user pernah ganti username,
+     login tetap bisa pakai username BARU. Kalau mapping belum ada
+     (akun lama sebelum fitur mapping ini ada, atau Firestore lagi
+     bermasalah), fallback ke pola lama: normalize(username)@tarzstore.local. */
+  let email;
+  if(emailOrUsername.includes('@')){
+    email = emailOrUsername;
+  }else{
+    const normalizedUsername = emailOrUsername.toLowerCase().replace(/[^a-z0-9_.-]/g, '');
+    email = normalizedUsername + '@tarzstore.local';
+    if(window.fbDb){
+      try{
+        const mapDoc = await window.fbDb.collection('usernames').doc(normalizedUsername).get();
+        if(mapDoc.exists && mapDoc.data() && mapDoc.data().email){
+          email = mapDoc.data().email;
+        }
+      }catch(e){ /* Firestore gagal diakses -- tetap lanjut pakai fallback di atas */ }
+    }
+  }
 
   /* "remember me" -- kalau TIDAK dicentang, sesi hanya disimpan selama tab
      ini terbuka (browserSessionPersistence), hilang begitu tab/browser
@@ -9305,6 +9371,163 @@ document.addEventListener('dragstart', function(e){
 
   applySavedThamnel();
   setupThamnelGallery();
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════
+     EDIT USERNAME — ubah nama tampilan (displayName) akun yang sedang
+     login. Disimpan lewat Firebase Auth updateProfile() sehingga nyantol
+     permanen ke akun (ikut akun kalau login di perangkat lain), bukan
+     cuma tersimpan di localStorage seperti avatar/banner/thamnel.
+     ═══════════════════════════════════════════════════ -->
+<script>
+(function(){
+  const overlay = document.getElementById('editUsernameModalOverlay');
+  const input = document.getElementById('editUsernameInput');
+  const errorMsg = document.getElementById('editUsernameErrorMsg');
+  const useBtn = document.getElementById('editUsernameUseBtn');
+
+  function euShowError(msg){
+    if(!errorMsg) return;
+    errorMsg.textContent = msg;
+    errorMsg.classList.add('show');
+    if(input) input.classList.add('shake');
+    setTimeout(()=>{ if(input) input.classList.remove('shake'); }, 400);
+  }
+  function euHideError(){
+    if(errorMsg) errorMsg.classList.remove('show');
+  }
+  function euSetBusy(busy){
+    if(!useBtn) return;
+    useBtn.disabled = busy;
+    useBtn.style.opacity = busy ? '.6' : '';
+    useBtn.style.pointerEvents = busy ? 'none' : '';
+  }
+
+  window.openEditUsernameModal = function(){
+    if(!overlay) return;
+    overlay.style.display = 'flex'; void overlay.offsetHeight;
+    overlay.classList.add('show');
+    document.body.style.overflow = 'hidden'; document.body.classList.add('tabbar-hide');
+    euHideError();
+    if(input){
+      const current = (_googleUser && _googleUser.displayName) || '';
+      input.value = current;
+      setTimeout(()=>{ input.focus(); }, 150);
+    }
+  };
+  window.closeEditUsernameModal = function(){
+    if(!overlay) return;
+    overlay.classList.remove('show');
+    document.body.style.overflow = ''; document.body.classList.remove('tabbar-hide');
+  };
+  if(overlay){
+    overlay.addEventListener('click', function(e){
+      if(e.target === overlay) closeEditUsernameModal();
+    });
+  }
+  if(input){
+    input.addEventListener('input', euHideError);
+  }
+
+  /* akun yang daftar/login pakai Username & Password punya email internal
+     berformat username@tarzstore.local (lihat authRegisterSubmit()).
+     Akun Google punya email asli Google, jadi TIDAK boleh diutak-atik. */
+  function euIsUsernamePasswordAccount(user){
+    const email = (user && user.email) || '';
+    return email.endsWith('@tarzstore.local');
+  }
+
+  function euFriendlyError(err){
+    const code = err && err.code;
+    if(code === 'auth/requires-recent-login') return 'Sesi login sudah lama, silakan logout & login ulang lalu coba lagi.';
+    return (err && err.message) || 'Gagal menyimpan username. Coba lagi.';
+  }
+
+  window.useEditUsername = async function(){
+    if(!input) return;
+    const newName = input.value.trim();
+
+    if(!newName){
+      euShowError('Username tidak boleh kosong.');
+      return;
+    }
+    if(newName.length < 3){
+      euShowError('Username minimal 3 karakter.');
+      return;
+    }
+    if(newName.length > 30){
+      euShowError('Username maksimal 30 karakter.');
+      return;
+    }
+
+    const client = (typeof getAuthClient === 'function') ? getAuthClient() : (window.fbAuth || null);
+    const user = client && client.currentUser;
+    if(!user){
+      euShowError('Kamu belum login.');
+      return;
+    }
+
+    euHideError();
+    euSetBusy(true);
+    try{
+      /* Untuk akun Username & Password, login pakai USERNAME (bukan email
+         beneran) diselesaikan lewat mapping Firestore `usernames/{username}`
+         -> {uid, email} (lihat authRegisterSubmit() & authSubmit()).
+         Jadi cukup pindahkan mapping-nya ke doc id baru -- TIDAK perlu
+         (dan tidak boleh) mengubah email asli di Firebase Auth, karena
+         user.updateEmail()/verifyBeforeUpdateEmail() akan ditolak Firebase
+         (auth/operation-not-allowed) kalau Email Enumeration Protection
+         aktif, apalagi email internal ini bukan email sungguhan yang bisa
+         menerima link verifikasi. */
+      if(euIsUsernamePasswordAccount(user)){
+        if(!window.fbDb){
+          euShowError('Koneksi database belum siap, coba lagi sebentar.');
+          euSetBusy(false);
+          return;
+        }
+        const normalized = newName.toLowerCase().replace(/[^a-z0-9_.-]/g, '');
+        if(normalized.length < 3){
+          euShowError('Username minimal 3 karakter (huruf/angka).');
+          euSetBusy(false);
+          return;
+        }
+        const oldUsername = user.email.replace(/@tarzstore\.local$/, '');
+        if(normalized !== oldUsername){
+          const newDocRef = window.fbDb.collection('usernames').doc(normalized);
+          const newDoc = await newDocRef.get();
+          if(newDoc.exists && newDoc.data() && newDoc.data().uid !== user.uid){
+            euShowError('Username sudah dipakai orang lain. Coba username lain.');
+            euSetBusy(false);
+            return;
+          }
+          // Buat mapping baru dulu (uid + email internal ASLI tetap sama,
+          // cuma "alias" username-nya yang pindah), baru hapus mapping lama --
+          // supaya tidak ada celah waktu di mana username tidak bisa dipakai
+          // login sama sekali kalau salah satu langkah gagal di tengah jalan.
+          await newDocRef.set({
+            uid: user.uid,
+            email: user.email,
+            created_at: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          await window.fbDb.collection('usernames').doc(oldUsername).delete().catch(()=>{});
+        }
+      }
+
+      await user.updateProfile({ displayName: newName });
+      _googleUser = user; // objek user sama, displayName sudah ke-update oleh SDK
+      if(typeof renderProfilePanel === 'function') renderProfilePanel();
+      const nameEl = document.getElementById('profileName');
+      if(nameEl) nameEl.textContent = newName;
+      if(typeof showToast === 'function') showToast('Username berhasil diubah', 'success');
+      closeEditUsernameModal();
+    }catch(e){
+      console.error('update username gagal:', e);
+      euShowError(euFriendlyError(e));
+    }finally{
+      euSetBusy(false);
+    }
+  };
 })();
 </script>
 
