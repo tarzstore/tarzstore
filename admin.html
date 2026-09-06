@@ -806,7 +806,25 @@
 
       <!-- STEP 2: link & akses -->
       <div class="step-panel" id="stepPanel2">
-        <label>Link Mediafire</label>
+        <label>Upload File APK <span class="hint">(otomatis isi link di bawah)</span></label>
+        <input type="file" id="fApkFile" accept=".apk" onchange="handleApkFileSelect(this.files[0])" style="display:none;">
+        <div id="apkUploadBox" onclick="document.getElementById('fApkFile').click()" style="
+          border:1px dashed var(--border-strong);border-radius:var(--radius-sm);
+          padding:14px 13px;cursor:pointer;background:var(--surface);
+          display:flex;align-items:center;gap:10px;transition:border-color .16s ease;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18" style="flex-shrink:0;color:var(--text2);"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <div style="flex:1;min-width:0;">
+            <div id="apkUploadTitle" style="font-size:13.5px;color:var(--text);font-weight:600;">Klik untuk pilih file .apk</div>
+            <div id="apkUploadSub" style="font-size:11px;color:var(--text3);margin-top:2px;">Otomatis diupload ke penyimpanan APK</div>
+          </div>
+        </div>
+        <div id="apkUploadProgress" style="display:none;margin-top:8px;">
+          <div style="height:4px;background:var(--card3);border-radius:4px;overflow:hidden;">
+            <div id="apkProgressBar" style="height:100%;width:0%;background:var(--green);transition:width .2s ease;"></div>
+          </div>
+        </div>
+
+        <label style="margin-top:16px;">Link Mediafire <span class="hint">(atau upload APK di atas)</span></label>
         <input type="text" id="fDownloadLink" placeholder="">
 
         <label>Key</label>
@@ -1125,6 +1143,106 @@ function toggleAdvanced(){
     });
   }
 }
+
+/* ═══════════════════════════════════════════════════
+   UPLOAD APK KE SUPABASE STORAGE
+   ═══════════════════════════════════════════════════ */
+/* anon public key ini AMAN ditaruh di frontend (beda dengan token GitHub) --
+   akses ditentukan lewat bucket policy di sisi Supabase, bukan disembunyikan. */
+const SUPABASE_URL      = 'https://jubwhcpnikprqmltqlok.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp1YndoY3BuaWtwcnFtbHRxbG9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg3MTU1ODAsImV4cCI6MjEwNDI5MTU4MH0.EPjoFO0JU_2ftE_uScdoCTco9bWUqNMxnZ5svRorywI';
+const SUPABASE_BUCKET   = 'apk';
+
+/* Update tampilan kotak upload APK */
+function setApkUploadState({ title, sub, subColor, showProgress, percent }){
+  const titleEl = document.getElementById('apkUploadTitle');
+  const subEl = document.getElementById('apkUploadSub');
+  const progWrap = document.getElementById('apkUploadProgress');
+  const progBar = document.getElementById('apkProgressBar');
+
+  if(title !== undefined) titleEl.textContent = title;
+  if(sub !== undefined){
+    subEl.textContent = sub;
+    subEl.style.color = subColor || 'var(--text3)';
+  }
+  if(showProgress){
+    progWrap.style.display = 'block';
+    progBar.style.width = (percent || 0) + '%';
+  } else {
+    progWrap.style.display = 'none';
+  }
+}
+
+/* Dipanggil saat admin pilih file .apk. Upload file langsung ke bucket
+   Supabase Storage lewat REST API-nya, lalu isi otomatis field link
+   download dengan URL publik hasil upload. */
+async function handleApkFileSelect(file){
+  if(!file) return;
+
+  if(!file.name.toLowerCase().endsWith('.apk')){
+    setApkUploadState({ title: 'File harus .apk', sub: 'Pilih file APK yang valid', subColor: 'var(--red)' });
+    return;
+  }
+
+  const sizeMb = (file.size / (1024*1024)).toFixed(1);
+  setApkUploadState({ title: file.name, sub: `${sizeMb} MB · Mengupload...`, showProgress: true, percent: 10 });
+
+  try{
+    // Nama file dibuat unik (timestamp + nama asli) supaya tidak saling
+    // menimpa kalau ada 2 APK dengan nama sama diupload di waktu berbeda.
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const objectPath = `${Date.now()}-${safeName}`;
+    const uploadEndpoint = `${SUPABASE_URL}/storage/v1/object/${SUPABASE_BUCKET}/${objectPath}`;
+
+    const publicUrl = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', uploadEndpoint);
+      xhr.setRequestHeader('Authorization', `Bearer ${SUPABASE_ANON_KEY}`);
+      xhr.setRequestHeader('apikey', SUPABASE_ANON_KEY);
+      xhr.setRequestHeader('Content-Type', 'application/vnd.android.package-archive');
+      xhr.setRequestHeader('x-upsert', 'true');
+      xhr.upload.onprogress = (e) => {
+        if(e.lengthComputable){
+          const pct = 10 + Math.round((e.loaded / e.total) * 85); // 10-95%
+          setApkUploadState({ title: file.name, sub: `${sizeMb} MB · Mengupload... ${Math.round((e.loaded/e.total)*100)}%`, showProgress: true, percent: pct });
+        }
+      };
+      xhr.onload = () => {
+        if(xhr.status >= 200 && xhr.status < 300){
+          const url = `${SUPABASE_URL}/storage/v1/object/public/${SUPABASE_BUCKET}/${objectPath}`;
+          resolve(url);
+        } else {
+          let msg = `Upload gagal (${xhr.status})`;
+          try{ const errBody = JSON.parse(xhr.responseText); if(errBody.message) msg = errBody.message; }catch(e){}
+          reject(new Error(msg));
+        }
+      };
+      xhr.onerror = () => reject(new Error('Koneksi terputus saat upload'));
+      xhr.send(file);
+    });
+
+    // Isi otomatis field link download dengan URL publik Supabase
+    document.getElementById('fDownloadLink').value = publicUrl;
+
+    setApkUploadState({
+      title: 'APK berhasil diupload',
+      sub: `${sizeMb} MB · Link otomatis terisi di bawah`,
+      subColor: 'var(--green)',
+      showProgress: true,
+      percent: 100
+    });
+    setTimeout(() => setApkUploadState({ showProgress: false }), 1500);
+
+  } catch(err){
+    setApkUploadState({
+      title: 'Gagal upload APK',
+      sub: err.message || 'Coba lagi',
+      subColor: 'var(--red)',
+      showProgress: false
+    });
+  }
+}
+window.handleApkFileSelect = handleApkFileSelect;
 
 /* ═══════════════════════════════════════════════════
    UPLOAD FOTO KE IMGBB
