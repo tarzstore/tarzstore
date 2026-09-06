@@ -1045,6 +1045,43 @@ button.profile-menu-item2:hover .profile-menu-icon2{background:rgba(255,255,255,
   color:#fff!important;
 }
 
+/* ── FREE STATUS — pita biru dongker elegan (default/Biru), produk bisa didownload TANPA VIP ──
+   Polos tanpa efek/animasi tambahan, ukuran sedikit lebih kecil dari pita lain.
+   Ikut berubah warna sesuai tema aktif: default (Biru) = biru dongker,
+   Pink Mode = pink, Light Mode = abu-abu netral. Sama seperti tool-card/buy-btn. */
+.card[data-status="free"] .platform-label,
+.card[data-status="free"] .price-label{
+  width:96px;
+  font-size:8px;
+  background:#123a7a!important;
+  color:#eaf1ff!important;
+  font-weight:800!important;
+  text-shadow:none!important;
+  box-shadow:none!important;
+  animation:none!important;
+}
+.card[data-status="free"] .platform-label::after,
+.card[data-status="free"] .price-label::after{
+  display:none!important;
+}
+.card[data-status="free"] .price-label::before{content:"";}
+.card[data-status="free"] .price-label span::before{content:"FREE";visibility:visible;letter-spacing:1px;}
+.card[data-status="free"] .price-label span{visibility:hidden;}
+
+/* Varian PINK MODE untuk pita FREE */
+body.pink-mode .card[data-status="free"] .platform-label,
+body.pink-mode .card[data-status="free"] .price-label{
+  background:#c93d94!important;
+  color:#fff0f8!important;
+}
+
+/* Varian LIGHT MODE untuk pita FREE */
+body.light-mode .card[data-status="free"] .platform-label,
+body.light-mode .card[data-status="free"] .price-label{
+  background:#5c5c66!important;
+  color:#f4f4f5!important;
+}
+
 /* IMAGE */
 .product-image{
   width:100%;height:108px;border-radius:12px;
@@ -1207,6 +1244,23 @@ button.profile-menu-item2:hover .profile-menu-icon2{background:rgba(255,255,255,
 .modal-badge.android{background:rgba(255,255,255,.18);color:#ffffff;border:1px solid rgba(255,255,255,.25);}
 .modal-badge.ios{background:rgba(255,255,255,.18);color:#ffffff;border:1px solid rgba(255,255,255,.25);}
 .modal-badge.pc{background:rgba(255,255,255,.18);color:#ffffff;border:1px solid rgba(255,255,255,.25);}
+.modal-badge.status-close{background:rgba(239,68,68,.18);color:#ff8a8a;border:1px solid rgba(239,68,68,.35);}
+.modal-badge.status-update{background:rgba(230,230,238,.18);color:#e4e4ec;border:1px solid rgba(230,230,238,.3);}
+.modal-badge.status-free{
+  background:rgba(30,95,217,.16);
+  color:#a9c8ff;
+  border:1px solid rgba(30,95,217,.4);
+}
+body.pink-mode .modal-badge.status-free{
+  background:rgba(255,111,201,.16);
+  color:#ffbfe6;
+  border:1px solid rgba(255,111,201,.4);
+}
+body.light-mode .modal-badge.status-free{
+  background:rgba(154,154,164,.16);
+  color:#d4d4d8;
+  border:1px solid rgba(154,154,164,.4);
+}
 .modal-product-desc{
   font-size:11.5px;color:var(--text2);line-height:1.6;
 }
@@ -1229,6 +1283,70 @@ button.profile-menu-item2:hover .profile-menu-icon2{background:rgba(255,255,255,
   z-index:5;
 }
 .modal-close:hover{background:rgba(255,80,80,.1);border-color:rgba(255,80,80,.3);color:#ff7070;}
+
+.modal-settings{
+  width:32px;height:32px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.07);
+  background:rgba(255,255,255,.03);
+  color:var(--text2);font-size:13px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background var(--t-fast),color var(--t-fast),border-color var(--t-fast);
+  flex-shrink:0;
+  -webkit-tap-highlight-color:transparent;
+  outline:none;
+  -webkit-appearance:none;
+  appearance:none;
+  position:absolute;
+  top:16px;right:56px;
+  z-index:5;
+}
+.modal-settings:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.3);color:#ffffff;}
+.modal-settings svg{stroke:currentColor;}
+.modal-settings.active{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.35);color:#ffffff;}
+
+.modal-settings-panel{
+  position:absolute;
+  top:54px;right:16px;
+  z-index:6;
+  min-width:200px;
+  background:var(--card2);
+  border:1px solid var(--border-strong);
+  border-radius:var(--radius-sm);
+  box-shadow:0 16px 38px rgba(0,0,0,.5);
+  padding:10px;
+  opacity:0;
+  transform:translateY(-6px) scale(.97);
+  pointer-events:none;
+  transition:opacity var(--t-fast) var(--ease),transform var(--t-fast) var(--ease);
+}
+.modal-settings-panel.open{
+  opacity:1;
+  transform:translateY(0) scale(1);
+  pointer-events:auto;
+}
+.modal-settings-row{
+  display:flex;align-items:flex-start;gap:9px;
+  cursor:pointer;
+  padding:4px;
+  border-radius:8px;
+  transition:background var(--t-fast);
+}
+.modal-settings-row:hover{background:rgba(255,255,255,.05);}
+.modal-settings-row input[type="checkbox"]{
+  margin-top:2px;
+  width:16px;height:16px;flex-shrink:0;
+  accent-color:#1e5fd9;
+  cursor:pointer;
+}
+body.pink-mode .modal-settings-row input[type="checkbox"]{accent-color:#ff6fc9;}
+body.light-mode .modal-settings-row input[type="checkbox"]{accent-color:#9a9aa4;}
+.modal-settings-row-text{display:flex;flex-direction:column;gap:1px;}
+.modal-settings-row-title{
+  font-size:11.5px;font-weight:800;letter-spacing:.4px;color:var(--text);
+}
+.modal-settings-row-sub{
+  font-size:9.5px;color:var(--text2);line-height:1.4;
+}
 
 /* ── MODAL SCROLL BODY ── */
 .modal-scroll{
@@ -5178,6 +5296,18 @@ body.auth-locked{overflow:hidden;}
         <div class="modal-product-desc" id="modalProductDesc">Deskripsi produk akan muncul di sini.</div>
       </div>
     </div>
+    <button class="modal-settings" aria-label="Pengaturan" onclick="toggleModalSettingsPanel(event)">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cog"><path d="M11 10.27 7 3.34"/><path d="m11 13.73-4 6.93"/><path d="M12 22v-2"/><path d="M12 2v2"/><path d="M14 12h8"/><path d="m17 20.66-1-1.73"/><path d="m17 3.34-1 1.73"/><path d="M2 12h2"/><path d="m20.66 17-1.73-1"/><path d="m20.66 7-1.73 1"/><path d="m3.34 17 1.73-1"/><path d="m3.34 7 1.73 1"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="12" r="8"/></svg>
+    </button>
+    <div class="modal-settings-panel" id="modalSettingsPanel">
+      <label class="modal-settings-row">
+        <input type="checkbox" id="modalFreeToggle" onchange="onModalFreeToggleChange(this)">
+        <span class="modal-settings-row-text">
+          <span class="modal-settings-row-title">FREE</span>
+          <span class="modal-settings-row-sub">Produk bisa didownload tanpa VIP</span>
+        </span>
+      </label>
+    </div>
     <button class="modal-close" onclick="closeModal()" aria-label="Tutup">
       <span class="js-icon" data-icon-key="modalClose">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -5596,9 +5726,35 @@ function showToast(msg, type=''){
 
 /* ── MODAL STATE ── */
 let _currentProduct = '';
+let _currentProductPid = null;
 let _selectedPackage = null;
 let _isClosed = false;
 let _specialMode = null;
+
+/* ── OWNER GATE ──
+   Fitur "setting label FREE" (icon gear di modal produk) hanya boleh
+   dipakai oleh akun owner. Cek berdasarkan email akun Google yang sedang
+   login lewat Firebase Auth. Email dibandingkan dalam huruf kecil supaya
+   tidak sensitif kapitalisasi. */
+const OWNER_EMAIL = 'tarz2642008@gmail.com';
+function isOwnerAccount(){
+  try{
+    const client = (typeof getAuthClient === 'function') ? getAuthClient() : (window.fbAuth || null);
+    const user = (client && client.currentUser) || _googleUser || null;
+    const email = user && user.email ? String(user.email).trim().toLowerCase() : '';
+    return !!email && email === OWNER_EMAIL.toLowerCase();
+  }catch(e){ return false; }
+}
+/* Tampilkan/sembunyikan tombol gear "Pengaturan" (setting label FREE) di
+   modal produk sesuai status owner. Dipanggil setiap modal produk dibuka
+   dan setiap status login berubah, supaya selalu sinkron. */
+function refreshModalSettingsVisibility(){
+  const btn = document.querySelector('.modal-settings');
+  if(!btn) return;
+  const allowed = isOwnerAccount();
+  btn.style.display = allowed ? '' : 'none';
+  if(!allowed) closeModalSettingsPanel();
+}
 
 /* ── ICON MAP (statis, bukan dari JSON eksternal) ──
    Semua SVG icon yang sebelumnya diambil dari config.json sekarang langsung
@@ -5626,7 +5782,7 @@ let _appConfig = {
   downloads:{}, copyKeys:{}, getKeyLinks:{}, freefireLinks:{},
   userFields:{}, keyLabels:{}, userLabels:{},
   getKeyTutorialLinks:{}, getKeyTutorialLabels:{},
-  freefireLabels:{}
+  freefireLabels:{}, freeProducts:{}
 };
 let _configLoadFailed = false;
 
@@ -5716,12 +5872,22 @@ function getProductStatus(productName){
   return _appConfig.productStatus[productName] || null;
 }
 
+/* ── FREE TOGGLE ──
+   Diatur lewat centang "FREE" di admin (field Firestore `is_free` pada produk).
+   Kalau dicentang: produk dapat pita hijau "FREE" & bisa didownload TANPA join VIP.
+   Kalau centang dihilangkan: produk kembali normal, wajib VIP lagi seperti biasa. */
+function isProductFree(productName){
+  if(!_appConfig || !_appConfig.freeProducts) return false;
+  return !!_appConfig.freeProducts[productName];
+}
+
 function renderProductStatuses(){
-  document.querySelectorAll('#cheat .card').forEach(card=>{
+  document.querySelectorAll('.card').forEach(card=>{
     const h4 = card.querySelector('h3, h4');
     if(!h4) return;
     const productName = h4.textContent.trim();
-    const status = getProductStatus(productName);
+    const isFree = isProductFree(productName);
+    const status = isFree ? 'free' : getProductStatus(productName);
 
     if(!status || status === 'open'){
       card.removeAttribute('data-status');
@@ -5740,7 +5906,7 @@ function renderProductStatuses(){
       imgWrap.insertBefore(label, imgWrap.firstChild);
     }
     label.className = 'platform-label ' + (card.dataset.platform || '');
-    label.textContent = status === 'close' ? 'CLOSE' : 'UPDATE';
+    label.textContent = status === 'close' ? 'CLOSE' : (status === 'free' ? 'FREE' : 'UPDATE');
   });
 }
 
@@ -6031,9 +6197,17 @@ function openModal(btn){
   try { packages = JSON.parse(d.packages || '[]'); } catch(e){ packages=[]; }
 
   _currentProduct = productName;
+  _currentProductPid = d.pid || null;
   _selectedPackage = packages[0] || null;
   _isClosed = d.status === 'close';
   _specialMode = d.special || null;
+
+  /* Sinkronkan checkbox FREE di panel settings dengan status produk saat ini,
+     dan tutup panel settings (kalau masih kebuka dari produk sebelumnya). */
+  closeModalSettingsPanel();
+  refreshModalSettingsVisibility();
+  const freeToggle = document.getElementById('modalFreeToggle');
+  if(freeToggle) freeToggle.checked = isProductFree(productName);
 
   const iconEl = document.getElementById('modalIcon');
   document.getElementById('modalHeader').style.display = '';
@@ -6055,7 +6229,7 @@ function openModal(btn){
     b.textContent = platformLabel[d.platform];
     badgeWrap.appendChild(b);
   }
-  if(d.status && d.status !== 'open'){
+  if(d.status && d.status !== 'open' && d.status !== 'free'){
     const s = document.createElement('span');
     s.className = 'modal-badge status-' + d.status;
     s.textContent = d.status === 'close' ? 'CLOSE' : 'UPDATE';
@@ -6597,6 +6771,73 @@ function closeModal(){
   overlay.setAttribute('inert','');
   document.body.style.overflow = '';
   document.body.classList.remove('tabbar-hide');
+  closeModalSettingsPanel();
+}
+
+/* ── PANEL SETTINGS (icon gear di modal produk) ──
+   Berisi toggle FREE. Buka/tutup dropdown kecil di bawah icon gear. */
+function toggleModalSettingsPanel(e){
+  if(e) e.stopPropagation();
+  if(!isOwnerAccount()) return; // hanya owner yang boleh buka panel setting label FREE
+  const panel = document.getElementById('modalSettingsPanel');
+  const btn = document.querySelector('.modal-settings');
+  if(!panel) return;
+  const isOpen = panel.classList.toggle('open');
+  if(btn) btn.classList.toggle('active', isOpen);
+}
+
+function closeModalSettingsPanel(){
+  const panel = document.getElementById('modalSettingsPanel');
+  const btn = document.querySelector('.modal-settings');
+  if(panel) panel.classList.remove('open');
+  if(btn) btn.classList.remove('active');
+}
+
+/* Tutup panel settings kalau user klik di luar area panel/tombol gear */
+document.addEventListener('click', function(e){
+  const panel = document.getElementById('modalSettingsPanel');
+  const btn = document.querySelector('.modal-settings');
+  if(!panel || !panel.classList.contains('open')) return;
+  if(panel.contains(e.target) || (btn && btn.contains(e.target))) return;
+  closeModalSettingsPanel();
+});
+
+/* Centang/hilangkan centang FREE untuk produk yang sedang dibuka di modal.
+   Update langsung ke Firestore (field is_free) supaya nyantol permanen +
+   ribbon FREE / gate VIP langsung ikut berubah di seluruh device (bukan cuma lokal). */
+async function onModalFreeToggleChange(checkbox){
+  if(!isOwnerAccount()){
+    showToast('Hanya owner yang bisa mengatur label FREE.','error');
+    checkbox.checked = !checkbox.checked;
+    return;
+  }
+  const productName = _currentProduct;
+  const pid = _currentProductPid;
+  const checked = !!checkbox.checked;
+
+  if(!pid){
+    showToast('Produk ini belum bisa diatur FREE (tidak ada ID produk).','error');
+    checkbox.checked = !checked;
+    return;
+  }
+
+  /* Update tampilan dulu (optimistic) supaya kerasa instan */
+  if(!_appConfig.freeProducts) _appConfig.freeProducts = {};
+  _appConfig.freeProducts[productName] = checked;
+  if(typeof renderProductStatuses === 'function') renderProductStatuses();
+
+  try{
+    if(!window.fbDb) throw new Error('Firestore belum siap');
+    await window.fbDb.collection('products').doc(pid).set({ is_free: checked }, { merge:true });
+    showToast(checked ? 'Produk ditandai FREE' : 'Produk kembali wajib VIP', 'success');
+  }catch(err){
+    console.error('Gagal update status FREE:', err && err.message);
+    /* Rollback kalau gagal simpan ke server */
+    _appConfig.freeProducts[productName] = !checked;
+    checkbox.checked = !checked;
+    if(typeof renderProductStatuses === 'function') renderProductStatuses();
+    showToast('Gagal menyimpan status FREE.', 'error');
+  }
 }
 
 function handleOverlayClick(e){
@@ -6693,6 +6934,10 @@ function bindAuthStateListener(client){
       try{ sessionStorage.removeItem('tarz_gate_session_active'); }catch(e){}
       showAuthGateForm();
     }
+    /* Sinkronkan visibilitas tombol setting label FREE tiap kali status
+       login berubah (login/logout/ganti akun), supaya non-owner yang lagi
+       buka modal produk langsung kehilangan akses tombol ini juga. */
+    if(typeof refreshModalSettingsVisibility === 'function') refreshModalSettingsVisibility();
   });
 }
 
@@ -7430,7 +7675,11 @@ function openKeyModal(productName, downloadLink, sourceTab){
   _keySourceTab = sourceTab || null;
   _qrisContext = 'product';
 
-  if(isVipUnlocked()){
+  /* Produk yang dicentang FREE oleh admin bisa langsung didownload
+     tanpa perlu jadi member VIP sama sekali. Kalau centang FREE
+     dihilangkan nanti, produk otomatis kembali wajib VIP seperti biasa
+     (karena isProductFree() akan kembali false). */
+  if(isProductFree(productName) || isVipUnlocked()){
     closeModal();
     if(downloadLink && !downloadLink.endsWith('#')){
       window.open(downloadLink,'_blank','noopener,noreferrer');
@@ -10608,6 +10857,7 @@ window.addEventListener('npFirebaseReady', fbInitOnce, {once:true});
     if(!_appConfig.getKeyTutorialLinks) _appConfig.getKeyTutorialLinks = {};
     if(!_appConfig.getKeyTutorialLabels) _appConfig.getKeyTutorialLabels = {};
     if(!_appConfig.freefireLabels) _appConfig.freefireLabels = {};
+    if(!_appConfig.freeProducts) _appConfig.freeProducts = {};
     /* Jangan paksa _configLoadFailed = false di sini: kalau config.json memang gagal
        dimuat, produk LAMA (yang link-nya cuma ada di config.json) tetap harus
        menampilkan error, bukan diam-diam dianggap berhasil. Produk Firestore sendiri
@@ -10627,6 +10877,11 @@ window.addEventListener('npFirebaseReady', fbInitOnce, {once:true});
       if(p.get_key_tutorial_link) _appConfig.getKeyTutorialLinks[name] = p.get_key_tutorial_link;
       if(p.get_key_tutorial_label) _appConfig.getKeyTutorialLabels[name] = p.get_key_tutorial_label;
       if(p.freefire_label) _appConfig.freefireLabels[name] = p.freefire_label;
+      /* Centang "FREE" di admin (field is_free) -> produk bisa didownload
+         tanpa VIP + dapat pita hijau FREE. Ditulis eksplisit true/false
+         (bukan cuma "if truthy") supaya saat centang DIHILANGKAN di admin,
+         status FREE juga langsung hilang dari sini (bukan nyangkut true selamanya). */
+      _appConfig.freeProducts[name] = !!p.is_free;
     });
 
     let cheatHtml = '';
@@ -10665,6 +10920,7 @@ window.addEventListener('npFirebaseReady', fbInitOnce, {once:true});
       const cardHtml = `
       <div class="card"
         data-special="${specialMode}"
+        data-pid="${npAttr(p.id || '')}"
         data-img="${npAttr(imgUrl)}" data-label="${npAttr(name)}"
         data-icon="" data-platform="${npAttr(platform)}"
         data-fitur='${fiturAttr}'
