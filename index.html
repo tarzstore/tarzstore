@@ -1039,14 +1039,14 @@ button.profile-menu-item2:hover .profile-menu-icon2{background:rgba(255,255,255,
 }
 
 /* ── UPDATE STATUS — pita biru dongker elegan (default/Biru), sama gaya seperti FREE ──
-   Polos tanpa efek/animasi tambahan, ukuran sedikit lebih kecil dari pita lain.
+   Polos tanpa efek/animasi tambahan, ukuran sedikit lebih kecil dari pita lain, sedikit transparan.
    Ikut berubah warna sesuai tema aktif: default (Biru) = biru dongker,
    Pink Mode = pink, Light Mode = abu-abu netral. Sama seperti tool-card/buy-btn. */
 .card[data-status="update"] .platform-label,
 .card[data-status="update"] .price-label{
   width:96px;
   font-size:8px;
-  background:#123a7a!important;
+  background:rgba(18,58,122,.7)!important;
   color:#eaf1ff!important;
   font-weight:800!important;
   text-shadow:none!important;
@@ -1061,26 +1061,26 @@ button.profile-menu-item2:hover .profile-menu-icon2{background:rgba(255,255,255,
 /* Varian PINK MODE untuk pita UPDATE */
 body.pink-mode .card[data-status="update"] .platform-label,
 body.pink-mode .card[data-status="update"] .price-label{
-  background:#c93d94!important;
+  background:rgba(201,61,148,.7)!important;
   color:#fff0f8!important;
 }
 
 /* Varian LIGHT MODE untuk pita UPDATE */
 body.light-mode .card[data-status="update"] .platform-label,
 body.light-mode .card[data-status="update"] .price-label{
-  background:#5c5c66!important;
+  background:rgba(92,92,102,.7)!important;
   color:#f4f4f5!important;
 }
 
 /* ── FREE STATUS — pita biru dongker elegan (default/Biru), produk bisa didownload TANPA VIP ──
-   Polos tanpa efek/animasi tambahan, ukuran sedikit lebih kecil dari pita lain.
+   Polos tanpa efek/animasi tambahan, ukuran sedikit lebih kecil dari pita lain, sedikit transparan.
    Ikut berubah warna sesuai tema aktif: default (Biru) = biru dongker,
    Pink Mode = pink, Light Mode = abu-abu netral. Sama seperti tool-card/buy-btn. */
 .card[data-status="free"] .platform-label,
 .card[data-status="free"] .price-label{
   width:96px;
   font-size:8px;
-  background:#123a7a!important;
+  background:rgba(18,58,122,.7)!important;
   color:#eaf1ff!important;
   font-weight:800!important;
   text-shadow:none!important;
@@ -1098,34 +1098,48 @@ body.light-mode .card[data-status="update"] .price-label{
 /* Varian PINK MODE untuk pita FREE */
 body.pink-mode .card[data-status="free"] .platform-label,
 body.pink-mode .card[data-status="free"] .price-label{
-  background:#c93d94!important;
+  background:rgba(201,61,148,.7)!important;
   color:#fff0f8!important;
 }
 
 /* Varian LIGHT MODE untuk pita FREE */
 body.light-mode .card[data-status="free"] .platform-label,
 body.light-mode .card[data-status="free"] .price-label{
-  background:#5c5c66!important;
+  background:rgba(92,92,102,.7)!important;
   color:#f4f4f5!important;
 }
 
-/* ── NEW STATUS — pita hijau tosca, tombol install tetap aktif ── */
-.card[data-status="new"] .platform-label{
-  background:linear-gradient(90deg,#0a7a5c,#00c896,#0a7a5c)!important;
-  background-size:200% 100%!important;
-  color:#fff!important;
+/* ── NEW STATUS — sama gaya & warna seperti FREE/UPDATE (biru dongker, polos, sedikit transparan) ──
+   Ikut berubah warna sesuai tema aktif: default (Biru) = biru dongker,
+   Pink Mode = pink, Light Mode = abu-abu netral. Sama seperti tool-card/buy-btn. */
+.card[data-status="new"] .platform-label,
+.card[data-status="new"] .price-label{
+  width:96px;
+  font-size:8px;
+  background:rgba(18,58,122,.7)!important;
+  color:#eaf1ff!important;
+  font-weight:800!important;
+  text-shadow:none!important;
+  box-shadow:none!important;
+  animation:none!important;
+}
+.card[data-status="new"] .platform-label::after,
+.card[data-status="new"] .price-label::after{
+  display:none!important;
 }
 
 /* Varian PINK MODE untuk pita NEW */
-body.pink-mode .card[data-status="new"] .platform-label{
-  background:linear-gradient(90deg,#8a2a63,#ff6fc9,#8a2a63)!important;
-  background-size:200% 100%!important;
+body.pink-mode .card[data-status="new"] .platform-label,
+body.pink-mode .card[data-status="new"] .price-label{
+  background:rgba(201,61,148,.7)!important;
+  color:#fff0f8!important;
 }
 
 /* Varian LIGHT MODE untuk pita NEW */
-body.light-mode .card[data-status="new"] .platform-label{
-  background:linear-gradient(90deg,#43434b,#9a9aa4,#43434b)!important;
-  background-size:200% 100%!important;
+body.light-mode .card[data-status="new"] .platform-label,
+body.light-mode .card[data-status="new"] .price-label{
+  background:rgba(92,92,102,.7)!important;
+  color:#f4f4f5!important;
 }
 
 
