@@ -1038,11 +1038,24 @@ button.profile-menu-item2:hover .profile-menu-icon2{background:rgba(255,255,255,
   transform:none!important;
 }
 
-/* ── UPDATE STATUS — pita biru transparan, tombol install TETAP AKTIF ── */
+/* ── UPDATE STATUS — pita biru transparan, tombol install NONAKTIF (produk sedang di-update) ── */
 .card[data-status="update"] .platform-label{
   background:linear-gradient(90deg,rgba(230,230,238,.55),rgba(200,200,210,.55),rgba(230,230,238,.55))!important;
   background-size:200% 100%!important;
   color:#fff!important;
+}
+.card[data-status="update"] .buy-btn{
+  background:rgba(60,60,80,.5)!important;
+  color:rgba(255,255,255,.28)!important;
+  cursor:not-allowed!important;
+  border-color:rgba(255,255,255,.06)!important;
+  box-shadow:none!important;
+  pointer-events:none!important;
+  transform:none!important;
+}
+.card[data-status="update"] .buy-btn:hover{
+  background:rgba(60,60,80,.5)!important;
+  transform:none!important;
 }
 
 /* ── FREE STATUS — pita biru dongker elegan (default/Biru), produk bisa didownload TANPA VIP ──
@@ -1080,6 +1093,25 @@ body.light-mode .card[data-status="free"] .platform-label,
 body.light-mode .card[data-status="free"] .price-label{
   background:#5c5c66!important;
   color:#f4f4f5!important;
+}
+
+/* ── NEW STATUS — pita hijau, produk baru, tombol install TETAP AKTIF ── */
+.card[data-status="new"] .platform-label{
+  background:linear-gradient(90deg,rgba(6,150,90,.85),rgba(16,185,110,.85),rgba(6,150,90,.85))!important;
+  background-size:200% 100%!important;
+  color:#fff!important;
+}
+
+/* Varian PINK MODE untuk pita NEW */
+body.pink-mode .card[data-status="new"] .platform-label{
+  background:linear-gradient(90deg,rgba(255,79,184,.85),rgba(255,143,212,.85),rgba(255,79,184,.85))!important;
+  background-size:200% 100%!important;
+}
+
+/* Varian LIGHT MODE untuk pita NEW */
+body.light-mode .card[data-status="new"] .platform-label{
+  background:linear-gradient(90deg,rgba(90,90,98,.85),rgba(130,130,140,.85),rgba(90,90,98,.85))!important;
+  background-size:200% 100%!important;
 }
 
 /* IMAGE */
@@ -1246,6 +1278,7 @@ body.light-mode .card[data-status="free"] .price-label{
 .modal-badge.pc{background:rgba(255,255,255,.18);color:#ffffff;border:1px solid rgba(255,255,255,.25);}
 .modal-badge.status-close{background:rgba(239,68,68,.18);color:#ff8a8a;border:1px solid rgba(239,68,68,.35);}
 .modal-badge.status-update{background:rgba(230,230,238,.18);color:#e4e4ec;border:1px solid rgba(230,230,238,.3);}
+.modal-badge.status-new{background:rgba(16,185,110,.18);color:#4ee0a3;border:1px solid rgba(16,185,110,.35);}
 .modal-badge.status-free{
   background:rgba(30,95,217,.16);
   color:#a9c8ff;
@@ -3959,7 +3992,7 @@ body.auth-locked{overflow:hidden;}
 }
 </style>
 </head>
-<body><a href="#main-content" class="skip-link">Lewati ke konten utama</a>
+<body class="auth-locked"><a href="#main-content" class="skip-link">Lewati ke konten utama</a>
 <div id="toast" class="toast" role="status" aria-live="polite">
   <span class="toast-icon" id="toastIcon"></span>
   <span class="toast-msg" id="toastMsg"></span>
@@ -5899,12 +5932,21 @@ function getProductFreefireLabel(productName){
   return 'APK FREE FIRE';
 }
 
-/* ── LABEL PRODUK (OPEN / CLOSE / UPDATE) ──
-   Diatur lewat config.json → "productStatus": { "NAMA PRODUK": "close" | "update" | "open" }.
+/* ── LABEL PRODUK (OPEN / CLOSE / UPDATE / NEW) ──
+   Dua sumber, dicek berurutan:
+   1) Firestore, lewat dropdown "Status" di admin (field product_status pada
+      produk) -- ini untuk produk yang dikelola dari panel admin, sama seperti
+      toggle FREE.
+   2) Fallback: config.json → "productStatus": { "NAMA PRODUK": "close" | "update" | "new" | "open" }
+      -- ini untuk produk LAMA yang belum dipindah ke Firestore.
    - close  : label CLOSE, tombol install/buy dinonaktifkan.
-   - update : label UPDATE, tombol tetap aktif (produk masih bisa diinstall).
-   - open   : tanpa label (default jika tidak diset di config.json). */
+   - update : label UPDATE, tombol install/buy dinonaktifkan (produk sedang di-update).
+   - new    : label NEW, tombol tetap aktif (produk baru rilis, masih bisa diinstall).
+   - open   : tanpa label. */
 function getProductStatus(productName){
+  if(_appConfig && _appConfig.firestoreProductStatus && _appConfig.firestoreProductStatus[productName]){
+    return _appConfig.firestoreProductStatus[productName];
+  }
   if(_configLoadFailed || !_appConfig || !_appConfig.productStatus) return null;
   return _appConfig.productStatus[productName] || null;
 }
@@ -5943,7 +5985,7 @@ function renderProductStatuses(){
       imgWrap.insertBefore(label, imgWrap.firstChild);
     }
     label.className = 'platform-label ' + (card.dataset.platform || '');
-    label.textContent = status === 'close' ? 'CLOSE' : (status === 'free' ? 'FREE' : 'UPDATE');
+    label.textContent = status === 'close' ? 'CLOSE' : (status === 'free' ? 'FREE' : (status === 'new' ? 'NEW' : 'UPDATE'));
   });
 }
 
@@ -6269,7 +6311,7 @@ function openModal(btn){
   if(d.status && d.status !== 'open' && d.status !== 'free'){
     const s = document.createElement('span');
     s.className = 'modal-badge status-' + d.status;
-    s.textContent = d.status === 'close' ? 'CLOSE' : 'UPDATE';
+    s.textContent = d.status === 'close' ? 'CLOSE' : (d.status === 'new' ? 'NEW' : 'UPDATE');
     badgeWrap.appendChild(s);
   }
 
@@ -11081,6 +11123,7 @@ window.addEventListener('npFirebaseReady', fbInitOnce, {once:true});
     if(!_appConfig.getKeyTutorialLabels) _appConfig.getKeyTutorialLabels = {};
     if(!_appConfig.freefireLabels) _appConfig.freefireLabels = {};
     if(!_appConfig.freeProducts) _appConfig.freeProducts = {};
+    if(!_appConfig.firestoreProductStatus) _appConfig.firestoreProductStatus = {};
     /* Jangan paksa _configLoadFailed = false di sini: kalau config.json memang gagal
        dimuat, produk LAMA (yang link-nya cuma ada di config.json) tetap harus
        menampilkan error, bukan diam-diam dianggap berhasil. Produk Firestore sendiri
@@ -11105,6 +11148,11 @@ window.addEventListener('npFirebaseReady', fbInitOnce, {once:true});
          (bukan cuma "if truthy") supaya saat centang DIHILANGKAN di admin,
          status FREE juga langsung hilang dari sini (bukan nyangkut true selamanya). */
       _appConfig.freeProducts[name] = !!p.is_free;
+      /* Pilihan status (open/new/update/close) diatur lewat dropdown di admin
+         (field Firestore `product_status`). Ditulis eksplisit setiap render
+         (termasuk saat kosong/'open') supaya saat diubah/dihapus di admin,
+         status di sini ikut sinkron -- bukan nyangkut ke nilai lama. */
+      _appConfig.firestoreProductStatus[name] = p.product_status || '';
     });
 
     let cheatHtml = '';
