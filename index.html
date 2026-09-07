@@ -1038,24 +1038,11 @@ button.profile-menu-item2:hover .profile-menu-icon2{background:rgba(255,255,255,
   transform:none!important;
 }
 
-/* ── UPDATE STATUS — pita biru transparan, tombol install NONAKTIF (produk sedang di-update) ── */
+/* ── UPDATE STATUS — pita biru transparan, tombol install TETAP AKTIF ── */
 .card[data-status="update"] .platform-label{
   background:linear-gradient(90deg,rgba(230,230,238,.55),rgba(200,200,210,.55),rgba(230,230,238,.55))!important;
   background-size:200% 100%!important;
   color:#fff!important;
-}
-.card[data-status="update"] .buy-btn{
-  background:rgba(60,60,80,.5)!important;
-  color:rgba(255,255,255,.28)!important;
-  cursor:not-allowed!important;
-  border-color:rgba(255,255,255,.06)!important;
-  box-shadow:none!important;
-  pointer-events:none!important;
-  transform:none!important;
-}
-.card[data-status="update"] .buy-btn:hover{
-  background:rgba(60,60,80,.5)!important;
-  transform:none!important;
 }
 
 /* ── FREE STATUS — pita biru dongker elegan (default/Biru), produk bisa didownload TANPA VIP ──
@@ -1093,25 +1080,6 @@ body.light-mode .card[data-status="free"] .platform-label,
 body.light-mode .card[data-status="free"] .price-label{
   background:#5c5c66!important;
   color:#f4f4f5!important;
-}
-
-/* ── NEW STATUS — pita hijau, produk baru, tombol install TETAP AKTIF ── */
-.card[data-status="new"] .platform-label{
-  background:linear-gradient(90deg,rgba(6,150,90,.85),rgba(16,185,110,.85),rgba(6,150,90,.85))!important;
-  background-size:200% 100%!important;
-  color:#fff!important;
-}
-
-/* Varian PINK MODE untuk pita NEW */
-body.pink-mode .card[data-status="new"] .platform-label{
-  background:linear-gradient(90deg,rgba(255,79,184,.85),rgba(255,143,212,.85),rgba(255,79,184,.85))!important;
-  background-size:200% 100%!important;
-}
-
-/* Varian LIGHT MODE untuk pita NEW */
-body.light-mode .card[data-status="new"] .platform-label{
-  background:linear-gradient(90deg,rgba(90,90,98,.85),rgba(130,130,140,.85),rgba(90,90,98,.85))!important;
-  background-size:200% 100%!important;
 }
 
 /* IMAGE */
@@ -1278,7 +1246,6 @@ body.light-mode .card[data-status="new"] .platform-label{
 .modal-badge.pc{background:rgba(255,255,255,.18);color:#ffffff;border:1px solid rgba(255,255,255,.25);}
 .modal-badge.status-close{background:rgba(239,68,68,.18);color:#ff8a8a;border:1px solid rgba(239,68,68,.35);}
 .modal-badge.status-update{background:rgba(230,230,238,.18);color:#e4e4ec;border:1px solid rgba(230,230,238,.3);}
-.modal-badge.status-new{background:rgba(16,185,110,.18);color:#4ee0a3;border:1px solid rgba(16,185,110,.35);}
 .modal-badge.status-free{
   background:rgba(30,95,217,.16);
   color:#a9c8ff;
@@ -1380,21 +1347,6 @@ body.light-mode .modal-settings-row input[type="checkbox"]{accent-color:#9a9aa4;
 .modal-settings-row-sub{
   font-size:9.5px;color:var(--text2);line-height:1.4;
 }
-.modal-settings-row-select{
-  justify-content:space-between;align-items:center;cursor:default;
-}
-.modal-settings-row-select #modalStatusSelect{
-  flex-shrink:0;
-  background:var(--card2);
-  color:var(--text);
-  border:1px solid var(--border-strong);
-  border-radius:8px;
-  font-size:10.5px;font-weight:700;
-  padding:5px 7px;
-  cursor:pointer;
-  font-family:inherit;
-}
-.modal-settings-row-select #modalStatusSelect:focus{outline:none;border-color:var(--blue2);}
 
 /* ── MODAL SCROLL BODY ── */
 .modal-scroll{
@@ -4007,7 +3959,7 @@ body.auth-locked{overflow:hidden;}
 }
 </style>
 </head>
-<body class="auth-locked"><a href="#main-content" class="skip-link">Lewati ke konten utama</a>
+<body><a href="#main-content" class="skip-link">Lewati ke konten utama</a>
 <div id="toast" class="toast" role="status" aria-live="polite">
   <span class="toast-icon" id="toastIcon"></span>
   <span class="toast-msg" id="toastMsg"></span>
@@ -5391,18 +5343,6 @@ body.auth-locked{overflow:hidden;}
           <span class="modal-settings-row-sub">Produk bisa didownload tanpa VIP</span>
         </span>
       </label>
-      <label class="modal-settings-row modal-settings-row-select">
-        <span class="modal-settings-row-text">
-          <span class="modal-settings-row-title">Status</span>
-          <span class="modal-settings-row-sub">Label OPEN / NEW / UPDATE / CLOSE</span>
-        </span>
-        <select id="modalStatusSelect" onchange="onModalStatusSelectChange(this)" onclick="event.stopPropagation()">
-          <option value="">OPEN</option>
-          <option value="new">NEW</option>
-          <option value="update">UPDATE</option>
-          <option value="close">CLOSE</option>
-        </select>
-      </label>
     </div>
     <button class="modal-close" onclick="closeModal()" aria-label="Tutup">
       <span class="js-icon" data-icon-key="modalClose">
@@ -5959,21 +5899,12 @@ function getProductFreefireLabel(productName){
   return 'APK FREE FIRE';
 }
 
-/* ── LABEL PRODUK (OPEN / CLOSE / UPDATE / NEW) ──
-   Dua sumber, dicek berurutan:
-   1) Firestore, lewat dropdown "Status" di admin (field product_status pada
-      produk) -- ini untuk produk yang dikelola dari panel admin, sama seperti
-      toggle FREE.
-   2) Fallback: config.json → "productStatus": { "NAMA PRODUK": "close" | "update" | "new" | "open" }
-      -- ini untuk produk LAMA yang belum dipindah ke Firestore.
+/* ── LABEL PRODUK (OPEN / CLOSE / UPDATE) ──
+   Diatur lewat config.json → "productStatus": { "NAMA PRODUK": "close" | "update" | "open" }.
    - close  : label CLOSE, tombol install/buy dinonaktifkan.
-   - update : label UPDATE, tombol install/buy dinonaktifkan (produk sedang di-update).
-   - new    : label NEW, tombol tetap aktif (produk baru rilis, masih bisa diinstall).
-   - open   : tanpa label. */
+   - update : label UPDATE, tombol tetap aktif (produk masih bisa diinstall).
+   - open   : tanpa label (default jika tidak diset di config.json). */
 function getProductStatus(productName){
-  if(_appConfig && _appConfig.firestoreProductStatus && _appConfig.firestoreProductStatus[productName]){
-    return _appConfig.firestoreProductStatus[productName];
-  }
   if(_configLoadFailed || !_appConfig || !_appConfig.productStatus) return null;
   return _appConfig.productStatus[productName] || null;
 }
@@ -6012,7 +5943,7 @@ function renderProductStatuses(){
       imgWrap.insertBefore(label, imgWrap.firstChild);
     }
     label.className = 'platform-label ' + (card.dataset.platform || '');
-    label.textContent = status === 'close' ? 'CLOSE' : (status === 'free' ? 'FREE' : (status === 'new' ? 'NEW' : 'UPDATE'));
+    label.textContent = status === 'close' ? 'CLOSE' : (status === 'free' ? 'FREE' : 'UPDATE');
   });
 }
 
@@ -6308,18 +6239,12 @@ function openModal(btn){
   _isClosed = d.status === 'close';
   _specialMode = d.special || null;
 
-  /* Sinkronkan checkbox FREE dan dropdown Status di panel settings dengan
-     status produk saat ini, dan tutup panel settings (kalau masih kebuka
-     dari produk sebelumnya). */
+  /* Sinkronkan checkbox FREE di panel settings dengan status produk saat ini,
+     dan tutup panel settings (kalau masih kebuka dari produk sebelumnya). */
   closeModalSettingsPanel();
   refreshModalSettingsVisibility();
   const freeToggle = document.getElementById('modalFreeToggle');
   if(freeToggle) freeToggle.checked = isProductFree(productName);
-  const statusSelect = document.getElementById('modalStatusSelect');
-  if(statusSelect){
-    const raw = (_appConfig && _appConfig.firestoreProductStatus && _appConfig.firestoreProductStatus[productName]) || '';
-    statusSelect.value = (raw === 'new' || raw === 'update' || raw === 'close') ? raw : '';
-  }
 
   const iconEl = document.getElementById('modalIcon');
   document.getElementById('modalHeader').style.display = '';
@@ -6344,7 +6269,7 @@ function openModal(btn){
   if(d.status && d.status !== 'open' && d.status !== 'free'){
     const s = document.createElement('span');
     s.className = 'modal-badge status-' + d.status;
-    s.textContent = d.status === 'close' ? 'CLOSE' : (d.status === 'new' ? 'NEW' : 'UPDATE');
+    s.textContent = d.status === 'close' ? 'CLOSE' : 'UPDATE';
     badgeWrap.appendChild(s);
   }
 
@@ -6949,65 +6874,6 @@ async function onModalFreeToggleChange(checkbox){
     checkbox.checked = !checked;
     if(typeof renderProductStatuses === 'function') renderProductStatuses();
     showToast('Gagal menyimpan status FREE.', 'error');
-  }
-}
-
-/* Ubah dropdown Status (open/new/update/close) untuk produk yang sedang
-   dibuka di modal. Update langsung ke Firestore (field product_status)
-   supaya nyantol permanen + label & tombol install langsung ikut berubah
-   di seluruh device, sama seperti toggle FREE. */
-async function onModalStatusSelectChange(select){
-  if(!isOwnerAccount()){
-    showToast('Hanya owner yang bisa mengatur status produk.','error');
-    return;
-  }
-  const productName = _currentProduct;
-  const pid = _currentProductPid;
-  const newStatus = select.value; // '', 'new', 'update', 'close'
-  const prevStatus = (_appConfig.firestoreProductStatus && _appConfig.firestoreProductStatus[productName]) || '';
-
-  if(!pid){
-    showToast('Produk ini belum bisa diatur status (tidak ada ID produk).','error');
-    select.value = prevStatus;
-    return;
-  }
-
-  /* Update tampilan dulu (optimistic) supaya kerasa instan */
-  if(!_appConfig.firestoreProductStatus) _appConfig.firestoreProductStatus = {};
-  _appConfig.firestoreProductStatus[productName] = newStatus;
-  _isClosed = newStatus === 'close';
-  if(typeof renderProductStatuses === 'function') renderProductStatuses();
-  const cardEl = document.querySelector(`.card[data-pid="${CSS.escape(pid)}"]`);
-  if(cardEl){
-    const dataStatus = cardEl.dataset.status;
-    const cta = document.getElementById('modalCta');
-    if(cta){
-      if(_isClosed){
-        cta.disabled = true;
-        cta.setAttribute('aria-disabled','true');
-        cta.style.cssText = 'opacity:.35;cursor:not-allowed;pointer-events:none;background:rgba(60,60,80,.6);box-shadow:none;';
-        cta.innerHTML = 'Produk Sedang CLOSE';
-      } else {
-        cta.disabled = false;
-        cta.removeAttribute('aria-disabled');
-        cta.style.cssText = '';
-        cta.innerHTML = getIcon('buyBtn','') + ' Beli Sekarang';
-      }
-    }
-  }
-
-  try{
-    if(!window.fbDb) throw new Error('Firestore belum siap');
-    await window.fbDb.collection('products').doc(pid).set({ product_status: newStatus }, { merge:true });
-    showToast(newStatus ? ('Status diubah ke ' + newStatus.toUpperCase()) : 'Status dikembalikan ke OPEN', 'success');
-  }catch(err){
-    console.error('Gagal update status produk:', err && err.message);
-    /* Rollback kalau gagal simpan ke server */
-    _appConfig.firestoreProductStatus[productName] = prevStatus;
-    select.value = prevStatus;
-    _isClosed = prevStatus === 'close';
-    if(typeof renderProductStatuses === 'function') renderProductStatuses();
-    showToast('Gagal menyimpan status produk.', 'error');
   }
 }
 
@@ -11215,7 +11081,6 @@ window.addEventListener('npFirebaseReady', fbInitOnce, {once:true});
     if(!_appConfig.getKeyTutorialLabels) _appConfig.getKeyTutorialLabels = {};
     if(!_appConfig.freefireLabels) _appConfig.freefireLabels = {};
     if(!_appConfig.freeProducts) _appConfig.freeProducts = {};
-    if(!_appConfig.firestoreProductStatus) _appConfig.firestoreProductStatus = {};
     /* Jangan paksa _configLoadFailed = false di sini: kalau config.json memang gagal
        dimuat, produk LAMA (yang link-nya cuma ada di config.json) tetap harus
        menampilkan error, bukan diam-diam dianggap berhasil. Produk Firestore sendiri
@@ -11240,11 +11105,6 @@ window.addEventListener('npFirebaseReady', fbInitOnce, {once:true});
          (bukan cuma "if truthy") supaya saat centang DIHILANGKAN di admin,
          status FREE juga langsung hilang dari sini (bukan nyangkut true selamanya). */
       _appConfig.freeProducts[name] = !!p.is_free;
-      /* Pilihan status (open/new/update/close) diatur lewat dropdown di admin
-         (field Firestore `product_status`). Ditulis eksplisit setiap render
-         (termasuk saat kosong/'open') supaya saat diubah/dihapus di admin,
-         status di sini ikut sinkron -- bukan nyangkut ke nilai lama. */
-      _appConfig.firestoreProductStatus[name] = p.product_status || '';
     });
 
     let cheatHtml = '';
