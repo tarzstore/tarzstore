@@ -1038,11 +1038,38 @@ button.profile-menu-item2:hover .profile-menu-icon2{background:rgba(255,255,255,
   transform:none!important;
 }
 
-/* ── UPDATE STATUS — pita biru transparan, tombol install TETAP AKTIF ── */
-.card[data-status="update"] .platform-label{
-  background:linear-gradient(90deg,rgba(230,230,238,.55),rgba(200,200,210,.55),rgba(230,230,238,.55))!important;
-  background-size:200% 100%!important;
-  color:#fff!important;
+/* ── UPDATE STATUS — pita biru dongker elegan (default/Biru), sama gaya seperti FREE ──
+   Polos tanpa efek/animasi tambahan, ukuran sedikit lebih kecil dari pita lain.
+   Ikut berubah warna sesuai tema aktif: default (Biru) = biru dongker,
+   Pink Mode = pink, Light Mode = abu-abu netral. Sama seperti tool-card/buy-btn. */
+.card[data-status="update"] .platform-label,
+.card[data-status="update"] .price-label{
+  width:96px;
+  font-size:8px;
+  background:#123a7a!important;
+  color:#eaf1ff!important;
+  font-weight:800!important;
+  text-shadow:none!important;
+  box-shadow:none!important;
+  animation:none!important;
+}
+.card[data-status="update"] .platform-label::after,
+.card[data-status="update"] .price-label::after{
+  display:none!important;
+}
+
+/* Varian PINK MODE untuk pita UPDATE */
+body.pink-mode .card[data-status="update"] .platform-label,
+body.pink-mode .card[data-status="update"] .price-label{
+  background:#c93d94!important;
+  color:#fff0f8!important;
+}
+
+/* Varian LIGHT MODE untuk pita UPDATE */
+body.light-mode .card[data-status="update"] .platform-label,
+body.light-mode .card[data-status="update"] .price-label{
+  background:#5c5c66!important;
+  color:#f4f4f5!important;
 }
 
 /* ── FREE STATUS — pita biru dongker elegan (default/Biru), produk bisa didownload TANPA VIP ──
@@ -1264,23 +1291,6 @@ body.light-mode .card[data-status="new"] .platform-label{
 .modal-badge.android{background:rgba(255,255,255,.18);color:#ffffff;border:1px solid rgba(255,255,255,.25);}
 .modal-badge.ios{background:rgba(255,255,255,.18);color:#ffffff;border:1px solid rgba(255,255,255,.25);}
 .modal-badge.pc{background:rgba(255,255,255,.18);color:#ffffff;border:1px solid rgba(255,255,255,.25);}
-.modal-badge.status-close{background:rgba(239,68,68,.18);color:#ff8a8a;border:1px solid rgba(239,68,68,.35);}
-.modal-badge.status-update{background:rgba(230,230,238,.18);color:#e4e4ec;border:1px solid rgba(230,230,238,.3);}
-.modal-badge.status-free{
-  background:rgba(30,95,217,.16);
-  color:#a9c8ff;
-  border:1px solid rgba(30,95,217,.4);
-}
-body.pink-mode .modal-badge.status-free{
-  background:rgba(255,111,201,.16);
-  color:#ffbfe6;
-  border:1px solid rgba(255,111,201,.4);
-}
-body.light-mode .modal-badge.status-free{
-  background:rgba(154,154,164,.16);
-  color:#d4d4d8;
-  border:1px solid rgba(154,154,164,.4);
-}
 .modal-product-desc{
   font-size:11.5px;color:var(--text2);line-height:1.6;
 }
@@ -6303,6 +6313,8 @@ function openModal(btn){
   document.getElementById('modalProductName').textContent = productName;
   document.getElementById('modalProductDesc').textContent = d.desc || '';
 
+  /* Label status (FREE/UPDATE/NEW) sengaja TIDAK ditampilkan di detail produk —
+     label hanya muncul di pita/ribbon pada card produk di grid. */
   const badgeWrap = document.getElementById('modalBadges');
   badgeWrap.innerHTML = '';
   if(d.platform && platformLabel[d.platform]){
@@ -6310,12 +6322,6 @@ function openModal(btn){
     b.className = 'modal-badge ' + platformClass[d.platform];
     b.textContent = platformLabel[d.platform];
     badgeWrap.appendChild(b);
-  }
-  if(d.status && (d.status === 'free' || d.status === 'update' || d.status === 'new')){
-    const s = document.createElement('span');
-    s.className = 'modal-badge status-' + d.status;
-    s.textContent = d.status === 'free' ? 'FREE' : (d.status === 'new' ? 'NEW' : 'UPDATE');
-    badgeWrap.appendChild(s);
   }
 
   const grid = document.getElementById('priceOptions');
