@@ -1380,6 +1380,21 @@ body.light-mode .modal-settings-row input[type="checkbox"]{accent-color:#9a9aa4;
 .modal-settings-row-sub{
   font-size:9.5px;color:var(--text2);line-height:1.4;
 }
+.modal-settings-row-select{
+  justify-content:space-between;align-items:center;cursor:default;
+}
+.modal-settings-row-select #modalStatusSelect{
+  flex-shrink:0;
+  background:var(--card2);
+  color:var(--text);
+  border:1px solid var(--border-strong);
+  border-radius:8px;
+  font-size:10.5px;font-weight:700;
+  padding:5px 7px;
+  cursor:pointer;
+  font-family:inherit;
+}
+.modal-settings-row-select #modalStatusSelect:focus{outline:none;border-color:var(--blue2);}
 
 /* ── MODAL SCROLL BODY ── */
 .modal-scroll{
@@ -5376,6 +5391,18 @@ body.auth-locked{overflow:hidden;}
           <span class="modal-settings-row-sub">Produk bisa didownload tanpa VIP</span>
         </span>
       </label>
+      <label class="modal-settings-row modal-settings-row-select">
+        <span class="modal-settings-row-text">
+          <span class="modal-settings-row-title">Status</span>
+          <span class="modal-settings-row-sub">Label OPEN / NEW / UPDATE / CLOSE</span>
+        </span>
+        <select id="modalStatusSelect" onchange="onModalStatusSelectChange(this)" onclick="event.stopPropagation()">
+          <option value="">OPEN</option>
+          <option value="new">NEW</option>
+          <option value="update">UPDATE</option>
+          <option value="close">CLOSE</option>
+        </select>
+      </label>
     </div>
     <button class="modal-close" onclick="closeModal()" aria-label="Tutup">
       <span class="js-icon" data-icon-key="modalClose">
@@ -6281,12 +6308,18 @@ function openModal(btn){
   _isClosed = d.status === 'close';
   _specialMode = d.special || null;
 
-  /* Sinkronkan checkbox FREE di panel settings dengan status produk saat ini,
-     dan tutup panel settings (kalau masih kebuka dari produk sebelumnya). */
+  /* Sinkronkan checkbox FREE dan dropdown Status di panel settings dengan
+     status produk saat ini, dan tutup panel settings (kalau masih kebuka
+     dari produk sebelumnya). */
   closeModalSettingsPanel();
   refreshModalSettingsVisibility();
   const freeToggle = document.getElementById('modalFreeToggle');
   if(freeToggle) freeToggle.checked = isProductFree(productName);
+  const statusSelect = document.getElementById('modalStatusSelect');
+  if(statusSelect){
+    const raw = (_appConfig && _appConfig.firestoreProductStatus && _appConfig.firestoreProductStatus[productName]) || '';
+    statusSelect.value = (raw === 'new' || raw === 'update' || raw === 'close') ? raw : '';
+  }
 
   const iconEl = document.getElementById('modalIcon');
   document.getElementById('modalHeader').style.display = '';
@@ -6916,6 +6949,65 @@ async function onModalFreeToggleChange(checkbox){
     checkbox.checked = !checked;
     if(typeof renderProductStatuses === 'function') renderProductStatuses();
     showToast('Gagal menyimpan status FREE.', 'error');
+  }
+}
+
+/* Ubah dropdown Status (open/new/update/close) untuk produk yang sedang
+   dibuka di modal. Update langsung ke Firestore (field product_status)
+   supaya nyantol permanen + label & tombol install langsung ikut berubah
+   di seluruh device, sama seperti toggle FREE. */
+async function onModalStatusSelectChange(select){
+  if(!isOwnerAccount()){
+    showToast('Hanya owner yang bisa mengatur status produk.','error');
+    return;
+  }
+  const productName = _currentProduct;
+  const pid = _currentProductPid;
+  const newStatus = select.value; // '', 'new', 'update', 'close'
+  const prevStatus = (_appConfig.firestoreProductStatus && _appConfig.firestoreProductStatus[productName]) || '';
+
+  if(!pid){
+    showToast('Produk ini belum bisa diatur status (tidak ada ID produk).','error');
+    select.value = prevStatus;
+    return;
+  }
+
+  /* Update tampilan dulu (optimistic) supaya kerasa instan */
+  if(!_appConfig.firestoreProductStatus) _appConfig.firestoreProductStatus = {};
+  _appConfig.firestoreProductStatus[productName] = newStatus;
+  _isClosed = newStatus === 'close';
+  if(typeof renderProductStatuses === 'function') renderProductStatuses();
+  const cardEl = document.querySelector(`.card[data-pid="${CSS.escape(pid)}"]`);
+  if(cardEl){
+    const dataStatus = cardEl.dataset.status;
+    const cta = document.getElementById('modalCta');
+    if(cta){
+      if(_isClosed){
+        cta.disabled = true;
+        cta.setAttribute('aria-disabled','true');
+        cta.style.cssText = 'opacity:.35;cursor:not-allowed;pointer-events:none;background:rgba(60,60,80,.6);box-shadow:none;';
+        cta.innerHTML = 'Produk Sedang CLOSE';
+      } else {
+        cta.disabled = false;
+        cta.removeAttribute('aria-disabled');
+        cta.style.cssText = '';
+        cta.innerHTML = getIcon('buyBtn','') + ' Beli Sekarang';
+      }
+    }
+  }
+
+  try{
+    if(!window.fbDb) throw new Error('Firestore belum siap');
+    await window.fbDb.collection('products').doc(pid).set({ product_status: newStatus }, { merge:true });
+    showToast(newStatus ? ('Status diubah ke ' + newStatus.toUpperCase()) : 'Status dikembalikan ke OPEN', 'success');
+  }catch(err){
+    console.error('Gagal update status produk:', err && err.message);
+    /* Rollback kalau gagal simpan ke server */
+    _appConfig.firestoreProductStatus[productName] = prevStatus;
+    select.value = prevStatus;
+    _isClosed = prevStatus === 'close';
+    if(typeof renderProductStatuses === 'function') renderProductStatuses();
+    showToast('Gagal menyimpan status produk.', 'error');
   }
 }
 
