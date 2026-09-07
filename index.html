@@ -1082,6 +1082,26 @@ body.light-mode .card[data-status="free"] .price-label{
   color:#f4f4f5!important;
 }
 
+/* ── NEW STATUS — pita hijau tosca, tombol install tetap aktif ── */
+.card[data-status="new"] .platform-label{
+  background:linear-gradient(90deg,#0a7a5c,#00c896,#0a7a5c)!important;
+  background-size:200% 100%!important;
+  color:#fff!important;
+}
+
+/* Varian PINK MODE untuk pita NEW */
+body.pink-mode .card[data-status="new"] .platform-label{
+  background:linear-gradient(90deg,#8a2a63,#ff6fc9,#8a2a63)!important;
+  background-size:200% 100%!important;
+}
+
+/* Varian LIGHT MODE untuk pita NEW */
+body.light-mode .card[data-status="new"] .platform-label{
+  background:linear-gradient(90deg,#43434b,#9a9aa4,#43434b)!important;
+  background-size:200% 100%!important;
+}
+
+
 /* IMAGE */
 .product-image{
   width:100%;height:108px;border-radius:12px;
@@ -5337,10 +5357,31 @@ body.auth-locked{overflow:hidden;}
     </button>
     <div class="modal-settings-panel" id="modalSettingsPanel">
       <label class="modal-settings-row">
-        <input type="checkbox" id="modalFreeToggle" onchange="onModalFreeToggleChange(this)">
+        <input type="radio" name="modalLabelChoice" id="modalLabelNone" value="none" onchange="onModalLabelChoiceChange(this)">
+        <span class="modal-settings-row-text">
+          <span class="modal-settings-row-title">TANPA LABEL</span>
+          <span class="modal-settings-row-sub">Produk tampil normal tanpa pita</span>
+        </span>
+      </label>
+      <label class="modal-settings-row">
+        <input type="radio" name="modalLabelChoice" id="modalLabelFree" value="free" onchange="onModalLabelChoiceChange(this)">
         <span class="modal-settings-row-text">
           <span class="modal-settings-row-title">FREE</span>
           <span class="modal-settings-row-sub">Produk bisa didownload tanpa VIP</span>
+        </span>
+      </label>
+      <label class="modal-settings-row">
+        <input type="radio" name="modalLabelChoice" id="modalLabelUpdate" value="update" onchange="onModalLabelChoiceChange(this)">
+        <span class="modal-settings-row-text">
+          <span class="modal-settings-row-title">UPDATE</span>
+          <span class="modal-settings-row-sub">Tandai produk baru saja diupdate</span>
+        </span>
+      </label>
+      <label class="modal-settings-row">
+        <input type="radio" name="modalLabelChoice" id="modalLabelNew" value="new" onchange="onModalLabelChoiceChange(this)">
+        <span class="modal-settings-row-text">
+          <span class="modal-settings-row-title">NEW</span>
+          <span class="modal-settings-row-sub">Tandai produk baru rilis</span>
         </span>
       </label>
     </div>
@@ -5819,7 +5860,7 @@ let _appConfig = {
   downloads:{}, copyKeys:{}, getKeyLinks:{}, freefireLinks:{},
   userFields:{}, keyLabels:{}, userLabels:{},
   getKeyTutorialLinks:{}, getKeyTutorialLabels:{},
-  freefireLabels:{}, freeProducts:{}
+  freefireLabels:{}, productLabels:{}
 };
 let _configLoadFailed = false;
 
@@ -5899,23 +5940,22 @@ function getProductFreefireLabel(productName){
   return 'APK FREE FIRE';
 }
 
-/* ── LABEL PRODUK (OPEN / CLOSE / UPDATE) ──
-   Diatur lewat config.json → "productStatus": { "NAMA PRODUK": "close" | "update" | "open" }.
-   - close  : label CLOSE, tombol install/buy dinonaktifkan.
-   - update : label UPDATE, tombol tetap aktif (produk masih bisa diinstall).
-   - open   : tanpa label (default jika tidak diset di config.json). */
-function getProductStatus(productName){
-  if(_configLoadFailed || !_appConfig || !_appConfig.productStatus) return null;
-  return _appConfig.productStatus[productName] || null;
+/* ── LABEL PRODUK (FREE / UPDATE / NEW) ──
+   Diatur owner lewat radio-pilihan di panel settings (icon gear) pada modal
+   produk — hanya SATU label yang bisa aktif per produk (tidak bisa tumpuk).
+   Tersimpan permanen di Firestore: field `label` pada dokumen produk,
+   berisi salah satu dari 'free' | 'update' | 'new' | null (kosong = tanpa label). */
+
+/* Ambil label aktif untuk sebuah produk ('free' | 'update' | 'new' | null) */
+function getProductLabel(productName){
+  if(!_appConfig || !_appConfig.productLabels) return null;
+  return _appConfig.productLabels[productName] || null;
 }
 
-/* ── FREE TOGGLE ──
-   Diatur lewat centang "FREE" di admin (field Firestore `is_free` pada produk).
-   Kalau dicentang: produk dapat pita hijau "FREE" & bisa didownload TANPA join VIP.
-   Kalau centang dihilangkan: produk kembali normal, wajib VIP lagi seperti biasa. */
+/* FREE tetap dipakai di tempat lain di kode (gate VIP/download tanpa join VIP),
+   jadi fungsi ini dipertahankan sebagai shortcut: true hanya kalau label aktifnya FREE. */
 function isProductFree(productName){
-  if(!_appConfig || !_appConfig.freeProducts) return false;
-  return !!_appConfig.freeProducts[productName];
+  return getProductLabel(productName) === 'free';
 }
 
 function renderProductStatuses(){
@@ -5923,17 +5963,16 @@ function renderProductStatuses(){
     const h4 = card.querySelector('h3, h4');
     if(!h4) return;
     const productName = h4.textContent.trim();
-    const isFree = isProductFree(productName);
-    const status = isFree ? 'free' : getProductStatus(productName);
+    const activeLabel = getProductLabel(productName); // 'free' | 'update' | 'new' | null
 
-    if(!status || status === 'open'){
+    if(!activeLabel){
       card.removeAttribute('data-status');
       const label = card.querySelector('.platform-label, .price-label');
       if(label) label.remove();
       return;
     }
 
-    card.dataset.status = status;
+    card.dataset.status = activeLabel;
 
     let label = card.querySelector('.platform-label');
     if(!label){
@@ -5943,7 +5982,7 @@ function renderProductStatuses(){
       imgWrap.insertBefore(label, imgWrap.firstChild);
     }
     label.className = 'platform-label ' + (card.dataset.platform || '');
-    label.textContent = status === 'close' ? 'CLOSE' : (status === 'free' ? 'FREE' : 'UPDATE');
+    label.textContent = activeLabel === 'free' ? 'FREE' : (activeLabel === 'new' ? 'NEW' : 'UPDATE');
   });
 }
 
@@ -6236,15 +6275,21 @@ function openModal(btn){
   _currentProduct = productName;
   _currentProductPid = d.pid || null;
   _selectedPackage = packages[0] || null;
-  _isClosed = d.status === 'close';
+  _isClosed = false;
   _specialMode = d.special || null;
 
-  /* Sinkronkan checkbox FREE di panel settings dengan status produk saat ini,
-     dan tutup panel settings (kalau masih kebuka dari produk sebelumnya). */
+  /* Sinkronkan radio label (FREE/UPDATE/NEW/Tanpa Label) di panel settings
+     dengan label aktif produk saat ini, dan tutup panel settings (kalau masih
+     kebuka dari produk sebelumnya). */
   closeModalSettingsPanel();
   refreshModalSettingsVisibility();
-  const freeToggle = document.getElementById('modalFreeToggle');
-  if(freeToggle) freeToggle.checked = isProductFree(productName);
+  const activeLabel = getProductLabel(productName) || 'none';
+  const radioToCheck = document.getElementById(
+    activeLabel === 'free' ? 'modalLabelFree' :
+    activeLabel === 'update' ? 'modalLabelUpdate' :
+    activeLabel === 'new' ? 'modalLabelNew' : 'modalLabelNone'
+  );
+  if(radioToCheck) radioToCheck.checked = true;
 
   const iconEl = document.getElementById('modalIcon');
   document.getElementById('modalHeader').style.display = '';
@@ -6266,10 +6311,10 @@ function openModal(btn){
     b.textContent = platformLabel[d.platform];
     badgeWrap.appendChild(b);
   }
-  if(d.status && d.status !== 'open' && d.status !== 'free'){
+  if(d.status && (d.status === 'free' || d.status === 'update' || d.status === 'new')){
     const s = document.createElement('span');
     s.className = 'modal-badge status-' + d.status;
-    s.textContent = d.status === 'close' ? 'CLOSE' : 'UPDATE';
+    s.textContent = d.status === 'free' ? 'FREE' : (d.status === 'new' ? 'NEW' : 'UPDATE');
     badgeWrap.appendChild(s);
   }
 
@@ -6839,41 +6884,49 @@ document.addEventListener('click', function(e){
   closeModalSettingsPanel();
 });
 
-/* Centang/hilangkan centang FREE untuk produk yang sedang dibuka di modal.
-   Update langsung ke Firestore (field is_free) supaya nyantol permanen +
-   ribbon FREE / gate VIP langsung ikut berubah di seluruh device (bukan cuma lokal). */
-async function onModalFreeToggleChange(checkbox){
+/* Ganti label aktif (FREE/UPDATE/NEW/Tanpa Label) untuk produk yang sedang
+   dibuka di modal. Hanya SATU label yang bisa aktif per produk (radio, tidak
+   bisa tumpuk). Update langsung ke Firestore (field `label`) supaya nyantol
+   permanen + ribbon & gate VIP langsung ikut berubah di seluruh device. */
+async function onModalLabelChoiceChange(radio){
   if(!isOwnerAccount()){
-    showToast('Hanya owner yang bisa mengatur label FREE.','error');
-    checkbox.checked = !checkbox.checked;
+    showToast('Hanya owner yang bisa mengatur label produk.','error');
     return;
   }
   const productName = _currentProduct;
   const pid = _currentProductPid;
-  const checked = !!checkbox.checked;
+  const newLabel = radio.value === 'none' ? null : radio.value; // 'free' | 'update' | 'new' | null
 
   if(!pid){
-    showToast('Produk ini belum bisa diatur FREE (tidak ada ID produk).','error');
-    checkbox.checked = !checked;
+    showToast('Produk ini belum bisa diatur label (tidak ada ID produk).','error');
     return;
   }
 
+  const prevLabel = getProductLabel(productName);
+
   /* Update tampilan dulu (optimistic) supaya kerasa instan */
-  if(!_appConfig.freeProducts) _appConfig.freeProducts = {};
-  _appConfig.freeProducts[productName] = checked;
+  if(!_appConfig.productLabels) _appConfig.productLabels = {};
+  _appConfig.productLabels[productName] = newLabel;
   if(typeof renderProductStatuses === 'function') renderProductStatuses();
+
+  const labelText = newLabel === 'free' ? 'FREE' : newLabel === 'update' ? 'UPDATE' : newLabel === 'new' ? 'NEW' : null;
 
   try{
     if(!window.fbDb) throw new Error('Firestore belum siap');
-    await window.fbDb.collection('products').doc(pid).set({ is_free: checked }, { merge:true });
-    showToast(checked ? 'Produk ditandai FREE' : 'Produk kembali wajib VIP', 'success');
+    await window.fbDb.collection('products').doc(pid).set({ label: newLabel }, { merge:true });
+    showToast(labelText ? `Produk ditandai ${labelText}` : 'Label produk dihapus', 'success');
   }catch(err){
-    console.error('Gagal update status FREE:', err && err.message);
+    console.error('Gagal update label produk:', err && err.message);
     /* Rollback kalau gagal simpan ke server */
-    _appConfig.freeProducts[productName] = !checked;
-    checkbox.checked = !checked;
+    _appConfig.productLabels[productName] = prevLabel;
+    const rollbackRadio = document.getElementById(
+      prevLabel === 'free' ? 'modalLabelFree' :
+      prevLabel === 'update' ? 'modalLabelUpdate' :
+      prevLabel === 'new' ? 'modalLabelNew' : 'modalLabelNone'
+    );
+    if(rollbackRadio) rollbackRadio.checked = true;
     if(typeof renderProductStatuses === 'function') renderProductStatuses();
-    showToast('Gagal menyimpan status FREE.', 'error');
+    showToast('Gagal menyimpan label produk.', 'error');
   }
 }
 
@@ -11080,7 +11133,7 @@ window.addEventListener('npFirebaseReady', fbInitOnce, {once:true});
     if(!_appConfig.getKeyTutorialLinks) _appConfig.getKeyTutorialLinks = {};
     if(!_appConfig.getKeyTutorialLabels) _appConfig.getKeyTutorialLabels = {};
     if(!_appConfig.freefireLabels) _appConfig.freefireLabels = {};
-    if(!_appConfig.freeProducts) _appConfig.freeProducts = {};
+    if(!_appConfig.productLabels) _appConfig.productLabels = {};
     /* Jangan paksa _configLoadFailed = false di sini: kalau config.json memang gagal
        dimuat, produk LAMA (yang link-nya cuma ada di config.json) tetap harus
        menampilkan error, bukan diam-diam dianggap berhasil. Produk Firestore sendiri
@@ -11100,11 +11153,19 @@ window.addEventListener('npFirebaseReady', fbInitOnce, {once:true});
       if(p.get_key_tutorial_link) _appConfig.getKeyTutorialLinks[name] = p.get_key_tutorial_link;
       if(p.get_key_tutorial_label) _appConfig.getKeyTutorialLabels[name] = p.get_key_tutorial_label;
       if(p.freefire_label) _appConfig.freefireLabels[name] = p.freefire_label;
-      /* Centang "FREE" di admin (field is_free) -> produk bisa didownload
-         tanpa VIP + dapat pita hijau FREE. Ditulis eksplisit true/false
-         (bukan cuma "if truthy") supaya saat centang DIHILANGKAN di admin,
-         status FREE juga langsung hilang dari sini (bukan nyangkut true selamanya). */
-      _appConfig.freeProducts[name] = !!p.is_free;
+      /* Label produk (FREE / UPDATE / NEW) — field `label` di Firestore, hanya
+         satu nilai aktif per produk (bukan array/multi-checkbox). Migrasi
+         mundur: kalau dokumen lama masih pakai is_free/is_update (sebelum
+         label digabung jadi satu field), tetap dibaca sebagai fallback. */
+      if(p.label){
+        _appConfig.productLabels[name] = p.label;
+      } else if(p.is_free){
+        _appConfig.productLabels[name] = 'free';
+      } else if(p.is_update){
+        _appConfig.productLabels[name] = 'update';
+      } else {
+        _appConfig.productLabels[name] = null;
+      }
     });
 
     let cheatHtml = '';
