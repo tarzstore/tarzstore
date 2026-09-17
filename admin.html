@@ -834,6 +834,12 @@
           <span>FREE FIRE MAX</span>
         </label>
 
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:14px;" for="fCustomLabelEnabled">
+          <input type="checkbox" id="fCustomLabelEnabled" onchange="toggleCustomLabel()" style="width:16px;height:16px;cursor:pointer;">
+          <span>Aktifkan Label Custom <span class="hint">(opsional)</span></span>
+        </label>
+        <input type="text" id="fCustomLabelText" placeholder="Teks label, misal: TERBARU" style="display:none;margin-top:8px;">
+
         <!-- opsional, disembunyikan biar form simple -->
         <button type="button" class="adv-toggle" id="advToggle" onclick="toggleAdvanced()" style="margin-top:20px;">
           <span class="adv-toggle-left">
@@ -1363,6 +1369,12 @@ function onFreefireVariantChange(which){
   }
 }
 
+/* Tampil/sembunyi input teks Label Custom sesuai checkbox */
+function toggleCustomLabel(){
+  const enabled = document.getElementById('fCustomLabelEnabled').checked;
+  document.getElementById('fCustomLabelText').style.display = enabled ? '' : 'none';
+}
+
 /* Ubah textarea List Fitur (satu baris = satu fitur) jadi array bersih */
 function parseFeatures(text){
   return text.split('\n').map(s => s.trim()).filter(Boolean);
@@ -1388,6 +1400,8 @@ async function saveProduct(){
   const note = document.getElementById('fNote').value.trim();
   const freefire_variant = document.getElementById('fFreefire').checked ? 'freefire'
     : (document.getElementById('fFreefireMax').checked ? 'freefire_max' : null);
+  const custom_label = document.getElementById('fCustomLabelEnabled').checked
+    ? document.getElementById('fCustomLabelText').value.trim() : '';
   const editId = document.getElementById('editId').value;
 
   if(!name){
@@ -1417,6 +1431,7 @@ async function saveProduct(){
       get_key_tutorial_label: get_key_tutorial_label || null,
       note: note || null,
       freefire_variant,
+      custom_label: custom_label || null,
       // price tetap diisi (kolom lama wajib not-null di database), tidak ditampilkan di form
       price: ''
     };
@@ -1462,6 +1477,9 @@ function resetForm(){
   document.getElementById('fNote').value = '';
   document.getElementById('fFreefire').checked = false;
   document.getElementById('fFreefireMax').checked = false;
+  document.getElementById('fCustomLabelEnabled').checked = false;
+  document.getElementById('fCustomLabelText').value = '';
+  document.getElementById('fCustomLabelText').style.display = 'none';
   document.getElementById('fImageFile').value = '';
   setUploadBoxState({
     thumbUrl: null,
@@ -1759,6 +1777,9 @@ function editProduct(id){
   document.getElementById('fNote').value = p.note || '';
   document.getElementById('fFreefire').checked = (p.freefire_variant === 'freefire');
   document.getElementById('fFreefireMax').checked = (p.freefire_variant === 'freefire_max');
+  document.getElementById('fCustomLabelEnabled').checked = !!p.custom_label;
+  document.getElementById('fCustomLabelText').value = p.custom_label || '';
+  document.getElementById('fCustomLabelText').style.display = p.custom_label ? '' : 'none';
   document.getElementById('fImageFile').value = '';
   if(p.image_url){
     setUploadBoxState({
