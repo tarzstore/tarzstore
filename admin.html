@@ -841,6 +841,14 @@
           <span>Aktifkan Label Custom</span>
         </label>
 
+        <label>Platform</label>
+        <select id="fPlatform">
+          <option value="android">No Root</option>
+          <option value="pc">Root</option>
+          <option value="ios">iOS</option>
+          <option value="off">Off</option>
+        </select>
+
         <!-- opsional, disembunyikan biar form simple -->
         <button type="button" class="adv-toggle" id="advToggle" onclick="toggleAdvanced()" style="margin-top:20px;">
           <span class="adv-toggle-left">
@@ -855,13 +863,6 @@
 
         <div class="adv-body" id="advBody">
           <div class="adv-body-inner-pad">
-            <label>Platform</label>
-            <select id="fPlatform">
-              <option value="android">Android</option>
-              <option value="pc">PC</option>
-              <option value="ios">iOS</option>
-            </select>
-
             <label>Link Mediafire FREE FIRE<span class="hint"></span></label>
             <input type="text" id="fDownloadLink2" placeholder="">
 
@@ -1547,7 +1548,7 @@ async function loadProducts(){
     return;
   }
 
-  const platformLabel = { android: 'Android', pc: 'PC', ios: 'iOS' };
+  const platformLabel = { android: 'No Root', pc: 'Root', ios: 'iOS', off: 'Off' };
 
   const renderItem = (p) => `
     <div class="product-item" data-id="${p.id}">
@@ -1800,7 +1801,7 @@ function editProduct(id){
   // buka accordion lanjutan otomatis kalau ada data yang terisi di sana (selain platform default)
   const advBody = document.getElementById('advBody');
   const advToggle = document.getElementById('advToggle');
-  const hasAdvData = (p.platform && p.platform !== 'android') || p.download_link_2 || p.copy_key || p.key_label || p.user_field || p.user_label || p.freefire_label || p.custom_label_text || p.custom_label_on;
+  const hasAdvData = p.download_link_2 || p.copy_key || p.key_label || p.user_field || p.user_label || p.freefire_label || p.custom_label_text || p.custom_label_on;
   if(hasAdvData){
     advBody.classList.add('open');
     advToggle.classList.add('open');
