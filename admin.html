@@ -838,7 +838,7 @@
           <input type="checkbox" id="fCustomLabelEnabled" onchange="toggleCustomLabel()" style="width:16px;height:16px;cursor:pointer;">
           <span>Aktifkan Label Custom <span class="hint">(opsional)</span></span>
         </label>
-        <input type="text" id="fCustomLabelText" placeholder="Teks label, misal: TERBARU" style="display:none;margin-top:8px;">
+        <input type="text" id="fCustomLabelText" placeholder="Teks label, misal: TERBARU" style="margin-top:8px;" autocomplete="off" inputmode="text" enterkeyhint="done">
 
         <!-- opsional, disembunyikan biar form simple -->
         <button type="button" class="adv-toggle" id="advToggle" onclick="toggleAdvanced()" style="margin-top:20px;">
@@ -1369,10 +1369,15 @@ function onFreefireVariantChange(which){
   }
 }
 
-/* Tampil/sembunyi input teks Label Custom sesuai checkbox */
+/* Input teks Label Custom selalu tampil di bawah checkbox.
+   Saat checkbox tidak dicentang, isi input diabaikan (lihat saveProduct). */
 function toggleCustomLabel(){
+  const input = document.getElementById('fCustomLabelText');
   const enabled = document.getElementById('fCustomLabelEnabled').checked;
-  document.getElementById('fCustomLabelText').style.display = enabled ? '' : 'none';
+  input.disabled = !enabled;
+  if(enabled){
+    input.focus();
+  }
 }
 
 /* Ubah textarea List Fitur (satu baris = satu fitur) jadi array bersih */
@@ -1779,7 +1784,7 @@ function editProduct(id){
   document.getElementById('fFreefireMax').checked = (p.freefire_variant === 'freefire_max');
   document.getElementById('fCustomLabelEnabled').checked = !!p.custom_label;
   document.getElementById('fCustomLabelText').value = p.custom_label || '';
-  document.getElementById('fCustomLabelText').style.display = p.custom_label ? '' : 'none';
+  toggleCustomLabel();
   document.getElementById('fImageFile').value = '';
   if(p.image_url){
     setUploadBoxState({
