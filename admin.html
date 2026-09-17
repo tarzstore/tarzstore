@@ -834,6 +834,13 @@
           <span>FREE FIRE MAX</span>
         </label>
 
+        <label>Label Custom <span class="hint">(opsional)</span></label>
+        <input type="text" id="fCustomLabelText" placeholder="Contoh: LIMITED, HOT, dll">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:6px;" for="fCustomLabelOn">
+          <input type="checkbox" id="fCustomLabelOn" style="width:16px;height:16px;cursor:pointer;">
+          <span>Aktifkan Label Custom</span>
+        </label>
+
         <!-- opsional, disembunyikan biar form simple -->
         <button type="button" class="adv-toggle" id="advToggle" onclick="toggleAdvanced()" style="margin-top:20px;">
           <span class="adv-toggle-left">
@@ -1388,6 +1395,8 @@ async function saveProduct(){
   const note = document.getElementById('fNote').value.trim();
   const freefire_variant = document.getElementById('fFreefire').checked ? 'freefire'
     : (document.getElementById('fFreefireMax').checked ? 'freefire_max' : null);
+  const custom_label_text = document.getElementById('fCustomLabelText').value.trim();
+  const custom_label_on = document.getElementById('fCustomLabelOn').checked;
   const editId = document.getElementById('editId').value;
 
   if(!name){
@@ -1417,6 +1426,8 @@ async function saveProduct(){
       get_key_tutorial_label: get_key_tutorial_label || null,
       note: note || null,
       freefire_variant,
+      custom_label_text: custom_label_text || null,
+      custom_label_on: custom_label_on,
       // price tetap diisi (kolom lama wajib not-null di database), tidak ditampilkan di form
       price: ''
     };
@@ -1462,6 +1473,8 @@ function resetForm(){
   document.getElementById('fNote').value = '';
   document.getElementById('fFreefire').checked = false;
   document.getElementById('fFreefireMax').checked = false;
+  document.getElementById('fCustomLabelText').value = '';
+  document.getElementById('fCustomLabelOn').checked = false;
   document.getElementById('fImageFile').value = '';
   setUploadBoxState({
     thumbUrl: null,
@@ -1759,6 +1772,8 @@ function editProduct(id){
   document.getElementById('fNote').value = p.note || '';
   document.getElementById('fFreefire').checked = (p.freefire_variant === 'freefire');
   document.getElementById('fFreefireMax').checked = (p.freefire_variant === 'freefire_max');
+  document.getElementById('fCustomLabelText').value = p.custom_label_text || '';
+  document.getElementById('fCustomLabelOn').checked = !!p.custom_label_on;
   document.getElementById('fImageFile').value = '';
   if(p.image_url){
     setUploadBoxState({
@@ -1785,7 +1800,7 @@ function editProduct(id){
   // buka accordion lanjutan otomatis kalau ada data yang terisi di sana (selain platform default)
   const advBody = document.getElementById('advBody');
   const advToggle = document.getElementById('advToggle');
-  const hasAdvData = (p.platform && p.platform !== 'android') || p.download_link_2 || p.copy_key || p.key_label || p.user_field || p.user_label || p.freefire_label;
+  const hasAdvData = (p.platform && p.platform !== 'android') || p.download_link_2 || p.copy_key || p.key_label || p.user_field || p.user_label || p.freefire_label || p.custom_label_text || p.custom_label_on;
   if(hasAdvData){
     advBody.classList.add('open');
     advToggle.classList.add('open');
