@@ -962,10 +962,19 @@ const auth = getAuth(firebaseApp);
 const dbFs = getFirestore(firebaseApp);
 const productsCol = collection(dbFs, 'products');
 
-/* Hanya email ini yang boleh masuk ke admin panel. Email lain, walau
+/* Hanya email di daftar ini yang boleh masuk ke admin panel. Email lain, walau
    berhasil login lewat Firebase Auth (mis. akun customer dari website
-   utama), akan langsung ditolak dan otomatis di-logout. */
-const ADMIN_EMAIL = 'tarz2642008@gmail.com';
+   utama), akan langsung ditolak dan otomatis di-logout.
+   Bisa lebih dari satu akun admin — tinggal tambahkan emailnya ke array
+   di bawah ini, satu email per baris. */
+const ADMIN_EMAILS = [
+  'tarz2642008@gmail.com',
+  'tarzx@tarzstore.local',
+];
+function isAdminEmail(email){
+  const e = String(email || '').trim().toLowerCase();
+  return !!e && ADMIN_EMAILS.some(a => String(a).trim().toLowerCase() === e);
+}
 
 /* Catatan: sesi login memakai persistence default Firebase (tetap tersambung
    antar tab/halaman, termasuk saat pindah ke index.html). Keamanan admin
@@ -991,7 +1000,7 @@ window.deleteProduct = deleteProduct;
    AUTH: LOGIN / LOGOUT / CEK SESSION
    ═══════════════════════════════════════════════════ */
 onAuthStateChanged(auth, (user) => {
-  if(user && user.email === ADMIN_EMAIL){
+  if(user && isAdminEmail(user.email)){
     showAdminView(user.email);
   } else {
     // Kalau tidak ada yang login, ATAU yang login bukan email admin (mis.
@@ -1036,7 +1045,7 @@ async function doLogin(){
   try{
     const cred = await signInWithEmailAndPassword(auth, email, password);
 
-    if(cred.user.email !== ADMIN_EMAIL){
+    if(!isAdminEmail(cred.user.email)){
       await signOut(auth);
       msg.textContent = 'Akses ditolak. Akun ini bukan akun admin.';
       msg.classList.add('show','error');
