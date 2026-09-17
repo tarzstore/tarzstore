@@ -824,14 +824,15 @@
         <label>Note <span class="hint">(opsional)</span></label>
         <textarea id="fNote" placeholder=""></textarea>
 
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:4px;" for="fFreefireVariantEnabled">
-          <input type="checkbox" id="fFreefireVariantEnabled" onchange="toggleFreefireVariant()" style="width:16px;height:16px;cursor:pointer;">
-          <span>Aktifkan Label Free Fire <span class="hint">(opsional)</span></span>
-        </label>
-        <select id="fFreefireVariant" style="display:none;margin-top:8px;">
+        <label>Label Free Fire</label>
+        <select id="fFreefireVariant">
           <option value="freefire">FREE FIRE</option>
           <option value="freefire_max">FREE FIRE MAX</option>
         </select>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:8px;" for="fFreefireVariantEnabled">
+          <input type="checkbox" id="fFreefireVariantEnabled" style="width:16px;height:16px;cursor:pointer;">
+          <span>Aktifkan Label Free Fire <span class="hint">(kalau tidak dicentang, label tidak akan muncul di index)</span></span>
+        </label>
 
         <!-- opsional, disembunyikan biar form simple -->
         <button type="button" class="adv-toggle" id="advToggle" onclick="toggleAdvanced()" style="margin-top:20px;">
@@ -1352,12 +1353,6 @@ function showFormMsg(text, type){
   setTimeout(()=> el.classList.remove('show'), 4000);
 }
 
-/* Tampil/sembunyi dropdown varian Free Fire sesuai checkbox */
-function toggleFreefireVariant(){
-  const enabled = document.getElementById('fFreefireVariantEnabled').checked;
-  document.getElementById('fFreefireVariant').style.display = enabled ? '' : 'none';
-}
-
 /* Ubah textarea List Fitur (satu baris = satu fitur) jadi array bersih */
 function parseFeatures(text){
   return text.split('\n').map(s => s.trim()).filter(Boolean);
@@ -1455,9 +1450,8 @@ function resetForm(){
   document.getElementById('fGetKeyTutorialLink').value = '';
   document.getElementById('fGetKeyTutorialLabel').value = '';
   document.getElementById('fNote').value = '';
-  document.getElementById('fFreefireVariantEnabled').checked = false;
   document.getElementById('fFreefireVariant').value = 'freefire';
-  document.getElementById('fFreefireVariant').style.display = 'none';
+  document.getElementById('fFreefireVariantEnabled').checked = false;
   document.getElementById('fImageFile').value = '';
   setUploadBoxState({
     thumbUrl: null,
@@ -1753,9 +1747,8 @@ function editProduct(id){
   document.getElementById('fGetKeyTutorialLink').value = p.get_key_tutorial_link || '';
   document.getElementById('fGetKeyTutorialLabel').value = p.get_key_tutorial_label || '';
   document.getElementById('fNote').value = p.note || '';
-  document.getElementById('fFreefireVariantEnabled').checked = !!p.freefire_variant;
   document.getElementById('fFreefireVariant').value = p.freefire_variant || 'freefire';
-  document.getElementById('fFreefireVariant').style.display = p.freefire_variant ? '' : 'none';
+  document.getElementById('fFreefireVariantEnabled').checked = !!p.freefire_variant;
   document.getElementById('fImageFile').value = '';
   if(p.image_url){
     setUploadBoxState({
