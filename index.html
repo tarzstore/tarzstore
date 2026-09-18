@@ -3666,6 +3666,37 @@ body.side-menu-open{overflow:hidden;}
 }
 .admin-choice-desc{font-size:.66rem;color:var(--text2);line-height:1.3;}
 .admin-choice-arrow{flex-shrink:0;width:16px;height:16px;color:var(--text2);}
+/* ── INFO AKUN MODAL — daftar semua akun yang pernah login (Google atau
+   username/password), menampilkan email + label VIP/FREE. Dibuka dari
+   MENU ADMIN > "Info Akun". ── */
+.infoakun-list{display:flex;flex-direction:column;gap:6px;max-height:56vh;overflow-y:auto;margin-top:4px;}
+.infoakun-item{
+  display:flex;align-items:center;gap:10px;
+  width:100%;padding:10px 12px;
+  background:rgba(255,255,255,.03);
+  border:1px solid var(--border);
+  border-radius:var(--radius-md);
+}
+.infoakun-email{
+  flex:1;min-width:0;font-family:'Space Mono',monospace;font-size:.72rem;
+  color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.infoakun-badge{
+  flex-shrink:0;font-family:'Space Grotesk',sans-serif;font-weight:700;
+  font-size:.6rem;letter-spacing:.04em;padding:4px 9px;border-radius:999px;
+}
+.infoakun-badge.is-vip{
+  background:linear-gradient(135deg,var(--blue),var(--blue2));color:#0a0a0a;
+}
+.infoakun-badge.is-free{
+  background:rgba(255,255,255,.06);color:var(--text2);border:1px solid var(--border-strong);
+}
+.infoakun-empty,.infoakun-loading{
+  text-align:center;font-size:.72rem;color:var(--text2);padding:24px 8px;
+}
+.infoakun-count{
+  text-align:center;font-size:.64rem;color:var(--text2);margin-top:10px;
+}
 /* ── EDIT PROFIL MODAL — preview banner & avatar terpisah, masing-masing dalam card sendiri ── */
 .editprofil-section{
   background:rgba(255,255,255,.03);
@@ -3877,6 +3908,19 @@ body.side-menu-open{overflow:hidden;}
 }
 #authGate.hide{display:none;}
 body.auth-locked{overflow:hidden;}
+/* FIX: sebelum JS sempat menambahkan class "auth-locked" ke <body>
+   (di frame-frame pertama saat parsing/render awal), body TIDAK terkunci
+   sehingga halaman di belakang authGate masih bisa discroll -- ini yang
+   menyebabkan elemen halaman utama (mis. bottom tab bar) sempat "bocor"
+   kelihatan di bawah layar saat discroll pas boot/loading. Kunci scroll
+   dari CSS murni selama authGate ada & belum disembunyikan, independen
+   dari timing JS. Begitu authGate dapat class "hide", body otomatis
+   scrollable lagi lewat aturan di bawah. */
+html:has(#authGate:not(.hide)),
+body:has(#authGate:not(.hide)){
+  overflow:hidden;
+  height:100%;
+}
 
 /* Header di layar login mengikuti gaya header halaman utama (lihat class
    `header` di CSS umum), hanya saja statis (bukan sticky) karena halaman
@@ -4116,6 +4160,20 @@ body.auth-locked{overflow:hidden;}
     radial-gradient(ellipse 70% 50% at 20% 20%,rgba(230,230,238,.06) 0%,transparent 60%),
     radial-gradient(ellipse 60% 40% at 80% 70%,rgba(255,255,255,.04) 0%,transparent 55%);
 }
+/* FIX: class "maintenance-locked" sebelumnya di-toggle lewat JS
+   (applyMaintenanceScreenVisibility()) tapi belum ada aturan CSS-nya,
+   jadi body TIDAK terkunci saat layar maintenance tampil -- konten di
+   belakangnya masih bisa discroll & "bocor" kelihatan di bawah, sama
+   seperti kasus authGate. Tambahan :has() di sini juga jadi jaring
+   pengaman untuk jeda sebelum status maintenance selesai dicek ke
+   server (async, jadi tidak bisa dikunci dari HTML awal seperti
+   authGate). */
+body.maintenance-locked{overflow:hidden;}
+html:has(#maintenanceScreen[style*="flex"]),
+body:has(#maintenanceScreen[style*="flex"]){
+  overflow:hidden;
+  height:100%;
+}
 .maintenance-box{
   max-width:420px;width:100%;text-align:center;
   background:var(--surface);
@@ -4146,7 +4204,7 @@ body.auth-locked{overflow:hidden;}
 }
 </style>
 </head>
-<body><a href="#main-content" class="skip-link">Lewati ke konten utama</a>
+<body class="auth-locked"><a href="#main-content" class="skip-link">Lewati ke konten utama</a>
 <div id="toast" class="toast" role="status" aria-live="polite">
   <span class="toast-icon" id="toastIcon"></span>
   <span class="toast-msg" id="toastMsg"></span>
@@ -4857,7 +4915,41 @@ body.auth-locked{overflow:hidden;}
         </span>
         <svg class="admin-choice-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
       </button>
+
+      <button type="button" class="admin-choice-item" onclick="openInfoAkunModal()">
+        <span class="admin-choice-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </span>
+        <span class="admin-choice-text">
+          <span class="admin-choice-title">Info Akun</span>
+          <span class="admin-choice-desc">Daftar akun login &amp; status VIP</span>
+        </span>
+        <svg class="admin-choice-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
     </div>
+  </div>
+</div>
+
+<!-- INFO AKUN MODAL — dibuka dari MENU ADMIN > "Info Akun".
+     Menampilkan daftar semua akun yang pernah login: baik lewat Google
+     (email asli, mis. contoh@gmail.com) maupun lewat username & password
+     (email internal @tarzstore.local, ditampilkan sebagai "username").
+     Data diambil dari 2 koleksi Firestore: `vip_users` (status VIP per uid)
+     dan `usernames` (mapping username -> uid untuk akun password), lalu
+     digabung supaya tiap akun tampil sekali dengan label VIP/FREE yang
+     benar. Lihat openInfoAkunModal() & loadInfoAkunList(). -->
+<div class="gapi-modal-overlay" id="infoAkunModalOverlay">
+  <div class="gapi-modal" role="dialog" aria-modal="true" aria-label="Info Akun">
+    <button class="gapi-modal-close" aria-label="Tutup" onclick="closeInfoAkunModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="gapi-modal-title">INFO AKUN</div>
+    <div class="gapi-modal-sub">Daftar akun yang login via Google &amp; username/password</div>
+
+    <div class="infoakun-list" id="infoAkunList">
+      <div class="infoakun-loading" id="infoAkunLoading">Memuat data akun...</div>
+    </div>
+    <div class="infoakun-count" id="infoAkunCount"></div>
   </div>
 </div>
 
@@ -6502,6 +6594,125 @@ function toggleAdminOnlineStatus(checked){
     });
 }
 
+/* ── INFO AKUN ──
+   Daftar semua akun yang pernah login, digate isOwnerAccount(). Datanya
+   digabung dari 2 koleksi Firestore:
+     1. `vip_users`  (docId = uid) -- dibuat/di-update begitu akun Google
+        pernah dicek status VIP-nya (lihat refreshGoogleVipStatus() &
+        markVipInGoogleAccount()). Field yang dipakai: email, is_vip,
+        vip_expiry.
+     2. `usernames`  (docId = username) -- dibuat saat akun daftar pakai
+        username & password (lihat submit register di atas). Field yang
+        dipakai: uid, email (email internal @tarzstore.local).
+   Untuk akun username/password, status VIP-nya dicek dengan mencocokkan
+   uid ke dokumen vip_users/{uid} yang sama (kalau ada). Akun Google yang
+   BELUM pernah dicek status VIP-nya (baru pertama kali buka situs tapi
+   belum sempat refreshGoogleVipStatus tersimpan) tidak akan muncul di
+   sini, karena Firebase Auth tidak bisa di-list dari sisi client tanpa
+   Admin SDK server -- daftar ini karenanya adalah "akun yang tercatat di
+   Firestore", bukan daftar akun Firebase Auth yang 100% lengkap. */
+function openInfoAkunModal(){
+  if(!isOwnerAccount()) return;
+  closeAdminChoiceModal();
+  const overlay = document.getElementById('infoAkunModalOverlay');
+  if(!overlay) return;
+  overlay.style.display = 'flex'; void overlay.offsetHeight;
+  overlay.classList.add('show');
+  document.body.style.overflow = 'hidden'; document.body.classList.add('tabbar-hide');
+  loadInfoAkunList();
+}
+function closeInfoAkunModal(){
+  const overlay = document.getElementById('infoAkunModalOverlay');
+  if(!overlay) return;
+  overlay.classList.remove('show');
+  document.body.style.overflow = ''; document.body.classList.remove('tabbar-hide');
+}
+
+function infoAkunEscapeHtml(str){
+  return String(str).replace(/[&<>"']/g, function(c){
+    return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+  });
+}
+
+/* Ambil & gabungkan data akun dari `vip_users` + `usernames`, lalu render
+   ke #infoAkunList. Dipanggil tiap kali modal dibuka supaya datanya segar. */
+async function loadInfoAkunList(){
+  const listEl = document.getElementById('infoAkunList');
+  const countEl = document.getElementById('infoAkunCount');
+  if(!listEl) return;
+  listEl.innerHTML = '<div class="infoakun-loading">Memuat data akun...</div>';
+  if(countEl) countEl.textContent = '';
+
+  if(!window.fbDb){
+    listEl.innerHTML = '<div class="infoakun-empty">Gagal terhubung ke server.</div>';
+    return;
+  }
+
+  try{
+    const [vipSnap, usernameSnap] = await Promise.all([
+      window.fbDb.collection('vip_users').get(),
+      window.fbDb.collection('usernames').get()
+    ]);
+
+    // uid -> { isVip }, dari koleksi vip_users (sumber kebenaran status VIP)
+    const vipByUid = {};
+    // daftar akun final yang akan dirender, key-nya email supaya tidak dobel
+    const accounts = {};
+
+    vipSnap.forEach(function(doc){
+      const data = doc.data() || {};
+      const uid = doc.id;
+      let isVip = !!data.is_vip;
+      if(isVip && data.vip_expiry){
+        const expiryMs = toMillis(data.vip_expiry);
+        if(expiryMs && Date.now() > expiryMs) isVip = false; // trial sudah habis
+      }
+      vipByUid[uid] = isVip;
+      if(data.email){
+        accounts[data.email] = { email: data.email, isVip: isVip };
+      }
+    });
+
+    usernameSnap.forEach(function(doc){
+      const data = doc.data() || {};
+      const email = data.email || (doc.id + '@tarzstore.local');
+      const isVip = data.uid && vipByUid.hasOwnProperty(data.uid) ? vipByUid[data.uid] : false;
+      // Akun username/password: tampilkan sebagai "username" (bagian sebelum
+      // @tarzstore.local), bukan email internalnya, supaya lebih mudah dibaca.
+      const displayName = email.endsWith('@tarzstore.local') ? doc.id : email;
+      accounts[email] = { email: displayName, isVip: isVip };
+    });
+
+    const list = Object.values(accounts).sort(function(a, b){
+      if(a.isVip !== b.isVip) return a.isVip ? -1 : 1; // VIP di atas
+      return a.email.localeCompare(b.email);
+    });
+
+    if(list.length === 0){
+      listEl.innerHTML = '<div class="infoakun-empty">Belum ada akun yang tercatat.</div>';
+      if(countEl) countEl.textContent = '';
+      return;
+    }
+
+    listEl.innerHTML = list.map(function(acc){
+      const badgeClass = acc.isVip ? 'is-vip' : 'is-free';
+      const badgeText = acc.isVip ? 'VIP' : 'FREE';
+      return '<div class="infoakun-item">' +
+        '<span class="infoakun-email">' + infoAkunEscapeHtml(acc.email) + '</span>' +
+        '<span class="infoakun-badge ' + badgeClass + '">' + badgeText + '</span>' +
+      '</div>';
+    }).join('');
+
+    if(countEl){
+      const vipCount = list.filter(function(a){ return a.isVip; }).length;
+      countEl.textContent = list.length + ' akun total \u2022 ' + vipCount + ' VIP';
+    }
+  }catch(e){
+    console.error('Gagal memuat Info Akun:', e);
+    listEl.innerHTML = '<div class="infoakun-empty">Gagal memuat data akun.</div>';
+  }
+}
+
 /* ── MODE MAINTENANCE ──
    GLOBAL lewat Firestore, dokumen config/maintenance_mode field `enabled`
    (+ `message` untuk pesan custom). Sama seperti Whatsapp Akses: begitu
@@ -7811,6 +8022,7 @@ function bindAuthStateListener(client){
     if(user){
       hideAuthGate();
       refreshGoogleVipStatus();
+      ensureVipUserRecord(user);
       /* Firebase Auth (via signInWithRedirect) sudah membersihkan sendiri
          parameter redirect OAuth dari URL, jadi tidak perlu penanganan
          hash/query manual seperti pada alur implicit flow Supabase dulu. */
@@ -7831,6 +8043,33 @@ function bindAuthStateListener(client){
     if(typeof applyMaintenanceScreenVisibility === 'function') applyMaintenanceScreenVisibility();
   });
 }
+
+/* ── AUTO-CATAT AKUN KE vip_users ──
+   Supaya fitur "Info Akun" di menu admin bisa menampilkan SEMUA akun yang
+   pernah login (Google ATAU username/password), bukan cuma yang pernah
+   menyentuh sistem VIP, dokumen vip_users/{uid} dibuat otomatis di sini
+   setiap kali ada login sukses -- baik baru daftar maupun login ulang.
+
+   Dipanggil dari bindAuthStateListener() setiap onAuthStateChanged(user)
+   terpicu. Pakai merge:true supaya:
+   - Kalau dokumen belum ada -> dibuat baru dengan is_vip:false (FREE).
+   - Kalau dokumen SUDAH ada (mis. sudah VIP) -> field is_vip & vip_expiry
+     yang sudah ada TIDAK tertimpa, cuma email & last_login yang diperbarui.
+   Aman dipanggil berkali-kali (setiap kali user itu login lagi). */
+function ensureVipUserRecord(user){
+  if(!user || !window.fbDb) return;
+  try{
+    window.fbDb.collection('vip_users').doc(user.uid).set({
+      email: user.email || null,
+      last_login: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true }).catch(function(err){
+      // Diamkan kalau gagal (mis. rules belum sempat diupdate) -- ini
+      // fitur pencatatan tambahan, tidak boleh mengganggu alur login utama.
+      console.error('Gagal mencatat akun ke vip_users:', err);
+    });
+  }catch(e){ console.error('ensureVipUserRecord error:', e); }
+}
+
 
 /* ══════════════════════════════════════════
    AUTH GATE — layar login wajib sebelum masuk situs.
@@ -8011,14 +8250,19 @@ async function authGoogleSignIn(){
   try{
     const provider = new firebase.auth.GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
-    await client.signInWithPopup(provider);
+    const cred = await client.signInWithPopup(provider);
     /* onAuthStateChanged (bindAuthStateListener) akan otomatis memanggil
-       hideAuthGate() + refreshGoogleVipStatus() begitu login berhasil,
-       jadi tidak perlu penanganan manual di sini. Popup (bukan redirect
-       full-page) berarti halaman TIDAK reload, sehingga semua state
-       JS in-memory (mis. _pendingVipAction) tetap utuh secara alami --
-       beda dengan alur redirect Supabase dulu yang butuh sessionStorage
-       untuk "mengingat" aksi tertunda lintas reload. */
+       hideAuthGate() + refreshGoogleVipStatus() + ensureVipUserRecord()
+       begitu login berhasil. Panggilan langsung di bawah ini cuma jaring
+       pengaman tambahan supaya akun Google ini PASTI langsung tercatat ke
+       vip_users saat itu juga, tanpa menunggu event listener -- berguna
+       kalau onAuthStateChanged sempat telat fire. ensureVipUserRecord()
+       sendiri aman dipanggil berkali-kali (pakai merge:true).
+       Popup (bukan redirect full-page) berarti halaman TIDAK reload,
+       sehingga semua state JS in-memory (mis. _pendingVipAction) tetap
+       utuh secara alami -- beda dengan alur redirect Supabase dulu yang
+       butuh sessionStorage untuk "mengingat" aksi tertunda lintas reload. */
+    if(cred && cred.user && typeof ensureVipUserRecord === 'function') ensureVipUserRecord(cred.user);
     showToast('Berhasil Login', 'success');
   }catch(err){
     authShowError(err && err.code === 'auth/popup-closed-by-user' ? 'Login dibatalkan.' : 'Login Google gagal. Coba lagi.');
@@ -8172,7 +8416,10 @@ async function googleSignIn(){
        situs ini) -- makanya ganti akun kelihatan "tidak bisa" kecuali
        dicoba di tab baru yang belum kena auto-login itu. */
     provider.setCustomParameters({ prompt: 'select_account' });
-    await client.signInWithPopup(provider);
+    const cred = await client.signInWithPopup(provider);
+    /* Catat akun ini ke vip_users segera (jaring pengaman tambahan di luar
+       onAuthStateChanged -- lihat catatan lengkap di authGoogleSignIn()). */
+    if(cred && cred.user && typeof ensureVipUserRecord === 'function') ensureVipUserRecord(cred.user);
     /* Popup (bukan redirect) berarti halaman tidak reload, jadi
        _pendingVipAction yang sudah ada di memory tetap utuh -- tinggal
        dilanjutkan langsung di sini begitu login sukses, tanpa perlu
