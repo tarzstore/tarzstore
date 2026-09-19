@@ -4719,6 +4719,241 @@ body:has(#banScreen[style*="flex"]){
 }
 .infoposter-ok-btn:hover{filter:brightness(1.08);}
 .infoposter-ok-btn:active{transform:scale(.97);}
+
+/* ═══════════════════════════════════════════════════
+   CHAT ADMIN — layar obrolan publik ↔ admin
+   Firebase terpisah (app "tarzChat"), tidak menyentuh
+   Firebase utama toko.
+   Tema: solid hitam & abu-abu, bersih, tanpa efek
+   blur/glass — flat, kontras jelas, mudah dibaca.
+   ═══════════════════════════════════════════════════ */
+.tzchat-overlay{
+  position:fixed;inset:0;z-index:100001;
+  background:rgba(0,0,0,.7);
+  display:flex;align-items:center;justify-content:center;
+  padding:0;
+  opacity:0;visibility:hidden;
+  transition:opacity .3s cubic-bezier(.22,1,.36,1),visibility .3s cubic-bezier(.22,1,.36,1);
+}
+.tzchat-overlay.show{opacity:1;visibility:visible;}
+.tzchat-panel{
+  position:relative;display:flex;flex-direction:column;
+  width:100%;height:100%;max-width:480px;max-height:100dvh;
+  background:#161618;
+  border:1px solid #2a2a2e;
+  box-shadow:0 24px 60px rgba(0,0,0,.55);
+  transform:translateY(24px);opacity:0;
+  transition:transform .38s cubic-bezier(.22,1,.36,1),opacity .38s cubic-bezier(.22,1,.36,1);
+  overflow:hidden;
+}
+@media(min-width:520px){
+  .tzchat-overlay{padding:16px;}
+  .tzchat-panel{height:min(720px,100%);border-radius:18px;}
+}
+.tzchat-overlay.show .tzchat-panel{transform:translateY(0);opacity:1;}
+
+.tzchat-head{
+  display:flex;align-items:center;gap:10px;flex-shrink:0;
+  padding:calc(12px + env(safe-area-inset-top,0px)) 12px 12px;
+  border-bottom:1px solid #2a2a2e;
+  background:#1c1c1f;
+}
+.tzchat-head-btn{
+  width:34px;height:34px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:#232326;border:1px solid #313136;
+  color:var(--text);cursor:pointer;padding:0;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .15s ease,background .2s ease;
+}
+.tzchat-head-btn:active{transform:scale(.9);background:#2c2c30;}
+.tzchat-head-btn svg{width:18px;height:18px;}
+.tzchat-avatar{
+  width:38px;height:38px;border-radius:50%;flex-shrink:0;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  background:#2a2a2e;border:1px solid #38383c;
+  font-weight:800;font-size:.9rem;color:var(--text);text-transform:uppercase;
+}
+.tzchat-avatar img{width:100%;height:100%;object-fit:cover;display:block;}
+.tzchat-head-info{flex:1;min-width:0;}
+.tzchat-head-title{
+  font-weight:800;font-size:.92rem;color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.tzchat-head-sub{
+  font-family:'Space Mono',monospace;font-size:.62rem;color:var(--text2);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+
+/* daftar akun (khusus admin) */
+.tzchat-list{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px;background:#161618;}
+.tzchat-list-item{
+  display:flex;align-items:center;gap:11px;width:100%;
+  padding:10px;border-radius:12px;margin-bottom:4px;
+  background:#1c1c1f;border:1px solid #28282c;
+  color:var(--text);cursor:pointer;text-align:left;
+  -webkit-tap-highlight-color:transparent;
+  transition:background .2s ease,border-color .2s ease;
+}
+.tzchat-list-item:hover{background:#232326;border-color:#313136;}
+.tzchat-list-item:active{background:#28282c;}
+.tzchat-list-body{flex:1;min-width:0;}
+.tzchat-list-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px;}
+.tzchat-list-name{
+  font-weight:700;font-size:.88rem;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.tzchat-list-time{font-family:'Space Mono',monospace;font-size:.58rem;color:var(--text2);flex-shrink:0;}
+.tzchat-list-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:2px;}
+.tzchat-list-last{
+  font-size:.76rem;color:var(--text2);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.tzchat-list-item.is-unread .tzchat-list-last{color:var(--text);font-weight:600;}
+.tzchat-badge{
+  min-width:18px;height:18px;padding:0 5px;border-radius:9px;flex-shrink:0;
+  background:#9a9aa4;color:#161618;
+  font-size:.66rem;font-weight:800;line-height:18px;text-align:center;
+}
+.tzchat-empty{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:8px;height:100%;min-height:200px;padding:24px;text-align:center;
+  color:var(--text2);font-size:.82rem;
+}
+.tzchat-empty svg{width:38px;height:38px;opacity:.45;}
+
+/* ruang obrolan */
+.tzchat-msgs{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:14px 12px;display:flex;flex-direction:column;gap:6px;
+  overscroll-behavior:contain;background:#141416;
+}
+.tzchat-day{
+  align-self:center;margin:8px 0 2px;padding:3px 10px;border-radius:10px;
+  background:#232326;border:1px solid #2e2e32;
+  font-family:'Space Mono',monospace;font-size:.58rem;color:var(--text2);
+}
+.tzchat-msg{
+  max-width:80%;padding:8px 11px 6px;border-radius:14px;
+  font-size:.86rem;line-height:1.4;color:var(--text);
+  word-wrap:break-word;overflow-wrap:anywhere;white-space:pre-wrap;
+  animation:tzchatIn .22s cubic-bezier(.22,1,.36,1);
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+  -webkit-user-select:none;user-select:none;
+  transition:transform .12s ease,filter .12s ease;
+}
+.tzchat-msg.tzchat-pressed{transform:scale(.97);filter:brightness(1.12);}
+@keyframes tzchatIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+.tzchat-msg.them{
+  align-self:flex-start;border-bottom-left-radius:4px;
+  background:#232326;border:1px solid #2e2e32;
+}
+.tzchat-msg.me{
+  align-self:flex-end;border-bottom-right-radius:4px;
+  background:#4a4a50;border:1px solid #58585e;
+}
+.tzchat-msg-time{
+  display:block;margin-top:3px;text-align:right;
+  font-family:'Space Mono',monospace;font-size:.54rem;color:var(--text2);
+}
+.tzchat-msg-edited{font-style:italic;opacity:.7;margin-right:4px;}
+.tzchat-msg.tzchat-deleted{font-style:italic;opacity:.55;}
+.tzchat-msg.pending{opacity:.6;}
+.tzchat-row{display:flex;align-items:flex-end;gap:7px;align-self:flex-start;max-width:88%;}
+.tzchat-row .tzchat-msg{max-width:100%;}
+.tzchat-avatar-sm{width:26px;height:26px;font-size:.7rem;}
+
+/* action sheet: tap lama pada bubble pesan (edit / hapus) */
+.tzchat-sheet-overlay{
+  position:fixed;inset:0;z-index:100010;
+  background:rgba(0,0,0,.55);
+  display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;visibility:hidden;
+  transition:opacity .22s ease,visibility .22s ease;
+}
+.tzchat-sheet-overlay.show{opacity:1;visibility:visible;}
+.tzchat-sheet{
+  width:100%;max-width:480px;background:#1c1c1f;border:1px solid #2e2e32;
+  border-bottom:none;border-radius:18px 18px 0 0;
+  padding:8px 10px calc(10px + env(safe-area-inset-bottom,0px));
+  transform:translateY(100%);transition:transform .26s cubic-bezier(.22,1,.36,1);
+}
+.tzchat-sheet-overlay.show .tzchat-sheet{transform:translateY(0);}
+.tzchat-sheet-preview{
+  padding:10px 12px;margin-bottom:6px;border-radius:12px;
+  background:#232326;color:var(--text2);font-size:.78rem;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.tzchat-sheet-btn{
+  display:flex;align-items:center;gap:10px;width:100%;
+  padding:13px 12px;border-radius:12px;margin-bottom:4px;
+  background:#232326;border:1px solid #2e2e32;
+  color:var(--text);font-weight:700;font-size:.88rem;text-align:left;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+.tzchat-sheet-btn:active{background:#2a2a2e;}
+.tzchat-sheet-btn svg{width:18px;height:18px;flex-shrink:0;}
+.tzchat-sheet-btn.tzchat-sheet-danger{color:#ff6b6b;}
+.tzchat-sheet-btn.tzchat-sheet-cancel{
+  background:transparent;border-color:#2e2e32;color:var(--text2);
+  font-weight:800;justify-content:center;margin-top:6px;
+}
+
+/* mode edit pada compose bar */
+.tzchat-edit-bar{
+  display:none;align-items:center;gap:8px;
+  padding:8px 12px;border-top:1px solid #2a2a2e;background:#1c1c1f;
+  font-size:.76rem;color:var(--text2);
+}
+.tzchat-edit-bar.show{display:flex;}
+.tzchat-edit-bar b{color:var(--text);font-weight:700;}
+.tzchat-edit-cancel{
+  margin-left:auto;background:none;border:none;color:var(--text2);
+  font-size:.76rem;font-weight:700;cursor:pointer;padding:4px 6px;
+  -webkit-tap-highlight-color:transparent;
+}
+
+.tzchat-compose{
+  display:flex;align-items:flex-end;gap:8px;flex-shrink:0;
+  padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));
+  border-top:1px solid #2a2a2e;background:#1c1c1f;
+}
+.tzchat-input{
+  flex:1;min-width:0;max-height:110px;resize:none;
+  padding:10px 13px;border-radius:16px;
+  background:#232326;border:1px solid #313136;
+  color:var(--text);font:inherit;font-size:.88rem;line-height:1.35;outline:none;
+  transition:border-color .2s ease;
+  scrollbar-width:none;-ms-overflow-style:none;
+}
+.tzchat-input::-webkit-scrollbar{display:none;width:0;height:0;}
+.tzchat-input:focus{border-color:#4a4a50;}
+.tzchat-input::placeholder{color:var(--text2);}
+.tzchat-send{
+  width:40px;height:40px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:#d4d4d8;color:#161618;border:none;cursor:pointer;padding:0;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .15s ease,opacity .2s ease;
+}
+.tzchat-send:active{transform:scale(.9);}
+.tzchat-send:disabled{opacity:.35;cursor:not-allowed;}
+.tzchat-send svg{width:18px;height:18px;}
+
+.tzchat-loading{
+  display:flex;align-items:center;justify-content:center;height:100%;min-height:160px;
+  color:var(--text2);font-size:.8rem;background:#141416;
+}
+
+/* titik notifikasi pada tombol chat admin di header */
+#headerChatBtn .tzchat-dot{
+  position:absolute;top:5px;right:5px;z-index:2;
+  min-width:15px;height:15px;padding:0 4px;border-radius:8px;
+  background:#9a9aa4;color:#161618;
+  font-size:.58rem;font-weight:800;line-height:15px;text-align:center;
+  display:none;
+}
+#headerChatBtn.has-unread .tzchat-dot{display:block;}
 </style>
 </head>
 <body class="auth-locked"><a href="#main-content" class="skip-link">Lewati ke konten utama</a>
@@ -4865,6 +5100,10 @@ body:has(#banScreen[style*="flex"]){
     </div>
   </div>
   <div class="header-actions">
+    <button type="button" class="diamond-btn" id="headerChatBtn" aria-label="Chat Admin" style="display:none;" onclick="openAdminChatInbox()">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span class="tzchat-dot" id="headerChatDot"></span>
+    </button>
     <button type="button" class="diamond-btn" id="headerAdminBtn" aria-label="Menu Admin" style="display:none;" onclick="openAdminChoiceModal()">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15H6a4 4 0 0 0-4 4v2"/><path d="M22 17.5c0 2.499-1.75 3.749-3.83 4.474a.5.5 0 0 1-.335-.005c-2.085-.72-3.835-1.97-3.835-4.47V14a.5.5 0 0 1 .5-.499c1 0 2.25-.6 3.12-1.36a.6.6 0 0 1 .76-.001c.875.765 2.12 1.36 3.12 1.36a.5.5 0 0 1 .5.5z"/><circle cx="9" cy="7" r="4"/></svg>
     </button>
@@ -4937,6 +5176,10 @@ body:has(#banScreen[style*="flex"]){
       <span class="side-menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span>
       <span>Info</span>
     </a></li>
+    <li><a href="#" onclick="openUserChat(); return false;">
+      <span class="side-menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+      <span>Chat Tarz Store</span>
+    </a></li>
   </ul>
 
   <div class="side-menu-signout-wrap">
@@ -4946,6 +5189,63 @@ body:has(#banScreen[style*="flex"]){
     </a>
   </div>
 </nav>
+
+<!-- ═══════════════════════════════════════════════════
+     CHAT ADMIN — satu layar, dua tampilan:
+       • publik : langsung ruang obrolan dengan admin
+       • admin  : daftar akun yang chat → klik → ruang obrolan
+     ═══════════════════════════════════════════════════ -->
+<div class="tzchat-overlay" id="tzchatOverlay" role="dialog" aria-modal="true" aria-label="Chat Tarz Store">
+  <div class="tzchat-panel">
+
+    <div class="tzchat-head">
+      <button type="button" class="tzchat-head-btn" id="tzchatBackBtn" aria-label="Kembali" onclick="tzchatBack()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      <div class="tzchat-avatar" id="tzchatHeadAvatar"></div>
+      <div class="tzchat-head-info">
+        <div class="tzchat-head-title" id="tzchatHeadTitle">Chat Tarz Store</div>
+        <div class="tzchat-head-sub" id="tzchatHeadSub"></div>
+      </div>
+      <button type="button" class="tzchat-head-btn" id="tzchatCloseBtn" aria-label="Tutup / kembali" onclick="tzchatBack()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <!-- tampilan 1 (admin): daftar akun -->
+    <div class="tzchat-list" id="tzchatList" style="display:none;"></div>
+
+    <!-- tampilan 2: ruang obrolan -->
+    <div class="tzchat-msgs" id="tzchatMsgs" style="display:none;"></div>
+    <div class="tzchat-edit-bar" id="tzchatEditBar">
+      Mengedit pesan: <b id="tzchatEditPreview"></b>
+      <button type="button" class="tzchat-edit-cancel" onclick="tzchatCancelEdit()">Batal</button>
+    </div>
+    <div class="tzchat-compose" id="tzchatCompose" style="display:none;">
+      <textarea class="tzchat-input" id="tzchatInput" rows="1" maxlength="1000" placeholder="Tulis pesan…" autocomplete="off"></textarea>
+      <button type="button" class="tzchat-send" id="tzchatSend" aria-label="Kirim" onclick="tzchatSendMessage()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- action sheet: muncul saat tap lama pada bubble pesan sendiri -->
+<div class="tzchat-sheet-overlay" id="tzchatSheetOverlay">
+  <div class="tzchat-sheet" id="tzchatSheet">
+    <div class="tzchat-sheet-preview" id="tzchatSheetPreview"></div>
+    <button type="button" class="tzchat-sheet-btn" id="tzchatSheetEditBtn" onclick="tzchatStartEdit()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+      Edit Pesan
+    </button>
+    <button type="button" class="tzchat-sheet-btn tzchat-sheet-danger" id="tzchatSheetDeleteBtn" onclick="tzchatConfirmDelete()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      Hapus Pesan
+    </button>
+    <button type="button" class="tzchat-sheet-btn tzchat-sheet-cancel" onclick="tzchatCloseSheet()">Batal</button>
+  </div>
+</div>
 
 <!-- LOBBY FF MODAL (foto lobby Free Fire + nama custom, bisa diunduh) -->
 <div class="lobbyff-modal-overlay" id="lobbyffModalOverlay">
@@ -15016,6 +15316,593 @@ window.addEventListener('npFirebaseReady', fbInitOnce, {once:true});
       else if(tries > 100){ clearInterval(poll); }
     }, 100);
   }
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════
+     CHAT ADMIN — LOGIKA
+     Memakai project Firebase KEDUA (khusus chat), terpisah dari
+     project utama toko (tarz-80183). App diberi nama "tarzChat"
+     supaya tidak bentrok dengan app default. Hanya Firestore yang
+     dipakai; identitas pengguna (uid/nama/foto) dibaca dari login
+     utama toko (_googleUser), jadi tidak ada login kedua.
+
+     STRUKTUR DATA (Firestore project chat):
+       chats/{uid}                      -> ringkasan percakapan
+           uid, name, photo, lastMessage, lastSender ('user'|'admin'),
+           lastAt, unreadAdmin (pesan user belum dibaca admin),
+           unreadUser (balasan admin belum dibaca user)
+       chats/{uid}/messages/{autoId}    -> isi pesan
+           text, sender ('user'|'admin'), createdAt
+     ═══════════════════════════════════════════════════ -->
+<!-- SDK Firebase (app + firestore) SUDAH dimuat oleh blok Firebase utama di atas
+     (versi sama 10.13.1), jadi tidak dimuat lagi di sini. -->
+<script>
+/* ▼▼▼ ISI DENGAN CONFIG FIREBASE BARU (khusus chat) ▼▼▼
+   Firebase Console → project baru → Project settings → Your apps → Web app. */
+const CHAT_FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBlP9fhYoFFSwlQQ2zvrkcvUby_RTcS7j0",
+  authDomain: "tarzx-46c69.firebaseapp.com",
+  projectId: "tarzx-46c69",
+  storageBucket: "tarzx-46c69.firebasestorage.app",
+  messagingSenderId: "950021277549",
+  appId: "1:950021277549:web:1d2a0056d8bff50d48fc64"
+};
+/* ▲▲▲ ─────────────────────────────────────────────── ▲▲▲ */
+
+(function(){
+  const ADMIN_PHOTO = 'https://i.ibb.co.com/XZbQqPjX/product.jpg';   // foto profil admin di chat
+  const MSG_LIMIT = 200;      // jumlah pesan terakhir yang dimuat per ruang obrolan
+  const TXT_MAX   = 1000;
+
+  let _db = null;             // Firestore project chat
+  let _mode = null;           // 'admin-list' | 'admin-room' | 'user-room'
+  let _roomUid = null;        // uid pemilik ruang obrolan yang sedang dibuka
+  let _roomUser = null;       // {name, photo} lawan bicara (mode admin)
+  let _unsubList = null;      // listener daftar chat (admin)
+  let _unsubMsgs = null;      // listener pesan ruang aktif
+  let _unsubBadge = null;     // listener badge unread (header admin / pengguna)
+  let _sending = false;
+  let _lastDay = '';
+  let _sheetMsgId = null;     // id pesan yang lagi dipilih di action sheet (tap lama)
+  let _sheetMsgText = '';     // teks pesan yang lagi dipilih (untuk preview & isi awal edit)
+  let _editMsgId = null;      // id pesan yang sedang diedit (compose berubah jadi mode edit)
+  let _pressTimer = null;     // timer buat deteksi tap lama
+  let _pressFired = false;    // penanda tap lama sudah kepicu, biar tap biasa tidak ikut ke-trigger
+
+  const $ = id => document.getElementById(id);
+  const toast = (m,t) => { if(typeof showToast === 'function') showToast(m,t); };
+  const isConfigured = () => CHAT_FIREBASE_CONFIG.apiKey && CHAT_FIREBASE_CONFIG.apiKey.indexOf('ISI_') !== 0;
+
+  /* ── init app Firebase kedua (lazy, sekali saja) ── */
+  function getChatDb(){
+    if(_db) return _db;
+    if(!isConfigured()) return null;
+    if(!(window.firebase && firebase.initializeApp && firebase.firestore)) return null;
+    let app;
+    try{
+      app = firebase.apps.find(a => a.name === 'tarzChat') || firebase.initializeApp(CHAT_FIREBASE_CONFIG, 'tarzChat');
+    }catch(e){ console.error('[chat] init gagal:', e); return null; }
+    _db = app.firestore();
+    return _db;
+  }
+
+  /* ── identitas pengguna dari login utama toko ── */
+  function currentUser(){
+    let u = null;
+    try{
+      const c = (typeof getAuthClient === 'function') ? getAuthClient() : (window.fbAuth || null);
+      u = (c && c.currentUser) || (typeof _googleUser !== 'undefined' ? _googleUser : null);
+    }catch(e){}
+    return u || null;
+  }
+  /* Foto profil pengguna untuk chat: dipilih ACAK dari galeri foto Edit Profil.
+     Acaknya "tetap per akun" (dihitung dari uid), jadi akun yang sama selalu
+     dapat foto yang sama, sedangkan akun berbeda dapat foto berbeda. Tidak
+     memakai Math.random supaya foto tidak berganti-ganti tiap kirim pesan. */
+  const RANDOM_PHOTOS = [
+    'https://apmxdcwebivmusqcuzcv.supabase.co/storage/v1/object/public/Tarzx/anime.png',
+    'https://i.ibb.co.com/WW61D1sV/profil2-png.jpg',
+    'https://i.ibb.co.com/LXMHt5Bm/b6c03c67d9f97b78604edb9956b12c7e.jpg',
+    'https://i.ibb.co.com/v65GGn9N/3ada57adf75eccdc1ec01e981840fbb7.jpg',
+    'https://i.ibb.co.com/Gfwwcfw2/122245.png',
+    'https://i.ibb.co.com/4Zwrmzd8/122251.png',
+    'https://i.ibb.co.com/4ZLjfCdC/ccb748e3d4cf403d41862188a07f68fb.jpg',
+    'https://i.ibb.co.com/vC1y13k4/122258.png'
+  ];
+  function userPhotoOf(u){
+    const key = String((u && u.uid) || (u && u.email) || 'anon');
+    let h = 0;
+    for(let i = 0; i < key.length; i++){ h = (h * 31 + key.charCodeAt(i)) >>> 0; }
+    return RANDOM_PHOTOS[h % RANDOM_PHOTOS.length];
+  }
+  function displayNameOf(u){
+    if(!u) return 'Pengguna';
+    const email = u.email || '';
+    return u.displayName || (email.endsWith('@tarzstore.local') ? email.split('@')[0] : email.split('@')[0]) || 'Pengguna';
+  }
+  function isAdmin(){ return typeof isOwnerAccount === 'function' && isOwnerAccount(); }
+
+  /* ── util tampilan ── */
+  function initial(name){ return (String(name || '?').trim()[0] || '?'); }
+  function setAvatar(el, name, photo){
+    el.innerHTML = '';
+    if(photo){
+      const img = document.createElement('img');
+      img.src = photo; img.alt = ''; img.referrerPolicy = 'no-referrer';
+      img.onerror = () => { el.textContent = initial(name); };
+      el.appendChild(img);
+    } else {
+      el.textContent = initial(name);
+    }
+  }
+  function tsMs(t){ return t && t.toMillis ? t.toMillis() : (typeof t === 'number' ? t : 0); }
+  function fmtTime(ms){
+    if(!ms) return '';
+    return new Date(ms).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
+  }
+  function fmtListTime(ms){
+    if(!ms) return '';
+    const d = new Date(ms), now = new Date();
+    if(d.toDateString() === now.toDateString()) return fmtTime(ms);
+    const y = new Date(now); y.setDate(now.getDate() - 1);
+    if(d.toDateString() === y.toDateString()) return 'Kemarin';
+    return d.toLocaleDateString('id-ID', {day:'numeric', month:'short'});
+  }
+  function fmtDay(ms){
+    const d = new Date(ms), now = new Date();
+    if(d.toDateString() === now.toDateString()) return 'Hari ini';
+    const y = new Date(now); y.setDate(now.getDate() - 1);
+    if(d.toDateString() === y.toDateString()) return 'Kemarin';
+    return d.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
+  }
+  function el(tag, cls, text){
+    const e = document.createElement(tag);
+    if(cls) e.className = cls;
+    if(text != null) e.textContent = text;   // textContent → aman dari XSS
+    return e;
+  }
+
+  /* ── buka / tutup overlay ── */
+  function showOverlay(){
+    const o = $('tzchatOverlay');
+    o.style.display = 'flex'; void o.offsetHeight;
+    o.classList.add('show');
+    document.body.style.overflow = 'hidden'; document.body.classList.add('tabbar-hide');
+  }
+  function hideOverlay(){
+    const o = $('tzchatOverlay');
+    o.classList.remove('show');
+    document.body.style.overflow = ''; document.body.classList.remove('tabbar-hide');
+  }
+  function stopRoom(){
+    if(_unsubMsgs){ _unsubMsgs(); _unsubMsgs = null; }
+    _editMsgId = null;
+    const bar = $('tzchatEditBar'); if(bar) bar.classList.remove('show');
+    const input = $('tzchatInput'); if(input) input.value = '';
+  }
+  function stopList(){ if(_unsubList){ _unsubList(); _unsubList = null; } }
+
+  function showView(which){
+    $('tzchatList').style.display    = which === 'list' ? '' : 'none';
+    $('tzchatMsgs').style.display    = which === 'room' ? 'flex' : 'none';
+    $('tzchatCompose').style.display = which === 'room' ? 'flex' : 'none';
+  }
+
+  /* ═════════ PUBLIK: buka ruang obrolan dengan admin ═════════ */
+  window.openUserChat = function(){
+    if(typeof closeSideMenu === 'function') closeSideMenu();
+    const u = currentUser();
+    if(!u){ toast('Login dulu untuk chat dengan admin.', 'error'); return; }
+    if(!getChatDb()){
+      toast(isConfigured() ? 'Chat belum siap, coba lagi sebentar.' : 'Fitur chat belum dikonfigurasi.', 'error');
+      return;
+    }
+    _mode = 'user-room';
+    _roomUid = u.uid;
+    _roomUser = null;
+    $('tzchatBackBtn').style.display = 'none';
+    $('tzchatCloseBtn').style.display = '';       // pengguna: X tampil
+    $('tzchatHeadTitle').textContent = 'Admin Tarz Store';
+    $('tzchatHeadSub').textContent = 'Balasan masuk di sini';
+    setAvatar($('tzchatHeadAvatar'), 'Admin', ADMIN_PHOTO);
+    showView('room');
+    showOverlay();
+    subscribeRoom(u.uid);
+    markRead('user', u.uid);
+  };
+
+  /* ═════════ ADMIN: buka daftar akun yang chat ═════════ */
+  window.openAdminChatInbox = function(){
+    if(!isAdmin()) return;
+    if(!getChatDb()){
+      toast(isConfigured() ? 'Chat belum siap, coba lagi sebentar.' : 'Fitur chat belum dikonfigurasi.', 'error');
+      return;
+    }
+    _mode = 'admin-list';
+    _roomUid = null;
+    $('tzchatBackBtn').style.display = 'none';    // admin: tombol panah kembali dihapus
+    $('tzchatCloseBtn').style.display = '';       // admin: pakai tombol X
+    $('tzchatHeadTitle').textContent = 'Chat Masuk';
+    $('tzchatHeadSub').textContent = 'Pilih akun untuk membalas';
+    setAvatar($('tzchatHeadAvatar'), 'C', null);
+    $('tzchatHeadAvatar').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:19px;height:19px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+    showView('list');
+    showOverlay();
+    subscribeList();
+  };
+
+  function subscribeList(){
+    stopList();
+    const box = $('tzchatList');
+    box.innerHTML = '';
+    box.appendChild(el('div', 'tzchat-loading', 'Memuat obrolan…'));
+    _unsubList = getChatDb().collection('chats').orderBy('lastAt', 'desc').limit(100).onSnapshot(snap => {
+      box.innerHTML = '';
+      if(snap.empty){
+        const empty = el('div', 'tzchat-empty');
+        empty.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+        empty.appendChild(el('div', '', 'Belum ada yang chat.'));
+        box.appendChild(empty);
+        return;
+      }
+      snap.docs.forEach(d => box.appendChild(buildListItem(d.id, d.data())));
+    }, err => {
+      console.error('[chat] list error:', err);
+      box.innerHTML = '';
+      box.appendChild(el('div', 'tzchat-empty', 'Gagal memuat obrolan. Cek Firestore rules project chat.'));
+    });
+  }
+
+  function buildListItem(uid, c){
+    const unread = Number(c.unreadAdmin) || 0;
+    const btn = el('button', 'tzchat-list-item' + (unread ? ' is-unread' : ''));
+    btn.type = 'button';
+    const av = el('div', 'tzchat-avatar');
+    setAvatar(av, c.name, c.photo);
+    const body = el('div', 'tzchat-list-body');
+    const top = el('div', 'tzchat-list-top');
+    top.appendChild(el('span', 'tzchat-list-name', c.name || 'Pengguna'));
+    top.appendChild(el('span', 'tzchat-list-time', fmtListTime(tsMs(c.lastAt))));
+    const bottom = el('div', 'tzchat-list-bottom');
+    const prefix = c.lastSender === 'admin' ? 'Kamu: ' : '';
+    bottom.appendChild(el('span', 'tzchat-list-last', prefix + (c.lastMessage || '')));
+    if(unread) bottom.appendChild(el('span', 'tzchat-badge', unread > 99 ? '99+' : String(unread)));
+    body.appendChild(top); body.appendChild(bottom);
+    btn.appendChild(av); btn.appendChild(body);
+    btn.onclick = () => openAdminRoom(uid, c);
+    return btn;
+  }
+
+  function openAdminRoom(uid, c){
+    stopList();
+    _mode = 'admin-room';
+    _roomUid = uid;
+    _roomUser = { name: c.name || 'Pengguna', photo: c.photo || '' };
+    $('tzchatHeadTitle').textContent = _roomUser.name;
+    $('tzchatHeadSub').textContent = 'Akun pengguna';
+    setAvatar($('tzchatHeadAvatar'), _roomUser.name, _roomUser.photo);
+    showView('room');
+    subscribeRoom(uid);
+    markRead('admin', uid);
+  }
+
+  /* tombol kembali: room admin → daftar; selain itu tutup */
+  window.tzchatBack = function(){
+    if(_mode === 'admin-room'){
+      stopRoom();
+      window.openAdminChatInbox();
+    } else {
+      window.closeTzChat();
+    }
+  };
+  window.closeTzChat = function(){
+    stopRoom(); stopList();
+    hideOverlay();
+    _mode = null; _roomUid = null;
+  };
+
+  /* ═════════ ruang obrolan (dipakai kedua sisi) ═════════ */
+  function subscribeRoom(uid){
+    stopRoom();
+    const box = $('tzchatMsgs');
+    box.innerHTML = '';
+    box.appendChild(el('div', 'tzchat-loading', 'Memuat pesan…'));
+    _lastDay = '';
+    let first = true;
+    _unsubMsgs = getChatDb().collection('chats').doc(uid).collection('messages')
+      .orderBy('createdAt', 'desc').limit(MSG_LIMIT)
+      .onSnapshot({ includeMetadataChanges: true }, snap => {
+        const docs = snap.docs.slice().reverse();
+        const stick = first || (box.scrollHeight - box.scrollTop - box.clientHeight < 90);
+        box.innerHTML = '';
+        _lastDay = '';
+        if(!docs.length){
+          box.appendChild(el('div', 'tzchat-empty',
+            _mode === 'user-room' ? 'Belum ada pesan. Tulis pesan pertamamu ke admin!' : 'Belum ada pesan.'));
+        }
+        const mine = _mode === 'user-room' ? 'user' : 'admin';
+        docs.forEach(d => {
+          const m = d.data();
+          const ms = tsMs(m.createdAt) || Date.now();     // pesan lokal belum punya timestamp server
+          const day = new Date(ms).toDateString();
+          if(day !== _lastDay){ _lastDay = day; box.appendChild(el('div', 'tzchat-day', fmtDay(ms))); }
+          const isMine = m.sender === mine;
+          const isDeleted = !!m.deleted;
+          const bubble = el('div', 'tzchat-msg ' + (isMine ? 'me' : 'them') + (d.metadata.hasPendingWrites ? ' pending' : '') + (isDeleted ? ' tzchat-deleted' : ''));
+          bubble.dataset.id = d.id;
+          if(isDeleted){
+            bubble.appendChild(document.createTextNode('Pesan telah dihapus'));
+          } else {
+            if(m.edited) bubble.appendChild(el('span', 'tzchat-msg-edited', '(diedit)'));
+            bubble.appendChild(document.createTextNode(m.text || ''));
+          }
+          bubble.appendChild(el('span', 'tzchat-msg-time', fmtTime(ms)));
+          /* tap lama hanya untuk pesan sendiri yang belum dihapus */
+          if(isMine && !isDeleted) attachLongPress(bubble, d.id, m.text || '');
+          if(_mode === 'user-room' && m.sender === 'admin'){
+            /* balasan admin di layar pengguna: tampilkan foto profil admin di kiri bubble */
+            const row = el('div', 'tzchat-row');
+            const av = el('div', 'tzchat-avatar tzchat-avatar-sm');
+            setAvatar(av, 'Admin', ADMIN_PHOTO);
+            row.appendChild(av); row.appendChild(bubble);
+            box.appendChild(row);
+          } else if(_mode === 'admin-room' && m.sender === 'user'){
+            /* pesan pengguna di layar admin: tampilkan foto profil akun pengguna
+               (foto Google / avatar akun) di kiri bubble; kalau tidak ada foto,
+               otomatis jadi huruf depan nama akun. */
+            const row = el('div', 'tzchat-row');
+            const av = el('div', 'tzchat-avatar tzchat-avatar-sm');
+            setAvatar(av, _roomUser && _roomUser.name, _roomUser && _roomUser.photo);
+            row.appendChild(av); row.appendChild(bubble);
+            box.appendChild(row);
+          } else {
+            box.appendChild(bubble);
+          }
+        });
+        if(stick) box.scrollTop = box.scrollHeight;
+        first = false;
+        // pesan baru masuk saat ruang terbuka → langsung dianggap terbaca
+        if(!snap.metadata.hasPendingWrites) markRead(_mode === 'user-room' ? 'user' : 'admin', uid);
+      }, err => {
+        console.error('[chat] room error:', err);
+        box.innerHTML = '';
+        box.appendChild(el('div', 'tzchat-empty', 'Gagal memuat pesan. Cek Firestore rules project chat.'));
+      });
+  }
+
+  /* tandai terbaca (reset counter unread sisi yang sedang membuka) */
+  function markRead(side, uid){
+    const db = getChatDb(); if(!db || !uid) return;
+    const field = side === 'admin' ? 'unreadAdmin' : 'unreadUser';
+    db.collection('chats').doc(uid).get().then(s => {
+      if(s.exists && Number(s.data()[field]) > 0) return s.ref.update({ [field]: 0 });
+    }).catch(()=>{});
+  }
+
+  /* ═════════ kirim pesan ═════════ */
+  window.tzchatSendMessage = async function(){
+    if(_sending) return;
+    const input = $('tzchatInput');
+    const text = input.value.trim().slice(0, TXT_MAX);
+    if(!text || !_roomUid) return;
+    const db = getChatDb(); if(!db) return;
+    const isUserSide = _mode === 'user-room';
+    if(isUserSide && !currentUser()){ toast('Sesi login berakhir, login lagi.', 'error'); return; }
+
+    /* kalau lagi mode edit, kirim = simpan perubahan, bukan pesan baru */
+    if(_editMsgId){ return tzchatSaveEdit(text); }
+
+    _sending = true;
+    $('tzchatSend').disabled = true;
+    input.value = ''; autoGrow();
+    const ts = firebase.firestore.FieldValue.serverTimestamp();
+    const inc = firebase.firestore.FieldValue.increment(1);
+    const chatRef = db.collection('chats').doc(_roomUid);
+    try{
+      const meta = {
+        lastMessage: text.slice(0, 120),
+        lastSender: isUserSide ? 'user' : 'admin',
+        lastAt: ts
+      };
+      if(isUserSide){
+        const u = currentUser();
+        meta.uid = u.uid;
+        meta.name = displayNameOf(u);
+        meta.photo = userPhotoOf(u);
+        meta.unreadAdmin = inc;
+      } else {
+        meta.unreadUser = inc;
+      }
+      const batch = db.batch();
+      batch.set(chatRef.collection('messages').doc(), { text, sender: isUserSide ? 'user' : 'admin', createdAt: ts });
+      batch.set(chatRef, meta, { merge: true });
+      await batch.commit();
+    }catch(e){
+      console.error('[chat] kirim gagal:', e);
+      input.value = text; autoGrow();
+      toast('Pesan gagal terkirim. Coba lagi.', 'error');
+    }finally{
+      _sending = false;
+      $('tzchatSend').disabled = false;
+    }
+  };
+
+  /* ═════════ tap lama pada bubble → buka action sheet (edit / hapus) ═════════ */
+  function attachLongPress(bubble, msgId, text){
+    const LONG_MS = 480;
+    const start = (ev) => {
+      _pressFired = false;
+      clearTimeout(_pressTimer);
+      _pressTimer = setTimeout(() => {
+        _pressFired = true;
+        bubble.classList.add('tzchat-pressed');
+        if(navigator.vibrate) navigator.vibrate(12);
+        tzchatOpenSheet(msgId, text);
+      }, LONG_MS);
+    };
+    const cancel = () => {
+      clearTimeout(_pressTimer);
+      bubble.classList.remove('tzchat-pressed');
+    };
+    bubble.addEventListener('touchstart', start, { passive: true });
+    bubble.addEventListener('touchend', cancel);
+    bubble.addEventListener('touchmove', cancel);
+    bubble.addEventListener('touchcancel', cancel);
+    bubble.addEventListener('mousedown', start);
+    bubble.addEventListener('mouseup', cancel);
+    bubble.addEventListener('mouseleave', cancel);
+    /* cegah klik biasa memicu apa pun setelah tap lama kepicu */
+    bubble.addEventListener('click', (ev) => { if(_pressFired){ ev.preventDefault(); ev.stopPropagation(); } });
+    bubble.addEventListener('contextmenu', (ev) => ev.preventDefault());
+  }
+
+  window.tzchatOpenSheet = function(msgId, text){
+    _sheetMsgId = msgId;
+    _sheetMsgText = text;
+    $('tzchatSheetPreview').textContent = text;
+    $('tzchatSheetOverlay').classList.add('show');
+  };
+  window.tzchatCloseSheet = function(){
+    $('tzchatSheetOverlay').classList.remove('show');
+    document.querySelectorAll('.tzchat-msg.tzchat-pressed').forEach(b => b.classList.remove('tzchat-pressed'));
+    _sheetMsgId = null; _sheetMsgText = '';
+  };
+
+  /* ═════════ mulai edit: isi compose dengan teks lama ═════════ */
+  window.tzchatStartEdit = function(){
+    if(!_sheetMsgId) return;
+    _editMsgId = _sheetMsgId;
+    const input = $('tzchatInput');
+    input.value = _sheetMsgText;
+    autoGrow();
+    input.focus();
+    $('tzchatEditPreview').textContent = _sheetMsgText.slice(0, 60);
+    $('tzchatEditBar').classList.add('show');
+    window.tzchatCloseSheet();
+  };
+  window.tzchatCancelEdit = function(){
+    _editMsgId = null;
+    $('tzchatEditBar').classList.remove('show');
+    $('tzchatInput').value = '';
+    autoGrow();
+  };
+  async function tzchatSaveEdit(newText){
+    const db = getChatDb(); if(!db || !_roomUid || !_editMsgId) return;
+    const msgId = _editMsgId;
+    const input = $('tzchatInput');
+    _sending = true;
+    $('tzchatSend').disabled = true;
+    try{
+      await db.collection('chats').doc(_roomUid).collection('messages').doc(msgId)
+        .update({ text: newText, edited: true });
+      input.value = ''; autoGrow();
+      _editMsgId = null;
+      $('tzchatEditBar').classList.remove('show');
+    }catch(e){
+      console.error('[chat] edit gagal:', e);
+      toast('Gagal menyimpan perubahan. Coba lagi.', 'error');
+    }finally{
+      _sending = false;
+      $('tzchatSend').disabled = false;
+    }
+  }
+
+  /* ═════════ hapus pesan (soft delete: teks diganti, ditandai deleted) ═════════ */
+  window.tzchatConfirmDelete = async function(){
+    const db = getChatDb();
+    const msgId = _sheetMsgId;
+    if(!db || !_roomUid || !msgId) return;
+    window.tzchatCloseSheet();
+    try{
+      await db.collection('chats').doc(_roomUid).collection('messages').doc(msgId)
+        .update({ text: '', deleted: true, edited: false });
+      /* kalau pesan yang dihapus itu sedang dalam mode edit, batalkan mode edit */
+      if(_editMsgId === msgId) window.tzchatCancelEdit();
+    }catch(e){
+      console.error('[chat] hapus gagal:', e);
+      toast('Gagal menghapus pesan. Coba lagi.', 'error');
+    }
+  };
+
+  /* textarea auto-tinggi + Enter kirim (Shift+Enter baris baru) */
+  function autoGrow(){
+    const i = $('tzchatInput');
+    i.style.height = 'auto';
+    i.style.height = Math.min(i.scrollHeight, 110) + 'px';
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    const i = $('tzchatInput');
+    if(i){
+      i.addEventListener('input', autoGrow);
+      i.addEventListener('keydown', e => {
+        if(e.key === 'Enter' && !e.shiftKey && !e.isComposing){ e.preventDefault(); window.tzchatSendMessage(); }
+      });
+    }
+    const o = $('tzchatOverlay');
+    if(o) o.addEventListener('mousedown', e => { if(e.target === o) window.closeTzChat(); });
+    const so = $('tzchatSheetOverlay');
+    if(so) so.addEventListener('mousedown', e => { if(e.target === so) window.tzchatCloseSheet(); });
+  });
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape' && $('tzchatSheetOverlay') && $('tzchatSheetOverlay').classList.contains('show')){ window.tzchatCloseSheet(); return; }
+    if(e.key === 'Escape' && $('tzchatOverlay') && $('tzchatOverlay').classList.contains('show')) window.tzchatBack();
+  });
+
+  /* ═════════ badge notifikasi ═════════
+     Admin  : angka total pesan belum dibaca di icon chat header.
+     Publik : dipakai untuk toast kecil saat ada balasan admin. */
+  function refreshChatHeaderBtn(){
+    const btn = $('headerChatBtn');
+    if(!btn) return;
+    const ok = isAdmin();
+    btn.style.display = ok ? '' : 'none';
+    if(ok) startAdminBadge(); else stopBadge();
+  }
+  function stopBadge(){
+    if(_unsubBadge){ _unsubBadge(); _unsubBadge = null; }
+    const btn = $('headerChatBtn');
+    if(btn) btn.classList.remove('has-unread');
+  }
+  function startAdminBadge(){
+    if(_unsubBadge) return;
+    const db = getChatDb(); if(!db) return;
+    _unsubBadge = db.collection('chats').where('unreadAdmin', '>', 0).onSnapshot(snap => {
+      let total = 0;
+      snap.forEach(d => { total += Number(d.data().unreadAdmin) || 0; });
+      const btn = $('headerChatBtn'), dot = $('headerChatDot');
+      if(!btn || !dot) return;
+      btn.classList.toggle('has-unread', total > 0);
+      dot.textContent = total > 99 ? '99+' : String(total);
+    }, err => console.warn('[chat] badge error:', err));
+  }
+
+  /* Sinkronkan tombol admin tiap status login berubah. Fungsi
+     refreshHeaderAdminBtnVisibility() milik toko dipanggil di setiap
+     perubahan login → kita "menumpang" di situ tanpa mengubah aslinya. */
+  function hookVisibility(){
+    if(typeof window.refreshHeaderAdminBtnVisibility === 'function' && !window.refreshHeaderAdminBtnVisibility._chatHooked){
+      const orig = window.refreshHeaderAdminBtnVisibility;
+      window.refreshHeaderAdminBtnVisibility = function(){
+        const r = orig.apply(this, arguments);
+        try{ refreshChatHeaderBtn(); }catch(e){}
+        return r;
+      };
+      window.refreshHeaderAdminBtnVisibility._chatHooked = true;
+    }
+  }
+  hookVisibility();
+  window.addEventListener('load', () => { hookVisibility(); setTimeout(refreshChatHeaderBtn, 800); });
+  window.addEventListener('npFirebaseFullyReady', () => setTimeout(refreshChatHeaderBtn, 600));
+  /* jaring pengaman: cek berkala (ringan) sampai status admin ketahuan, lalu berhenti */
+  (function(){
+    let n = 0;
+    const t = setInterval(() => {
+      n++;
+      refreshChatHeaderBtn();
+      if(_unsubBadge || n > 40) clearInterval(t);
+    }, 1500);
+  })();
 })();
 </script>
 
