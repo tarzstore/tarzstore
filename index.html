@@ -7744,10 +7744,18 @@ function closeInfoVipModal(){
   document.body.style.overflow = ''; document.body.classList.remove('tabbar-hide');
 }
 
-/* Ambil data akun yang sama seperti Info Akun (vip_users + usernames
-   digabung ke _infoAkunAllAccounts). Query mandiri (tidak bergantung Info
-   Akun modal sudah pernah dibuka duluan) supaya datanya selalu segar tiap
-   kali Info VIP dibuka. */
+/* Ambil data akun VIP untuk modal Info VIP dan simpan ke
+   _infoAkunAllAccounts (bentuk objek sama seperti sebelumnya).
+   HEMAT READS: TIDAK lagi membaca seluruh koleksi.
+   1) vip_users -> where('is_vip','==',true): cuma akun VIP yang dibaca
+      (satu field, tidak butuh index komposit). Biaya = jumlah VIP, bukan
+      jumlah semua akun yang pernah login.
+   2) usernames -> cuma dokumen untuk uid yang muncul di hasil VIP tadi,
+      lewat where('uid','in',[...]) dipecah per 10 uid (batas operator 'in').
+      Akun yang tidak ada di usernames = akun Google, tampil pakai email.
+   Filter VIP kedaluwarsa (vip_expiry sudah lewat -> bukan VIP) tetap
+   dijalankan di infoAkunBuildAccount(), lalu akun yang sudah kedaluwarsa
+   dibuang dari cache karena modal ini memang hanya menampilkan VIP. */
 async function loadInfoVipData(){
   const listEl = document.getElementById('infoVipList');
   const countEl = document.getElementById('infoVipCount');
@@ -7761,64 +7769,52 @@ async function loadInfoVipData(){
   }
 
   try{
-    const [vipSnap, usernameSnap] = await Promise.all([
-      window.fbDb.collection('vip_users').get(),
-      window.fbDb.collection('usernames').get()
-    ]);
+    // 1) Hanya akun yang is_vip:true.
+    const vipSnap = await window.fbDb.collection('vip_users')
+      .where('is_vip', '==', true).get();
 
     const vipDataByUid = {};
-    const accounts = {};
-
     vipSnap.forEach(function(doc){
-      const data = doc.data() || {};
-      const uid = doc.id;
-      let isVip = !!data.is_vip;
-      if(isVip && data.vip_expiry){
-        const expiryMs = toMillis(data.vip_expiry);
-        if(expiryMs && Date.now() > expiryMs) isVip = false;
-      }
-      vipDataByUid[uid] = data;
-      if(data.email){
-        const isInternal = data.email.endsWith('@tarzstore.local');
-        accounts[data.email] = {
-          uid: uid,
-          email: data.email,
-          isVip: isVip,
-          isBanned: !!data.is_banned,
-          method: isInternal ? 'password' : 'google',
-          createdAt: data.created_at || null,
-          vipSince: isVip ? (data.vip_since || null) : null,
-          vipExpiry: data.vip_expiry || null
-        };
-      }
+      vipDataByUid[doc.id] = doc.data() || {};
+    });
+    const vipUids = Object.keys(vipDataByUid);
+
+    // 2) Lookup usernames hanya untuk uid VIP, per 10 uid (batas 'in').
+    //    Dijalankan paralel; tiap chunk = 1 query.
+    const usernameDocByUid = {};
+    const chunks = [];
+    for(let i = 0; i < vipUids.length; i += 10){
+      chunks.push(vipUids.slice(i, i + 10));
+    }
+    const usernameSnaps = await Promise.all(chunks.map(function(chunk){
+      return window.fbDb.collection('usernames')
+        .where('uid', 'in', chunk).get();
+    }));
+    usernameSnaps.forEach(function(snap){
+      snap.forEach(function(doc){
+        const udata = doc.data() || {};
+        if(udata.uid && !usernameDocByUid[udata.uid]){
+          usernameDocByUid[udata.uid] = { id: doc.id, data: udata };
+        }
+      });
     });
 
-    usernameSnap.forEach(function(doc){
-      const data = doc.data() || {};
-      const email = data.email || (doc.id + '@tarzstore.local');
-      const vipData = data.uid ? vipDataByUid[data.uid] : null;
-      let isVip = !!(vipData && vipData.is_vip);
-      if(isVip && vipData.vip_expiry){
-        const expiryMs = toMillis(vipData.vip_expiry);
-        if(expiryMs && Date.now() > expiryMs) isVip = false;
-      }
-      const displayName = email.endsWith('@tarzstore.local') ? doc.id : email;
-      accounts[email] = {
-        uid: data.uid || null,
-        email: displayName,
-        isVip: isVip,
-        isBanned: !!(vipData && vipData.is_banned),
-        method: 'password',
-        createdAt: data.created_at || (vipData && vipData.created_at) || null,
-        vipSince: isVip ? (vipData && vipData.vip_since || null) : null,
-        vipExpiry: (vipData && vipData.vip_expiry) || null
-      };
+    // 3) Susun akun. Kalau uid punya dokumen username -> tampil sebagai
+    //    username (bukan email @tarzstore.local); kalau tidak -> akun Google.
+    const accounts = [];
+    vipUids.forEach(function(uid){
+      const vipData = vipDataByUid[uid];
+      const usernameDoc = usernameDocByUid[uid] || null;
+      // Akun tanpa email & tanpa username tidak bisa ditampilkan (sama
+      // seperti perilaku lama yang mengabaikan dokumen tanpa email).
+      if(!usernameDoc && !vipData.email) return;
+      const acc = infoAkunBuildAccount(uid, vipData, usernameDoc);
+      if(acc.isVip) accounts.push(acc); // buang yang vip_expiry-nya sudah lewat
     });
 
     // Cache yang sama dipakai juga oleh Info Akun & Analisis Akun supaya
     // ketiga modal admin ini konsisten & tidak query Firestore berkali-kali.
-    _infoAkunAllAccounts = Object.values(accounts).sort(function(a, b){
-      if(a.isVip !== b.isVip) return a.isVip ? -1 : 1;
+    _infoAkunAllAccounts = accounts.sort(function(a, b){
       return a.email.localeCompare(b.email);
     });
 
