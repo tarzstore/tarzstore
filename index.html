@@ -3689,9 +3689,9 @@ body.side-menu-open{overflow:hidden;}
 }
 .admin-choice-desc{font-size:.66rem;color:var(--text2);line-height:1.3;}
 .admin-choice-arrow{flex-shrink:0;width:16px;height:16px;color:var(--text2);}
-/* ── INFO AKUN MODAL — daftar semua akun yang pernah login (Google atau
+/* ── GIFT VIP MODAL (dulu "Info Akun") — daftar akun yang dicari (Google atau
    username/password), menampilkan email + label VIP/FREE. Dibuka dari
-   MENU ADMIN > "Info Akun". Pakai wrapper sendiri (.infoakun-modal),
+   MENU ADMIN > "Gift VIP" (dulu "Info Akun"). Pakai wrapper sendiri (.infoakun-modal),
    BUKAN .gapi-modal, supaya bisa lebih lebar & muat kolom pencarian. ── */
 .infoakun-modal{
   position:relative;
@@ -3712,27 +3712,45 @@ body.side-menu-open{overflow:hidden;}
   position:relative;margin-top:12px;margin-bottom:10px;flex-shrink:0;
 }
 .infoakun-search-wrap svg{
-  position:absolute;left:12px;top:50%;transform:translateY(-50%);
+  position:absolute;left:13px;top:50%;transform:translateY(-50%);
   width:15px;height:15px;color:var(--text2);pointer-events:none;
 }
 .infoakun-search-input{
-  width:100%;padding:10px 12px 10px 36px;
+  width:100%;padding:11px 12px 11px 38px;
   background:rgba(255,255,255,.04);
   border:1px solid var(--border-strong);
   border-radius:var(--radius-md);
   color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:.78rem;
-  outline:none;transition:border-color .2s ease,background .2s ease;
+  outline:none;transition:border-color .2s ease,background .2s ease,box-shadow .2s ease;
 }
-.infoakun-search-input::placeholder{color:var(--text2);}
-.infoakun-search-input:focus{border-color:var(--blue2);background:rgba(255,255,255,.06);}
+.infoakun-search-input::placeholder{color:var(--text2);opacity:.75;}
+.infoakun-search-input:focus{
+  border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.06);
+  box-shadow:0 0 0 3px rgba(255,255,255,.05);
+}
+.infoakun-search-wrap-btn{display:flex;gap:8px;align-items:stretch;margin-bottom:12px;}
+.infoakun-search-wrap-btn .infoakun-search-input{flex:1;min-width:0;}
+.infoakun-search-wrap-btn svg{left:14px;}
+.infoakun-search-btn{
+  flex-shrink:0;padding:0 20px;
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+  border:none;border-radius:var(--radius-md);
+  color:#0a0a0a;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.74rem;
+  letter-spacing:.02em;cursor:pointer;
+  transition:filter .2s ease,transform .15s ease,opacity .2s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.infoakun-search-btn:hover{filter:brightness(1.08);}
+.infoakun-search-btn:active{transform:scale(.96);}
+.infoakun-search-btn:disabled{opacity:.5;cursor:default;pointer-events:none;}
 .infoakun-filter-tabs{
   display:flex;gap:6px;margin-bottom:10px;flex-shrink:0;
 }
 .infoakun-filter-tab{
-  flex:1;padding:7px 8px;text-align:center;cursor:pointer;
+  flex:1;padding:8px 6px;text-align:center;cursor:pointer;
   background:rgba(255,255,255,.03);border:1px solid var(--border);
   border-radius:var(--radius-sm);
-  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.66rem;
+  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.64rem;
   letter-spacing:.03em;color:var(--text2);
   transition:background .2s ease,border-color .2s ease,color .2s ease;
   -webkit-tap-highlight-color:transparent;
@@ -3741,52 +3759,127 @@ body.side-menu-open{overflow:hidden;}
   background:linear-gradient(135deg,var(--blue),var(--blue2));
   border-color:transparent;color:#0a0a0a;
 }
-.infoakun-list{display:flex;flex-direction:column;gap:7px;overflow-y:auto;flex:1;min-height:120px;}
-.infoakun-item{
+
+/* ── GIFT VIP — header (ikon hadiah + judul) & petunjuk pencarian ── */
+.giftvip-hero{
   display:flex;align-items:center;gap:12px;
-  width:100%;padding:12px 14px;
+  padding:2px 34px 14px 2px;margin-bottom:2px;
+  border-bottom:1px solid var(--border);
+}
+.giftvip-hero-icon{
+  flex-shrink:0;width:42px;height:42px;border-radius:13px;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--blue),var(--blue2));color:#0a0a0a;
+  box-shadow:0 6px 16px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.55);
+}
+.giftvip-hero-icon svg{width:21px;height:21px;}
+.giftvip-hero-text{min-width:0;display:flex;flex-direction:column;gap:2px;}
+.giftvip-title{text-align:left;font-size:.98rem;letter-spacing:.06em;}
+.giftvip-sub{font-size:.66rem;color:var(--text2);line-height:1.35;}
+
+/* ── DAFTAR AKUN ── */
+.infoakun-list{
+  display:flex;flex-direction:column;gap:8px;overflow-y:auto;flex:1;min-height:150px;
+  padding-right:2px;-webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.14) transparent;
+}
+.infoakun-list::-webkit-scrollbar{width:4px;}
+.infoakun-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);border-radius:4px;}
+.infoakun-item{
+  position:relative;
+  display:flex;align-items:center;gap:10px;
+  width:100%;padding:12px 10px 12px 12px;
   background:rgba(255,255,255,.03);
   border:1px solid var(--border);
   border-radius:var(--radius-md);
-  transition:background .2s ease,border-color .2s ease;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  transition:background .2s ease,border-color .2s ease,transform .15s ease;
 }
-.infoakun-item:hover{background:rgba(255,255,255,.05);border-color:var(--border-strong);}
+.infoakun-item:hover{background:rgba(255,255,255,.055);border-color:var(--border-strong);}
+.infoakun-item:active{transform:scale(.985);}
+.infoakun-item:focus-visible{outline:2px solid rgba(255,255,255,.3);outline-offset:2px;}
+.infoakun-item.is-vip{
+  background:linear-gradient(135deg,rgba(243,212,137,.07),rgba(255,255,255,.02));
+  border-color:rgba(243,212,137,.2);
+}
+.infoakun-item.is-vip:hover{border-color:rgba(243,212,137,.34);}
 .infoakun-item.is-banned{border-color:rgba(255,70,70,.35);background:rgba(255,70,70,.05);}
 .infoakun-ban-tag{color:#ff6b6b;font-weight:700;}
 .infoakun-avatar{
-  flex-shrink:0;width:32px;height:32px;border-radius:50%;
+  position:relative;
+  flex-shrink:0;width:38px;height:38px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
   background:linear-gradient(135deg,var(--blue),var(--blue2));
-  color:#0a0a0a;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.78rem;
+  color:#0a0a0a;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.86rem;
   text-transform:uppercase;
+  box-shadow:0 0 0 2px rgba(255,255,255,.05);
 }
 .infoakun-item.is-free .infoakun-avatar{
-  background:rgba(255,255,255,.08);color:var(--text2);
+  background:rgba(255,255,255,.08);color:var(--text2);box-shadow:none;
 }
-.infoakun-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+.infoakun-avatar-dot{
+  position:absolute;bottom:-1px;right:-1px;
+  width:11px;height:11px;border-radius:50%;
+  background:rgba(255,255,255,.18);border:2px solid var(--card2);
+}
+.infoakun-item.is-vip .infoakun-avatar-dot{background:#4ade80;}
+.infoakun-item.is-banned .infoakun-avatar-dot{background:#ff6b6b;}
+.infoakun-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px;}
 .infoakun-email{
-  font-family:'Space Mono',monospace;font-size:.74rem;
+  font-family:'Space Mono',monospace;font-size:.7rem;font-weight:600;letter-spacing:-.01em;
   color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
-.infoakun-method{
-  font-size:.6rem;color:var(--text2);
+.infoakun-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.infoakun-method{font-size:.6rem;color:var(--text2);line-height:1.4;}
+.infoakun-chip{
+  display:inline-block;padding:2px 7px;border-radius:6px;
+  background:rgba(255,255,255,.06);
+  font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.56rem;
+  letter-spacing:.03em;color:var(--text2);line-height:1.4;
 }
+.infoakun-chip.is-ban{background:rgba(255,70,70,.14);color:#ff6b6b;font-weight:700;text-transform:uppercase;letter-spacing:.05em;}
 .infoakun-badge{
-  flex-shrink:0;font-family:'Space Grotesk',sans-serif;font-weight:700;
-  font-size:.6rem;letter-spacing:.04em;padding:5px 10px;border-radius:999px;
+  flex-shrink:0;display:inline-flex;align-items:center;gap:4px;
+  font-family:'Space Grotesk',sans-serif;font-weight:700;
+  font-size:.58rem;letter-spacing:.05em;padding:5px 9px;border-radius:999px;
 }
+.infoakun-badge svg{position:static;transform:none;width:10px;height:10px;color:inherit;}
 .infoakun-badge.is-vip{
-  background:linear-gradient(135deg,var(--blue),var(--blue2));color:#0a0a0a;
+  background:linear-gradient(135deg,#f3d489,#d9b45c);color:#3a2a05;
+  box-shadow:0 2px 8px rgba(217,180,92,.25);
 }
 .infoakun-badge.is-free{
   background:rgba(255,255,255,.06);color:var(--text2);border:1px solid var(--border-strong);
 }
+.infoakun-item-arrow{flex-shrink:0;width:14px;height:14px;color:var(--text2);opacity:.5;position:static;transform:none;margin-left:-2px;}
+
+/* ── STATE KOSONG / LOADING ── */
 .infoakun-empty,.infoakun-loading{
-  text-align:center;font-size:.75rem;color:var(--text2);padding:36px 8px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  text-align:center;font-size:.75rem;color:var(--text2);padding:34px 12px;
 }
+.infoakun-empty-icon{
+  width:46px;height:46px;border-radius:50%;margin-bottom:4px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.05);border:1px solid var(--border-strong);color:var(--text2);
+}
+.infoakun-empty-icon.is-error{background:rgba(255,70,70,.08);border-color:rgba(255,70,70,.28);color:#ff6b6b;}
+.infoakun-empty-icon svg{position:static;transform:none;width:20px;height:20px;color:inherit;}
+.infoakun-empty-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.78rem;color:var(--text);}
+.infoakun-empty-sub{font-size:.66rem;color:var(--text2);line-height:1.45;max-width:230px;}
+.infoakun-loading{flex-direction:row;gap:10px;}
+.infoakun-spinner{
+  width:15px;height:15px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.14);border-top-color:var(--text);
+  animation:infoakunSpin .7s linear infinite;
+}
+@keyframes infoakunSpin{to{transform:rotate(360deg);}}
 .infoakun-count{
-  text-align:center;font-size:.66rem;color:var(--text2);margin-top:12px;flex-shrink:0;
+  text-align:center;font-size:.64rem;color:var(--text2);margin-top:12px;flex-shrink:0;
+  letter-spacing:.02em;
 }
+.infoakun-count:empty{display:none;}
 /* ── INFO AKUN DETAIL MODAL — dibuka saat item akun di INFO AKUN MODAL
    diklik. Nunjukin Waktu Bergabung, Waktu VIP & Status per akun. ── */
 .infoakun-detail-modal{
@@ -3795,95 +3888,91 @@ body.side-menu-open{overflow:hidden;}
   background:linear-gradient(165deg,var(--card2),var(--card));
   border:1px solid var(--border-strong);
   border-radius:var(--radius-lg);
-  padding:28px 20px 20px;
+  padding:26px 18px 18px;
   box-shadow:0 24px 60px rgba(0,0,0,.55);
   transform:scale(.9) translateY(22px);
   opacity:0;
   transition:transform .4s cubic-bezier(.22,1,.36,1),opacity .4s cubic-bezier(.22,1,.36,1);
+  max-height:92vh;overflow-y:auto;
 }
 .gapi-modal-overlay.show .infoakun-detail-modal{transform:scale(1) translateY(0);opacity:1;}
 .infoakun-detail-head{
-  display:flex;flex-direction:column;align-items:center;gap:7px;
-  text-align:center;padding-bottom:20px;margin-bottom:18px;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  text-align:center;padding:4px 0 18px;margin-bottom:16px;
   border-bottom:1px solid var(--border);
 }
-.infoakun-detail-avatar-wrap{
-  position:relative;margin-bottom:6px;
-}
+.infoakun-detail-avatar-wrap{position:relative;margin-bottom:6px;}
 .infoakun-detail-avatar{
-  width:60px;height:60px;border-radius:50%;
+  width:64px;height:64px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
   background:linear-gradient(135deg,var(--blue),var(--blue2));
-  color:#0a0a0a;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.5rem;
+  color:#0a0a0a;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.6rem;
   text-transform:uppercase;
-  box-shadow:0 0 0 3px rgba(255,255,255,.05),0 6px 18px rgba(0,0,0,.35);
+  box-shadow:0 0 0 4px rgba(255,255,255,.05),0 8px 22px rgba(0,0,0,.4);
 }
 .infoakun-detail-avatar.is-free{
   background:rgba(255,255,255,.08);color:var(--text2);
-  box-shadow:0 0 0 3px rgba(255,255,255,.03);
+  box-shadow:0 0 0 4px rgba(255,255,255,.03);
 }
 .infoakun-detail-avatar-dot{
-  position:absolute;bottom:1px;right:1px;
-  width:14px;height:14px;border-radius:50%;
+  position:absolute;bottom:2px;right:2px;
+  width:15px;height:15px;border-radius:50%;
   background:rgba(255,255,255,.15);
-  border:2.5px solid var(--card2);
+  border:3px solid var(--card2);
   transition:background .2s ease;
 }
 .infoakun-detail-avatar-dot.is-vip{background:#4ade80;}
 .infoakun-detail-email{
   font-family:'Space Mono',monospace;font-size:.84rem;color:var(--text);
-  word-break:break-all;font-weight:600;
+  word-break:break-all;font-weight:700;line-height:1.35;
 }
-.infoakun-detail-method{font-size:.66rem;color:var(--text2);letter-spacing:.02em;}
-.infoakun-detail-head .infoakun-badge{margin-top:8px;}
-.infoakun-detail-rows{display:flex;flex-direction:column;gap:9px;}
+.infoakun-detail-method{
+  display:inline-block;padding:3px 10px;border-radius:999px;
+  background:rgba(255,255,255,.06);border:1px solid var(--border);
+  font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.62rem;
+  color:var(--text2);letter-spacing:.03em;
+}
+.infoakun-detail-head .infoakun-badge{margin-top:6px;}
+.infoakun-detail-rows{display:flex;flex-direction:column;gap:8px;}
 .infoakun-detail-row{
   display:flex;align-items:center;gap:11px;
-  padding:11px 13px;
+  padding:10px 12px;
   background:rgba(255,255,255,.03);
   border:1px solid var(--border);
   border-radius:var(--radius-md);
-  transition:background .2s ease,border-color .2s ease;
 }
 .infoakun-detail-row-icon{
-  flex-shrink:0;width:28px;height:28px;border-radius:9px;
+  flex-shrink:0;width:30px;height:30px;border-radius:9px;
   display:flex;align-items:center;justify-content:center;
   background:rgba(255,255,255,.05);color:var(--text2);
 }
 .infoakun-detail-row-icon svg{width:14px;height:14px;}
-.infoakun-detail-row-icon.is-vip{
-  background:rgba(243,212,137,.12);color:#f3d489;
-}
-.infoakun-detail-row-icon.is-ban{
-  background:rgba(255,70,70,.14);color:#ff6b6b;
-}
+.infoakun-detail-row-icon.is-vip{background:rgba(243,212,137,.14);color:#f3d489;}
+.infoakun-detail-row-icon.is-ban{background:rgba(255,70,70,.14);color:#ff6b6b;}
 .infoakun-detail-label{
   flex:1;min-width:0;
   font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.68rem;
   color:var(--text2);letter-spacing:.02em;
 }
 .infoakun-detail-value{
-  flex-shrink:0;
-  font-family:'Space Mono',monospace;font-size:.74rem;color:var(--text);font-weight:600;
-  text-align:right;
+  flex-shrink:0;max-width:56%;
+  font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text);font-weight:600;
+  text-align:right;line-height:1.35;
 }
-#infoAkunDetailBanRow{
-  background:rgba(255,70,70,.06);border-color:rgba(255,70,70,.28);
-}
+#infoAkunDetailBanRow{background:rgba(255,70,70,.06);border-color:rgba(255,70,70,.28);}
 .infoakun-detail-actions{
-  display:flex;flex-direction:column;gap:8px;margin-top:18px;
+  display:flex;flex-direction:column;gap:8px;
+  margin-top:16px;padding-top:16px;border-top:1px solid var(--border);
 }
-.infoakun-detail-actions-row{
-  display:flex;gap:8px;
-}
+.infoakun-detail-actions-row{display:flex;gap:8px;}
 .infoakun-detail-actions-row .infoakun-detail-action-btn{flex:1;}
 .infoakun-detail-action-btn{
   display:flex;align-items:center;justify-content:center;gap:7px;
-  width:100%;padding:11px 10px;
+  width:100%;padding:12px 10px;
   border-radius:var(--radius-md);
   font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.7rem;
   letter-spacing:.01em;cursor:pointer;
-  transition:filter .2s ease,transform .15s ease,opacity .2s ease;
+  transition:filter .2s ease,transform .15s ease,opacity .2s ease,background .2s ease;
   border:1px solid transparent;
   -webkit-tap-highlight-color:transparent;
 }
@@ -3892,17 +3981,18 @@ body.side-menu-open{overflow:hidden;}
 .infoakun-detail-action-btn:disabled{opacity:.5;pointer-events:none;}
 .infoakun-detail-action-btn.loading{opacity:.6;pointer-events:none;}
 .infoakun-detail-action-btn.is-gift{
-  background:linear-gradient(135deg,var(--blue),var(--blue2));color:#0a0a0a;
+  background:linear-gradient(135deg,#f3d489,#d9b45c);color:#3a2a05;
+  box-shadow:0 4px 14px rgba(217,180,92,.22);
 }
-.infoakun-detail-action-btn.is-gift:hover{filter:brightness(1.08);}
+.infoakun-detail-action-btn.is-gift:hover{filter:brightness(1.06);}
 .infoakun-detail-action-btn.is-danger{
   background:rgba(255,70,70,.1);color:#ff6b6b;border-color:rgba(255,70,70,.3);
 }
 .infoakun-detail-action-btn.is-danger:hover{background:rgba(255,70,70,.16);}
 .infoakun-detail-action-btn.is-ban{
-  background:rgba(255,70,70,.85);color:#fff;
+  background:rgba(255,255,255,.04);color:var(--text2);border-color:var(--border-strong);
 }
-.infoakun-detail-action-btn.is-ban:hover{filter:brightness(1.08);}
+.infoakun-detail-action-btn.is-ban:hover{background:rgba(255,70,70,.12);color:#ff6b6b;border-color:rgba(255,70,70,.3);}
 .infoakun-detail-action-btn.is-unban{
   background:rgba(70,200,120,.12);color:#4ade80;border-color:rgba(70,200,120,.32);
 }
@@ -5357,22 +5447,11 @@ body:has(#banScreen[style*="flex"]){
 
       <button type="button" class="admin-choice-item" onclick="openInfoAkunModal()">
         <span class="admin-choice-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
         </span>
         <span class="admin-choice-text">
-          <span class="admin-choice-title">Info Akun</span>
-          <span class="admin-choice-desc">Daftar akun login &amp; status VIP</span>
-        </span>
-        <svg class="admin-choice-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-      </button>
-
-      <button type="button" class="admin-choice-item" onclick="openAnalisisAkunModal()">
-        <span class="admin-choice-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
-        </span>
-        <span class="admin-choice-text">
-          <span class="admin-choice-title">Analisis Akun</span>
-          <span class="admin-choice-desc">Akun baru daftar</span>
+          <span class="admin-choice-title">Gift VIP</span>
+          <span class="admin-choice-desc">Cari akun, beri atau cabut VIP &amp; kelola ban</span>
         </span>
         <svg class="admin-choice-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
       </button>
@@ -5402,39 +5481,77 @@ body:has(#banScreen[style*="flex"]){
   </div>
 </div>
 
-<!-- INFO AKUN MODAL — dibuka dari MENU ADMIN > "Info Akun".
-     Menampilkan daftar semua akun yang pernah login: baik lewat Google
-     (email asli, mis. contoh@gmail.com) maupun lewat username & password
-     (email internal @tarzstore.local, ditampilkan sebagai "username").
-     Data diambil dari 2 koleksi Firestore: `vip_users` (status VIP per uid)
-     dan `usernames` (mapping username -> uid untuk akun password), lalu
-     digabung supaya tiap akun tampil sekali dengan label VIP/FREE yang
-     benar. Lihat openInfoAkunModal() & loadInfoAkunList().
+<!-- GIFT VIP MODAL (dulu "Info Akun") — dibuka dari MENU ADMIN > "Gift VIP".
+     Cari SATU akun spesifik lewat email (login Google) atau username
+     (login username/password) -- tidak lagi menarik seluruh isi koleksi
+     `vip_users` & `usernames` supaya hemat kuota baca Firestore. Lihat
+     openInfoAkunModal() & searchInfoAkun().
      Pakai wrapper .infoakun-modal (bukan .gapi-modal biasa) supaya lebih
-     lebar & muat kolom pencarian + filter tab. -->
+     lebar & muat kolom pencarian. -->
 <div class="gapi-modal-overlay" id="infoAkunModalOverlay">
-  <div class="infoakun-modal" role="dialog" aria-modal="true" aria-label="Info Akun">
+  <div class="infoakun-modal giftvip-modal" role="dialog" aria-modal="true" aria-label="Gift VIP">
     <button class="gapi-modal-close" aria-label="Tutup" onclick="closeInfoAkunModal()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
-    <div class="gapi-modal-title">INFO AKUN</div>
-    <div class="gapi-modal-sub">Daftar akun yang login via Google &amp; username/password</div>
 
-    <div class="infoakun-search-wrap">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" class="infoakun-search-input" id="infoAkunSearchInput" placeholder="Cari email / username..." oninput="filterInfoAkunList()" autocomplete="off">
+    <div class="giftvip-hero">
+      <span class="giftvip-hero-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+      </span>
+      <div class="giftvip-hero-text">
+        <div class="gapi-modal-title giftvip-title">GIFT VIP</div>
+        <div class="giftvip-sub">Cari akun lalu beri atau cabut akses VIP</div>
+      </div>
     </div>
 
-    <div class="infoakun-filter-tabs">
-      <div class="infoakun-filter-tab active" data-filter="all" onclick="setInfoAkunFilter('all')">SEMUA</div>
-      <div class="infoakun-filter-tab" data-filter="vip" onclick="setInfoAkunFilter('vip')">VIP</div>
-      <div class="infoakun-filter-tab" data-filter="free" onclick="setInfoAkunFilter('free')">FREE</div>
+    <div class="infoakun-search-wrap infoakun-search-wrap-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" class="infoakun-search-input" id="infoAkunSearchInput" placeholder="Email lengkap / awalan username" autocomplete="off" autocapitalize="off" spellcheck="false" onkeydown="if(event.key==='Enter'){event.preventDefault();searchInfoAkun();}">
+      <button type="button" class="infoakun-search-btn" id="infoAkunSearchBtn" onclick="searchInfoAkun()">Cari</button>
     </div>
 
     <div class="infoakun-list" id="infoAkunList">
-      <div class="infoakun-loading" id="infoAkunLoading">Memuat data akun...</div>
+      <div class="infoakun-empty">
+        <span class="infoakun-empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
+        <span class="infoakun-empty-title">Belum ada pencarian</span>
+        <span class="infoakun-empty-sub">Ketik email atau username, lalu tekan Cari.</span>
+      </div>
     </div>
     <div class="infoakun-count" id="infoAkunCount"></div>
+  </div>
+</div>
+
+<!-- INFO VIP MODAL — dibuka dari MENU ADMIN > "Info VIP".
+     Fokus khusus member VIP: kapan tiap member beli/upgrade VIP (vip_since),
+     siapa saja yang saat ini VIP, dan siapa yang BARU SAJA join VIP (filter
+     per rentang waktu, sama pola dengan Analisis Akun). Pakai ulang data
+     yang sama dari _infoAkunAllAccounts (loadInfoAkunList() di Info Akun)
+     supaya tidak query Firestore dua kali -- lihat openInfoVipModal().
+     Item TIDAK bisa diklik -- ini murni tampilan pantau (kelola VIP tetap
+     lewat Gift VIP > detail akun). -->
+<div class="gapi-modal-overlay" id="infoVipModalOverlay">
+  <div class="infoakun-modal" role="dialog" aria-modal="true" aria-label="Info VIP">
+    <button class="gapi-modal-close" aria-label="Tutup" onclick="closeInfoVipModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="gapi-modal-title">INFO VIP</div>
+    <div class="gapi-modal-sub">Waktu beli VIP &amp; member yang baru join</div>
+
+    <div class="infoakun-search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" class="infoakun-search-input" id="infoVipSearchInput" placeholder="Cari email/username..." oninput="renderInfoVipList()" autocomplete="off">
+    </div>
+
+    <div class="infoakun-filter-tabs">
+      <div class="infoakun-filter-tab active" data-range="all" onclick="setInfoVipRange('all')">SEMUA VIP</div>
+      <div class="infoakun-filter-tab" data-range="today" onclick="setInfoVipRange('today')">BARU HARI INI</div>
+      <div class="infoakun-filter-tab" data-range="week" onclick="setInfoVipRange('week')">7 HARI TERAKHIR</div>
+    </div>
+
+    <div class="infoakun-list" id="infoVipList">
+      <div class="infoakun-loading">Memuat data VIP...</div>
+    </div>
+    <div class="infoakun-count" id="infoVipCount"></div>
   </div>
 </div>
 
@@ -5511,67 +5628,6 @@ body:has(#banScreen[style*="flex"]){
         </button>
       </div>
     </div>
-  </div>
-</div>
-
-<!-- ANALISIS AKUN MODAL — dibuka dari MENU ADMIN > "Analisis Akun".
-     Menampilkan daftar akun yang BARU DAFTAR, difilter per rentang waktu
-     (Hari Ini / Seminggu / Semua) lewat 3 tab, supaya admin cepat tahu
-     siapa saja yang bikin akun baru hari ini. Pakai ulang data yang sama
-     dari _infoAkunAllAccounts (loadInfoAkunList() di Info Akun) supaya
-     tidak perlu query Firestore dua kali -- lihat openAnalisisAkunModal(). -->
-<div class="gapi-modal-overlay" id="analisisAkunModalOverlay">
-  <div class="infoakun-modal" role="dialog" aria-modal="true" aria-label="Analisis Akun">
-    <button class="gapi-modal-close" aria-label="Tutup" onclick="closeAnalisisAkunModal()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-    <div class="gapi-modal-title">ANALISIS AKUN</div>
-    <div class="gapi-modal-sub">Akun yang baru daftar, per rentang waktu</div>
-
-    <div class="infoakun-filter-tabs">
-      <div class="infoakun-filter-tab active" data-range="today" onclick="setAnalisisAkunRange('today')">HARI INI</div>
-      <div class="infoakun-filter-tab" data-range="week" onclick="setAnalisisAkunRange('week')">SEMINGGU</div>
-      <div class="infoakun-filter-tab" data-range="all" onclick="setAnalisisAkunRange('all')">SEMUA</div>
-    </div>
-
-    <div class="infoakun-list" id="analisisAkunList">
-      <div class="infoakun-loading">Memuat data akun...</div>
-    </div>
-    <div class="infoakun-count" id="analisisAkunCount"></div>
-  </div>
-</div>
-
-<!-- INFO VIP MODAL — dibuka dari MENU ADMIN > "Info VIP".
-     Fokus khusus member VIP: kapan tiap member beli/upgrade VIP (vip_since),
-     siapa saja yang saat ini VIP, dan siapa yang BARU SAJA join VIP (filter
-     per rentang waktu, sama pola dengan Analisis Akun). Pakai ulang data
-     yang sama dari _infoAkunAllAccounts (loadInfoAkunList() di Info Akun)
-     supaya tidak query Firestore dua kali -- lihat openInfoVipModal().
-     Item TIDAK bisa diklik -- ini murni tampilan pantau (kelola VIP tetap
-     lewat Info Akun > detail akun). -->
-<div class="gapi-modal-overlay" id="infoVipModalOverlay">
-  <div class="infoakun-modal" role="dialog" aria-modal="true" aria-label="Info VIP">
-    <button class="gapi-modal-close" aria-label="Tutup" onclick="closeInfoVipModal()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-    <div class="gapi-modal-title">INFO VIP</div>
-    <div class="gapi-modal-sub">Waktu beli VIP &amp; member yang baru join</div>
-
-    <div class="infoakun-search-wrap">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" class="infoakun-search-input" id="infoVipSearchInput" placeholder="Cari email / username..." oninput="renderInfoVipList()" autocomplete="off">
-    </div>
-
-    <div class="infoakun-filter-tabs">
-      <div class="infoakun-filter-tab active" data-range="all" onclick="setInfoVipRange('all')">SEMUA VIP</div>
-      <div class="infoakun-filter-tab" data-range="today" onclick="setInfoVipRange('today')">BARU HARI INI</div>
-      <div class="infoakun-filter-tab" data-range="week" onclick="setInfoVipRange('week')">7 HARI TERAKHIR</div>
-    </div>
-
-    <div class="infoakun-list" id="infoVipList">
-      <div class="infoakun-loading">Memuat data VIP...</div>
-    </div>
-    <div class="infoakun-count" id="infoVipCount"></div>
   </div>
 </div>
 
@@ -7407,11 +7463,17 @@ function openInfoAkunModal(){
   overlay.style.display = 'flex'; void overlay.offsetHeight;
   overlay.classList.add('show');
   document.body.style.overflow = 'hidden'; document.body.classList.add('tabbar-hide');
-  // reset pencarian & filter tiap kali modal dibuka ulang
+  // reset pencarian tiap kali modal dibuka ulang -- tidak fetch apa pun
+  // di sini, nunggu user ketik & klik Cari (searchInfoAkun()) supaya tidak
+  // ada query Firestore yang jalan sia-sia tiap modal dibuka.
   const searchInput = document.getElementById('infoAkunSearchInput');
   if(searchInput) searchInput.value = '';
-  setInfoAkunFilter('all');
-  loadInfoAkunList();
+  _infoAkunRenderedList = [];
+  _infoAkunDetailFromVip = false;
+  const listEl = document.getElementById('infoAkunList');
+  if(listEl) listEl.innerHTML = infoAkunEmptyHtml('search', 'Belum ada pencarian', 'Ketik email atau username, lalu tekan Cari.');
+  const countEl = document.getElementById('infoAkunCount');
+  if(countEl) countEl.textContent = '';
 }
 function closeInfoAkunModal(){
   const overlay = document.getElementById('infoAkunModalOverlay');
@@ -7420,180 +7482,207 @@ function closeInfoAkunModal(){
   document.body.style.overflow = ''; document.body.classList.remove('tabbar-hide');
 }
 
+/* State kosong/error/loading yang seragam untuk modal Gift VIP:
+   ikon bulat + judul + keterangan kecil. type: 'search' | 'none' | 'error'. */
+function infoAkunEmptyHtml(type, title, sub){
+  const icons = {
+    search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>',
+    none:   '<circle cx="12" cy="12" r="10"/><path d="M8 15s1.5-2 4-2 4 2 4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>',
+    error:  '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>'
+  };
+  return '<div class="infoakun-empty">' +
+    '<span class="infoakun-empty-icon' + (type === 'error' ? ' is-error' : '') + '" aria-hidden="true">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + (icons[type] || icons.search) + '</svg>' +
+    '</span>' +
+    '<span class="infoakun-empty-title">' + title + '</span>' +
+    (sub ? '<span class="infoakun-empty-sub">' + sub + '</span>' : '') +
+  '</div>';
+}
+
 function infoAkunEscapeHtml(str){
   return String(str).replace(/[&<>"']/g, function(c){
     return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
   });
 }
 
-/* Ambil & gabungkan data akun dari `vip_users` + `usernames`, simpan ke
-   _infoAkunAllAccounts, lalu render. Dipanggil tiap kali modal dibuka
-   supaya datanya segar. */
-async function loadInfoAkunList(){
+/* Susun objek akun (shape sama dengan yang dipakai openInfoAkunDetail())
+   dari sepasang data mentah vip_users + usernames (salah satunya boleh
+   null kalau akun itu cuma tercatat di satu koleksi). */
+function infoAkunBuildAccount(uid, vipData, usernameDoc){
+  const vd = vipData || {};
+  let isVip = !!vd.is_vip;
+  if(isVip && vd.vip_expiry){
+    const expiryMs = toMillis(vd.vip_expiry);
+    if(expiryMs && Date.now() > expiryMs) isVip = false; // trial sudah habis
+  }
+  let email, method, createdAt;
+  if(usernameDoc){
+    // Akun username/password: tampilkan sebagai "username", bukan email
+    // internal @tarzstore.local, supaya lebih mudah dibaca.
+    email = usernameDoc.id;
+    method = 'password';
+    createdAt = usernameDoc.data.created_at || vd.created_at || null;
+  } else {
+    email = vd.email || '(tidak diketahui)';
+    const isInternal = (vd.email || '').endsWith('@tarzstore.local');
+    method = isInternal ? 'password' : 'google';
+    createdAt = vd.created_at || null;
+  }
+  return {
+    uid: uid || null,
+    email: email,
+    isVip: isVip,
+    isBanned: !!vd.is_banned,
+    method: method,
+    createdAt: createdAt,
+    vipSince: isVip ? (vd.vip_since || null) : null,
+    vipExpiry: vd.vip_expiry || null
+  };
+}
+
+/* Cari SATU akun spesifik lewat email (login Google, dicari di `vip_users`
+   dengan where('email','==', ...)) atau username (login username/password,
+   langsung .doc(username).get() di `usernames` -- 1 read). Ini gantinya
+   loadInfoAkunList() yang lama, yang menarik SELURUH isi kedua koleksi
+   tiap kali modal dibuka -- sekarang cuma query akun yang dicari saja. */
+/* Cari akun lewat PREFIX (awalan) dari email atau username, case-insensitive,
+   dan tampilkan SEMUA yang cocok (bukan cuma 1). Ini bukan pencarian
+   "contains" sungguhan (Firestore tidak mendukung itu tanpa scan semua
+   dokumen) -- ketik "tarz" akan nemuin "tarzstore"/"tarz123" (yang DIAWALI
+   tarz), tapi tidak nemuin "mr_tarz" (tarz di tengah/akhir). Query prefix
+   pakai trik range: where(field,'>=',kw).where(field,'<=',kw+'\uf8ff'),
+   cuma men-scan dokumen yang match -- bukan seluruh koleksi. */
+async function searchInfoAkun(){
   const listEl = document.getElementById('infoAkunList');
   const countEl = document.getElementById('infoAkunCount');
-  if(!listEl) return;
-  listEl.innerHTML = '<div class="infoakun-loading">Memuat data akun...</div>';
-  if(countEl) countEl.textContent = '';
+  const searchInput = document.getElementById('infoAkunSearchInput');
+  const btn = document.getElementById('infoAkunSearchBtn');
+  if(!listEl || !searchInput) return;
 
-  if(!window.fbDb){
-    listEl.innerHTML = '<div class="infoakun-empty">Gagal terhubung ke server.</div>';
+  const keywordRaw = searchInput.value.trim();
+  if(!keywordRaw){
+    listEl.innerHTML = infoAkunEmptyHtml('search', 'Belum ada pencarian', 'Ketik email atau username, lalu tekan Cari.');
+    if(countEl) countEl.textContent = '';
     return;
   }
 
-  try{
-    const [vipSnap, usernameSnap] = await Promise.all([
-      window.fbDb.collection('vip_users').get(),
-      window.fbDb.collection('usernames').get()
-    ]);
+  if(!window.fbDb){
+    listEl.innerHTML = infoAkunEmptyHtml('error', 'Gagal terhubung', 'Tidak bisa terhubung ke server.');
+    return;
+  }
 
-    // uid -> data mentah dari vip_users (sumber kebenaran status VIP,
-    // vip_since & created_at), dipakai lagi oleh loop usernameSnap di bawah.
-    const vipDataByUid = {};
-    // daftar akun final, key-nya email supaya tidak dobel
+  listEl.innerHTML = '<div class="infoakun-loading"><span class="infoakun-spinner" aria-hidden="true"></span>Mencari akun...</div>';
+  if(countEl) countEl.textContent = '';
+  if(btn) btn.disabled = true;
+
+  try{
+    // Ada "@" -> dianggap pencarian EMAIL, harus PERSIS/LENGKAP (exact
+    // match ke field `email` asli, sama seperti pola sebelum prefix search
+    // ditambahkan -- tidak butuh field email_lower/migrasi apa pun).
+    // Tanpa "@" -> dianggap pencarian USERNAME, tetap pakai prefix search
+    // (docId /usernames sudah selalu lowercase, jadi bisa ketik "budi"
+    // buat nemuin "budi123", dst).
+    const isEmailLike = keywordRaw.indexOf('@') !== -1;
     const accounts = {};
 
-    vipSnap.forEach(function(doc){
-      const data = doc.data() || {};
-      const uid = doc.id;
-      let isVip = !!data.is_vip;
-      if(isVip && data.vip_expiry){
-        const expiryMs = toMillis(data.vip_expiry);
-        if(expiryMs && Date.now() > expiryMs) isVip = false; // trial sudah habis
+    if(isEmailLike){
+      const snap = await window.fbDb.collection('vip_users')
+        .where('email', '==', keywordRaw)
+        .limit(1).get();
+      if(!snap.empty){
+        const doc = snap.docs[0];
+        const data = doc.data();
+        if(!(data.email || '').endsWith('@tarzstore.local')){
+          const acc = infoAkunBuildAccount(doc.id, data, null);
+          accounts[acc.uid || doc.id] = acc;
+        }
       }
-      vipDataByUid[uid] = data;
-      if(data.email){
-        // Email internal (@tarzstore.local) berarti akun ini sebenarnya
-        // login lewat username/password, bukan Google -- akan ditangani
-        // ulang oleh loop usernameSnap di bawah (supaya nama tampilnya
-        // jadi username, bukan email internal), jadi di sini cukup tandai
-        // metodenya saja dan biarkan email aslinya ditimpa nanti kalau ada.
-        const isInternal = data.email.endsWith('@tarzstore.local');
-        accounts[data.email] = {
-          uid: uid,
-          email: data.email,
-          isVip: isVip,
-          isBanned: !!data.is_banned,
-          method: isInternal ? 'password' : 'google',
-          createdAt: data.created_at || null,
-          vipSince: isVip ? (data.vip_since || null) : null,
-          vipExpiry: data.vip_expiry || null
-        };
-      }
-    });
+    } else {
+      const keyword = keywordRaw.toLowerCase();
+      const rangeEnd = keyword + '\uf8ff';
+      const MAX_RESULTS = 30;
 
-    usernameSnap.forEach(function(doc){
-      const data = doc.data() || {};
-      const email = data.email || (doc.id + '@tarzstore.local');
-      const vipData = data.uid ? vipDataByUid[data.uid] : null;
-      let isVip = !!(vipData && vipData.is_vip);
-      if(isVip && vipData.vip_expiry){
-        const expiryMs = toMillis(vipData.vip_expiry);
-        if(expiryMs && Date.now() > expiryMs) isVip = false;
-      }
-      // Akun username/password: tampilkan sebagai "username" (bagian sebelum
-      // @tarzstore.local), bukan email internalnya, supaya lebih mudah dibaca.
-      const displayName = email.endsWith('@tarzstore.local') ? doc.id : email;
-      // Waktu bergabung: pakai created_at dari usernames (saat akun dibuat)
-      // sebagai sumber utama -- lebih akurat dari vip_users yang baru
-      // tercatat saat login pertama lewat ensureVipUserRecord().
-      accounts[email] = {
-        uid: data.uid || null,
-        email: displayName,
-        isVip: isVip,
-        isBanned: !!(vipData && vipData.is_banned),
-        method: 'password',
-        createdAt: data.created_at || (vipData && vipData.created_at) || null,
-        vipSince: isVip ? (vipData && vipData.vip_since || null) : null,
-        vipExpiry: (vipData && vipData.vip_expiry) || null
-      };
-    });
+      const usernameSnap = await window.fbDb.collection('usernames')
+        .where(firebase.firestore.FieldPath.documentId(), '>=', keyword)
+        .where(firebase.firestore.FieldPath.documentId(), '<=', rangeEnd)
+        .limit(MAX_RESULTS).get();
 
-    _infoAkunAllAccounts = Object.values(accounts).sort(function(a, b){
+      // Hasil dari usernames: ambil vip_users terkait (kalau ada uid) untuk
+      // tahu status VIP/ban -- cuma dokumen yang benar-benar match pencarian.
+      const usernameLookups = usernameSnap.docs.map(async function(doc){
+        const udata = doc.data() || {};
+        let vipData = null;
+        if(udata.uid){
+          const vipDoc = await window.fbDb.collection('vip_users').doc(udata.uid).get();
+          if(vipDoc.exists) vipData = vipDoc.data();
+        }
+        const acc = infoAkunBuildAccount(udata.uid || null, vipData, { id: doc.id, data: udata });
+        accounts[acc.uid || ('username:' + doc.id)] = acc;
+      });
+      await Promise.all(usernameLookups);
+    }
+
+    const results = Object.values(accounts).sort(function(a, b){
       if(a.isVip !== b.isVip) return a.isVip ? -1 : 1; // VIP di atas
       return a.email.localeCompare(b.email);
     });
 
-    renderInfoAkunList();
+    if(results.length === 0){
+      listEl.innerHTML = infoAkunEmptyHtml('none', 'Akun tidak ditemukan', 'Periksa lagi penulisan email atau username.');
+      _infoAkunRenderedList = [];
+      if(countEl) countEl.textContent = '';
+      return;
+    }
+
+    renderInfoAkunList(results);
   }catch(e){
-    console.error('Gagal memuat Info Akun:', e);
-    listEl.innerHTML = '<div class="infoakun-empty">Gagal memuat data akun.</div>';
+    console.error('Gagal mencari akun:', e);
+    listEl.innerHTML = infoAkunEmptyHtml('error', 'Gagal mencari akun', 'Coba lagi beberapa saat.');
+  }finally{
+    if(btn) btn.disabled = false;
   }
 }
 
-/* Ganti tab filter aktif (Semua/VIP/FREE) lalu render ulang list dari
-   cache _infoAkunAllAccounts (tanpa query ulang ke Firestore). */
-function setInfoAkunFilter(filter){
-  _infoAkunCurrentFilter = filter;
-  document.querySelectorAll('.infoakun-filter-tab').forEach(function(tab){
-    tab.classList.toggle('active', tab.dataset.filter === filter);
-  });
-  renderInfoAkunList();
-}
-
-/* Dipanggil tiap kali user mengetik di kolom pencarian (oninput). Cukup
-   render ulang dari cache, tidak query ulang ke Firestore. */
-function filterInfoAkunList(){
-  renderInfoAkunList();
-}
-
-/* Terapkan filter tab + kata kunci pencarian ke _infoAkunAllAccounts,
-   lalu render hasilnya ke #infoAkunList. Sumber tunggal render supaya
-   search & filter tab selalu konsisten. */
-function renderInfoAkunList(){
+/* Render hasil pencarian (array akun, bisa banyak item) ke #infoAkunList.
+   Dipakai ulang oleh openInfoAkunDetail(idx) lewat _infoAkunRenderedList,
+   sama seperti sebelumnya. */
+function renderInfoAkunList(results){
   const listEl = document.getElementById('infoAkunList');
   const countEl = document.getElementById('infoAkunCount');
   if(!listEl) return;
+  // Dipanggil tanpa argumen setelah Gift/Hapus VIP/Ban/Buka Ban -> pakai
+  // ulang list yang sedang tampil supaya badge & warna kartu ikut ter-update.
+  if(!Array.isArray(results)) results = _infoAkunRenderedList;
+  if(!results || results.length === 0) return;
 
-  const searchInput = document.getElementById('infoAkunSearchInput');
-  const keyword = searchInput ? searchInput.value.trim().toLowerCase() : '';
-
-  let filtered = _infoAkunAllAccounts;
-  if(_infoAkunCurrentFilter === 'vip') filtered = filtered.filter(function(a){ return a.isVip; });
-  else if(_infoAkunCurrentFilter === 'free') filtered = filtered.filter(function(a){ return !a.isVip; });
-  if(keyword){
-    filtered = filtered.filter(function(a){ return a.email.toLowerCase().indexOf(keyword) !== -1; });
-  }
-
-  if(_infoAkunAllAccounts.length === 0){
-    listEl.innerHTML = '<div class="infoakun-empty">Belum ada akun yang tercatat.</div>';
-    if(countEl) countEl.textContent = '';
-    return;
-  }
-  if(filtered.length === 0){
-    listEl.innerHTML = '<div class="infoakun-empty">Tidak ada akun yang cocok.</div>';
-  } else {
-    listEl.innerHTML = filtered.map(function(acc, idx){
-      const badgeClass = acc.isVip ? 'is-vip' : 'is-free';
-      const badgeText = acc.isVip ? 'VIP' : 'FREE';
-      const methodText = acc.method === 'google' ? 'Login Google' : 'Username & Password';
-      const initial = infoAkunEscapeHtml(acc.email.charAt(0));
-      // Tag "DIBLOKIR" kecil tambahan di samping method, cuma tampil kalau
-      // is_banned:true -- supaya admin bisa lihat sekilas di daftar tanpa
-      // perlu buka detail satu-satu.
-      const banTag = acc.isBanned ? ' <span class="infoakun-ban-tag">\u2022 DIBLOKIR</span>' : '';
-      // Avatar/item bisa diklik -> buka detail (Waktu Bergabung, Waktu VIP,
-      // Status). Dicari ulang dari _infoAkunAllAccounts pakai email supaya
-      // tidak perlu nyimpan objek besar di data-attribute HTML.
-      return '<div class="infoakun-item ' + badgeClass + (acc.isBanned ? ' is-banned' : '') + '" role="button" tabindex="0" onclick="openInfoAkunDetail(' + idx + ')">' +
-        '<span class="infoakun-avatar">' + initial + '</span>' +
-        '<span class="infoakun-info">' +
-          '<span class="infoakun-email">' + infoAkunEscapeHtml(acc.email) + '</span>' +
-          '<span class="infoakun-method">' + methodText + banTag + '</span>' +
-        '</span>' +
-        '<span class="infoakun-badge ' + badgeClass + '">' + badgeText + '</span>' +
-      '</div>';
-    }).join('');
-    // simpan array yang sedang dirender supaya openInfoAkunDetail(idx) bisa
-    // ambil akun yang benar persis sesuai urutan tampil (setelah filter/cari)
-    _infoAkunRenderedList = filtered;
-  }
+  listEl.innerHTML = results.map(function(acc, idx){
+    const badgeClass = acc.isVip ? 'is-vip' : 'is-free';
+    const methodText = acc.method === 'google' ? 'Google' : 'Username';
+    const initial = infoAkunEscapeHtml(acc.email.charAt(0));
+    const crown = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5L3 8z"/></svg>';
+    const badge = acc.isVip
+      ? '<span class="infoakun-badge is-vip">' + crown + 'VIP</span>'
+      : '<span class="infoakun-badge is-free">FREE</span>';
+    // Chip "DIBLOKIR" cuma tampil kalau is_banned:true -- admin bisa lihat
+    // sekilas di daftar tanpa perlu buka detail satu-satu.
+    const banTag = acc.isBanned ? '<span class="infoakun-chip is-ban">Diblokir</span>' : '';
+    return '<div class="infoakun-item ' + badgeClass + (acc.isBanned ? ' is-banned' : '') + '" role="button" tabindex="0" onclick="openInfoAkunDetail(' + idx + ')" onkeydown="if(event.key===\'Enter\'){openInfoAkunDetail(' + idx + ');}">' +
+      '<span class="infoakun-avatar">' + initial + '<span class="infoakun-avatar-dot"></span></span>' +
+      '<span class="infoakun-info">' +
+        '<span class="infoakun-email">' + infoAkunEscapeHtml(acc.email) + '</span>' +
+        '<span class="infoakun-meta"><span class="infoakun-chip">' + methodText + '</span>' + banTag + '</span>' +
+      '</span>' +
+      badge +
+      '<svg class="infoakun-item-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>' +
+    '</div>';
+  }).join('');
+  // simpan array yang sedang dirender supaya openInfoAkunDetail(idx) bisa
+  // ambil akun yang benar persis sesuai urutan tampil
+  _infoAkunRenderedList = results;
 
   if(countEl){
-    const totalVip = _infoAkunAllAccounts.filter(function(a){ return a.isVip; }).length;
-    let text = _infoAkunAllAccounts.length + ' akun total \u2022 ' + totalVip + ' VIP';
-    if(filtered.length !== _infoAkunAllAccounts.length) text += ' (menampilkan ' + filtered.length + ')';
-    countEl.textContent = text;
+    const totalVip = results.filter(function(a){ return a.isVip; }).length;
+    countEl.textContent = results.length + ' akun ditemukan \u2022 ' + totalVip + ' VIP';
   }
 }
 
@@ -7609,148 +7698,14 @@ function infoAkunFormatDate(v, fallbackText){
   return hari + ', ' + jam;
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   ANALISIS AKUN — daftar akun BARU DAFTAR, difilter per rentang waktu
-   (Hari Ini / Seminggu / Semua). Tujuannya supaya admin bisa cepat lihat
-   siapa saja yang bikin akun baru hari ini, tanpa perlu scroll manual di
-   Info Akun. Pakai ulang data yang sama dari _infoAkunAllAccounts (di-
-   load lewat loadInfoAkunList()) supaya tidak query Firestore dua kali --
-   modal ini murni "lensa waktu" di atas data yang sama, tidak ada aksi
-   admin (gift/ban/dll) karena fokusnya cuma untuk memantau, bukan mengelola.
-   ══════════════════════════════════════════════════════════════════ */
-let _analisisAkunCurrentRange = 'today';
-
-function openAnalisisAkunModal(){
-  if(!isOwnerAccount()) return;
-  closeAdminChoiceModal();
-  const overlay = document.getElementById('analisisAkunModalOverlay');
-  if(!overlay) return;
-  overlay.style.display = 'flex'; void overlay.offsetHeight;
-  overlay.classList.add('show');
-  document.body.style.overflow = 'hidden'; document.body.classList.add('tabbar-hide');
-  setAnalisisAkunRange('today');
-  loadAnalisisAkunData();
-}
-function closeAnalisisAkunModal(){
-  const overlay = document.getElementById('analisisAkunModalOverlay');
-  if(!overlay) return;
-  overlay.classList.remove('show');
-  document.body.style.overflow = ''; document.body.classList.remove('tabbar-hide');
-}
-
-/* Ambil data akun yang sama seperti Info Akun (vip_users + usernames
-   digabung ke _infoAkunAllAccounts). Kalau cache sudah ada & baru saja
-   diisi (mis. Info Akun barusan dibuka), tidak perlu query ulang -- tapi
-   supaya datanya selalu segar tiap kali Analisis Akun dibuka, query ulang
-   lewat loadInfoAkunList() punya fungsi sendiri, jadi di sini kita panggil
-   ulang logic fetch-nya secara mandiri (tidak bergantung Info Akun modal
-   sudah pernah dibuka duluan atau belum). */
-async function loadAnalisisAkunData(){
-  const listEl = document.getElementById('analisisAkunList');
-  const countEl = document.getElementById('analisisAkunCount');
-  if(!listEl) return;
-  listEl.innerHTML = '<div class="infoakun-loading">Memuat data akun...</div>';
-  if(countEl) countEl.textContent = '';
-
-  if(!window.fbDb){
-    listEl.innerHTML = '<div class="infoakun-empty">Gagal terhubung ke server.</div>';
-    return;
-  }
-
-  try{
-    // Kalau _infoAkunAllAccounts sudah pernah diisi sebelumnya (Info Akun
-    // pernah dibuka di sesi ini), pakai itu dulu supaya modal langsung
-    // tampil tanpa nunggu -- lalu tetap fetch ulang di background biar
-    // datanya segar (akun yang baru saja daftar ikut kelihatan).
-    if(_infoAkunAllAccounts.length > 0) renderAnalisisAkunList();
-
-    const [vipSnap, usernameSnap] = await Promise.all([
-      window.fbDb.collection('vip_users').get(),
-      window.fbDb.collection('usernames').get()
-    ]);
-
-    const vipDataByUid = {};
-    const accounts = {};
-
-    vipSnap.forEach(function(doc){
-      const data = doc.data() || {};
-      const uid = doc.id;
-      let isVip = !!data.is_vip;
-      if(isVip && data.vip_expiry){
-        const expiryMs = toMillis(data.vip_expiry);
-        if(expiryMs && Date.now() > expiryMs) isVip = false;
-      }
-      vipDataByUid[uid] = data;
-      if(data.email){
-        const isInternal = data.email.endsWith('@tarzstore.local');
-        accounts[data.email] = {
-          uid: uid,
-          email: data.email,
-          isVip: isVip,
-          isBanned: !!data.is_banned,
-          method: isInternal ? 'password' : 'google',
-          createdAt: data.created_at || null,
-          vipSince: isVip ? (data.vip_since || null) : null,
-          vipExpiry: data.vip_expiry || null
-        };
-      }
-    });
-
-    usernameSnap.forEach(function(doc){
-      const data = doc.data() || {};
-      const email = data.email || (doc.id + '@tarzstore.local');
-      const vipData = data.uid ? vipDataByUid[data.uid] : null;
-      let isVip = !!(vipData && vipData.is_vip);
-      if(isVip && vipData.vip_expiry){
-        const expiryMs = toMillis(vipData.vip_expiry);
-        if(expiryMs && Date.now() > expiryMs) isVip = false;
-      }
-      const displayName = email.endsWith('@tarzstore.local') ? doc.id : email;
-      accounts[email] = {
-        uid: data.uid || null,
-        email: displayName,
-        isVip: isVip,
-        isBanned: !!(vipData && vipData.is_banned),
-        method: 'password',
-        createdAt: data.created_at || (vipData && vipData.created_at) || null,
-        vipSince: isVip ? (vipData && vipData.vip_since || null) : null,
-        vipExpiry: (vipData && vipData.vip_expiry) || null
-      };
-    });
-
-    // Simpan juga ke cache Info Akun supaya keduanya tetap konsisten &
-    // tidak perlu fetch dobel kalau admin buka Info Akun setelah ini.
-    _infoAkunAllAccounts = Object.values(accounts).sort(function(a, b){
-      if(a.isVip !== b.isVip) return a.isVip ? -1 : 1;
-      return a.email.localeCompare(b.email);
-    });
-
-    renderAnalisisAkunList();
-  }catch(e){
-    console.error('Gagal memuat Analisis Akun:', e);
-    if(_infoAkunAllAccounts.length === 0){
-      listEl.innerHTML = '<div class="infoakun-empty">Gagal memuat data akun.</div>';
-    }
-  }
-}
-
-/* Ganti tab rentang waktu aktif (Hari Ini/Seminggu/Semua) lalu render
-   ulang dari cache _infoAkunAllAccounts (tanpa query ulang). */
-function setAnalisisAkunRange(range){
-  _analisisAkunCurrentRange = range;
-  document.querySelectorAll('#analisisAkunModalOverlay .infoakun-filter-tab').forEach(function(tab){
-    tab.classList.toggle('active', tab.dataset.range === range);
-  });
-  renderAnalisisAkunList();
-}
-
-/* Cek apakah timestamp createdAt akun jatuh dalam rentang waktu yang
-   dipilih. "Hari Ini" = sejak jam 00.00 hari ini (waktu device), "Seminggu"
-   = 7x24 jam terakhir dari sekarang, "Semua" = tanpa filter waktu. */
-function analisisAkunInRange(createdAt, range){
+/* Cek apakah timestamp jatuh dalam rentang waktu yang dipilih. Dipakai
+   Info VIP untuk filter tab Hari Ini/7 Hari Terakhir/Semua VIP.
+   "Hari Ini" = sejak jam 00.00 hari ini (waktu device), "week" = 7x24 jam
+   terakhir dari sekarang, "all" = tanpa filter waktu. */
+function infoVipInRange(ts, range){
   if(range === 'all') return true;
-  const ms = toMillis(createdAt);
-  if(!ms) return false; // akun tanpa createdAt tidak dianggap "baru" di rentang manapun
+  const ms = toMillis(ts);
+  if(!ms) return false;
   const now = Date.now();
   if(range === 'today'){
     const startOfToday = new Date();
@@ -7763,63 +7718,6 @@ function analisisAkunInRange(createdAt, range){
   return true;
 }
 
-/* Render daftar akun untuk Analisis Akun: sumbernya sama seperti Info
-   Akun (_infoAkunAllAccounts), tapi difilter berdasar waktu daftar
-   (createdAt), diurutkan TERBARU DULU (kebalikan dari Info Akun yang
-   VIP-dulu) supaya akun yang baru saja daftar langsung kelihatan di atas.
-   Item di sini TIDAK bisa diklik -- ini murni tampilan pantau, bukan
-   tempat mengelola akun (kelola tetap lewat Info Akun). */
-function renderAnalisisAkunList(){
-  const listEl = document.getElementById('analisisAkunList');
-  const countEl = document.getElementById('analisisAkunCount');
-  if(!listEl) return;
-
-  if(_infoAkunAllAccounts.length === 0){
-    listEl.innerHTML = '<div class="infoakun-empty">Belum ada akun yang tercatat.</div>';
-    if(countEl) countEl.textContent = '';
-    return;
-  }
-
-  const range = _analisisAkunCurrentRange;
-  const filtered = _infoAkunAllAccounts
-    .filter(function(a){ return analisisAkunInRange(a.createdAt, range); })
-    .sort(function(a, b){
-      // Terbaru dulu; akun tanpa createdAt ditaruh paling bawah.
-      const msA = toMillis(a.createdAt) || 0;
-      const msB = toMillis(b.createdAt) || 0;
-      return msB - msA;
-    });
-
-  if(filtered.length === 0){
-    const emptyText = range === 'today' ? 'Belum ada akun yang daftar hari ini.'
-      : range === 'week' ? 'Belum ada akun yang daftar dalam seminggu terakhir.'
-      : 'Belum ada akun yang tercatat.';
-    listEl.innerHTML = '<div class="infoakun-empty">' + emptyText + '</div>';
-  } else {
-    listEl.innerHTML = filtered.map(function(acc){
-      const badgeClass = acc.isVip ? 'is-vip' : 'is-free';
-      const badgeText = acc.isVip ? 'VIP' : 'FREE';
-      const methodText = acc.method === 'google' ? 'Login Google' : 'Username & Password';
-      const initial = infoAkunEscapeHtml(acc.email.charAt(0));
-      const joinedText = infoAkunFormatDate(acc.createdAt, 'Waktu tidak diketahui');
-      const banTag = acc.isBanned ? ' <span class="infoakun-ban-tag">\u2022 DIBLOKIR</span>' : '';
-      return '<div class="infoakun-item ' + badgeClass + (acc.isBanned ? ' is-banned' : '') + '" style="cursor:default;">' +
-        '<span class="infoakun-avatar">' + initial + '</span>' +
-        '<span class="infoakun-info">' +
-          '<span class="infoakun-email">' + infoAkunEscapeHtml(acc.email) + '</span>' +
-          '<span class="infoakun-method">' + joinedText + banTag + '</span>' +
-        '</span>' +
-        '<span class="infoakun-badge ' + badgeClass + '">' + badgeText + '</span>' +
-      '</div>';
-    }).join('');
-  }
-
-  if(countEl){
-    const rangeLabel = range === 'today' ? 'hari ini' : range === 'week' ? 'dalam 7 hari terakhir' : 'total';
-    countEl.textContent = filtered.length + ' akun daftar ' + rangeLabel;
-  }
-}
-
 /* ══════════════════════════════════════════════════════════════════
    INFO VIP — dibuka dari MENU ADMIN > "Info VIP".
    Fokus khusus akun yang berstatus VIP: kapan tiap akun beli/upgrade VIP
@@ -7830,8 +7728,13 @@ function renderAnalisisAkunList(){
    Info Akun) supaya tidak query Firestore dua kali -- modal ini murni
    "lensa VIP" di atas data yang sama, tidak ada aksi admin (gift/ban/dll)
    karena fokusnya cuma untuk memantau, bukan mengelola (kelola tetap
-   lewat Info Akun > klik akun > detail). ══════════════════════════════ */
+   lewat Gift VIP > klik akun > detail). ══════════════════════════════ */
 let _infoVipCurrentRange = 'all';
+// list hasil filter+cari yang sedang tampil di Info VIP (dipakai openInfoVipDetail)
+let _infoVipRenderedList = [];
+// true kalau modal detail dibuka dari Info VIP -> tombol Gift VIP disembunyikan
+// & setelah aksi (Hapus VIP/Ban/Buka Ban) yang di-refresh adalah daftar Info VIP.
+let _infoAkunDetailFromVip = false;
 
 function openInfoVipModal(){
   if(!isOwnerAccount()) return;
@@ -7953,7 +7856,7 @@ function setInfoVipRange(range){
    akun itu beli/di-gift VIP), lalu diurutkan TERBARU DULU supaya member
    yang baru saja join VIP langsung kelihatan di atas. Mendukung pencarian
    email/username lewat #infoVipSearchInput. Item TIDAK bisa diklik -- ini
-   murni tampilan pantau, kelola tetap lewat Info Akun. */
+   murni tampilan pantau, kelola tetap lewat Gift VIP. */
 function renderInfoVipList(){
   const listEl = document.getElementById('infoVipList');
   const countEl = document.getElementById('infoVipCount');
@@ -7972,7 +7875,7 @@ function renderInfoVipList(){
   const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
 
   let filtered = vipOnly
-    .filter(function(a){ return analisisAkunInRange(a.vipSince, range); })
+    .filter(function(a){ return infoVipInRange(a.vipSince, range); })
     .sort(function(a, b){
       // Terbaru join VIP dulu; akun tanpa vipSince (mis. di-gift manual
       // tanpa tanggal) ditaruh paling bawah.
@@ -7992,22 +7895,27 @@ function renderInfoVipList(){
       : 'Belum ada member VIP.';
     listEl.innerHTML = '<div class="infoakun-empty">' + emptyText + '</div>';
   } else {
-    listEl.innerHTML = filtered.map(function(acc){
+    listEl.innerHTML = filtered.map(function(acc, idx){
       const initial = infoAkunEscapeHtml(acc.email.charAt(0));
       const vipSinceText = infoAkunFormatDate(acc.vipSince, 'Waktu tidak diketahui');
       const expiryMs = toMillis(acc.vipExpiry);
       const expiryText = expiryMs ? (' \u2022 berakhir ' + infoAkunFormatDate(acc.vipExpiry, '\u2014')) : '';
       const banTag = acc.isBanned ? ' <span class="infoakun-ban-tag">\u2022 DIBLOKIR</span>' : '';
-      return '<div class="infoakun-item is-vip' + (acc.isBanned ? ' is-banned' : '') + '" style="cursor:default;">' +
-        '<span class="infoakun-avatar">' + initial + '</span>' +
+      return '<div class="infoakun-item is-vip' + (acc.isBanned ? ' is-banned' : '') + '" role="button" tabindex="0" onclick="openInfoVipDetail(' + idx + ')" onkeydown="if(event.key===\'Enter\'){openInfoVipDetail(' + idx + ');}">' +
+        '<span class="infoakun-avatar">' + initial + '<span class="infoakun-avatar-dot"></span></span>' +
         '<span class="infoakun-info">' +
           '<span class="infoakun-email">' + infoAkunEscapeHtml(acc.email) + '</span>' +
           '<span class="infoakun-method">Join VIP: ' + vipSinceText + expiryText + banTag + '</span>' +
         '</span>' +
-        '<span class="infoakun-badge is-vip">VIP</span>' +
+        '<span class="infoakun-badge is-vip"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5L3 8z"/></svg>VIP</span>' +
+        '<svg class="infoakun-item-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>' +
       '</div>';
     }).join('');
   }
+
+  // simpan list yang sedang tampil supaya klik item -> openInfoVipDetail(idx)
+  // ambil akun yang benar persis sesuai urutan di layar.
+  _infoVipRenderedList = filtered;
 
   if(countEl){
     const rangeLabel = range === 'today' ? 'baru join hari ini' : range === 'week' ? 'baru join dalam 7 hari terakhir' : 'total member VIP';
@@ -8018,8 +7926,13 @@ function renderInfoVipList(){
 /* Buka modal detail 1 akun (dari daftar yang lagi ditampilkan, index sesuai
    urutan hasil filter/cari saat ini). Isinya: Waktu Bergabung, Waktu VIP
    (kalau VIP), dan Status (VIP/belum VIP). */
-function openInfoAkunDetail(idx){
-  const acc = _infoAkunRenderedList[idx];
+function openInfoAkunDetail(idx, fromVip){
+  // fromVip diberi nilai true/false hanya saat dipanggil dari alur Info VIP
+  // (lihat openInfoVipDetail). Saat undefined (mis. dipanggil ulang setelah
+  // aksi) mode yang sedang aktif dipertahankan.
+  if(typeof fromVip === 'boolean') _infoAkunDetailFromVip = fromVip;
+  const list = _infoAkunDetailFromVip ? _infoVipRenderedList : _infoAkunRenderedList;
+  const acc = list[idx];
   if(!acc) return;
 
   const overlay = document.getElementById('infoAkunDetailModalOverlay');
@@ -8074,7 +7987,9 @@ function openInfoAkunDetail(idx){
   const unbanBtn = document.getElementById('infoAkunUnbanBtn');
   const hasUid = !!acc.uid;
   if(giftBtn){
-    giftBtn.style.display = acc.isVip ? 'none' : 'flex';
+    // Dari Info VIP: tombol Gift VIP selalu disembunyikan (hanya bisa Hapus
+    // VIP / Ban / Buka Ban). Gift VIP tetap cuma lewat menu Gift VIP.
+    giftBtn.style.display = (acc.isVip || _infoAkunDetailFromVip) ? 'none' : 'flex';
     giftBtn.disabled = !hasUid;
   }
   if(revokeBtn){
@@ -8100,11 +8015,38 @@ function closeInfoAkunDetailModal(){
   setTimeout(function(){ if(!overlay.classList.contains('show')) overlay.style.display = 'none'; }, 300);
 }
 
+/* Buka modal detail dari daftar Info VIP. Sama persis dengan detail di Gift
+   VIP, tapi tombol "Gift VIP Permanen" disembunyikan -- di sini admin cuma
+   bisa Hapus VIP, Ban Akun, atau Buka Ban. */
+function openInfoVipDetail(idx){
+  openInfoAkunDetail(idx, true);
+}
+
+/* Refresh tampilan setelah aksi (Hapus VIP / Ban / Buka Ban / Gift VIP).
+   Kalau detail dibuka dari Info VIP -> render ulang daftar Info VIP (akun
+   yang baru dicabut VIP-nya otomatis hilang dari daftar, karena daftar ini
+   hanya menampilkan akun VIP) lalu tutup detail kalau akunnya sudah tidak
+   ada di daftar. Kalau dari Gift VIP -> perilaku lama (render daftar akun). */
+function infoAkunRefreshAfterAction(acc){
+  if(_infoAkunDetailFromVip){
+    renderInfoVipList();
+    const idx = _infoVipRenderedList.indexOf(acc);
+    if(idx === -1){
+      closeInfoAkunDetailModal();   // akun sudah bukan VIP -> tidak ada lagi di daftar
+    } else {
+      openInfoAkunDetail(idx);      // masih VIP (mis. habis Ban/Buka Ban) -> segarkan detail
+    }
+  } else {
+    openInfoAkunDetail(_infoAkunRenderedList.indexOf(acc));
+    renderInfoAkunList();
+  }
+}
+
 /* Update satu akun di cache _infoAkunAllAccounts + list yang lagi dirender
    supaya UI (badge, warna item) langsung sinkron begitu Gift/Hapus VIP
    selesai, tanpa perlu query ulang ke Firestore & tanpa modal ketutup. */
 function infoAkunPatchLocalAccount(uid, patch){
-  [_infoAkunAllAccounts, _infoAkunRenderedList].forEach(function(list){
+  [_infoAkunAllAccounts, _infoAkunRenderedList, _infoVipRenderedList].forEach(function(list){
     list.forEach(function(a){
       if(a.uid === uid) Object.assign(a, patch);
     });
@@ -8199,8 +8141,7 @@ async function giftVipToInfoAkunDetail(){
 
     infoAkunPatchLocalAccount(acc.uid, { isVip: true, vipExpiry: null, vipSince: new Date() });
     showToast('VIP permanen diberikan ke ' + acc.email, 'success');
-    openInfoAkunDetail(_infoAkunRenderedList.indexOf(acc));
-    renderInfoAkunList();
+    infoAkunRefreshAfterAction(acc);
   }catch(e){
     console.error('Gagal memberi VIP:', e);
     showToast('Gagal memberi VIP. Coba lagi.', 'error');
@@ -8239,8 +8180,7 @@ async function revokeVipFromInfoAkunDetail(){
 
     infoAkunPatchLocalAccount(acc.uid, { isVip: false, vipExpiry: null, vipSince: null });
     showToast('VIP dicabut dari ' + acc.email, 'success');
-    openInfoAkunDetail(_infoAkunRenderedList.indexOf(acc));
-    renderInfoAkunList();
+    infoAkunRefreshAfterAction(acc);
   }catch(e){
     console.error('Gagal menghapus VIP:', e);
     showToast('Gagal menghapus VIP. Coba lagi.', 'error');
@@ -8284,8 +8224,7 @@ async function banInfoAkunDetail(){
 
     infoAkunPatchLocalAccount(acc.uid, { isBanned: true });
     showToast('Akun ' + acc.email + ' diblokir', 'warning');
-    openInfoAkunDetail(_infoAkunRenderedList.indexOf(acc));
-    renderInfoAkunList();
+    infoAkunRefreshAfterAction(acc);
   }catch(e){
     console.error('Gagal mem-ban akun:', e);
     showToast('Gagal mem-ban akun. Coba lagi.', 'error');
@@ -8315,8 +8254,7 @@ async function unbanInfoAkunDetail(){
 
     infoAkunPatchLocalAccount(acc.uid, { isBanned: false });
     showToast('Blokir dibuka untuk ' + acc.email, 'success');
-    openInfoAkunDetail(_infoAkunRenderedList.indexOf(acc));
-    renderInfoAkunList();
+    infoAkunRefreshAfterAction(acc);
   }catch(e){
     console.error('Gagal membuka ban akun:', e);
     showToast('Gagal membuka ban. Coba lagi.', 'error');
@@ -8422,7 +8360,7 @@ function startBanListener(uid){
       applyBanScreenVisibility();
 
       // ── Live-sync status VIP ──
-      // Dulu revoke VIP dari admin (Info Akun > Hapus VIP) baru kelihatan
+      // Dulu revoke VIP dari admin (Gift VIP > Hapus VIP) baru kelihatan
       // efeknya setelah user logout/login ulang, karena _googleVipStatus &
       // cache localStorage (tarz_vip/tarz_vip_expiry) cuma diisi sekali
       // saat login lewat refreshGoogleVipStatus() dan tidak pernah
@@ -9972,7 +9910,7 @@ function bindAuthStateListener(client){
 }
 
 /* ── AUTO-CATAT AKUN KE vip_users ──
-   Supaya fitur "Info Akun" di menu admin bisa menampilkan SEMUA akun yang
+   Supaya fitur "Gift VIP" di menu admin bisa menampilkan SEMUA akun yang
    pernah login (Google ATAU username/password), bukan cuma yang pernah
    menyentuh sistem VIP, dokumen vip_users/{uid} dibuat otomatis di sini
    setiap kali ada login sukses -- baik baru daftar maupun login ulang.
@@ -9993,7 +9931,7 @@ function ensureVipUserRecord(user){
         last_login: firebase.firestore.FieldValue.serverTimestamp()
       };
       // created_at cuma diisi SEKALI, saat dokumen belum ada sama sekali --
-      // supaya "Waktu Bergabung" di Info Akun selalu menunjuk ke login
+      // supaya "Waktu Bergabung" di Gift VIP selalu menunjuk ke login
       // pertama akun ini, bukan tertimpa tiap kali user login ulang.
       if(!snap.exists || !snap.data().created_at){
         payload.created_at = firebase.firestore.FieldValue.serverTimestamp();
@@ -10635,7 +10573,7 @@ async function markVipInGoogleAccount(expiryTimestampMs){
     const snap = await docRef.get();
     // vip_since dicatat cuma saat akun ini BELUM VIP sebelumnya -- jadi
     // perpanjangan VIP (yang sudah VIP, redeem key lagi) tidak menggeser
-    // "Waktu VIP" yang ditampilkan di Info Akun ke tanggal hari ini.
+    // "Waktu VIP" yang ditampilkan di Gift VIP ke tanggal hari ini.
     const wasVip = snap.exists && !!snap.data().is_vip;
 
     const expiryIso = expiryTimestampMs ? new Date(expiryTimestampMs).toISOString() : null;
