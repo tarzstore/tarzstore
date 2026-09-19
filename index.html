@@ -3618,6 +3618,11 @@ body.side-menu-open{overflow:hidden;}
   opacity:1;visibility:visible;
   -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
 }
+/* saat modal konfirmasi dibuka DI ATAS chat admin (mis. Gift VIP / Ban Akun
+   dari titik-tiga ruang obrolan), overlay chat sendiri sudah z-index 100001+
+   (lihat .tzchat-overlay), jadi confirmActionModalOverlay yang defaultnya
+   9998 perlu dinaikkan supaya tidak tertutup panel chat & kelihatan "hilang". */
+#confirmActionModalOverlay.show{ z-index:100020; }
 .gapi-modal{
   position:relative;
   width:100%;max-width:320px;
@@ -4775,6 +4780,8 @@ body:has(#banScreen[style*="flex"]){
   font-weight:800;font-size:.9rem;color:var(--text);text-transform:uppercase;
 }
 .tzchat-avatar img{width:100%;height:100%;object-fit:cover;display:block;}
+/* border biru: akun ini VIP (dipakai di avatar header ruang obrolan admin) */
+.tzchat-avatar.is-vip{border-color:#3b82f6;border-width:2px;}
 .tzchat-head-info{flex:1;min-width:0;}
 .tzchat-head-title{
   font-weight:800;font-size:.92rem;color:var(--text);
@@ -4898,6 +4905,8 @@ body:has(#banScreen[style*="flex"]){
   background:transparent;border-color:#2e2e32;color:var(--text2);
   font-weight:800;justify-content:center;margin-top:6px;
 }
+.tzchat-sheet-btn.loading{opacity:.6;pointer-events:none;}
+.tzchat-sheet-btn[disabled]{opacity:.4;pointer-events:none;}
 
 /* mode edit pada compose bar */
 .tzchat-edit-bar{
@@ -5207,6 +5216,9 @@ body:has(#banScreen[style*="flex"]){
         <div class="tzchat-head-title" id="tzchatHeadTitle">Chat Tarz Store</div>
         <div class="tzchat-head-sub" id="tzchatHeadSub"></div>
       </div>
+      <button type="button" class="tzchat-head-btn" id="tzchatUserActionBtn" aria-label="Aksi Akun" style="display:none;" onclick="openTzchatUserActionSheet()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ellipsis-vertical preview-icon"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+      </button>
       <button type="button" class="tzchat-head-btn" id="tzchatCloseBtn" aria-label="Tutup / kembali" onclick="tzchatBack()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
@@ -5244,6 +5256,31 @@ body:has(#banScreen[style*="flex"]){
       Hapus Pesan
     </button>
     <button type="button" class="tzchat-sheet-btn tzchat-sheet-cancel" onclick="tzchatCloseSheet()">Batal</button>
+  </div>
+</div>
+
+<!-- action sheet: aksi admin (Gift VIP / Ban Akun) untuk akun yang sedang
+     dibuka di ruang obrolan, dipicu tombol titik-tiga di header chat. -->
+<div class="tzchat-sheet-overlay" id="tzchatUserActionSheetOverlay" onclick="if(event.target===this) closeTzchatUserActionSheet()">
+  <div class="tzchat-sheet" id="tzchatUserActionSheet">
+    <div class="tzchat-sheet-preview" id="tzchatUserActionPreview">Memuat status akun…</div>
+    <button type="button" class="tzchat-sheet-btn" id="tzchatActionGiftBtn" onclick="tzchatActionGiftVip()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+      Gift VIP Permanen
+    </button>
+    <button type="button" class="tzchat-sheet-btn" id="tzchatActionRevokeBtn" onclick="tzchatActionRevokeVip()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+      Hapus VIP
+    </button>
+    <button type="button" class="tzchat-sheet-btn tzchat-sheet-danger" id="tzchatActionBanBtn" onclick="tzchatActionBan()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.9" y1="4.9" x2="19.1" y2="19.1"/></svg>
+      Ban Akun
+    </button>
+    <button type="button" class="tzchat-sheet-btn" id="tzchatActionUnbanBtn" onclick="tzchatActionUnban()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+      Buka Ban
+    </button>
+    <button type="button" class="tzchat-sheet-btn tzchat-sheet-cancel" onclick="closeTzchatUserActionSheet()">Batal</button>
   </div>
 </div>
 
@@ -15487,6 +15524,7 @@ const CHAT_FIREBASE_CONFIG = {
     $('tzchatList').style.display    = which === 'list' ? '' : 'none';
     $('tzchatMsgs').style.display    = which === 'room' ? 'flex' : 'none';
     $('tzchatCompose').style.display = which === 'room' ? 'flex' : 'none';
+    if(which !== 'room' && $('tzchatUserActionBtn')) $('tzchatUserActionBtn').style.display = 'none';
   }
 
   /* ═════════ PUBLIK: buka ruang obrolan dengan admin ═════════ */
@@ -15503,8 +15541,9 @@ const CHAT_FIREBASE_CONFIG = {
     _roomUser = null;
     $('tzchatBackBtn').style.display = 'none';
     $('tzchatCloseBtn').style.display = '';       // pengguna: X tampil
+    $('tzchatUserActionBtn').style.display = 'none';
     $('tzchatHeadTitle').textContent = 'Admin Tarz Store';
-    $('tzchatHeadSub').textContent = 'Balasan masuk di sini';
+    $('tzchatHeadSub').textContent = 'Kirim pesan ke admin';
     setAvatar($('tzchatHeadAvatar'), 'Admin', ADMIN_PHOTO);
     showView('room');
     showOverlay();
@@ -15554,10 +15593,41 @@ const CHAT_FIREBASE_CONFIG = {
     });
   }
 
+  /* cache status VIP per uid, dipakai buat border biru di list chat masuk.
+     Diisi lewat query sekali ke vip_users/{uid} (Firebase utama toko, beda
+     project dari Firebase chat) -- di-cache supaya tidak query ulang tiap
+     kali snapshot list berubah (bisa sering, tiap pesan baru masuk). */
+  const _vipStatusCache = {}; // uid -> true/false/undefined(belum tau)
+
+  /* target: elemen tunggal ATAU array elemen yang perlu di-toggle class
+     is-vip begitu status akun ini diketahui (dipakai buat avatar di list
+     chat masuk & avatar header ruang obrolan sekaligus). */
+  function tzchatCheckVipStatus(uid, target, target2){
+    if(!window.fbDb || !uid) return;
+    const targets = [target, target2].filter(Boolean);
+    if(_vipStatusCache[uid] !== undefined){
+      targets.forEach(t => t.classList.toggle('is-vip', !!_vipStatusCache[uid]));
+      return;
+    }
+    window.fbDb.collection('vip_users').doc(uid).get().then(doc => {
+      const vd = doc.exists ? (doc.data() || {}) : {};
+      let isVip = !!vd.is_vip;
+      if(isVip && vd.vip_expiry){
+        const expiryMs = toMillis(vd.vip_expiry);
+        if(expiryMs && Date.now() > expiryMs) isVip = false;
+      }
+      _vipStatusCache[uid] = isVip;
+      // elemen bisa saja sudah dibuang dari DOM (list di-render ulang) --
+      // aman, classList.toggle di elemen lepas tidak menimbulkan efek apa pun.
+      targets.forEach(t => t.classList.toggle('is-vip', isVip));
+    }).catch(() => {});
+  }
+
   function buildListItem(uid, c){
     const unread = Number(c.unreadAdmin) || 0;
     const btn = el('button', 'tzchat-list-item' + (unread ? ' is-unread' : ''));
     btn.type = 'button';
+    btn.dataset.uid = uid;
     const av = el('div', 'tzchat-avatar');
     setAvatar(av, c.name, c.photo);
     const body = el('div', 'tzchat-list-body');
@@ -15571,6 +15641,7 @@ const CHAT_FIREBASE_CONFIG = {
     body.appendChild(top); body.appendChild(bottom);
     btn.appendChild(av); btn.appendChild(body);
     btn.onclick = () => openAdminRoom(uid, c);
+    tzchatCheckVipStatus(uid, av);
     return btn;
   }
 
@@ -15582,15 +15653,168 @@ const CHAT_FIREBASE_CONFIG = {
     $('tzchatHeadTitle').textContent = _roomUser.name;
     $('tzchatHeadSub').textContent = 'Akun pengguna';
     setAvatar($('tzchatHeadAvatar'), _roomUser.name, _roomUser.photo);
+    $('tzchatHeadAvatar').classList.toggle('is-vip', !!_vipStatusCache[uid]);
+    tzchatCheckVipStatus(uid, null, $('tzchatHeadAvatar')); // segarkan kalau belum ke-cache
+    $('tzchatUserActionBtn').style.display = '';   // titik-tiga: Gift VIP / Ban Akun
     showView('room');
     subscribeRoom(uid);
     markRead('admin', uid);
   }
 
+  /* ═════════ ADMIN: menu titik-tiga di ruang obrolan → Gift VIP / Ban Akun ═════════
+     Aksi ini menyentuh koleksi `vip_users/{uid}` di Firebase UTAMA toko
+     (window.fbDb), bukan Firebase chat (getChatDb()/tarzChat) yang terpisah --
+     makanya dipisah dari mekanisme chat, langsung reuse pola yang sama dengan
+     Menu Admin > Gift VIP (showConfirmModal + showToast + patch vip_users). */
+  let _uaUid = null;
+  let _uaName = '';
+  let _uaAcc = null; // {isVip, isBanned} status akun target, diambil live tiap sheet dibuka
+
+  window.openTzchatUserActionSheet = function(){
+    if(!isAdmin() || _mode !== 'admin-room' || !_roomUid) return;
+    _uaUid = _roomUid;
+    _uaName = (_roomUser && _roomUser.name) || 'Pengguna';
+    _uaAcc = null;
+
+    const preview = $('tzchatUserActionPreview');
+    if(preview) preview.textContent = _uaName;
+    ['tzchatActionGiftBtn','tzchatActionRevokeBtn','tzchatActionBanBtn','tzchatActionUnbanBtn'].forEach(id => {
+      const b = $(id); if(b){ b.style.display = 'none'; b.disabled = true; }
+    });
+
+    const overlay = $('tzchatUserActionSheetOverlay');
+    overlay.style.display = 'flex'; void overlay.offsetHeight;
+    overlay.classList.add('show');
+
+    if(!window.fbDb){
+      if(preview) preview.textContent = _uaName + ' — koneksi akun bermasalah';
+      return;
+    }
+    window.fbDb.collection('vip_users').doc(_uaUid).get().then(doc => {
+      if(_uaUid !== _roomUid) return; // sheet sudah ditutup/ganti akun sebelum data datang
+      const vd = doc.exists ? (doc.data() || {}) : {};
+      let isVip = !!vd.is_vip;
+      if(isVip && vd.vip_expiry){
+        const expiryMs = toMillis(vd.vip_expiry);
+        if(expiryMs && Date.now() > expiryMs) isVip = false;
+      }
+      _uaAcc = { isVip: isVip, isBanned: !!vd.is_banned };
+      tzchatRenderUserActionButtons();
+    }).catch(err => {
+      console.error('[chat] gagal ambil status akun:', err);
+      if(preview) preview.textContent = _uaName + ' — gagal memuat status akun';
+    });
+  };
+
+  function tzchatRenderUserActionButtons(){
+    if(!_uaAcc) return;
+    const preview = $('tzchatUserActionPreview');
+    if(preview) preview.textContent = _uaName + (_uaAcc.isVip ? ' • VIP' : ' • Free') + (_uaAcc.isBanned ? ' • Diblokir' : '');
+    const giftBtn = $('tzchatActionGiftBtn');
+    const revokeBtn = $('tzchatActionRevokeBtn');
+    const banBtn = $('tzchatActionBanBtn');
+    const unbanBtn = $('tzchatActionUnbanBtn');
+    if(giftBtn){ giftBtn.style.display = _uaAcc.isVip ? 'none' : 'flex'; giftBtn.disabled = false; }
+    if(revokeBtn){ revokeBtn.style.display = _uaAcc.isVip ? 'flex' : 'none'; revokeBtn.disabled = false; }
+    if(banBtn){ banBtn.style.display = _uaAcc.isBanned ? 'none' : 'flex'; banBtn.disabled = false; }
+    if(unbanBtn){ unbanBtn.style.display = _uaAcc.isBanned ? 'flex' : 'none'; unbanBtn.disabled = false; }
+  }
+
+  window.closeTzchatUserActionSheet = function(){
+    const overlay = $('tzchatUserActionSheetOverlay');
+    if(!overlay) return;
+    overlay.classList.remove('show');
+    setTimeout(() => { if(!overlay.classList.contains('show')) overlay.style.display = 'none'; }, 250);
+  };
+
+  async function tzchatUserActionRun(btnId, confirmOpts, patch, successMsg, successType){
+    if(!isAdmin() || !_uaUid || !window.fbDb) return;
+    if(confirmOpts){
+      const confirmed = await showConfirmModal(confirmOpts);
+      if(!confirmed) return;
+    }
+    const btn = $(btnId);
+    if(btn) btn.classList.add('loading');
+    try{
+      await window.fbDb.collection('vip_users').doc(_uaUid).set(
+        Object.assign({}, patch, { updated_at: firebase.firestore.FieldValue.serverTimestamp() }),
+        { merge: true }
+      );
+      // patch punya field is_vip kalau aksinya Gift/Hapus VIP -- segarkan
+      // cache border biru di avatar (list chat masuk & header ruang obrolan)
+      // supaya tidak perlu nunggu reload.
+      if(Object.prototype.hasOwnProperty.call(patch, 'is_vip')){
+        _vipStatusCache[_uaUid] = !!patch.is_vip;
+        const listItem = $('tzchatList') ?
+          Array.from($('tzchatList').querySelectorAll('.tzchat-list-item')).find(b => b.dataset && b.dataset.uid === _uaUid) : null;
+        const listAvatar = listItem ? listItem.querySelector('.tzchat-avatar') : null;
+        if(listAvatar) listAvatar.classList.toggle('is-vip', !!patch.is_vip);
+        if(_uaUid === _roomUid && $('tzchatHeadAvatar')) $('tzchatHeadAvatar').classList.toggle('is-vip', !!patch.is_vip);
+      }
+      toast(successMsg, successType || 'success');
+      closeTzchatUserActionSheet();
+    }catch(e){
+      console.error('[chat] aksi akun gagal:', e);
+      toast('Gagal memproses aksi. Coba lagi.', 'error');
+    }finally{
+      if(btn) btn.classList.remove('loading');
+    }
+  }
+
+  window.tzchatActionGiftVip = async function(){
+    const confirmed = await showConfirmModal({
+      title: 'Gift VIP Permanen',
+      message: 'Beri akses VIP permanen ke <b>' + _uaName + '</b>?',
+      okText: 'IYA',
+      neutral: true
+    });
+    if(!confirmed) return;
+    tzchatUserActionRun('tzchatActionGiftBtn', null, {
+      is_vip: true,
+      vip_expiry: null,
+      vip_since: firebase.firestore.FieldValue.serverTimestamp(),
+      gift_notice: { type: 'vip_permanent', at: firebase.firestore.FieldValue.serverTimestamp() }
+    }, 'VIP permanen diberikan ke ' + _uaName, 'success');
+  };
+
+  window.tzchatActionRevokeVip = async function(){
+    const confirmed = await showConfirmModal({
+      title: 'Hapus VIP',
+      message: 'Hapus status VIP dari <b>' + _uaName + '</b>? Akun ini akan langsung jadi FREE.',
+      okText: 'IYA'
+    });
+    if(!confirmed) return;
+    tzchatUserActionRun('tzchatActionRevokeBtn', null, {
+      is_vip: false,
+      vip_expiry: null,
+      gift_notice: firebase.firestore.FieldValue.delete()
+    }, 'VIP dicabut dari ' + _uaName, 'success');
+  };
+
+  window.tzchatActionBan = async function(){
+    const confirmed = await showConfirmModal({
+      title: 'Ban Akun',
+      message: 'Ban akun <b>' + _uaName + '</b>? Akun ini tidak akan bisa mengakses situs sampai kamu buka blokirnya lagi.',
+      okText: 'IYA'
+    });
+    if(!confirmed) return;
+    tzchatUserActionRun('tzchatActionBanBtn', null, {
+      is_banned: true,
+      banned_at: firebase.firestore.FieldValue.serverTimestamp()
+    }, 'Akun ' + _uaName + ' diblokir', 'warning');
+  };
+
+  window.tzchatActionUnban = function(){
+    tzchatUserActionRun('tzchatActionUnbanBtn', null, {
+      is_banned: false
+    }, 'Blokir dibuka untuk ' + _uaName, 'success');
+  };
+
   /* tombol kembali: room admin → daftar; selain itu tutup */
   window.tzchatBack = function(){
     if(_mode === 'admin-room'){
       stopRoom();
+      if(typeof closeTzchatUserActionSheet === 'function') closeTzchatUserActionSheet();
       window.openAdminChatInbox();
     } else {
       window.closeTzChat();
@@ -15598,6 +15822,7 @@ const CHAT_FIREBASE_CONFIG = {
   };
   window.closeTzChat = function(){
     stopRoom(); stopList();
+    if(typeof closeTzchatUserActionSheet === 'function') closeTzchatUserActionSheet();
     hideOverlay();
     _mode = null; _roomUid = null;
   };
