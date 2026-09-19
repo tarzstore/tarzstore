@@ -8136,7 +8136,12 @@ async function giftVipToInfoAkunDetail(){
       is_vip: true,
       vip_expiry: null, // null = permanen, tidak ada tanggal habis
       vip_since: firebase.firestore.FieldValue.serverTimestamp(),
-      updated_at: firebase.firestore.FieldValue.serverTimestamp()
+      updated_at: firebase.firestore.FieldValue.serverTimestamp(),
+      // Penanda notifikasi untuk PENERIMA: listener realtime di device
+      // penerima (startBanListener) membaca field ini lalu menampilkan popup
+      // "kamu dapat VIP" & menghapusnya lagi (lihat showVipGiftNoticeIfAny).
+      // Kalau penerima sedang offline, popup muncul saat dia login berikutnya.
+      gift_notice: { type: 'vip_permanent', at: firebase.firestore.FieldValue.serverTimestamp() }
     }, { merge: true });
 
     infoAkunPatchLocalAccount(acc.uid, { isVip: true, vipExpiry: null, vipSince: new Date() });
@@ -8175,6 +8180,7 @@ async function revokeVipFromInfoAkunDetail(){
     await window.fbDb.collection('vip_users').doc(acc.uid).set({
       is_vip: false,
       vip_expiry: null,
+      gift_notice: firebase.firestore.FieldValue.delete(), // batalkan notif gift yang belum sempat dibaca
       updated_at: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
 
@@ -8376,6 +8382,8 @@ function startBanListener(uid){
       if(liveVip){
         _googleVipStatus = true;
         markVipUnlocked(); // sinkronkan cache localStorage juga
+        // Ada hadiah VIP dari admin yang belum diberitahukan ke penerima ini?
+        if(data && data.gift_notice) showVipGiftNoticeIfAny(uid, data.gift_notice);
       } else if(_googleVipStatus !== false || localStorage.getItem('tarz_vip') === 'true' || localStorage.getItem('tarz_vip_expiry')){
         // Status VIP di Firestore sudah false/dicabut, tapi cache lokal
         // (memory atau localStorage) masih menganggap VIP -> bersihkan
@@ -8391,6 +8399,36 @@ function startBanListener(uid){
       // akun yang sebenarnya tidak diban.
       console.error('Gagal memantau status ban akun:', err);
     });
+}
+
+/* NOTIFIKASI GIFT VIP untuk penerima — dipanggil listener realtime di atas
+   begitu dokumen vip_users/{uid} punya field gift_notice (diisi admin lewat
+   giftVipToInfoAkunDetail). Menampilkan popup yang sama seperti setelah
+   bayar QRIS / redeem key (showVipCelebration), lalu MENGHAPUS penanda itu
+   dari Firestore supaya popup tidak muncul lagi di refresh/login berikutnya
+   maupun di device lain milik akun yang sama.
+   - _giftNoticeHandledFor: guard per uid supaya beberapa snapshot beruntun
+     (mis. saat penghapusan penanda memicu snapshot baru) tidak menampilkan
+     popup dobel.
+   - Owner yang menge-gift dirinya sendiri juga akan dapat popup, itu wajar. */
+let _giftNoticeHandledFor = null;
+function showVipGiftNoticeIfAny(uid, notice){
+  if(!uid || !notice) return;
+  const key = uid + ':' + (notice.at && notice.at.seconds ? notice.at.seconds : 'pending');
+  if(_giftNoticeHandledFor === key) return;
+  // Timestamp server belum ter-resolve di snapshot lokal (null) -> tunggu
+  // snapshot berikutnya yang membawa nilai final, jangan tampil/hapus dulu.
+  if(!notice.at) return;
+  _giftNoticeHandledFor = key;
+
+  showVipCelebration('KAMU DAPAT VIP!', 'Admin memberimu VIP permanen. Semua cheat sekarang terbuka.');
+
+  // Hapus penanda supaya notifikasi hanya tampil SEKALI.
+  try{
+    window.fbDb.collection('vip_users').doc(uid).update({
+      gift_notice: firebase.firestore.FieldValue.delete()
+    }).catch(function(e){ console.error('Gagal menghapus gift_notice:', e); });
+  }catch(e){ console.error('Gagal menghapus gift_notice:', e); }
 }
 
 /* Tampilkan/sembunyikan layar penuh "Akun Diblokir". Owner SELALU
