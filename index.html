@@ -5877,6 +5877,9 @@ body:has(#banScreen[style*="flex"]){
       <div class="infoakun-loading">Memuat data VIP...</div>
     </div>
     <div class="infoakun-count" id="infoVipCount"></div>
+    <div style="text-align:center;padding:6px 0 2px;">
+      <button type="button" onclick="loadInfoVipData(true)" style="background:none;border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:6px 14px;font-size:.75rem;cursor:pointer;">Muat ulang data (baca baru dari server)</button>
+    </div>
   </div>
 </div>
 
@@ -8055,6 +8058,11 @@ function infoVipInRange(ts, range){
    karena fokusnya cuma untuk memantau, bukan mengelola (kelola tetap
    lewat Gift VIP > klik akun > detail). ══════════════════════════════ */
 let _infoVipCurrentRange = 'all';
+/* HEMAT READS: waktu terakhir daftar VIP berhasil dibaca dari Firestore.
+   Selama masih < INFO_VIP_CACHE_MS, membuka modal Info VIP berkali-kali
+   memakai data di memori (0 read). Tombol "Muat ulang" memaksa baca baru. */
+let _infoVipLoadedAt = 0;
+const INFO_VIP_CACHE_MS = 10 * 60 * 1000; // 10 menit
 // list hasil filter+cari yang sedang tampil di Info VIP (dipakai openInfoVipDetail)
 let _infoVipRenderedList = [];
 // true kalau modal detail dibuka dari Info VIP -> tombol Gift VIP disembunyikan
@@ -8093,10 +8101,17 @@ function closeInfoVipModal(){
    Filter VIP kedaluwarsa (vip_expiry sudah lewat -> bukan VIP) tetap
    dijalankan di infoAkunBuildAccount(), lalu akun yang sudah kedaluwarsa
    dibuang dari cache karena modal ini memang hanya menampilkan VIP. */
-async function loadInfoVipData(){
+async function loadInfoVipData(forceRefresh){
   const listEl = document.getElementById('infoVipList');
   const countEl = document.getElementById('infoVipCount');
   if(!listEl) return;
+
+  // Cache masih segar -> tampilkan langsung, TANPA query Firestore.
+  if(!forceRefresh && _infoVipLoadedAt && (Date.now() - _infoVipLoadedAt) < INFO_VIP_CACHE_MS && _infoAkunAllAccounts.length){
+    renderInfoVipList();
+    return;
+  }
+
   listEl.innerHTML = '<div class="infoakun-loading">Memuat data VIP...</div>';
   if(countEl) countEl.textContent = '';
 
@@ -8155,6 +8170,7 @@ async function loadInfoVipData(){
       return a.email.localeCompare(b.email);
     });
 
+    _infoVipLoadedAt = Date.now();
     renderInfoVipList();
   }catch(e){
     console.error('Gagal memuat Info VIP:', e);
@@ -10280,26 +10296,48 @@ function bindAuthStateListener(client){
    - Kalau dokumen SUDAH ada (mis. sudah VIP) -> field is_vip & vip_expiry
      yang sudah ada TIDAK tertimpa, cuma email & last_login yang diperbarui.
    Aman dipanggil berkali-kali (setiap kali user itu login lagi). */
-function ensureVipUserRecord(user){
-  if(!user || !window.fbDb) return;
+/* Firestore project kedua (chat, tarzx-46c69). Memakai app bernama
+   'tarzChat' yang SAMA dengan getChatDb() milik modul chat, jadi tidak
+   ada inisialisasi ganda. CHAT_FIREBASE_CONFIG dideklarasikan lebih
+   bawah (const global), tapi baru dibaca saat fungsi ini DIPANGGIL (setelah
+   halaman selesai dimuat), jadi aman. */
+function getAkunDb(){
   try{
-    const docRef = window.fbDb.collection('vip_users').doc(user.uid);
-    docRef.get().then(function(snap){
-      const payload = {
-        email: user.email || null,
-        last_login: firebase.firestore.FieldValue.serverTimestamp()
-      };
-      // created_at cuma diisi SEKALI, saat dokumen belum ada sama sekali --
-      // supaya "Waktu Bergabung" di Gift VIP selalu menunjuk ke login
-      // pertama akun ini, bukan tertimpa tiap kali user login ulang.
-      if(!snap.exists || !snap.data().created_at){
-        payload.created_at = firebase.firestore.FieldValue.serverTimestamp();
-      }
-      return docRef.set(payload, { merge: true });
+    if(typeof CHAT_FIREBASE_CONFIG === 'undefined') return null;
+    if(!(window.firebase && firebase.initializeApp && firebase.firestore)) return null;
+    const app = firebase.apps.find(function(a){ return a.name === 'tarzChat'; })
+      || firebase.initializeApp(CHAT_FIREBASE_CONFIG, 'tarzChat');
+    return app.firestore();
+  }catch(e){ return null; }
+}
+
+function ensureVipUserRecord(user){
+  if(!user) return;
+
+  /* HEMAT FIRESTORE: akun BARU/FREE dicatat di project kedua
+     (koleksi akun_terdaftar/{uid}), BUKAN lagi di vip_users project utama.
+     - Akun lama yang sudah ada di vip_users dibiarkan (tidak dipindah).
+     - vip_users project utama sekarang hanya dibuat saat memang perlu:
+       Gift VIP, beli VIP, ban, dsb (aksi-aksi itu memakai set merge sendiri).
+     - Sekali per akun per perangkat: penanda di localStorage mencegah
+       write berulang tiap login (sebelumnya 1 read + 1 write tiap login). */
+  const flagKey = 'tarz_akun_tercatat_' + user.uid;
+  try{ if(localStorage.getItem(flagKey) === '1') return; }catch(e){}
+
+  const db = getAkunDb();
+  if(!db) return; // project kedua belum siap -> lewati, tidak ganggu login
+
+  try{
+    db.collection('akun_terdaftar').doc(user.uid).set({
+      email: user.email || null,
+      created_at: firebase.firestore.FieldValue.serverTimestamp(),
+      last_login: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true }).then(function(){
+      try{ localStorage.setItem(flagKey, '1'); }catch(e){}
     }).catch(function(err){
-      // Diamkan kalau gagal (mis. rules belum sempat diupdate) -- ini
-      // fitur pencatatan tambahan, tidak boleh mengganggu alur login utama.
-      console.error('Gagal mencatat akun ke vip_users:', err);
+      // Diamkan kalau gagal (mis. rules project kedua belum diizinkan) --
+      // pencatatan ini tambahan, tidak boleh mengganggu alur login utama.
+      console.error('Gagal mencatat akun ke project kedua:', err);
     });
   }catch(e){ console.error('ensureVipUserRecord error:', e); }
 }
@@ -14980,8 +15018,27 @@ window.addEventListener('npFirebaseReady', fbInitOnce, {once:true});
       });
     }
 
-    let data;
+    /* HEMAT READS: daftar produk di-cache di localStorage selama 5 menit.
+       Tanpa cache, tiap pengunjung yang buka/refresh situs membaca SEMUA
+       dokumen `products` (puluhan read). Dengan cache, kunjungan berulang
+       dalam 5 menit = 0 read. Produk baru/perubahan terlihat maksimal 5
+       menit kemudian (pengunjung tanpa cache langsung melihat yang terbaru). */
+    const PRODUK_CACHE_KEY = 'tarz_produk_cache_v1';
+    const PRODUK_CACHE_MS = 5 * 60 * 1000; // 5 menit
+
+    let data = null;
     try{
+      const raw = localStorage.getItem(PRODUK_CACHE_KEY);
+      if(raw){
+        const c = JSON.parse(raw);
+        if(c && Array.isArray(c.data) && c.data.length && (Date.now() - c.t) < PRODUK_CACHE_MS){
+          data = c.data; // cache masih segar -> 0 read Firestore
+        }
+      }
+    }catch(e){ data = null; }
+
+    if(!data){
+     try{
       const snap = await window.fbDb.collection('products').get();
       data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       /* Sort manual di client (sama seperti admin.html) supaya tidak
@@ -14995,10 +15052,26 @@ window.addEventListener('npFirebaseReady', fbInitOnce, {once:true});
         const caB = b.created_at && b.created_at.toMillis ? b.created_at.toMillis() : 0;
         return caB - caA;
       });
-    } catch(error){
+      /* Simpan ke cache. Timestamp Firestore (created_at, dll) TIDAK bisa
+         di-JSON-kan apa adanya (method toMillis hilang), jadi diubah dulu
+         jadi angka milidetik. Render produk tidak memakai field waktu ini
+         (hanya untuk sortir, yang sudah selesai di atas). */
+      try{
+        const plain = data.map(function(p){
+          const o = {};
+          Object.keys(p).forEach(function(k){
+            const v = p[k];
+            o[k] = (v && typeof v.toMillis === 'function') ? v.toMillis() : v;
+          });
+          return o;
+        });
+        localStorage.setItem(PRODUK_CACHE_KEY, JSON.stringify({ t: Date.now(), data: plain }));
+      }catch(e){ /* localStorage penuh/tidak tersedia -> abaikan, tetap jalan tanpa cache */ }
+     } catch(error){
       console.error('Gagal memuat produk dari Firestore:', error && error.message);
       clearSkeletons();
       return;
+     }
     }
 
     /* Pastikan _appConfig sudah ada (bisa saja config.json masih memuat).
