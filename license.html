@@ -1,0 +1,1355 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>License Panel - Firebase</title>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #05070d; --panel: rgba(255,255,255,.055); --panel2: rgba(255,255,255,.06); --line: rgba(255,255,255,.12);
+      --text: #f4f6fb; --muted: #9aa3b8; --blue: #4f8cff; --blue2: #7db4ff;
+      --green: #34d399; --red: #f87171; --amber: #fbbf24;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    .hidden { display: none !important; }
+    html, body { height: 100%; }
+    body {
+      margin: 0; min-height: 100vh;
+      background: var(--bg);
+      color: var(--text); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .wrap { max-width: 1160px; margin: auto; padding: 0 20px 40px; }
+    svg.icon { width: 1em; height: 1em; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: -2px; flex: none; }
+
+    /* Liquid glass base */
+    .glass {
+      background: rgba(22,25,36,.82);
+      border: 1px solid var(--line);
+      box-shadow: 0 1px 0 rgba(255,255,255,.15) inset, 0 8px 30px rgba(0,0,0,.35);
+      position: relative;
+    }
+    /* Header */
+    .topbar {
+      position: sticky; top: 0; z-index: 10;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; padding: 14px 20px;
+      background: rgba(8,10,18,.9);
+      border-bottom: 1px solid var(--line); margin-bottom: 28px;
+      box-shadow: 0 1px 0 rgba(255,255,255,.08) inset, 0 8px 24px rgba(0,0,0,.25);
+    }
+    .topbar-inner { max-width: 1160px; margin: 0 auto; width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 800; letter-spacing: -.01em; }
+    .brand .logo {
+      width: 34px; height: 34px; border-radius: 11px; flex: none;
+      background: var(--blue);
+      border: 1px solid rgba(255,255,255,.25);
+      box-shadow: 0 1px 0 rgba(255,255,255,.4) inset, 0 6px 16px rgba(79,140,255,.35);
+      display: flex; align-items: center; justify-content: center; color: #fff;
+    }
+    .brand .logo svg { width: 17px; height: 17px; }
+    .brand span { color: var(--blue2); }
+    .who-pill {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,.06); border: 1px solid var(--line); border-radius: 999px;
+      padding: 6px 8px 6px 12px; font-size: 12.5px; color: var(--muted);
+    }
+    .who-pill b { color: var(--text); font-weight: 600; }
+    .who-pill .avatar {
+      width: 22px; height: 22px; border-radius: 50%; flex: none;
+      background: var(--green);
+      border: 1px solid rgba(255,255,255,.3);
+      display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #06210f;
+    }
+
+    /* Login screen */
+    .login-page {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      padding: 24px; position: relative; overflow: hidden;
+    }
+    .login-page::before, .login-page::after {
+      content: ""; position: absolute; border-radius: 50%; pointer-events: none; z-index: 0;
+    }
+    .login-page::before {
+      width: 480px; height: 480px; top: -180px; left: -140px;
+      background: radial-gradient(circle, rgba(79,140,255,.28), transparent 70%);
+    }
+    .login-page::after {
+      width: 420px; height: 420px; bottom: -160px; right: -120px;
+      background: radial-gradient(circle, rgba(52,211,153,.16), transparent 70%);
+    }
+    .login-box { width: 100%; max-width: 380px; position: relative; z-index: 1; animation: login-in .45s cubic-bezier(.16,1,.3,1); }
+    @keyframes login-in {
+      from { opacity: 0; transform: translateY(14px) scale(.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .login-brand { display: flex; flex-direction: column; align-items: center; gap: 14px; margin-bottom: 28px; }
+    .login-brand .logo {
+      width: 52px; height: 52px; border-radius: 16px;
+      background: linear-gradient(160deg, var(--blue), #2f5fd6);
+      border: 1px solid rgba(255,255,255,.3);
+      box-shadow: 0 1px 0 rgba(255,255,255,.4) inset, 0 10px 28px rgba(79,140,255,.4);
+      display: flex; align-items: center; justify-content: center; color: #fff;
+    }
+    .login-brand .logo svg { width: 26px; height: 26px; }
+    .login-brand h1 { margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -.01em; text-align: center; }
+    .login-brand h1 span { color: var(--blue2); }
+    .login-brand p { margin: 0; color: var(--muted); font-size: 13px; text-align: center; }
+    .login-card { border-radius: 20px; padding: 28px 26px; }
+    .field-group { margin-bottom: 16px; }
+    .field-group label {
+      display: flex; align-items: center; gap: 6px;
+      color: var(--muted); font-size: 12px; margin: 0 0 7px; font-weight: 600;
+    }
+    .field-group label svg.icon { width: 13px; height: 13px; color: var(--blue2); }
+    .input-wrap { position: relative; display: flex; align-items: center; }
+    .input-wrap svg.icon.leading {
+      position: absolute; left: 13px; width: 15px; height: 15px; color: var(--muted); pointer-events: none;
+    }
+    .input-wrap input {
+      margin: 0; padding-left: 38px; height: 46px;
+    }
+    .input-wrap input#password { padding-right: 40px; }
+    .pw-toggle {
+      position: absolute; right: 4px; width: 34px; height: 34px; padding: 0; border-radius: 8px;
+      background: transparent; border: none; box-shadow: none; color: var(--muted);
+    }
+    .pw-toggle:hover:not(:disabled) { background: rgba(255,255,255,.08); filter: none; color: var(--text); }
+    .pw-toggle svg.icon { width: 16px; height: 16px; }
+    #loginBtn {
+      width: 100%; height: 46px; margin-top: 6px; font-size: 14px; border-radius: 12px;
+      box-shadow: 0 1px 0 rgba(255,255,255,.35) inset, 0 8px 22px rgba(79,140,255,.35);
+    }
+    #loginBtn svg.icon { width: 15px; height: 15px; }
+    #loginBtn .spinner {
+      width: 15px; height: 15px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,.4); border-top-color: #fff;
+      animation: spin .7s linear infinite; display: none;
+    }
+    #loginBtn.loading .spinner { display: inline-block; }
+    #loginBtn.loading .btn-label { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .login-msg {
+      display: flex; align-items: center; gap: 7px;
+      min-height: 0; margin-top: 14px; padding: 10px 12px; border-radius: 10px;
+      font-size: 12.5px; line-height: 1.4;
+    }
+    .login-msg:empty { display: none; margin: 0; padding: 0; }
+    .login-msg svg.icon { width: 14px; height: 14px; flex: none; }
+    .login-msg.err { color: #fca5a5; background: rgba(248,113,113,.1); border: 1px solid rgba(248,113,113,.25); }
+    .login-msg.ok { color: #86efac; background: rgba(52,211,153,.1); border: 1px solid rgba(52,211,153,.25); }
+    .login-msg.info { color: var(--muted); background: rgba(255,255,255,.05); border: 1px solid var(--line); }
+    .login-foot { text-align: center; margin-top: 20px; color: var(--muted); font-size: 11.5px; }
+    .sub { color: var(--muted); margin: 0 0 18px; }
+    .card { border-radius: 18px; padding: 22px; margin-bottom: 18px; }
+    label { display: block; color: var(--muted); font-size: 12px; margin: 0 0 6px; font-weight: 500; }
+    input, select {
+      width: 100%; margin-bottom: 12px; border: 1px solid var(--line); border-radius: 10px;
+      background: rgba(255,255,255,.05);
+      color: var(--text); padding: 11px 12px; outline: none; font-size: 13.5px; transition: border-color .15s, background .15s;
+    }
+    input:focus, select:focus { border-color: var(--blue); background: rgba(255,255,255,.08); }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .row > * { flex: 1 1 150px; }
+    button {
+      border: 1px solid rgba(255,255,255,.18); border-radius: 10px;
+      background: rgba(79,140,255,.95);
+      color: white; cursor: pointer; font-weight: 700; padding: 11px 16px; font-size: 13.5px;
+      box-shadow: 0 1px 0 rgba(255,255,255,.35) inset, 0 4px 14px rgba(79,140,255,.25);
+      transition: filter .15s, transform .05s;
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      -webkit-tap-highlight-color: transparent;
+      outline: none;
+      overflow: hidden;
+    }
+    button:focus-visible { outline: 2px solid var(--blue2); outline-offset: 2px; }
+    button.secondary { background: rgba(255,255,255,.1); box-shadow: 0 1px 0 rgba(255,255,255,.2) inset; color: var(--text); }
+    button.danger { background: rgba(248,113,113,.9); }
+    button.green { background: rgba(52,211,153,.9); }
+    button.amber { background: rgba(251,191,36,.9); color: #241a00; }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+    button:hover:not(:disabled) { filter: brightness(1.12); }
+    button:active:not(:disabled) { transform: scale(.98); }
+    .msg { min-height: 20px; color: var(--muted); margin-top: 10px; }
+    .msg.err { color: #fca5a5; }
+    .msg.ok { color: #86efac; }
+    .stats { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px; justify-content: center; }
+    .stat { flex: 1 1 130px; border-radius: 14px; padding: 12px 14px; }
+    .stat small { color: var(--muted); text-transform: uppercase; font-size: 9.5px; letter-spacing: .04em; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+    .stat strong { display: block; font-size: 22px; margin-top: 4px; font-weight: 800; letter-spacing: -.02em; }
+    .stat.stat-blue { border-color: rgba(79,140,255,.32); background: linear-gradient(180deg, rgba(79,140,255,.14), rgba(79,140,255,.04)); }
+    .stat.stat-blue small svg.icon { color: var(--blue2); }
+    .stat.stat-blue strong { color: var(--blue2); }
+    .stat.stat-green { border-color: rgba(52,211,153,.32); background: linear-gradient(180deg, rgba(52,211,153,.14), rgba(52,211,153,.04)); }
+    .stat.stat-green small svg.icon { color: var(--green); }
+    .stat.stat-green strong { color: var(--green); }
+    .stat.stat-red { border-color: rgba(248,113,113,.32); background: linear-gradient(180deg, rgba(248,113,113,.14), rgba(248,113,113,.04)); }
+    .stat.stat-red small svg.icon { color: var(--red); }
+    .stat.stat-red strong { color: var(--red); }
+    .stat.stat-amber { border-color: rgba(251,191,36,.32); background: linear-gradient(180deg, rgba(251,191,36,.14), rgba(251,191,36,.04)); }
+    .stat.stat-amber small svg.icon { color: var(--amber); }
+    .stat.stat-amber strong { color: var(--amber); }
+    h2 { font-size: 15.5px; margin: 0 0 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    h2 svg.icon { color: var(--blue2); width: 17px; height: 17px; }
+    .h2-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+    .h2-row h2 { margin: 0; }
+    .keylist { display: flex; flex-direction: column; gap: 9px; border-radius: 12px; }
+    .keyrow {
+      display: grid;
+      grid-template-columns: 1fr;
+      background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02));
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      transition: border-color .15s;
+    }
+    .keyrow:hover { border-color: rgba(255,255,255,.22); }
+    .kr-stripe { display: none; }
+    .kr-body { padding: 13px 15px; min-width: 0; position: relative; }
+    .kr-body::before {
+      content: ""; position: absolute; left: 0; top: 10px; bottom: 10px; width: 2px; border-radius: 2px;
+      background: var(--muted); opacity: .35;
+    }
+    .keyrow.st-active .kr-body::before { background: var(--green); opacity: 1; box-shadow: 0 0 8px rgba(52,211,153,.6); }
+    .keyrow.st-expired .kr-body::before { background: var(--red); opacity: 1; box-shadow: 0 0 8px rgba(248,113,113,.5); }
+    .keyrow.st-disabled .kr-body::before { background: var(--muted); opacity: .6; }
+    .kr-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 10px; padding-left: 8px; }
+    .kr-head-main { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; min-width: 0; }
+    .kr-dot { width: 6px; height: 6px; border-radius: 50%; flex: none; background: var(--muted); opacity: .6; }
+    .keyrow.st-active .kr-dot { background: var(--green); opacity: 1; box-shadow: 0 0 5px rgba(52,211,153,.7); }
+    .keyrow.st-expired .kr-dot { background: var(--red); opacity: 1; box-shadow: 0 0 5px rgba(248,113,113,.6); }
+    .keyrow.st-disabled .kr-dot { background: var(--muted); opacity: .8; }
+    .kr-head code {
+      color: var(--text); font-weight: 700; font-size: 12px; letter-spacing: .01em; word-break: break-all;
+    }
+    .kr-head .kr-app-tag {
+      color: var(--muted); font-size: 10.5px; font-weight: 600;
+    }
+    .kr-head .kr-title {
+      color: var(--text); font-size: 13px; font-weight: 700; letter-spacing: -.01em;
+    }
+    .kr-fields {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 8px;
+      padding-left: 8px;
+    }
+    .kr-field {
+      display: flex; flex-direction: column; gap: 4px; min-width: 0;
+      padding: 8px 10px; border-radius: 10px;
+      background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.07);
+      transition: background .15s;
+    }
+    .kr-field.kr-field-key {
+      background: rgba(79,140,255,.08); border-color: rgba(79,140,255,.22);
+    }
+    .kr-field.kr-field-copyable { cursor: pointer; transition: background .15s, border-color .15s; }
+    .kr-field.kr-field-copyable:hover { background: rgba(79,140,255,.14); border-color: rgba(79,140,255,.35); }
+    .kr-field.kr-field-copyable:active { background: rgba(79,140,255,.2); }
+    .kr-field small {
+      color: var(--muted); font-size: 9px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .06em;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .kr-field b { font-size: 12px; font-weight: 700; color: var(--text); letter-spacing: -.01em; }
+    .kr-field.kr-field-key b { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--blue2); font-size: 11.5px; word-break: break-all; }
+    .kr-field b.exp-soon { color: var(--amber); }
+    .kr-field b.exp-out { color: var(--red); }
+    .kr-field b.exp-never { color: var(--green); }
+    .kr-footer {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      flex-wrap: wrap; margin-top: 10px; padding-top: 10px; padding-left: 8px; border-top: 1px solid rgba(255,255,255,.08);
+    }
+    .kr-devbox {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 10px; border-radius: 9px;
+      background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.07);
+    }
+    .kr-devbox small {
+      color: var(--muted); font-size: 9px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .05em;
+    }
+    .kr-devcell { display: flex; align-items: center; gap: 5px; }
+    .kr-devcell b { font-size: 11px; min-width: 30px; text-align: right; }
+    .kr-devcell b.ok { color: var(--green); }
+    .kr-devcell b.full { color: var(--red); }
+    .kr-actions { position: relative; flex: none; margin-top: -8px; margin-right: -4px; }
+    .kr-actions > button {
+      padding: 6px 9px; border-radius: 9px;
+      background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14);
+      color: var(--text); transition: background .15s, border-color .15s, transform .1s;
+    }
+    .kr-actions > button svg.icon { width: 14px; height: 14px; }
+    .kr-actions > button:hover:not(:disabled) { background: rgba(255,255,255,.13); border-color: rgba(255,255,255,.22); }
+    .kr-menu {
+      display: none; position: absolute; right: 0; top: calc(100% + 8px); z-index: 20;
+      width: max-content; max-width: min(190px, calc(100vw - 32px));
+      border-radius: 14px; padding: 7px; flex-direction: column; gap: 2px;
+      background: #12141d; border: 1px solid rgba(255,255,255,.14);
+      box-shadow: 0 16px 40px rgba(0,0,0,.55), 0 1px 0 rgba(255,255,255,.06) inset;
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      animation: kr-menu-in .14s ease-out;
+    }
+    @media (max-width: 480px) {
+      .kr-menu { position: fixed; left: 16px; right: 16px; top: auto; bottom: 16px; width: auto; max-width: none; }
+    }
+    @keyframes kr-menu-in {
+      from { opacity: 0; transform: translateY(4px) scale(.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .kr-menu.open { display: flex; }
+    .kr-menu-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 4px 6px 6px; margin-bottom: 2px; border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .kr-menu-head span {
+      font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted);
+    }
+    .kr-menu-close {
+      width: 24px; height: 24px; padding: 0; flex: none; border-radius: 7px;
+      background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); color: var(--text);
+      display: flex; align-items: center; justify-content: center; box-shadow: none;
+    }
+    .kr-menu-close:hover:not(:disabled) { background: rgba(255,255,255,.16); filter: none; }
+    .kr-menu-close svg.icon { width: 12px; height: 12px; }
+    .kr-menu button {
+      background: transparent; border: none; box-shadow: none; color: var(--text);
+      text-align: left; padding: 10px 12px; font-weight: 600; font-size: 13px; border-radius: 9px;
+      justify-content: flex-start; letter-spacing: -.005em;
+    }
+    .kr-menu button:hover:not(:disabled) { background: rgba(255,255,255,.09); filter: none; }
+    .kr-menu button:active:not(:disabled) { background: rgba(255,255,255,.14); }
+    .kr-menu button.danger-text { color: var(--red); }
+    .kr-menu button.danger-text:hover:not(:disabled) { background: rgba(248,113,113,.12); }
+    .kr-menu-sep { height: 1px; margin: 5px 4px; background: rgba(255,255,255,.09); flex: none; }
+    @media (max-width: 560px) {
+      .kr-footer { flex-direction: column; align-items: stretch; }
+      .kr-devbox { justify-content: space-between; }
+    }
+    code { color: #93c5fd; font-weight: 700; font-size: 12.5px; white-space: normal; word-break: break-all; }
+    .badge { border-radius: 999px; padding: 4px 10px; font-size: 11px; font-weight: 700; border: 1px solid transparent; display: inline-flex; align-items: center; gap: 4px; }
+    .active { background: rgba(52,211,153,.14); color: var(--green); border-color: rgba(52,211,153,.3); }
+    .expired { background: rgba(248,113,113,.14); color: var(--red); border-color: rgba(248,113,113,.3); }
+    .disabled { background: rgba(154,163,184,.14); color: var(--muted); border-color: rgba(154,163,184,.25); }
+    .actions { display: flex; gap: 5px; }
+    .actions button { padding: 6px 9px; font-size: 11px; }
+    .devcell { display: flex; align-items: center; gap: 6px; }
+    .devcell b { min-width: 42px; display: inline-block; }
+    .devcell b.ok { color: var(--green); }
+    .devcell b.full { color: var(--red); }
+    .devcell input { width: 62px; margin: 0; padding: 5px 6px; font-size: 12px; }
+    .result { margin-top: 14px; padding: 14px; border-radius: 12px; background: rgba(255,255,255,.05); border: 1px solid var(--line); }
+    .result code { display: block; margin-top: 5px; }
+
+    /* Generate Key form */
+    .gen-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 16px;
+      padding: 16px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    @media (max-width: 720px) {
+      .gen-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 460px) {
+      .gen-grid { grid-template-columns: 1fr; }
+    }
+    .gen-field { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+    .gen-field label {
+      display: flex; align-items: center; gap: 6px;
+      margin: 0; color: var(--muted); font-size: 11.5px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .05em; height: 15px;
+    }
+    .gen-field label svg.icon { width: 13px; height: 13px; color: var(--blue2); opacity: .9; }
+    .gen-field label .req { color: var(--red); font-size: 12px; }
+    .gen-field input {
+      margin: 0; background: rgba(255,255,255,.04); border: 1px solid var(--line);
+      border-radius: 11px; padding: 12px 13px; font-size: 14px; font-weight: 600;
+      height: 44px; width: 100%;
+      transition: border-color .15s, background .15s, box-shadow .15s;
+    }
+    .gen-field input:focus { box-shadow: 0 0 0 3px rgba(79,140,255,.18); }
+    .gen-field input::placeholder { color: var(--muted); font-weight: 400; opacity: .7; }
+    .gen-field.gen-field-submit label { visibility: hidden; }
+    #genBtn {
+      width: 100%; height: 44px; padding: 0 16px; font-size: 14px; border-radius: 11px;
+      box-shadow: 0 1px 0 rgba(255,255,255,.35) inset, 0 6px 20px rgba(79,140,255,.35);
+    }
+    #genBtn svg.icon { width: 15px; height: 15px; }
+    #genBtn .spinner {
+      width: 15px; height: 15px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,.4); border-top-color: #fff;
+      animation: spin .7s linear infinite; display: none;
+    }
+    #genBtn.loading .spinner { display: inline-block; }
+    #genBtn.loading .btn-label { display: none; }
+    .result.gen-result {
+      margin-top: 16px; padding: 0; border-radius: 14px; overflow: hidden;
+      background: rgba(52,211,153,.06); border: 1px solid rgba(52,211,153,.28);
+    }
+    .gen-result-head {
+      display: flex; align-items: center; gap: 8px;
+      padding: 11px 16px; font-size: 12px; font-weight: 700; letter-spacing: .02em;
+      color: #86efac; background: rgba(52,211,153,.12); border-bottom: 1px solid rgba(52,211,153,.22);
+    }
+    .gen-result-head svg.icon { width: 14px; height: 14px; }
+    .gen-result-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+    .gen-key-chip {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+      border-radius: 10px; padding: 9px 12px; cursor: pointer;
+      transition: background .15s, border-color .15s;
+    }
+    .gen-key-chip:hover { background: rgba(79,140,255,.14); border-color: rgba(79,140,255,.35); }
+    .gen-key-chip:active { background: rgba(79,140,255,.2); }
+    .gen-key-chip code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px;
+      color: var(--blue2); font-weight: 700; letter-spacing: .01em; word-break: break-all;
+    }
+    .gen-key-chip svg.icon { width: 14px; height: 14px; color: var(--muted); flex: none; }
+    .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 0; }
+    .toolbar input, .toolbar select { width: auto; flex: 1 1 200px; margin: 0; }
+    .search-wrap { position: relative; flex: 1 1 200px; min-width: 0; }
+    .search-wrap svg.icon {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      width: 14px; height: 14px; color: var(--muted); pointer-events: none;
+    }
+    .search-wrap input { width: 100%; padding-left: 34px; margin: 0; }
+    #refreshBtn { flex: none; white-space: nowrap; }
+    .keylist { min-height: 0; }
+    .keylist-empty {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 10px; padding: 44px 20px; text-align: center; color: var(--muted);
+      border: 1px dashed var(--line); border-radius: 14px;
+    }
+    .keylist-empty svg.icon { width: 30px; height: 30px; opacity: .5; }
+    .keylist-empty span { font-size: 13px; }
+    .hint { color: var(--muted); font-size: 12px; margin: 10px 0 0; }
+    .hint b { color: var(--text); }
+    @media (max-width: 650px) {
+      .stat { flex: 1 1 calc(50% - 6px); }
+      .wrap { padding: 0 12px 30px; }
+      table { min-width: 900px; }
+      .topbar { padding: 12px 14px; }
+      .who-pill span.who-text { display: none; }
+    }
+
+    /* Edit-max modal */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 100;
+      background: rgba(3,5,10,.6);
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-box {
+      width: 100%; max-width: 340px; border-radius: 16px; padding: 20px;
+      background: #12141d; border: 1px solid rgba(255,255,255,.14);
+    }
+    .modal-box .modal-sub {
+      color: var(--muted); font-size: 12.5px; margin: 0 0 16px;
+    }
+    .modal-box .modal-sub code { font-size: 12px; }
+    .modal-stepper { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+    .modal-stepper button {
+      width: 40px; height: 40px; padding: 0; border-radius: 11px; font-size: 18px; font-weight: 800;
+      background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16); color: var(--text);
+      flex: none;
+    }
+    .modal-stepper button:hover:not(:disabled) { background: rgba(255,255,255,.14); }
+    .modal-stepper input {
+      margin: 0; text-align: center; font-size: 18px; font-weight: 800; letter-spacing: -.01em;
+      padding: 10px 8px;
+    }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+    .modal-actions button { padding: 9px 16px; }
+
+    /* Toast notifications */
+    .toast-stack {
+      position: fixed; left: 50%; bottom: 70px; z-index: 200; transform: translateX(-50%);
+      display: flex; flex-direction: column-reverse; align-items: center; gap: 8px;
+    }
+    .toast {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 12px; border-radius: 11px;
+      background: rgba(20,22,31,.82); border: 1px solid rgba(255,255,255,.14);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 10px 26px rgba(0,0,0,.4);
+      animation: toast-in .18s ease-out;
+      width: max-content; max-width: 220px;
+    }
+    @keyframes toast-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .toast.leaving { animation: toast-out .15s ease-in forwards; }
+    @keyframes toast-out {
+      to { opacity: 0; transform: translateY(6px); }
+    }
+    .toast .toast-icon {
+      width: 20px; height: 20px; border-radius: 50%; flex: none;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .toast .toast-icon svg.icon { width: 12px; height: 12px; }
+    .toast.ok .toast-icon { background: rgba(52,211,153,.16); color: var(--green); }
+    .toast.err .toast-icon { background: rgba(248,113,113,.16); color: var(--red); }
+    .toast.info .toast-icon { background: rgba(79,140,255,.16); color: var(--blue2); }
+    .toast .toast-text {
+      font-size: 12.5px; line-height: 1.3; color: var(--text); flex: 1; min-width: 0;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;
+    }
+    .toast .toast-close {
+      background: transparent; border: none; box-shadow: none; padding: 2px; margin: 0;
+      color: var(--muted); flex: none; border-radius: 6px;
+    }
+    .toast .toast-close svg.icon { width: 11px; height: 11px; }
+    .toast .toast-close:hover:not(:disabled) { color: var(--text); filter: none; background: rgba(255,255,255,.08); }
+    @media (max-width: 560px) {
+      .toast-stack { left: 50%; right: auto; bottom: 82px; transform: translateX(-50%); }
+      .toast { max-width: calc(100vw - 24px); }
+    }
+  </style>
+</head>
+<body>
+  <div id="loginScreen" class="login-page">
+    <div class="login-box">
+      <div class="login-brand">
+        <div class="logo"><svg class="icon" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M10.5 12.5 20 3M17 6l3 3M14 9l2 2"/></svg></div>
+        <h1>License <span>Panel</span></h1>
+        <p>Masuk dengan akun admin Firebase</p>
+      </div>
+      <form id="loginForm" class="login-card glass" autocomplete="on">
+        <div class="field-group">
+          <label for="email"><svg class="icon" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>Email</label>
+          <div class="input-wrap">
+            <svg class="icon leading" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>
+            <input id="email" type="email" autocomplete="username" placeholder="admin@domain.com" required>
+          </div>
+        </div>
+        <div class="field-group">
+          <label for="password"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Password</label>
+          <div class="input-wrap">
+            <svg class="icon leading" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input id="password" type="password" autocomplete="current-password" placeholder="Password admin" required>
+            <button type="button" id="pwToggle" class="pw-toggle" aria-label="Tampilkan password">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <button id="loginBtn" type="submit">
+          <span class="spinner"></span>
+          <span class="btn-label"><svg class="icon" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>Masuk</span>
+        </button>
+        <div id="loginMsg" class="login-msg"></div>
+      </form>
+      <p class="login-foot">Akses terbatas untuk admin yang berwenang.</p>
+    </div>
+  </div>
+
+  <div id="adminScreen" class="hidden">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <div class="logo"><svg class="icon" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M10.5 12.5 20 3M17 6l3 3M14 9l2 2"/></svg></div>
+          License <span>Panel</span>
+        </div>
+        <div class="who-pill">
+          <div class="avatar" id="whoAvatar">A</div>
+          <span class="who-text">Masuk sebagai <b id="who"></b></span>
+          <button id="logoutBtn" class="danger" style="padding:5px 10px; font-size:11px; border-radius:999px;">
+            <svg class="icon" viewBox="0 0 24 24" style="width:12px;height:12px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+            Logout
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="wrap">
+    <div class="stats">
+      <div class="stat glass stat-blue"><small><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>Total</small><strong id="total">0</strong></div>
+      <div class="stat glass stat-green"><small><svg class="icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>Aktif</small><strong id="active">0</strong></div>
+      <div class="stat glass stat-red"><small><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Expired</small><strong id="expired">0</strong></div>
+      <div class="stat glass stat-amber"><small><svg class="icon" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>Device</small><strong id="devices">0</strong></div>
+    </div>
+
+    <section class="card glass">
+      <div class="h2-row">
+        <h2><svg class="icon" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg>Daftar Key</h2>
+      </div>
+      <div class="toolbar">
+        <div class="search-wrap">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+          <input id="search" placeholder="Cari key atau catatan">
+        </div>
+        <button id="refreshBtn" class="secondary">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+          Refresh
+        </button>
+      </div>
+      <div id="listMsg" class="msg"></div>
+      <div id="keyList" class="keylist"></div>
+    </section>
+
+    <section class="card glass">
+      <div class="h2-row">
+        <h2><svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Generate Key</h2>
+      </div>
+      <div class="gen-grid">
+        <div class="gen-field">
+          <label><svg class="icon" viewBox="0 0 24 24"><path d="M4 4h16v16H4z" opacity="0"/><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Title <span class="req">*</span></label>
+          <input id="genNote" placeholder="Nama" required>
+        </div>
+        <div class="gen-field">
+          <label><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>Jumlah</label>
+          <input id="genCount" type="number" min="1" max="200" value="1">
+        </div>
+        <div class="gen-field">
+          <label><svg class="icon" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.01M10 8h4"/></svg>App ID</label>
+          <input id="genAppId" value="app1" placeholder="mis. app1">
+        </div>
+        <div class="gen-field">
+          <label><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Masa berlaku (hari)</label>
+          <input id="genExpiry" type="number" min="0" placeholder="0 = selamanya">
+        </div>
+        <div class="gen-field">
+          <label><svg class="icon" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>Maks device</label>
+          <input id="genMax" type="number" min="0" value="0" placeholder="0 = tak terbatas">
+        </div>
+        <div class="gen-field gen-field-submit">
+          <label>&nbsp;</label>
+          <button id="genBtn">
+            <span class="spinner"></span>
+            <span class="btn-label"><svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Generate</span>
+          </button>
+        </div>
+      </div>
+      <div id="genResult" class="result gen-result hidden"></div>
+    </section>
+    </div>
+    <div id="toastStack" class="toast-stack"></div>
+  </div>
+
+  <script>
+    const FIREBASE_CONFIG = {
+      apiKey: "AIzaSyAI9d8eTeVafEdQicjwcLaYRUA75xYDmQI",
+      authDomain: "tarzmodz-1dbab.firebaseapp.com",
+      databaseURL: "https://tarzmodz-1dbab-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "tarzmodz-1dbab",
+      storageBucket: "tarzmodz-1dbab.firebasestorage.app",
+      messagingSenderId: "886882124675",
+      appId: "1:886882124675:web:6255a2b03a30e21fb1ecb6"
+    };
+    const PUBLIC_PATH = 'licenses';
+    const PRIVATE_PATH = 'adminKeys';
+    const DEVICE_PATH = 'deviceRegs';
+    const APP_ID_FIELD = 'app';
+    const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+    const $ = (id) => document.getElementById(id);
+    const state = { records: {}, devices: {}, devicesOk: true };
+    const labels = { active: 'Aktif', expired: 'Expired', disabled: 'Nonaktif' };
+
+    firebase.initializeApp(FIREBASE_CONFIG);
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    function normalizeCode(value) {
+      return String(value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    }
+
+    async function sha256Hex(value) {
+      const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value));
+      return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function makeCode() {
+      const raw = new Uint32Array(5);
+      crypto.getRandomValues(raw);
+      let value = '';
+      for (const n of raw) value += ALPHABET[n % ALPHABET.length];
+      return 'TARZ-' + value;
+    }
+
+    function statusOf(record) {
+      if (record.off) return 'disabled';
+      if (record.exp && record.exp < Date.now()) return 'expired';
+      return 'active';
+    }
+
+    function allRecords() {
+      return Object.keys(state.records)
+        .map((h) => Object.assign({ h }, state.records[h]))
+        .sort((a, b) => {
+          const ta = a.createdAt ? Date.parse(a.createdAt) : 0;
+          const tb = b.createdAt ? Date.parse(b.createdAt) : 0;
+          return tb - ta;
+        });
+    }
+
+    function buildLicensesPayload(records) {
+      return {
+        version: 1,
+        updatedAt: new Date().toISOString(),
+        keys: Object.keys(records).map((h) => {
+          const r = records[h];
+          const max = Math.max(parseInt(r.max, 10) || 0, 0);
+          return { h, app: r.app || '', exp: r.exp || 0, off: !!r.off, max };
+        })
+      };
+    }
+
+    function deviceCount(hash) {
+      const entry = state.devices[hash];
+      if (!entry || typeof entry !== 'object') return 0;
+      return Object.keys(entry).length;
+    }
+
+    function maxOf(record) {
+      return Math.max(parseInt(record.max, 10) || 0, 0);
+    }
+
+    function friendlyError(error) {
+      const code = (error && error.code) || '';
+      const map = {
+        'auth/invalid-credential': 'Email atau password salah.',
+        'auth/user-not-found': 'Email atau password salah.',
+        'auth/wrong-password': 'Email atau password salah.',
+        'auth/invalid-email': 'Format email tidak valid.',
+        'auth/too-many-requests': 'Terlalu banyak percobaan. Tunggu sebentar.',
+        'auth/network-request-failed': 'Tidak bisa terhubung. Cek internet.',
+        'auth/operation-not-allowed': 'Login Email/Password belum diaktifkan di Firebase Console (Authentication > Sign-in method).',
+        'auth/user-disabled': 'Akun ini dinonaktifkan.',
+        'PERMISSION_DENIED': 'Rules Firebase menolak. Paste database.rules.json ke Realtime Database > Rules.'
+      };
+      if (map[code]) return map[code];
+      if (String(code).indexOf('PERMISSION_DENIED') >= 0) return map.PERMISSION_DENIED;
+      return (error && error.message) || 'Terjadi kesalahan.';
+    }
+
+    function setMsg(id, text, kind) {
+      const el = $(id);
+      el.textContent = text || '';
+      el.className = 'msg' + (kind ? ' ' + kind : '');
+    }
+
+    const LOGIN_MSG_ICONS = {
+      err: '<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg>',
+      ok: '<svg class="icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>',
+      info: '<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/></svg>'
+    };
+    function setLoginMsg(text, kind) {
+      const el = $('loginMsg');
+      if (!text) {
+        el.textContent = '';
+        el.className = 'login-msg';
+        return;
+      }
+      const icon = LOGIN_MSG_ICONS[kind] || LOGIN_MSG_ICONS.info;
+      el.innerHTML = icon + '<span>' + text + '</span>';
+      el.className = 'login-msg' + (kind ? ' ' + kind : ' info');
+    }
+
+    const TOAST_ICONS = {
+      ok: '<svg class="icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>',
+      err: '<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg>',
+      info: '<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/></svg>'
+    };
+
+    function showToast(text, kind) {
+      if (!text) return;
+      const type = kind === 'err' ? 'err' : kind === 'info' ? 'info' : 'ok';
+      const stack = $('toastStack');
+      const toast = document.createElement('div');
+      toast.className = 'toast ' + type;
+
+      const icon = document.createElement('div');
+      icon.className = 'toast-icon';
+      icon.innerHTML = TOAST_ICONS[type];
+      toast.appendChild(icon);
+
+      const msg = document.createElement('div');
+      msg.className = 'toast-text';
+      msg.textContent = text;
+      toast.appendChild(msg);
+
+      const close = document.createElement('button');
+      close.type = 'button';
+      close.className = 'toast-close';
+      close.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+      const dismiss = () => {
+        toast.classList.add('leaving');
+        setTimeout(() => toast.remove(), 150);
+      };
+      close.addEventListener('click', dismiss);
+      toast.appendChild(close);
+
+      stack.appendChild(toast);
+      setTimeout(dismiss, 4000);
+    }
+
+    async function copyKeyCode(code) {
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(code);
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = code;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          ta.remove();
+        }
+        showToast('Key disalin: ' + code, 'ok');
+      } catch (error) {
+        showToast('Gagal menyalin key.', 'err');
+      }
+    }
+
+    function countdownOf(exp) {
+      if (!exp) return { text: 'Selamanya', cls: 'exp-never' };
+      const diff = exp - Date.now();
+      if (diff <= 0) return { text: 'Kedaluwarsa', cls: 'exp-out' };
+      const totalMin = Math.floor(diff / 60000);
+      const days = Math.floor(totalMin / 1440);
+      const hours = Math.floor((totalMin % 1440) / 60);
+      const mins = totalMin % 60;
+      const parts = [];
+      if (days > 0) parts.push(days + 'h');
+      if (days > 0 || hours > 0) parts.push(hours + 'j');
+      parts.push(mins + 'm');
+      return { text: parts.join(' '), cls: days < 1 ? 'exp-soon' : '' };
+    }
+
+    function render() {
+      const all = allRecords();
+      $('total').textContent = all.length;
+      $('active').textContent = all.filter((r) => statusOf(r) === 'active').length;
+      $('expired').textContent = all.filter((r) => statusOf(r) === 'expired').length;
+      $('devices').textContent = state.devicesOk ? all.reduce((sum, r) => sum + deviceCount(r.h), 0) : '-';
+
+      const query = $('search').value.trim().toUpperCase();
+      const filtered = all.filter((r) =>
+        (!query || String(r.code || '').toUpperCase().includes(query) || String(r.note || '').toUpperCase().includes(query))
+      );
+
+      const list = $('keyList');
+
+      if (filtered.length === 0) {
+        list.replaceChildren();
+        const empty = document.createElement('div');
+        empty.className = 'keylist-empty';
+        empty.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg>' +
+          '<span>' + (query ? 'Tidak ada key yang cocok dengan pencarian.' : 'Belum ada key. Buat key baru di bawah.') + '</span>';
+        list.appendChild(empty);
+        return;
+      }
+
+      const fragment = document.createDocumentFragment();
+      filtered.forEach((record) => {
+        const st = statusOf(record);
+        const row = document.createElement('div');
+        row.className = 'keyrow st-' + st;
+
+        const body = document.createElement('div');
+        body.className = 'kr-body';
+
+        const head = document.createElement('div');
+        head.className = 'kr-head';
+
+        const headMain = document.createElement('div');
+        headMain.className = 'kr-head-main';
+        const dot = document.createElement('span');
+        dot.className = 'kr-dot';
+        headMain.appendChild(dot);
+        const title = document.createElement('span');
+        title.className = 'kr-title';
+        title.textContent = record.note || (record.app ? '(' + record.app + ')' : 'Tanpa judul');
+        headMain.appendChild(title);
+        if (record.note && record.app) {
+          const appTag = document.createElement('span');
+          appTag.className = 'kr-app-tag';
+          appTag.textContent = '(' + record.app + ')';
+          headMain.appendChild(appTag);
+        }
+        head.appendChild(headMain);
+
+        const actionsWrap = document.createElement('div');
+        actionsWrap.className = 'kr-actions';
+        const moreBtn = document.createElement('button');
+        moreBtn.className = 'secondary';
+        moreBtn.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg>';
+        moreBtn.dataset.action = 'menu';
+        actionsWrap.appendChild(moreBtn);
+        const menu = document.createElement('div');
+        menu.className = 'kr-menu';
+        const menuHead = document.createElement('div');
+        menuHead.className = 'kr-menu-head';
+        const menuHeadLabel = document.createElement('span');
+        menuHeadLabel.textContent = 'Aksi';
+        const menuCloseBtn = document.createElement('button');
+        menuCloseBtn.type = 'button';
+        menuCloseBtn.className = 'kr-menu-close';
+        menuCloseBtn.dataset.action = 'closemenu';
+        menuCloseBtn.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+        menuHead.appendChild(menuHeadLabel);
+        menuHead.appendChild(menuCloseBtn);
+        menu.appendChild(menuHead);
+        const menuItems = [
+          ['extend', 'Perpanjang +30h'],
+          ['toggle', record.off ? 'Aktifkan' : 'Nonaktifkan'],
+          ['editmax', 'Edit maks device'],
+          ['resetdev', 'Reset device'],
+          ['sep', null],
+          ['delete', 'Hapus key']
+        ];
+        menuItems.forEach(([act, label]) => {
+          if (act === 'sep') {
+            const sep = document.createElement('div');
+            sep.className = 'kr-menu-sep';
+            menu.appendChild(sep);
+            return;
+          }
+          const button = document.createElement('button');
+          if (act === 'delete') button.className = 'danger-text';
+          button.textContent = label;
+          button.dataset.action = act;
+          button.dataset.hash = record.h;
+          menu.appendChild(button);
+        });
+        actionsWrap.appendChild(menu);
+        head.appendChild(actionsWrap);
+
+        body.appendChild(head);
+
+        const fields = document.createElement('div');
+        fields.className = 'kr-fields';
+
+        const keyField = document.createElement('div');
+        keyField.className = 'kr-field kr-field-key';
+        if (record.code) {
+          keyField.classList.add('kr-field-copyable');
+          keyField.title = 'Klik untuk salin key';
+          keyField.addEventListener('click', () => copyKeyCode(record.code));
+        }
+        const keySmall = document.createElement('small');
+        keySmall.textContent = 'Key';
+        const keyB = document.createElement('b');
+        keyB.textContent = record.code || '(hanya hash)';
+        keyField.appendChild(keySmall);
+        keyField.appendChild(keyB);
+        fields.appendChild(keyField);
+
+        const expField = document.createElement('div');
+        expField.className = 'kr-field kr-field-exp';
+        expField.dataset.exp = record.exp || 0;
+        const expSmall = document.createElement('small');
+        expSmall.textContent = 'Sisa Waktu';
+        const expB = document.createElement('b');
+        expB.className = 'exp-countdown';
+        const cd = countdownOf(record.exp);
+        expB.textContent = cd.text;
+        if (cd.cls) expB.classList.add(cd.cls);
+        expField.appendChild(expSmall);
+        expField.appendChild(expB);
+        fields.appendChild(expField);
+
+        body.appendChild(fields);
+
+        const footer = document.createElement('div');
+        footer.className = 'kr-footer';
+
+        const max = maxOf(record);
+        const used = deviceCount(record.h);
+        const devBox = document.createElement('div');
+        devBox.className = 'kr-devbox';
+        const devLabel = document.createElement('small');
+        devLabel.textContent = 'Devices';
+        devBox.appendChild(devLabel);
+        const devCell = document.createElement('div');
+        devCell.className = 'kr-devcell';
+        const usedLabel = document.createElement('b');
+        usedLabel.textContent = max > 0 ? used + ' / ' + max : used + ' / ∞';
+        if (max > 0) usedLabel.className = used >= max ? 'full' : 'ok';
+        if (!state.devicesOk) usedLabel.textContent = '-';
+        devCell.appendChild(usedLabel);
+        devBox.appendChild(devCell);
+        footer.appendChild(devBox);
+
+        body.appendChild(footer);
+        row.appendChild(body);
+        fragment.appendChild(row);
+      });
+      list.replaceChildren(fragment);
+    }
+
+    function tickCountdowns() {
+      document.querySelectorAll('.kr-field-exp').forEach((field) => {
+        const exp = parseInt(field.dataset.exp, 10) || 0;
+        const b = field.querySelector('.exp-countdown');
+        if (!b) return;
+        const cd = countdownOf(exp);
+        b.textContent = cd.text;
+        b.className = 'exp-countdown' + (cd.cls ? ' ' + cd.cls : '');
+      });
+    }
+    setInterval(tickCountdowns, 30000);
+
+    async function load() {
+      setMsg('listMsg', 'Memuat data...');
+      const results = await Promise.all([
+        db.ref(PRIVATE_PATH).once('value'),
+        db.ref(PUBLIC_PATH).once('value'),
+        db.ref(DEVICE_PATH).once('value').catch(() => null)
+      ]);
+      const raw = results[0].val();
+      state.records = raw && typeof raw === 'object' ? raw : {};
+      const deviceSnapshot = results[2];
+      const devices = deviceSnapshot ? deviceSnapshot.val() : null;
+      state.devices = devices && typeof devices === 'object' ? devices : {};
+      state.devicesOk = !!deviceSnapshot;
+      if (!state.devicesOk) {
+        setMsg('listMsg', '', '');
+        showToast('Node deviceRegs gagal dibaca.', 'err');
+      }
+      if (!results[1].exists()) {
+        await db.ref().update({
+          [PUBLIC_PATH]: buildLicensesPayload(state.records),
+          [PRIVATE_PATH]: state.records
+        });
+        if (state.devicesOk) {
+          setMsg('listMsg', '');
+          showToast(raw ? 'Node licenses dibuat ulang.' : 'Database masih kosong.', 'info');
+        }
+      } else if (state.devicesOk) {
+        setMsg('listMsg', '');
+      }
+      render();
+    }
+
+    async function persist(silent) {
+      setMsg('listMsg', 'Menyimpan...');
+      await db.ref().update({
+        [PUBLIC_PATH]: buildLicensesPayload(state.records),
+        [PRIVATE_PATH]: state.records
+      });
+      setMsg('listMsg', '');
+      if (!silent) showToast('Tersimpan di Firebase.', 'ok');
+    }
+
+    async function generate() {
+      const noteInput = $('genNote');
+      const note = noteInput.value.trim();
+      if (!note) {
+        noteInput.focus();
+        showToast('Title wajib diisi.', 'err');
+        return;
+      }
+      const button = $('genBtn');
+      button.disabled = true;
+      button.classList.add('loading');
+      try {
+        const count = Math.min(Math.max(parseInt($('genCount').value, 10) || 1, 1), 200);
+        const app = $('genAppId').value.trim() || 'app1';
+        const days = Math.max(parseInt($('genExpiry').value, 10) || 0, 0);
+        const max = Math.max(parseInt($('genMax').value, 10) || 0, 0);
+        const exp = days > 0 ? Date.now() + days * 86400000 : 0;
+        const created = [];
+        for (let i = 0; i < count; i += 1) {
+          const code = makeCode();
+          const h = await sha256Hex(normalizeCode(code));
+          state.records[h] = { code, app, exp, off: false, max, note, createdAt: new Date().toISOString() };
+          created.push(state.records[h]);
+        }
+        await persist();
+        const resultBox = $('genResult');
+        resultBox.classList.remove('hidden');
+        resultBox.replaceChildren();
+
+        const head = document.createElement('div');
+        head.className = 'gen-result-head';
+        head.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>' +
+          (created.length === 1 ? '1 key berhasil dibuat' : created.length + ' key berhasil dibuat');
+        resultBox.appendChild(head);
+
+        const body = document.createElement('div');
+        body.className = 'gen-result-body';
+        created.forEach((record) => {
+          const chip = document.createElement('div');
+          chip.className = 'gen-key-chip';
+          chip.title = 'Klik untuk salin';
+          const code = document.createElement('code');
+          code.textContent = record.code;
+          const copyIcon = document.createElement('svg');
+          copyIcon.setAttribute('class', 'icon');
+          copyIcon.setAttribute('viewBox', '0 0 24 24');
+          copyIcon.innerHTML = '<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>';
+          chip.appendChild(code);
+          chip.appendChild(copyIcon);
+          chip.addEventListener('click', async () => {
+            try {
+              await navigator.clipboard.writeText(record.code);
+              showToast('Key disalin.', 'ok');
+            } catch (error) {
+              showToast('Gagal menyalin key.', 'err');
+            }
+          });
+          body.appendChild(chip);
+        });
+        resultBox.appendChild(body);
+
+        clearTimeout(window.__genResultTimeout);
+        window.__genResultTimeout = setTimeout(() => {
+          resultBox.classList.add('hidden');
+          resultBox.replaceChildren();
+        }, 3000);
+
+        noteInput.value = '';
+        render();
+      } catch (error) {
+        showToast(friendlyError(error), 'err');
+      } finally {
+        button.disabled = false;
+        button.classList.remove('loading');
+      }
+    }
+
+    async function action(event) {
+      const menuToggle = event.target.closest('button[data-action="menu"]');
+      if (menuToggle) {
+        const menu = menuToggle.parentElement.querySelector('.kr-menu');
+        const wasOpen = menu.classList.contains('open');
+        document.querySelectorAll('.kr-menu.open').forEach((m) => m.classList.remove('open'));
+        if (!wasOpen) menu.classList.add('open');
+        return;
+      }
+      const closeBtn = event.target.closest('button[data-action="closemenu"]');
+      if (closeBtn) {
+        closeBtn.closest('.kr-menu').classList.remove('open');
+        return;
+      }
+      const button = event.target.closest('button[data-action]');
+      if (!button) return;
+      const openMenu = button.closest('.kr-menu');
+      if (openMenu) openMenu.classList.remove('open');
+      const h = button.dataset.hash;
+      const record = state.records[h];
+      if (!record) return;
+      try {
+        if (button.dataset.action === 'delete') {
+          if (!confirm('Hapus key ' + (record.code || h) + ' beserta daftar device-nya?')) return;
+          delete state.records[h];
+          const cleaned = await clearDevices(h);
+          await persist(true);
+          render();
+          showToast(cleaned ? 'Key dihapus.' : 'Key dihapus, device gagal dihapus.', cleaned ? 'ok' : 'err');
+          return;
+        } else if (button.dataset.action === 'toggle') {
+          record.off = !record.off;
+        } else if (button.dataset.action === 'extend') {
+          const base = record.exp && record.exp > Date.now() ? record.exp : Date.now();
+          record.exp = base + 30 * 86400000;
+          record.off = false;
+        } else if (button.dataset.action === 'editmax') {
+          openEditMaxModal(h, record);
+          return;
+        } else if (button.dataset.action === 'resetdev') {
+          const used = deviceCount(h);
+          if (!used) {
+            showToast('Belum ada device terdaftar.', 'info');
+            return;
+          }
+          if (!confirm('Reset ' + used + ' device untuk key ' + (record.code || h) + '? Device harus install ulang / logout.')) return;
+          const cleared = await clearDevices(h);
+          if (cleared) {
+            await load();
+            showToast('Daftar device direset.', 'ok');
+          } else {
+            delete state.devices[h];
+            render();
+            showToast('Rules menolak penghapusan device.', 'err');
+          }
+          return;
+        }
+        await persist();
+        render();
+      } catch (error) {
+        showToast(friendlyError(error), 'err');
+      }
+    }
+
+    function closeEditMaxModal() {
+      const overlay = $('editMaxOverlay');
+      if (overlay) overlay.remove();
+    }
+
+    function openEditMaxModal(hash, record) {
+      closeEditMaxModal();
+      const current = maxOf(record);
+
+      const overlay = document.createElement('div');
+      overlay.className = 'modal-overlay';
+      overlay.id = 'editMaxOverlay';
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) closeEditMaxModal(); });
+
+      const box = document.createElement('div');
+      box.className = 'modal-box glass';
+
+      const sub = document.createElement('p');
+      sub.className = 'modal-sub';
+      sub.innerHTML = 'Key <code>' + (record.code || hash) + '</code>';
+      box.appendChild(sub);
+
+      const stepper = document.createElement('div');
+      stepper.className = 'modal-stepper';
+      const minusBtn = document.createElement('button');
+      minusBtn.type = 'button';
+      minusBtn.textContent = '−';
+      const input = document.createElement('input');
+      input.type = 'number';
+      input.min = '0';
+      input.value = String(current);
+      input.id = 'editMaxInput';
+      const plusBtn = document.createElement('button');
+      plusBtn.type = 'button';
+      plusBtn.textContent = '+';
+      stepper.appendChild(minusBtn);
+      stepper.appendChild(input);
+      stepper.appendChild(plusBtn);
+      box.appendChild(stepper);
+
+      minusBtn.addEventListener('click', () => {
+        input.value = String(Math.max((parseInt(input.value, 10) || 0) - 1, 0));
+      });
+      plusBtn.addEventListener('click', () => {
+        input.value = String((parseInt(input.value, 10) || 0) + 1);
+      });
+
+      const actions = document.createElement('div');
+      actions.className = 'modal-actions';
+      const cancelBtn = document.createElement('button');
+      cancelBtn.type = 'button';
+      cancelBtn.className = 'secondary';
+      cancelBtn.textContent = 'Batal';
+      cancelBtn.addEventListener('click', closeEditMaxModal);
+      const saveBtn = document.createElement('button');
+      saveBtn.type = 'button';
+      saveBtn.textContent = 'Simpan';
+      saveBtn.addEventListener('click', async () => {
+        const next = Math.max(parseInt(input.value, 10) || 0, 0);
+        closeEditMaxModal();
+        if (next === current) return;
+        try {
+          record.max = next;
+          await persist(true);
+          render();
+          showToast(next === 0 ? 'Maks device diubah: tak terbatas.' : 'Maks device diubah: ' + next + '.', 'ok');
+        } catch (error) {
+          showToast(friendlyError(error), 'err');
+        }
+      });
+      actions.appendChild(cancelBtn);
+      actions.appendChild(saveBtn);
+      box.appendChild(actions);
+
+      overlay.appendChild(box);
+      document.body.appendChild(overlay);
+      input.focus();
+      input.select();
+    }
+
+    async function clearDevices(hash) {
+      try {
+        await db.ref(DEVICE_PATH + '/' + hash).remove();
+        delete state.devices[hash];
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    async function login() {
+      const email = $('email').value.trim();
+      const password = $('password').value;
+      if (!email || !password) {
+        setLoginMsg('Email dan password wajib diisi.', 'err');
+        return;
+      }
+      const button = $('loginBtn');
+      button.disabled = true;
+      button.classList.add('loading');
+      setLoginMsg('', '');
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+      } catch (error) {
+        setLoginMsg(friendlyError(error), 'err');
+      } finally {
+        button.disabled = false;
+        button.classList.remove('loading');
+      }
+    }
+
+    async function afterLogin(user) {
+      $('who').textContent = user ? user.email : '-';
+      $('whoAvatar').textContent = user && user.email ? user.email.charAt(0).toUpperCase() : 'A';
+      $('loginScreen').classList.add('hidden');
+      $('adminScreen').classList.remove('hidden');
+      try {
+        await load();
+      } catch (error) {
+        showToast(friendlyError(error), 'err');
+      }
+    }
+
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        afterLogin(user);
+      } else {
+        closeEditMaxModal();
+        document.querySelectorAll('.kr-menu.open').forEach((m) => m.classList.remove('open'));
+        $('adminScreen').classList.add('hidden');
+        $('loginScreen').classList.remove('hidden');
+        $('password').value = '';
+        setLoginMsg('', '');
+        $('who').textContent = '-';
+        $('whoAvatar').textContent = 'A';
+      }
+    });
+
+    $('loginForm').addEventListener('submit', (e) => { e.preventDefault(); login(); });
+    $('pwToggle').addEventListener('click', () => {
+      const pwInput = $('password');
+      const showing = pwInput.type === 'text';
+      pwInput.type = showing ? 'password' : 'text';
+      $('pwToggle').innerHTML = showing
+        ? '<svg class="icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg>'
+        : '<svg class="icon" viewBox="0 0 24 24"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.86 21.86 0 0 1 5.06-6.06M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a21.8 21.8 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>';
+      $('pwToggle').setAttribute('aria-label', showing ? 'Tampilkan password' : 'Sembunyikan password');
+    });
+    $('genBtn').addEventListener('click', generate);
+    $('keyList').addEventListener('click', action);
+    $('refreshBtn').addEventListener('click', () => load().catch((error) => showToast(friendlyError(error), 'err')));
+    $('logoutBtn').addEventListener('click', () => {
+      const button = $('logoutBtn');
+      button.disabled = true;
+      auth.signOut()
+        .catch((error) => showToast(friendlyError(error), 'err'))
+        .finally(() => { button.disabled = false; });
+    });
+    $('search').addEventListener('input', () => {
+      clearTimeout(window.__searchDebounce);
+      window.__searchDebounce = setTimeout(render, 200);
+    });
+    document.addEventListener('click', (event) => {
+      if (!event.target.closest('.kr-actions')) {
+        document.querySelectorAll('.kr-menu.open').forEach((m) => m.classList.remove('open'));
+      }
+    });
+  </script>
+</body>
+</html>
