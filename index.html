@@ -1165,6 +1165,7 @@ async function giftVipToInfoAkunDetail(){
   try{
     await window.fbDb.collection('vip_users').doc(acc.uid).set({
       is_vip: true,
+      vip_revoked: false,
       vip_expiry: null, // null = permanen, tidak ada tanggal habis
       vip_since: firebase.firestore.FieldValue.serverTimestamp(),
       updated_at: firebase.firestore.FieldValue.serverTimestamp(),
@@ -1210,6 +1211,7 @@ async function revokeVipFromInfoAkunDetail(){
   try{
     await window.fbDb.collection('vip_users').doc(acc.uid).set({
       is_vip: false,
+      vip_revoked: true, // penanda: dicabut admin, jangan disinkron ulang dari token lokal
       vip_expiry: null,
       gift_notice: firebase.firestore.FieldValue.delete(), // batalkan notif gift yang belum sempat dibaca
       updated_at: firebase.firestore.FieldValue.serverTimestamp()
@@ -1415,6 +1417,14 @@ function startBanListener(uid){
         markVipUnlocked(); // sinkronkan cache localStorage juga
         // Ada hadiah VIP dari admin yang belum diberitahukan ke penerima ini?
         if(data && data.gift_notice) showVipGiftNoticeIfAny(uid, data.gift_notice);
+      } else if(localStorage.getItem('tarz_vip_token') && !(data && data.is_vip === false && data.vip_revoked)){
+        // FIX: user punya token pembayaran dari server tapi dokumen Firestore
+        // belum/tidak punya is_vip (mis. write gagal atau belum sempat masuk).
+        // Jangan hapus cache -- coba sinkronkan ulang ke Firestore.
+        if(!window._vipResyncTried){
+          window._vipResyncTried = true;
+          try{ markVipInGoogleAccount(); }catch(e){}
+        }
       } else if(_googleVipStatus !== false || localStorage.getItem('tarz_vip') === 'true' || localStorage.getItem('tarz_vip_expiry')){
         // Status VIP di Firestore sudah false/dicabut, tapi cache lokal
         // (memory atau localStorage) masih menganggap VIP -> bersihkan
@@ -3670,6 +3680,7 @@ async function markVipInGoogleAccount(expiryTimestampMs){
     const expiryIso = expiryTimestampMs ? new Date(expiryTimestampMs).toISOString() : null;
     const payload = {
       is_vip: true,
+      vip_revoked: false,
       vip_expiry: expiryIso,
       email: user.email || null,
       updated_at: firebase.firestore.FieldValue.serverTimestamp()
@@ -4525,6 +4536,7 @@ async function checkPendingVipOrderNow(){
       try{ localStorage.removeItem('tarz_vip_pending_order'); }catch(e){}
       localStorage.setItem('tarz_vip_token', data.vipToken);
       markVipUnlocked();
+      markVipInGoogleAccount(); // FIX: sinkron ke Firestore (dulu terlewat di jalur ini)
       notifyVipViaQris(pending.orderId);
       refreshVipHeaderBadge();
       refreshVipPageCard();
@@ -8171,6 +8183,7 @@ const CHAT_FIREBASE_CONFIG = {
     if(!confirmed) return;
     tzchatUserActionRun('tzchatActionGiftBtn', null, {
       is_vip: true,
+      vip_revoked: false,
       vip_expiry: null,
       vip_since: firebase.firestore.FieldValue.serverTimestamp(),
       gift_notice: { type: 'vip_permanent', at: firebase.firestore.FieldValue.serverTimestamp() }
@@ -8186,6 +8199,7 @@ const CHAT_FIREBASE_CONFIG = {
     if(!confirmed) return;
     tzchatUserActionRun('tzchatActionRevokeBtn', null, {
       is_vip: false,
+      vip_revoked: true,
       vip_expiry: null,
       gift_notice: firebase.firestore.FieldValue.delete()
     }, 'VIP dicabut dari ' + _uaName, 'success');
