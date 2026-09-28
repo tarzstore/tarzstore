@@ -22,5 +22,23 @@ export const kv = {
       return redis.set(key, value, { ex: options.ex });
     }
     return redis.set(key, value);
+  },
+
+  // SET jika belum ada (atomik, NX). Return true kalau berhasil membuat key.
+  async setnx(key, value, options) {
+    const opts = { nx: true };
+    if (options && options.ex) opts.ex = options.ex;
+    const r = await redis.set(key, value, opts);
+    return r === 'OK';
+  },
+
+  // Hapus TTL sehingga key menjadi permanen (dipakai untuk token VIP).
+  async persist(key) {
+    return redis.persist(key);
+  },
+
+  // Set ulang TTL (detik) untuk key yang sudah ada.
+  async expire(key, seconds) {
+    return redis.expire(key, seconds);
   }
 };

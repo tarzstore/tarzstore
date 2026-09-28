@@ -89,13 +89,19 @@ export default async function handler(req, res) {
 
 // Dipakai juga oleh webhook.js — ditaruh di sini supaya logikanya satu tempat.
 export async function markOrderPaidAndUnlock(orderId, order) {
-  // Bikin token VIP acak yang akan disimpan di browser user (bukti sudah bayar,
-  // dicek ulang ke server tiap kali, jadi tidak bisa dipalsu lewat localStorage biasa)
-  const vipToken = 'vip_' + Buffer.from(orderId + ':' + Date.now()).toString('base64url');
+  // Webhook dan polling check-status bisa memanggil fungsi ini bersamaan untuk
+  // order yang sama. Token dibuat DETERMINISTIK dari orderId, jadi semua
+  // pemanggil menghasilkan token yang sama; penulisan `vip:` memakai SET NX
+  // (atomik) sehingga tidak pernah ada dua token untuk satu order.
+  const vipToken = 'vip_' + Buffer.from(orderId).toString('base64url');
 
+  // Token VIP permanen (tanpa TTL): pembayaran sekali = VIP selamanya.
+  // Kalau sudah ada (pemanggil lain duluan), biarkan -- hasilnya sama.
+  await kv.setnx(`vip:${vipToken}`, { orderId, unlockedAt: Date.now() });
+
+  // Tandai order sukses SETELAH token tersimpan, supaya order tidak pernah
+  // 'success' tanpa token yang valid.
   await kv.set(`order:${orderId}`, { ...order, status: 'success', vipToken }, { ex: 60 * 60 * 24 * 30 });
-  // Token VIP ini yang dicek endpoint verify-vip.js — berlaku permanen (30 hari TTL, diperpanjang tiap dicek)
-  await kv.set(`vip:${vipToken}`, { orderId, unlockedAt: Date.now() }, { ex: 60 * 60 * 24 * 365 });
 
   return vipToken;
 }

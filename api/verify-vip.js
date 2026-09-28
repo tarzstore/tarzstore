@@ -18,6 +18,15 @@ export default async function handler(req, res) {
 
   try {
     const record = await kv.get(`vip:${token}`);
+
+    // Token valid -> jadikan permanen (hapus TTL). Sebelumnya token kedaluwarsa
+    // 365 hari setelah dibuat walau komentarnya bilang "diperpanjang tiap dicek",
+    // sehingga user yang sudah bayar bisa kehilangan VIP setahun kemudian.
+    // Gagal persist tidak boleh membatalkan hasil verifikasi.
+    if (record) {
+      try { await kv.persist(`vip:${token}`); } catch (e) { console.error('persist vip error:', e); }
+    }
+
     return res.status(200).json({ ok: true, vip: !!record });
   } catch (err) {
     console.error('verify-vip error:', err);
