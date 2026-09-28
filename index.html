@@ -608,6 +608,7 @@ async function searchInfoAkun(){
     const accounts = {};
 
     if(isEmailLike){
+      // 1) vip_users: akun yang pernah beli/di-gift/di-ban (punya status VIP).
       const snap = await window.fbDb.collection('vip_users')
         .where('email', '==', keywordRaw)
         .limit(1).get();
@@ -617,6 +618,40 @@ async function searchInfoAkun(){
         if(!(data.email || '').endsWith('@tarzstore.local')){
           const acc = infoAkunBuildAccount(doc.id, data, null);
           accounts[acc.uid || doc.id] = acc;
+        }
+      }
+
+      // 2) FIX: akun Google BARU/FREE dicatat di project kedua
+      //    (akun_terdaftar) sejak penghematan Firestore, BUKAN di vip_users,
+      //    jadi tanpa langkah ini akun yang baru daftar tidak pernah ketemu.
+      //    Kalau ketemu di sini, status VIP-nya tetap dicek ke vip_users
+      //    (doc uid yang sama) supaya badge VIP/FREE akurat.
+      if(Object.keys(accounts).length === 0){
+        try{
+          const akunDb = (typeof getAkunDb === 'function') ? getAkunDb() : null;
+          if(akunDb){
+            const asnap = await akunDb.collection('akun_terdaftar')
+              .where('email', '==', keywordRaw)
+              .limit(1).get();
+            if(!asnap.empty){
+              const adoc = asnap.docs[0];
+              const adata = adoc.data() || {};
+              if(!(adata.email || '').endsWith('@tarzstore.local')){
+                let vipData = null;
+                try{
+                  const vdoc = await window.fbDb.collection('vip_users').doc(adoc.id).get();
+                  if(vdoc.exists) vipData = vdoc.data();
+                }catch(e){ /* abaikan, anggap FREE */ }
+                const merged = Object.assign({}, adata, vipData || {});
+                merged.email = (vipData && vipData.email) || adata.email;
+                merged.created_at = (vipData && vipData.created_at) || adata.created_at || null;
+                const acc = infoAkunBuildAccount(adoc.id, merged, null);
+                accounts[acc.uid || adoc.id] = acc;
+              }
+            }
+          }
+        }catch(e){
+          console.error('Gagal mencari di akun_terdaftar:', e);
         }
       }
     } else {
@@ -1417,13 +1452,18 @@ function startBanListener(uid){
         markVipUnlocked(); // sinkronkan cache localStorage juga
         // Ada hadiah VIP dari admin yang belum diberitahukan ke penerima ini?
         if(data && data.gift_notice) showVipGiftNoticeIfAny(uid, data.gift_notice);
-      } else if(localStorage.getItem('tarz_vip_token') && !(data && data.is_vip === false && data.vip_revoked)){
+      } else if(data && data.vip_revoked === true){
+        // Dicabut admin (Hapus VIP): hormati, bersihkan TOTAL termasuk token
+        // dan penanda belum-tersinkron, supaya tidak dipulihkan lagi.
+        _googleVipStatus = false;
+        clearLocalVipState({ force: true });
+      } else if(localStorage.getItem('tarz_vip_token')){
         // FIX: user punya token pembayaran dari server tapi dokumen Firestore
         // belum/tidak punya is_vip (mis. write gagal atau belum sempat masuk).
-        // Jangan hapus cache -- coba sinkronkan ulang ke Firestore.
+        // Jangan hapus cache -- coba sinkronkan ulang ke Firestore (1x/sesi).
         if(!window._vipResyncTried){
           window._vipResyncTried = true;
-          try{ markVipInGoogleAccount(); }catch(e){}
+          resyncPendingVipIfAny();
         }
       } else if(_googleVipStatus !== false || localStorage.getItem('tarz_vip') === 'true' || localStorage.getItem('tarz_vip_expiry')){
         // Status VIP di Firestore sudah false/dicabut, tapi cache lokal
@@ -3032,15 +3072,25 @@ function ensureVipUserRecord(user){
   if(!db) return; // project kedua belum siap -> lewati, tidak ganggu login
 
   try{
-    db.collection('akun_terdaftar').doc(user.uid).set({
-      email: user.email || null,
-      created_at: firebase.firestore.FieldValue.serverTimestamp(),
-      last_login: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true }).then(function(){
+    /* FIX: rules akun_terdaftar membedakan CREATE (harus persis keys
+       email/created_at/last_login) dan UPDATE (cuma boleh ubah
+       email/last_login). set(...,{merge:true}) dengan created_at selalu
+       dianggap UPDATE kalau dokumen sudah ada, lalu DITOLAK rules karena
+       created_at ikut berubah. Jadi: cek dulu dokumennya, lalu kirim
+       payload yang sesuai (create lengkap / update tanpa created_at). */
+    const ref = db.collection('akun_terdaftar').doc(user.uid);
+    const ts = firebase.firestore.FieldValue.serverTimestamp();
+    ref.get().then(function(snap){
+      if(snap.exists){
+        return ref.update({ email: user.email || null, last_login: ts });
+      }
+      return ref.set({ email: user.email || null, created_at: ts, last_login: ts });
+    }).then(function(){
       try{ localStorage.setItem(flagKey, '1'); }catch(e){}
     }).catch(function(err){
-      // Diamkan kalau gagal (mis. rules project kedua belum diizinkan) --
-      // pencatatan ini tambahan, tidak boleh mengganggu alur login utama.
+      // Diamkan kalau gagal -- pencatatan ini tambahan, tidak boleh
+      // mengganggu alur login utama. Flag TIDAK dipasang, jadi akan dicoba
+      // lagi di login berikutnya.
       console.error('Gagal mencatat akun ke project kedua:', err);
     });
   }catch(e){ console.error('ensureVipUserRecord error:', e); }
@@ -3433,10 +3483,17 @@ async function googleSignIn(){
    akun Google -- sebelumnya cuma _googleVipStatus yang direset, jadi
    device yang pernah dapat status VIP lewat key/trial/token tetap
    dianggap VIP meski sudah logout. */
-function clearLocalVipState(){
+function clearLocalVipState(opts){
   try{ localStorage.removeItem('tarz_vip'); }catch(e){}
   try{ localStorage.removeItem('tarz_vip_expiry'); }catch(e){}
-  try{ localStorage.removeItem('tarz_vip_token'); }catch(e){}
+  /* Token bukti bayar dipertahankan kalau VIP-nya belum sempat tercatat di
+     Firestore (tarz_vip_unsynced), supaya logout tidak menghilangkan VIP yang
+     sudah dibayar. Untuk hapus akun (opts.force) tetap dibersihkan total. */
+  const keepToken = !(opts && opts.force) && !!localStorage.getItem('tarz_vip_unsynced');
+  if(!keepToken){
+    try{ localStorage.removeItem('tarz_vip_token'); }catch(e){}
+    try{ localStorage.removeItem('tarz_vip_unsynced'); }catch(e){}
+  }
 }
 
 /* ── KONFIRMASI LOG OUT — tampilkan pilihan Batal/Keluar sebelum benar-benar sign out ── */
@@ -3607,6 +3664,8 @@ async function refreshGoogleVipStatus(){
     refreshVipHeaderBadge();
     refreshVipPageCard();
     renderProfilePanel(); // update badge "MEMBER VIP" + ring avatar begitu status VIP diketahui
+    // Ada bukti bayar di device ini tapi Firestore belum VIP? Pulihkan diam-diam.
+    if(_googleVipStatus === false) resyncPendingVipIfAny();
     // Poster Informasi mode "Hanya VIP" butuh status VIP yang sudah final
     // -- evaluasi ulang sekarang karena hasil cek Firestore baru saja selesai.
     if(typeof applyInfoPosterVisibility === 'function') applyInfoPosterVisibility();
@@ -3665,36 +3724,84 @@ function markVipUnlocked(){
    yang dipanggil terpisah). */
 async function markVipInGoogleAccount(expiryTimestampMs){
   const client = getAuthClient();
-  if(!client) return;
-  try{
-    const user = client.currentUser;
-    if(!user) return; // belum login Google, tidak apa-apa
+  if(!client) return false;
+  const user = client.currentUser;
+  if(!user) return false; // belum login Google, tidak apa-apa
 
-    const docRef = window.fbDb.collection('vip_users').doc(user.uid);
-    const snap = await docRef.get();
-    // vip_since dicatat cuma saat akun ini BELUM VIP sebelumnya -- jadi
-    // perpanjangan VIP (yang sudah VIP, redeem key lagi) tidak menggeser
-    // "Waktu VIP" yang ditampilkan di Gift VIP ke tanggal hari ini.
-    const wasVip = snap.exists && !!snap.data().is_vip;
+  /* Penanda "VIP sudah dibayar tapi BELUM tercatat di Firestore". Selama
+     penanda ini ada: (1) logout tidak menghapus token VIP, dan (2) sesi
+     berikutnya akan mencoba menulis ulang (lihat resyncPendingVipIfAny). */
+  try{ localStorage.setItem('tarz_vip_unsynced', String(user.uid)); }catch(e){}
 
-    const expiryIso = expiryTimestampMs ? new Date(expiryTimestampMs).toISOString() : null;
-    const payload = {
-      is_vip: true,
-      vip_revoked: false,
-      vip_expiry: expiryIso,
-      email: user.email || null,
-      updated_at: firebase.firestore.FieldValue.serverTimestamp()
-    };
-    if(!wasVip){
-      payload.vip_since = firebase.firestore.FieldValue.serverTimestamp();
+  const MAX_TRY = 3;
+  for(let attempt = 1; attempt <= MAX_TRY; attempt++){
+    try{
+      const docRef = window.fbDb.collection('vip_users').doc(user.uid);
+      const snap = await docRef.get();
+      // vip_since dicatat cuma saat akun ini BELUM VIP sebelumnya -- jadi
+      // perpanjangan VIP (yang sudah VIP, redeem key lagi) tidak menggeser
+      // "Waktu VIP" yang ditampilkan di Gift VIP ke tanggal hari ini.
+      const wasVip = snap.exists && !!snap.data().is_vip;
+
+      const expiryIso = expiryTimestampMs ? new Date(expiryTimestampMs).toISOString() : null;
+      const payload = {
+        is_vip: true,
+        vip_revoked: false,
+        vip_expiry: expiryIso,
+        email: user.email || null,
+        updated_at: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      if(!wasVip){
+        payload.vip_since = firebase.firestore.FieldValue.serverTimestamp();
+      }
+      await docRef.set(payload, { merge: true });
+
+      // Berhasil tercatat -> lepas penanda belum-tersinkron.
+      try{ localStorage.removeItem('tarz_vip_unsynced'); }catch(e){}
+
+      _googleUser = user;
+      _googleVipStatus = true;
+      renderProfilePanel();
+      if(typeof applyInfoPosterVisibility === 'function') applyInfoPosterVisibility();
+      return true;
+    }catch(e){
+      console.error('markVipInGoogleAccount gagal (percobaan ' + attempt + '/' + MAX_TRY + '):', e);
+      if(attempt < MAX_TRY){
+        // jeda bertahap 1.5s, 3s sebelum coba lagi
+        await new Promise(function(r){ setTimeout(r, 1500 * attempt); });
+      }
     }
-    await docRef.set(payload, { merge: true });
+  }
+  // Semua percobaan gagal: penanda 'tarz_vip_unsynced' tetap ada, jadi akan
+  // dicoba lagi otomatis di sesi/login berikutnya.
+  return false;
+}
 
-    _googleUser = user;
-    _googleVipStatus = true;
-    renderProfilePanel();
-    if(typeof applyInfoPosterVisibility === 'function') applyInfoPosterVisibility();
-  }catch(e){ console.error('markVipInGoogleAccount error:', e); }
+/* Pemulihan otomatis: kalau device ini punya bukti bayar (token dari server)
+   tapi dokumen vip_users akun yang login belum VIP, tulis ulang. Dipanggil
+   setelah status VIP akun selesai dicek (refreshGoogleVipStatus). Tidak
+   menimpa pencabutan admin: kalau vip_revoked:true, tidak dipulihkan. */
+async function resyncPendingVipIfAny(){
+  try{
+    const token = localStorage.getItem('tarz_vip_token');
+    const unsyncedUid = localStorage.getItem('tarz_vip_unsynced');
+    if(!token && !unsyncedUid) return;
+    if(_googleVipStatus === true) { // sudah VIP di Firestore -> penanda tidak perlu lagi
+      try{ localStorage.removeItem('tarz_vip_unsynced'); }catch(e){}
+      return;
+    }
+    const client = getAuthClient();
+    const user = client && client.currentUser;
+    if(!user || !window.fbDb) return;
+    // Penanda milik akun lain di device ini -> jangan dipakai untuk akun ini.
+    if(unsyncedUid && unsyncedUid !== user.uid && !token) return;
+
+    const snap = await window.fbDb.collection('vip_users').doc(user.uid).get();
+    const d = snap.exists ? snap.data() : null;
+    if(d && d.vip_revoked === true) return; // dicabut admin: hormati
+    if(d && d.is_vip === true) return;      // sudah VIP: tidak perlu
+    await markVipInGoogleAccount();
+  }catch(e){ console.error('resyncPendingVipIfAny error:', e); }
 }
 
 /* akses trial: berlaku sampai waktu tertentu (expiryTimestampMs), lalu otomatis terkunci lagi */
@@ -4139,8 +4246,22 @@ async function isVipUnlockedAsync(){
   try{
     const res = await fetch('/api/verify-vip?token=' + encodeURIComponent(token));
     const data = await res.json();
-    if(data.vip === true) return true;
-    if(data.vip === false){ localStorage.removeItem('tarz_vip_token'); return false; }
+    if(data.vip === true){
+      try{ localStorage.removeItem('tarz_vip_false_count'); }catch(e){}
+      return true;
+    }
+    if(data.vip === false){
+      /* Jangan langsung hapus token dari SATU respons false: server/Redis bisa
+         sesekali salah balas (eviction, replikasi telat). Token baru dihapus
+         setelah 3 kali false berturut-turut di sesi/muat halaman berbeda. */
+      let n = 0;
+      try{ n = Number(localStorage.getItem('tarz_vip_false_count') || 0) + 1; localStorage.setItem('tarz_vip_false_count', String(n)); }catch(e){}
+      if(n >= 3){
+        try{ localStorage.removeItem('tarz_vip_token'); localStorage.removeItem('tarz_vip_false_count'); }catch(e){}
+        return false;
+      }
+      return true; // tetap dianggap VIP sementara
+    }
     return true; // data.vip === null -> server error, jangan kunci akses yang sudah ada
   }catch(e){
     return true; // offline/error -> jangan kunci user yang sudah pernah verify
@@ -5809,7 +5930,7 @@ document.addEventListener('dragstart', function(e){
 
       await user.delete();
 
-      clearLocalVipState();
+      clearLocalVipState({ force: true });
       showToast('Akun berhasil dihapus.', 'success');
       closeDeleteAccountModal();
       if(form) form.reset();
