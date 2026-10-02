@@ -791,6 +791,8 @@ let _infoVipCurrentRange = 'all';
    Selama masih < INFO_VIP_CACHE_MS, membuka modal Info VIP berkali-kali
    memakai data di memori (0 read). Tombol "Muat ulang" memaksa baca baru. */
 let _infoVipLoadedAt = 0;
+// false = modal Info VIP baru dibuka & belum menekan "Tampilkan" -> TIDAK ada query Firestore
+let _infoVipRevealed = false;
 const INFO_VIP_CACHE_MS = 10 * 60 * 1000; // 10 menit
 // list hasil filter+cari yang sedang tampil di Info VIP (dipakai openInfoVipDetail)
 let _infoVipRenderedList = [];
@@ -808,8 +810,11 @@ function openInfoVipModal(){
   document.body.style.overflow = 'hidden'; document.body.classList.add('tabbar-hide');
   const searchInput = document.getElementById('infoVipSearchInput');
   if(searchInput) searchInput.value = '';
-  setInfoVipRange('all');
-  loadInfoVipData();
+  _infoVipRevealed = false;   // selalu mulai kosong; data baru dibaca setelah klik "Tampilkan"
+  setInfoVipRange('all');     // render placeholder (tanpa query)
+}
+function tampilkanInfoVip(){
+  loadInfoVipData();          // pakai cache 10 menit kalau masih segar
 }
 function closeInfoVipModal(){
   const overlay = document.getElementById('infoVipModalOverlay');
@@ -831,6 +836,7 @@ function closeInfoVipModal(){
    dijalankan di infoAkunBuildAccount(), lalu akun yang sudah kedaluwarsa
    dibuang dari cache karena modal ini memang hanya menampilkan VIP. */
 async function loadInfoVipData(forceRefresh){
+  _infoVipRevealed = true;
   const listEl = document.getElementById('infoVipList');
   const countEl = document.getElementById('infoVipCount');
   if(!listEl) return;
@@ -927,6 +933,16 @@ function renderInfoVipList(){
   const listEl = document.getElementById('infoVipList');
   const countEl = document.getElementById('infoVipCount');
   if(!listEl) return;
+
+  // Belum ditekan "Tampilkan" -> tampilkan placeholder saja, nol read Firestore.
+  if(!_infoVipRevealed){
+    listEl.innerHTML = '<div class="infoakun-empty" style="text-align:center;padding:28px 12px;">' +
+      '<div style="margin-bottom:12px;">Data VIP disembunyikan supaya hemat kuota.</div>' +
+      '<button type="button" onclick="tampilkanInfoVip()" style="background:var(--accent,#3b82f6);border:none;color:#fff;border-radius:8px;padding:9px 22px;font-size:.85rem;font-weight:600;cursor:pointer;">Tampilkan</button>' +
+      '</div>';
+    if(countEl) countEl.textContent = '';
+    return;
+  }
 
   const vipOnly = _infoAkunAllAccounts.filter(function(a){ return a.isVip; });
 
