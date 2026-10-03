@@ -37,6 +37,11 @@ export const kv = {
     return redis.persist(key);
   },
 
+  // Hapus key (dipakai melepas penanda 'sudah dinotifikasi' kalau Telegram gagal).
+  async del(key) {
+    return redis.del(key);
+  },
+
   // Set ulang TTL (detik) untuk key yang sudah ada.
   async expire(key, seconds) {
     return redis.expire(key, seconds);
