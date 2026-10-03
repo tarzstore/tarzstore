@@ -2135,6 +2135,115 @@ footer::before{
 }
 .key-box .key-body{overflow-y:auto;-webkit-overflow-scrolling:touch;}
 
+
+/* ══ QRIS INLINE (satu layar) — tampil di dalam halaman membership.
+   Ringan: hanya animasi transform & opacity. Semua class berawalan vq- ══ */
+.vq-screen{position:absolute;inset:0;z-index:6;display:none;justify-content:center;align-items:stretch;background:var(--vbg,#07070a)}
+.vq-screen.on{display:flex}
+.vq-screen .vq{--vq-gold:#f3d489;--vq-gold2:#c2a05c;--vq-text:#f6f2e8;--vq-text2:#a7a296;--vq-line:rgba(243,212,137,.18);height:100%;max-height:780px;animation:vqIn .45s cubic-bezier(.16,1,.3,1)}
+@keyframes vqIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+.vq{position:relative;width:100%;max-width:380px;height:100dvh;max-height:720px;padding:max(14px,env(safe-area-inset-top)) 16px max(14px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:clamp(8px,1.6dvh,14px);overflow:hidden;
+ background:radial-gradient(90% 50% at 50% 28%,rgba(243,212,137,.14),transparent 70%),linear-gradient(180deg,#14131a,#0b0b10)}
+.vq>*{position:relative;z-index:1}
+
+.vq-obj{position:absolute!important;z-index:0!important;pointer-events:none;will-change:transform}
+.vq-obj svg{width:100%;height:100%;display:block}
+.vq-o1{width:30px;height:30px;left:4%;top:26%;animation:vqFl 5s ease-in-out infinite}
+.vq-o2{width:24px;height:24px;right:4%;top:32%;animation:vqFl 6s ease-in-out -2s infinite}
+.vq-o3{width:24px;height:24px;left:4%;top:50%;animation:vqFl 7s ease-in-out -1s infinite}
+.vq-o4{width:28px;height:28px;right:4%;top:48%;animation:vqFl 5.5s ease-in-out -3s infinite}
+@keyframes vqFl{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.vq-sp{position:absolute!important;z-index:0!important;width:4px;height:4px;background:var(--vq-gold);border-radius:50%;animation:vqTw 2.8s ease-in-out infinite;will-change:opacity,transform}
+@keyframes vqTw{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:.9;transform:scale(1.2)}}
+
+.vq-head{text-align:center}
+.vq-chip{display:inline-flex;align-items:center;gap:6px;font-size:9.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--vq-gold);background:rgba(243,212,137,.1);border:1px solid var(--vq-line);padding:4px 11px;border-radius:99px}
+.vq-title{font-size:1.3rem;font-weight:800;letter-spacing:-.4px;margin-top:7px}
+.vq-title em,.vqls-title em{font-style:normal;color:var(--vq-gold)}
+.vq-order{font:9.5px ui-monospace,Menlo,monospace;color:var(--vq-text2);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.vq-stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
+.vq-qrwrap{position:relative;width:min(58vw,34dvh,240px);aspect-ratio:1}
+.vq-halo{position:absolute;inset:-26px;border-radius:50%;background:radial-gradient(closest-side,rgba(243,212,137,.35),transparent);animation:vqHalo 2.8s ease-in-out infinite;will-change:opacity,transform}
+@keyframes vqHalo{0%,100%{opacity:.4;transform:scale(.95)}50%{opacity:.9;transform:scale(1.05)}}
+.vq-frame{position:absolute;inset:-8px;border-radius:28px;border:1.5px solid rgba(243,212,137,.28)}
+.vq-c{position:absolute;width:18px;height:18px;border:3px solid var(--vq-gold);animation:vqCp 2.4s ease-in-out infinite;will-change:opacity}
+.vq-c.c1{top:-14px;left:-14px;border-right:0;border-bottom:0;border-radius:10px 0 0 0}
+.vq-c.c2{top:-14px;right:-14px;border-left:0;border-bottom:0;border-radius:0 10px 0 0;animation-delay:.6s}
+.vq-c.c4{bottom:-14px;right:-14px;border-left:0;border-top:0;border-radius:0 0 10px 0;animation-delay:1.2s}
+.vq-c.c3{bottom:-14px;left:-14px;border-right:0;border-top:0;border-radius:0 0 0 10px;animation-delay:1.8s}
+@keyframes vqCp{0%,100%{opacity:.35}50%{opacity:1}}
+.vq-qr{position:relative;width:100%;height:100%;background:#fff;border-radius:20px;padding:11px;overflow:hidden;box-shadow:0 14px 30px rgba(0,0,0,.5)}
+.vq-qr>img{display:block;width:100%;height:100%}
+.vq-scan{position:absolute;left:0;right:0;top:0;height:36%;background:linear-gradient(180deg,transparent,rgba(243,212,137,.5));border-bottom:2px solid var(--vq-gold);transform:translateY(-100%);animation:vqScan 2.4s linear infinite;will-change:transform}
+@keyframes vqScan{to{transform:translateY(280%)}}
+.vq-logo{position:absolute;left:50%;top:50%;width:15%;aspect-ratio:1;transform:translate(-50%,-50%);background:#fff;border-radius:22%;box-shadow:0 0 0 3px #fff;display:grid;place-items:center;font-weight:900;font-size:11px;color:#1a1400}
+.vq-cover{position:absolute;inset:0;display:none;place-items:center;font-weight:800;font-size:14px}
+.vq-qr.exp .vq-cover{display:grid;background:rgba(255,255,255,.88);color:#333}
+.vq-qr.exp .vq-scan,.vq-qr.exp .vq-logo{display:none}
+.vq-qr.paid .vq-cover{display:grid;background:#5fd6a0}
+.vq-qr.paid .vq-scan,.vq-qr.paid .vq-logo{display:none}
+.vq-cover svg{width:40%;stroke-dasharray:40;animation:vqDr .45s .05s ease-out both}
+@keyframes vqDr{from{stroke-dashoffset:40}to{stroke-dashoffset:0}}
+.vq-qr.exp .vq-cover svg{display:none}.vq-qr.paid .vq-cover span{display:none}
+
+.vq-info{position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 13px 13px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08)}
+.vq-info small{display:block;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--vq-text2);margin-bottom:2px}
+.vq-price b{font-size:1.45rem;font-weight:800;letter-spacing:-.8px;font-variant-numeric:tabular-nums;color:var(--vq-gold)}
+.vq-price b i{font-style:normal;font-size:.7rem;margin-right:3px}
+.vq-time{text-align:right}
+.vq-time b{font-size:1.2rem;font-weight:800;color:var(--vq-gold);font-variant-numeric:tabular-nums}
+.vq-bar{position:absolute;left:13px;right:13px;bottom:0;height:3px;border-radius:9px;background:rgba(255,255,255,.07);overflow:hidden}
+.vq-bar span{display:block;height:100%;width:100%;background:var(--vq-gold);transform-origin:0 50%}
+.vq-info.urgent .vq-time b{color:#ff7b7b}.vq-info.urgent .vq-bar span{background:#ff6b6b}
+
+.vq-status{display:flex;align-items:center;justify-content:center;gap:9px;font-size:12px;font-weight:600;color:var(--vq-gold)}
+.vq-pulse{position:relative;width:8px;height:8px;border-radius:50%;background:currentColor}
+.vq-pulse::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:2px solid currentColor;animation:vqPl 1.6s ease-out infinite;will-change:transform,opacity}
+@keyframes vqPl{from{transform:scale(.5);opacity:.9}to{transform:scale(1.6);opacity:0}}
+.vq-status.ok{color:#6fe0ae}.vq-status.err{color:#ff8f8f}.vq-status.err .vq-pulse::after,.vq-status.ok .vq-pulse::after{display:none}
+
+.vq-steps{display:flex;align-items:center;justify-content:space-between;gap:4px;padding:9px 8px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)}
+.vq-step{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:9.5px;line-height:1.2;color:var(--vq-text2);text-align:center}
+.vq-step svg{width:18px;height:18px;color:var(--vq-gold)}
+.vq-arrow{color:var(--vq-gold2);opacity:.6;font-size:12px;flex:none}
+
+.vq-actions{display:flex;gap:8px}
+.vq-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:12px;border-radius:14px;font:700 12.5px inherit;font-family:inherit;cursor:pointer;border:0;transition:transform .12s}
+.vq-btn:active{transform:scale(.96)}.vq-btn svg{width:15px;height:15px}
+.vq-btn.pri{flex:1.5;color:#241a00;background:linear-gradient(155deg,#fbe7a9,#c4a766 60%,#9c7f3e)}
+.vq-btn.sec{color:var(--vq-text2);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
+
+
+.vqls{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(14px,3dvh,24px);text-align:center}
+.vqls-qrwrap{position:relative;width:min(46vw,26dvh,190px);aspect-ratio:1}
+.vqls-box{position:relative;width:100%;height:100%;border-radius:20px;overflow:hidden;background:rgba(255,255,255,.06);border:1px solid var(--vq-line)}
+.vqls-box svg{position:absolute;inset:0;width:100%;height:100%;padding:11px}
+.vqls-box .a{animation:vqLb 1.6s ease-in-out infinite;will-change:opacity}
+.vqls-box .b{animation:vqLb 1.6s ease-in-out .8s infinite;will-change:opacity}
+@keyframes vqLb{0%,100%{opacity:.15}50%{opacity:.85}}
+.vqls-box::after{content:"";position:absolute;left:0;right:0;top:0;height:36%;background:linear-gradient(180deg,transparent,rgba(243,212,137,.45));border-bottom:2px solid var(--vq-gold);transform:translateY(-100%);animation:vqScan 2s linear infinite;will-change:transform}
+.vqls-title{font-size:1.25rem;font-weight:800;letter-spacing:-.3px}
+.vqls-dots{display:inline-flex;gap:3px;margin-left:4px}
+.vqls-dots span{width:4px;height:4px;border-radius:50%;background:var(--vq-gold);animation:vqLd 1.2s ease-in-out infinite;will-change:transform,opacity}
+.vqls-dots span:nth-child(2){animation-delay:.15s}.vqls-dots span:nth-child(3){animation-delay:.3s}
+@keyframes vqLd{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-4px);opacity:1}}
+.vqls-sub{font-size:12px;color:var(--vq-text2);margin-top:4px}
+.vqls-list{width:100%;max-width:270px;display:grid;gap:8px;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);text-align:left}
+.vqls-st{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--vq-text);opacity:.4;animation:vqLson 6s steps(1,end) infinite}
+.vqls-st:nth-child(2),.vqls-st:nth-child(2) .vqls-ic>*{animation-delay:1.8s}
+.vqls-st:nth-child(3),.vqls-st:nth-child(3) .vqls-ic>*{animation-delay:3.6s}
+@keyframes vqLson{0%{opacity:.4}6%{opacity:1}}
+.vqls-ic{position:relative;flex:none;width:18px;height:18px}
+.vqls-sp{position:absolute;inset:0;border-radius:50%;border:2px solid rgba(243,212,137,.25);border-top-color:var(--vq-gold);animation:vqSpin .9s linear infinite;will-change:transform}
+@keyframes vqSpin{to{transform:rotate(360deg)}}
+.vqls-ck{position:absolute;inset:0;padding:3px;border-radius:50%;background:#5fd6a0;color:#06281a;opacity:0;animation:vqLsck 6s steps(1,end) infinite}
+@keyframes vqLsck{0%{opacity:0}26%{opacity:1}}
+.vqls-prog{width:100%;max-width:270px;height:5px;border-radius:9px;background:rgba(255,255,255,.07);overflow:hidden}
+.vqls-prog span{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--vq-gold2),var(--vq-gold));transform-origin:0 50%;animation:vqLp 6s cubic-bezier(.4,0,.2,1) infinite;will-change:transform}
+@keyframes vqLp{0%{transform:scaleX(.04)}90%,100%{transform:scaleX(.97)}}
+@media (prefers-reduced-motion:reduce){.vq *,.vqls *,.vq-obj,.vq-sp{animation:none!important}}
+
 /* ── QRIS MODE — dipakai khusus saat kartu "Scan & Bayar VIP" tampil.
    Box dilebarkan sedikit dan semua jarak/ukuran dipadatkan supaya seluruh
    konten (jumlah, kode QR, timer, status, langkah bayar, tombol batal)
@@ -7685,6 +7794,7 @@ body:has(#banScreen[style*="flex"]){
     </div>
 
   </div>
+  <div class="vq-screen" id="vqScreen" aria-live="polite"></div>
 </div>
 
 <script>
@@ -12243,7 +12353,7 @@ async function startVipPayment(){
     const data = await res.json();
     if(!data.ok){
       if(_qrisContext === 'vippage'){
-        closeKeyModal();
+        resetVipInlinePay();
         showToast('Gagal menyiapkan QRIS. Coba lagi ya.', 'error');
       } else {
         showVipGate();
@@ -12254,7 +12364,7 @@ async function startVipPayment(){
     pollVipPayment(data.orderId);
   }catch(e){
     if(_qrisContext === 'vippage'){
-      closeKeyModal();
+      resetVipInlinePay();
       showToast('Gagal terhubung.', 'error');
     } else {
       showToast('Gagal terhubung ke server pembayaran.', 'error');
@@ -12308,27 +12418,82 @@ function openVipPaymentDirect(planId){
   _keySourceTab = 'file';
   _qrisContext = 'vippage';
 
-  // Sembunyikan eyebrow "ACCESS TERKUNCI" & icon gembok SEBELUM overlay ditampilkan,
-  // supaya sekilas pun tidak pernah kelihatan -- beda dari alur produk biasa yang
-  // memang menampilkan gate itu dulu.
-  document.getElementById('vipGateBody').classList.add('hide');
-  setKeyHeadDecorHidden(true);
-
-  // Keluar dari halaman/modal VIP dulu, baru tampilkan proses QRIS --
-  // supaya tidak ada 2 modal yang tampil bertumpuk.
-  closeVipModal();
-
-  const overlay = document.getElementById('keyOverlay');
-  overlay.classList.add('open');
-  overlay.setAttribute('aria-hidden','false');
-  overlay.removeAttribute('inert');
-  document.body.style.overflow = 'hidden';
-  document.body.classList.add('tabbar-hide');
-
+  // Pembayaran tampil satu layar langsung di dalam halaman membership (tanpa modal terpisah).
   startVipPayment();
 }
 
+/* ── QRIS satu layar di halaman membership ── */
+const VQ_GEM='<svg viewBox="0 0 48 48"><path d="M12 8h24l8 11-20 22L4 19z" fill="#e3c06c" stroke="#fff3c9" stroke-opacity=".6" stroke-width="1.2" stroke-linejoin="round"/><path d="M4 19h40M12 8l6 11 6 22M36 8l-6 11-6 22M18 19l6-11 6 11" stroke="#2a1f00" stroke-opacity=".35" fill="none"/></svg>';
+const VQ_COIN='<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="#e6c36e" stroke="#fff3c9" stroke-opacity=".7" stroke-width="2"/><circle cx="24" cy="24" r="14" fill="none" stroke="#8a6d2b" stroke-width="2"/><path d="M24 15v18M19 20h8a3 3 0 0 1 0 6h-6a3 3 0 0 0 0 6h8" stroke="#8a6d2b" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>';
+const VQ_CROWN='<svg viewBox="0 0 48 48" width="11" height="11"><path d="M6 16l9 8 9-14 9 14 9-8-4 22H10z" fill="#e6c36e"/></svg>';
+const VQ_OBJ='<div class="vq-obj vq-o1">'+VQ_GEM+'</div><div class="vq-obj vq-o2">'+VQ_COIN+'</div><div class="vq-obj vq-o3">'+VQ_COIN+'</div><div class="vq-obj vq-o4">'+VQ_GEM+'</div><span class="vq-sp" style="left:20%;top:16%"></span><span class="vq-sp" style="left:80%;top:20%;animation-delay:-1s"></span><span class="vq-sp" style="left:12%;top:66%;animation-delay:-.6s"></span><span class="vq-sp" style="left:88%;top:62%;animation-delay:-1.8s"></span>';
+const VQ_FRAME='<div class="vq-halo"></div><div class="vq-frame"></div><i class="vq-c c1"></i><i class="vq-c c2"></i><i class="vq-c c3"></i><i class="vq-c c4"></i>';
+function vqSvg(p){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'; }
+function vqEsc(t){ return String(t==null?'':t).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+/* kerangka QR: satu SVG saja (bukan ratusan elemen) */
+function vqSkeleton(){
+  const n=21, A=[], B=[]; let fx='';
+  const fin=function(x,y){ for(const o of [[0,0],[14,0],[0,14]]){ const a=x-o[0], b=y-o[1]; if(a>=0&&a<7&&b>=0&&b<7) return (a==0||a==6||b==0||b==6||(a>1&&a<5&&b>1&&b<5))?2:1; } return 0; };
+  for(let y=0;y<n;y++) for(let x=0;x<n;x++){
+    const f=fin(x,y);
+    if(f===2) fx+='<rect x="'+x+'" y="'+y+'" width="1" height="1" rx=".15"/>';
+    else if(!f){ const r=Math.abs((Math.sin(x*12.9898+y*78.233)*43758.5453)%1); (r>.5?A:B).push('<rect x="'+(x+.1)+'" y="'+(y+.1)+'" width=".8" height=".8" rx=".15"/>'); }
+  }
+  return '<svg viewBox="0 0 21 21" fill="#f3d489"><g opacity=".9">'+fx+'</g><g class="a">'+A.join('')+'</g><g class="b">'+B.join('')+'</g></svg>';
+}
+function vqLoadingHTML(){
+  const CK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+  const st=function(t){ return '<div class="vqls-st"><span class="vqls-ic"><span class="vqls-sp"></span><span class="vqls-ck">'+CK+'</span></span>'+t+'</div>'; };
+  return '<div class="vq">'+VQ_OBJ+'<div class="vqls">'
+   +'<div class="vqls-qrwrap">'+VQ_FRAME+'<div class="vqls-box">'+vqSkeleton()+'</div></div>'
+   +'<div><div class="vqls-title">Menyiapkan <em>QRIS</em><span class="vqls-dots"><span></span><span></span><span></span></span></div><div class="vqls-sub">Mohon tunggu sebentar</div></div>'
+   +'<div class="vqls-list">'+st('Membuat order VIP')+st('Menghubungkan pembayaran')+st('Menghasilkan kode QRIS')+'</div>'
+   +'<div class="vqls-prog"><span></span></div></div></div>';
+}
+function vqPayHTML(data){
+  const plan=(_vipSelectedPlan && VIP_PLANS[_vipSelectedPlan]) ? VIP_PLANS[_vipSelectedPlan] : null;
+  return '<div class="vq">'+VQ_OBJ
+   +'<div class="vq-head"><span class="vq-chip">'+VQ_CROWN+'VIP '+vqEsc(plan?plan.label:'Membership')+'</span>'
+   +'<h2 class="vq-title">Scan &amp; <em>Bayar</em> VIP</h2>'
+   +(data.orderId?'<div class="vq-order">Order #'+vqEsc(data.orderId)+'</div>':'')+'</div>'
+   +'<div class="vq-stage"><div class="vq-qrwrap">'+VQ_FRAME
+   +'<div class="vq-qr" id="vqQr"><img src="'+vqEsc(data.qrImageUrl)+'" alt="QRIS VIP Tarz Store" decoding="async"><div class="vq-scan"></div>'
+   +'<div class="vq-logo"><img src="https://apmxdcwebivmusqcuzcv.supabase.co/storage/v1/object/public/Tarzx/Ts.png" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit"></div>'
+   +'<div class="vq-cover"><span>Kedaluwarsa</span><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div></div></div></div>'
+   +'<div class="vq-info" id="qrisTimerRow"><div class="vq-price"><small>Total bayar</small><b><i>Rp</i>'+Number(data.amount).toLocaleString('id-ID')+'</b></div>'
+   +'<div class="vq-time"><small>Sisa waktu</small><b id="qrisTimerText">15:00</b></div><div class="vq-bar"><span id="vqBar"></span></div></div>'
+   +'<div class="vq-status" id="qrisStatusCard"><span class="vq-pulse"></span><span id="vipPayStatus">Menunggu pembayaran...</span></div>'
+   +'<div class="vq-steps">'
+   +'<div class="vq-step">'+vqSvg('<rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/>')+'Buka e-wallet<br>/ m-banking</div><span class="vq-arrow">&rsaquo;</span>'
+   +'<div class="vq-step">'+vqSvg('<path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2M4 12h16"/>')+'Scan<br>QRIS</div><span class="vq-arrow">&rsaquo;</span>'
+   +'<div class="vq-step">'+vqSvg('<path d="M20 6 9 17l-5-5"/>')+'Cek nominal<br>&amp; bayar</div></div>'
+   +'<div class="vq-actions"><button type="button" class="vq-btn sec" onclick="cancelVipPayment()">'+vqSvg('<path d="M19 12H5m6-6-6 6 6 6"/>')+'Batal</button>'
+   +'<button type="button" class="vq-btn pri" onclick="downloadVipQris()">'+vqSvg('<path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/>')+'Download QRIS</button></div></div>';
+}
+function showVipPayPanel(html){
+  const box=document.getElementById('vqScreen'); if(!box) return;
+  box.innerHTML=html; box.classList.add('on');
+}
+function resetVipInlinePay(){
+  const box=document.getElementById('vqScreen');
+  if(box){ box.classList.remove('on'); box.innerHTML=''; }
+  if(typeof resetVipPlanSelection==='function') resetVipPlanSelection();
+}
+function renderVipQrisInline(data){
+  _vipQrisImageUrl = data.qrImageUrl;
+  _qrisExpiresAt = Date.now() + 15 * 60 * 1000;
+  _qrisPaymentActive = true;
+  try{
+    localStorage.setItem('tarz_vip_pending_order', JSON.stringify({
+      orderId: data.orderId, expiresAt: _qrisExpiresAt, plan: _vipSelectedPlan || null
+    }));
+  }catch(e){}
+  showVipPayPanel(vqPayHTML(data));
+  startQrisCountdown();
+}
+
 function showVipQrisLoading(){
+  if(_qrisContext === 'vippage'){ showVipPayPanel(vqLoadingHTML()); return; }
   document.getElementById('vipGateBody').classList.add('hide');
   document.getElementById('vipKeyFormBody').classList.remove('show');
   document.getElementById('keySuccessWrap').classList.remove('show');
@@ -12369,6 +12534,7 @@ let _qrisCountdownTimer = null;
 let _qrisPaymentActive = false;
 
 function renderVipQris(data){
+  if(_qrisContext === 'vippage'){ renderVipQrisInline(data); return; }
   document.getElementById('keyTitle').textContent = 'Scan & Bayar VIP';
   document.getElementById('keySub').innerHTML = 'Selesaikan pembayaran' + (_vipSelectedPlan && VIP_PLANS[_vipSelectedPlan] ? ' &middot; VIP ' + VIP_PLANS[_vipSelectedPlan].label : '');
   setKeyHeadDecorHidden(true);
@@ -12453,6 +12619,8 @@ function startQrisCountdown(){
     if(remainMs <= 0){
       timerText.textContent = '00:00';
       timerRow.classList.add('urgent');
+      const _bar0 = document.getElementById('vqBar'); if(_bar0) _bar0.style.transform = 'scaleX(0)';
+      const _q = document.getElementById('vqQr'); if(_q) _q.classList.add('exp');
       clearInterval(_qrisCountdownTimer);
       return;
     }
@@ -12460,6 +12628,7 @@ function startQrisCountdown(){
     const m = Math.floor(totalSec / 60);
     const s = totalSec % 60;
     timerText.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    const _bar = document.getElementById('vqBar'); if(_bar) _bar.style.transform = 'scaleX(' + Math.max(0, Math.min(1, remainMs / 900000)).toFixed(4) + ')';
     if(totalSec <= 120) timerRow.classList.add('urgent');
   };
   tick();
@@ -12504,6 +12673,15 @@ function setQrisStatus(state, title, sub){
   const card = document.getElementById('qrisStatusCard');
   const titleEl = document.getElementById('vipPayStatus');
   if(!card || !titleEl) return;
+  if(card.classList.contains('vq-status')){
+    card.classList.remove('ok','err');
+    if(state === 'ok') card.classList.add('ok'); else if(state === 'error') card.classList.add('err');
+    titleEl.textContent = title;
+    const _qr = document.getElementById('vqQr');
+    if(_qr){ if(state === 'ok') _qr.classList.add('paid'); else if(state === 'error') _qr.classList.add('exp'); }
+    if(state === 'error'){ const _r = document.getElementById('qrisTimerRow'); if(_r) _r.classList.add('urgent'); }
+    return;
+  }
   card.classList.remove('ok','error');
   let iconHtml = '';
   if(state === 'ok'){
@@ -12710,7 +12888,7 @@ function cancelVipPayment(){
   _qrisPaymentActive = false;
   try{ localStorage.removeItem('tarz_vip_pending_order'); }catch(e){}
   if(_qrisContext === 'vippage'){
-    closeKeyModal();
+    resetVipInlinePay();
   } else {
     showVipGate();
   }
@@ -12725,6 +12903,7 @@ function showVipCelebration(title, sub){
   _vipCelebrationShown = true;
   _vipQrisImageUrl = null;
   closeKeyModal();
+  resetVipInlinePay();
   const titleEl = document.getElementById('vipCelebrateTitle');
   const subEl = document.getElementById('vipCelebrateSub');
   if(titleEl) titleEl.textContent = title || 'WELCOME TO VIP';
