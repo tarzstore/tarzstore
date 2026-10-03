@@ -29,7 +29,8 @@ export default async function handler(req, res) {
   try {
     let body = req.body || {};
     if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
-    const { method, isTrial, trialHours, orderId } = body;
+    const { method, isTrial, trialHours, orderId, buyerName, buyerEmail,
+            plan, targetName, targetEmail, targetUid, adminName, adminEmail } = body;
 
     // ── QRIS: notifikasi dikirim SEKALI per order, paketnya dibaca dari ORDER di server ──
     // Sebelumnya frontend memanggil endpoint ini dari beberapa jalur (polling, kembali
@@ -37,6 +38,7 @@ export default async function handler(req, res) {
     // setelah reload -> muncul 2 notifikasi, satu tanpa "Paket". Sekarang dedupe di sini.
     let planInfo = null;
     let priceNum = null;
+    let qrisExpiry; // ms | null (permanen) | undefined (tidak diketahui)
     if (method === 'qris') {
       if (!orderId || typeof orderId !== 'string') {
         return res.status(200).json({ ok: false });
@@ -47,6 +49,11 @@ export default async function handler(req, res) {
         return res.status(200).json({ ok: false });
       }
       planInfo = getPlan(order.plan) || null;
+      // Tanggal berakhir yang disimpan server saat pembayaran dikonfirmasi
+      // (order.vipExpiry). Order lama tanpa field ini dihitung dari paketnya.
+      if (typeof order.vipExpiry === 'number') qrisExpiry = order.vipExpiry;
+      else if (order.vipExpiry === null && planInfo && !planInfo.days) qrisExpiry = null;
+      else if (planInfo && planInfo.days) qrisExpiry = Date.now() + planInfo.days * 86400000;
       // Harga yang benar-benar ditagih saat order dibuat (fallback: harga paket).
       priceNum = Number(order.amount) > 0 ? Number(order.amount) : (planInfo ? planInfo.price : null);
 
@@ -57,6 +64,21 @@ export default async function handler(req, res) {
       }
     }
 
+    // ── GIFT: admin memberi VIP lewat menu Gift VIP / titik-tiga chat ──
+    if (method === 'gift') {
+      planInfo = getPlan(plan) || null;
+      if (!planInfo) return res.status(200).json({ ok: false }); // paket tidak dikenal -> abaikan
+      // Anti dobel: klik/panggilan ganda untuk penerima+paket yang sama dalam 20 detik.
+      const who = String(targetUid || targetEmail || targetName || '').slice(0, 120);
+      if (!who) return res.status(200).json({ ok: false });
+      claimKey = `giftnotif:${who}:${plan}`;
+      const claimed = await kv.setnx(claimKey, 1, { ex: 20 });
+      if (!claimed) {
+        claimKey = null; // bukan milik kita, jangan dilepas
+        return res.status(200).json({ ok: true, duplicate: true });
+      }
+    }
+
     const waktu = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
 
     // Input dari browser tidak dipercaya: trialHours dipaksa angka (kalau tidak,
@@ -64,15 +86,50 @@ export default async function handler(req, res) {
     const hoursNum = Number(trialHours);
     const hoursText = Number.isFinite(hoursNum) && hoursNum > 0 ? String(hoursNum) : '?';
 
-    const lines = ['🟢 <b>VIP BARU!</b> — Tarz Store', ''];
-    if (method === 'qris') {
+    // Nama/email dikirim browser -> dianggap teks biasa: dipotong & di-escape HTML
+    // supaya karakter seperti < > & tidak membuat Telegram menolak pesan.
+    const esc = (v, max) => String(v == null ? '' : v).replace(/[\r\n]+/g, ' ').trim().slice(0, max)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const nameText = esc(buyerName, 60);
+    const emailText = esc(buyerEmail, 80);
+
+    const fmtUntil = (ms) => new Date(ms)
+      .toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+    const lines = [method === 'gift' ? '🎁 <b>VIP GIFT!</b> — Tarz Store' : '🟢 <b>VIP BARU!</b> — Tarz Store', ''];
+    if (method === 'gift') {
+      lines.push('🎁 Metode: Gift Admin');
+      lines.push(`📦 Paket: ${planInfo.label}`);
+      if (planInfo.days) {
+        lines.push(`⏳ Expried: ${fmtUntil(Date.now() + planInfo.days * 86400000)} WIB`);
+      } else {
+        lines.push('♾️ Berlaku: Selamanya');
+      }
+      const tName = esc(targetName, 60);
+      const tEmail = esc(targetEmail, 80);
+      lines.push(`👤 Penerima: ${tName || tEmail || '-'}`);
+      if (tName && tEmail) lines.push(`📧 Email: ${tEmail}`);
+      const aName = esc(adminName, 60);
+      const aEmail = esc(adminEmail, 80);
+      if (aName || aEmail) lines.push(`👑 Diberikan oleh: ${aName || aEmail}`);
+    } else if (method === 'qris') {
       lines.push('💳 Metode: QRIS');
       if (planInfo) lines.push(`📦 Paket: ${planInfo.label}`);
       if (priceNum) lines.push(`💸 Price: Rp${String(Math.round(priceNum)).replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`);
+      if (planInfo && typeof qrisExpiry === 'number') lines.push(`⏳ Expried: ${fmtUntil(qrisExpiry)} WIB`);
+      else if (planInfo && qrisExpiry === null) lines.push('♾️ Berlaku: Selamanya');
     } else if (method === 'key') {
       lines.push(isTrial ? `🔑 Metode: Key Trial (${hoursText} jam)` : '🔑 Metode: Key VIP');
     } else {
       lines.push('❓ Metode: tidak diketahui');
+    }
+    if (method !== 'gift') {
+      if (nameText || emailText) {
+        if (nameText) lines.push(`👤 Nama: ${nameText}`);
+        if (emailText) lines.push(`📧 Email: ${emailText}`);
+      } else {
+        lines.push('👤 Akun: Belum login Google');
+      }
     }
     lines.push(`🕒 Waktu: ${waktu} WIB`);
 
