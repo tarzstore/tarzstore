@@ -12549,7 +12549,20 @@ function notifyVipGift(planId, targetName, targetEmail, targetUid){
         targetName: targetName || null, targetEmail: targetEmail || null, targetUid: targetUid || null,
         adminName: admin.buyerName, adminEmail: admin.buyerEmail
       })
-    }).catch(() => {});
+    }).then(async function(r){
+      let txt = ''; try{ txt = await r.text(); }catch(e){}
+      let j = null; try{ j = JSON.parse(txt); }catch(e){}
+      if(!r.ok || !j || j.ok === false){
+        const why = !r.ok ? ('HTTP ' + r.status) : ((j && j.reason) || 'respon tidak valid');
+        console.warn('[notifyVipGift] gagal:', r.status, txt);
+        if(typeof showToast === 'function') showToast('Notif Telegram gagal: ' + why, 'warning');
+      } else if(j.duplicate){
+        console.log('[notifyVipGift] duplikat diabaikan server');
+      }
+    }).catch(function(e){
+      console.warn('[notifyVipGift] network error:', e);
+      if(typeof showToast === 'function') showToast('Notif Telegram gagal: tidak terhubung', 'warning');
+    });
   }catch(e){}
 }
 async function notifyVipViaQris(orderId){
