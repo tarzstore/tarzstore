@@ -22,7 +22,7 @@ export default async function handler(req, res) {
   const chatId = process.env.TELEGRAM_CHAT_ID;
   if (!token || !chatId) {
     console.error('[notify-vip] TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID belum di-set.');
-    return res.status(200).json({ ok: false }); // jangan gagalkan alur VIP user
+    return res.status(200).json({ ok: false, reason: 'env_missing' }); // jangan gagalkan alur VIP user
   }
 
   let claimKey = null;
@@ -67,15 +67,19 @@ export default async function handler(req, res) {
     // ── GIFT: admin memberi VIP lewat menu Gift VIP / titik-tiga chat ──
     if (method === 'gift') {
       planInfo = getPlan(plan) || null;
-      if (!planInfo) return res.status(200).json({ ok: false }); // paket tidak dikenal -> abaikan
+      if (!planInfo) {
+        console.error('[notify-vip] gift: paket tidak dikenal:', plan);
+        return res.status(200).json({ ok: false, reason: 'plan_unknown:' + plan });
+      }
       // Anti dobel: klik/panggilan ganda untuk penerima+paket yang sama dalam 20 detik.
       const who = String(targetUid || targetEmail || targetName || '').slice(0, 120);
-      if (!who) return res.status(200).json({ ok: false });
+      if (!who) return res.status(200).json({ ok: false, reason: 'no_target' });
       claimKey = `giftnotif:${who}:${plan}`;
       const claimed = await kv.setnx(claimKey, 1, { ex: 20 });
       if (!claimed) {
         claimKey = null; // bukan milik kita, jangan dilepas
-        return res.status(200).json({ ok: true, duplicate: true });
+        console.log('[notify-vip] gift duplikat diabaikan:', who, plan);
+        return res.status(200).json({ ok: true, duplicate: true, reason: 'duplicate_20s' });
       }
     }
 
@@ -148,12 +152,14 @@ export default async function handler(req, res) {
       console.error('[notify-vip] Telegram menolak pesan:', data.description);
       // Lepas penanda supaya percobaan berikutnya masih bisa mengirim.
       if (claimKey) { try { await kv.del(claimKey); } catch (e) { console.error('[notify-vip] del claim error:', e); } }
+      return res.status(200).json({ ok: false, reason: 'telegram: ' + data.description });
     }
 
+    console.log('[notify-vip] terkirim ke Telegram, method =', method);
     return res.status(200).json({ ok: true });
   } catch (err) {
     console.error('[notify-vip] error:', err);
     if (claimKey) { try { await kv.del(claimKey); } catch (e) { /* abaikan */ } }
-    return res.status(200).json({ ok: false });
+    return res.status(200).json({ ok: false, reason: 'exception: ' + (err && err.message ? err.message : err) });
   }
 }
