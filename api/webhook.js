@@ -25,8 +25,21 @@ export default async function handler(req, res) {
     return res.status(405).end();
   }
 
-  const rawBody = await readRawBody(req);
-  const signatureHeader = req.headers['x-buatqris-signature'] || '';
+  // Tanpa secret, createHmac melempar error dan function crash -> cek di awal.
+  if (!process.env.BUATQRIS_WEBHOOK_SECRET) {
+    console.error('Webhook: BUATQRIS_WEBHOOK_SECRET belum di-set di Environment Variables.');
+    return res.status(500).json({ ok: false, error: 'Webhook belum dikonfigurasi' });
+  }
+
+  let rawBody;
+  try {
+    rawBody = await readRawBody(req);
+  } catch (e) {
+    console.error('Webhook gagal membaca body:', e);
+    return res.status(400).json({ ok: false, error: 'Invalid body' });
+  }
+  const sigHeaderRaw = req.headers['x-buatqris-signature'] || '';
+  const signatureHeader = Array.isArray(sigHeaderRaw) ? sigHeaderRaw[0] : String(sigHeaderRaw);
 
   const expectedSig =
     'sha256=' +
@@ -58,6 +71,9 @@ export default async function handler(req, res) {
         }
         const order = await kv.get(`order:${orderId}`);
         if (order && order.status !== 'success') {
+          // Paket (7/15/30 hari/permanen) dibaca dari order.plan yang disimpan
+          // create-payment.js; masa aktif dihitung di markOrderPaidAndUnlock.
+          // Hasilnya objek { vipToken, plan, vipExpiry } -- tidak dipakai di sini.
           await markOrderPaidAndUnlock(orderId, order);
         }
         break;
@@ -67,7 +83,8 @@ export default async function handler(req, res) {
         const orderId = await kv.get(`txn:${event.transaction_id}`);
         if (orderId) {
           const order = await kv.get(`order:${orderId}`);
-          if (order) {
+          // Jangan timpa order yang sudah sukses (event expired/failed bisa datang telat)
+          if (order && order.status !== 'success') {
             const status = event.event === 'payment.expired' ? 'expired' : 'failed';
             await kv.set(`order:${orderId}`, { ...order, status }, { ex: 1800 });
           }

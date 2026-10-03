@@ -28,7 +28,7 @@ const CONFIGS = {
   },
   fakeffduo: {
     // Endpoint ini pakai domain apii.nexadev.my.id (dobel i), beda dari yang lain.
-    base: "https://apii.nexadev.my.id/fakeffduo?nickname1=Tarz&nickname2=Kuntul",
+    base: "https://apii.nexadev.my.id/fakeffduo",
     params: ["nickname1", "nickname2"],
   },
   tiktokstalker: {
@@ -48,7 +48,10 @@ const CONFIGS = {
 
 export default async function handler(req, res) {
   const { type } = req.query;
-  const config = CONFIGS[type];
+  // hasOwn: cegah type seperti "constructor" / "__proto__" lolos sebagai config valid.
+  const config = typeof type === "string" && Object.prototype.hasOwnProperty.call(CONFIGS, type)
+    ? CONFIGS[type]
+    : undefined;
 
   if (!config) {
     return res.status(404).json({
@@ -67,7 +70,7 @@ export default async function handler(req, res) {
   }
 
   const qs = config.params
-    .map((p) => `${p}=${encodeURIComponent(req.query[p])}`)
+    .map((p) => `${p}=${encodeURIComponent(String(req.query[p]))}`)
     .join("&");
   const upstreamUrl = `${config.base}?${qs}`;
 

@@ -1,8 +1,6 @@
 // /api/verify-vip.js
-// Dipanggil frontend tiap kali halaman dimuat untuk cek "apakah vipToken yang
-// tersimpan di browser ini masih valid?". Ini menggantikan localStorage-only
-// check yang lama (localStorage.tarz_vip='true') supaya status VIP tidak bisa
-// dipalsukan cuma dengan mengetik di DevTools console.
+// Dipanggil frontend tiap halaman dimuat: "apakah vipToken di browser ini masih valid?"
+// Mendukung VIP berjangka (7/15/30 hari) dan permanen.
 
 import { kv } from './_kv.js';
 
@@ -12,26 +10,34 @@ export default async function handler(req, res) {
   }
 
   const { token } = req.query;
-  if (!token) {
+  if (!token || typeof token !== 'string') {
     return res.status(200).json({ ok: true, vip: false });
   }
 
   try {
     const record = await kv.get(`vip:${token}`);
-
-    // Token valid -> jadikan permanen (hapus TTL). Sebelumnya token kedaluwarsa
-    // 365 hari setelah dibuat walau komentarnya bilang "diperpanjang tiap dicek",
-    // sehingga user yang sudah bayar bisa kehilangan VIP setahun kemudian.
-    // Gagal persist tidak boleh membatalkan hasil verifikasi.
-    if (record) {
-      try { await kv.persist(`vip:${token}`); } catch (e) { console.error('persist vip error:', e); }
+    if (!record) {
+      return res.status(200).json({ ok: true, vip: false });
     }
 
-    return res.status(200).json({ ok: true, vip: !!record });
+    // expiresAt angka  -> VIP berjangka.
+    // expiresAt null / tidak ada (token lama) -> permanen.
+    const expiresAt = typeof record.expiresAt === 'number' ? record.expiresAt : null;
+
+    if (expiresAt !== null) {
+      if (Date.now() >= expiresAt) {
+        return res.status(200).json({ ok: true, vip: false, expired: true, expiresAt });
+      }
+      // Jangan persist: token berjangka harus ikut hilang sesuai TTL.
+      return res.status(200).json({ ok: true, vip: true, expiresAt });
+    }
+
+    // Permanen: pastikan tidak ada TTL. Gagal persist tidak boleh membatalkan verifikasi.
+    try { await kv.persist(`vip:${token}`); } catch (e) { console.error('persist vip error:', e); }
+    return res.status(200).json({ ok: true, vip: true, expiresAt: null });
   } catch (err) {
     console.error('verify-vip error:', err);
-    // Kalau server error, jangan langsung kunci user yang sudah bayar — biarkan
-    // frontend fallback ke status localStorage yang sudah ada sebelumnya.
+    // Jangan kunci user yang sudah bayar; frontend fallback ke status lokal.
     return res.status(200).json({ ok: true, vip: null });
   }
 }

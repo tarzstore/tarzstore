@@ -1,9 +1,9 @@
 // /api/check-status.js
-// Dipanggil berulang (polling) oleh frontend tiap beberapa detik selagi user
-// melihat layar QRIS, untuk tahu kapan pembayaran sukses.
-// Ini JARING KEDUA selain webhook — supaya tetap update walau webhook telat.
+// Dipanggil berulang (polling) oleh frontend selagi user melihat layar QRIS.
+// JARING KEDUA selain webhook — supaya tetap update walau webhook telat.
 
 import { kv } from './_kv.js';
+import { getPlan, DAY_MS } from './_plans.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -11,7 +11,7 @@ export default async function handler(req, res) {
   }
 
   const { orderId } = req.query;
-  if (!orderId) {
+  if (!orderId || typeof orderId !== 'string') {
     return res.status(400).json({ ok: false, error: 'orderId wajib diisi' });
   }
 
@@ -21,9 +21,15 @@ export default async function handler(req, res) {
       return res.status(404).json({ ok: false, error: 'Order tidak ditemukan atau kedaluwarsa' });
     }
 
-    // Kalau sudah sukses/gagal dari webhook, langsung balikin — tidak perlu tanya BuatQris lagi.
+    // Sudah final (dari webhook / polling sebelumnya) -> langsung balikin.
     if (order.status === 'success' || order.status === 'failed' || order.status === 'expired') {
-      return res.status(200).json({ ok: true, status: order.status, vipToken: order.vipToken || null });
+      return res.status(200).json({
+        ok: true,
+        status: order.status,
+        vipToken: order.vipToken || null,
+        plan: order.plan || null,
+        vipExpiry: order.vipExpiry || null
+      });
     }
 
     // Masih pending -> tanya langsung ke BuatQris (jaga-jaga webhook belum sampai)
@@ -48,11 +54,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ ok: true, status: 'pending' }); // jangan hentikan polling hanya karena 1x gagal cek
     }
 
-    // LOG SEMENTARA: buka Vercel > project > Deployments > Functions > check-status
-    // untuk lihat persis bentuk respons BuatQris dan pastikan field di bawah sudah cocok.
-    console.log('BuatQris check-status raw response:', JSON.stringify(data));
-
-    // Coba beberapa kemungkinan nama field (BuatQris tidak selalu konsisten di dokumentasi vs respons asli)
+    // Beberapa kemungkinan nama field status (BuatQris tidak selalu konsisten)
     const rawStatus =
       data.data?.status ??
       data.data?.transaction_status ??
@@ -61,7 +63,6 @@ export default async function handler(req, res) {
       data.status ??
       data.transaction_status;
 
-    // Normalisasi: banyak provider QRIS pakai variasi kata untuk "sukses"
     const normalized = String(rawStatus || '').toLowerCase().trim();
     const isSuccess = ['success', 'paid', 'settlement', 'completed', 'sukses'].includes(normalized);
     const isExpired = ['expired', 'expire', 'timeout'].includes(normalized);
@@ -70,15 +71,19 @@ export default async function handler(req, res) {
     const remoteStatus = isSuccess ? 'success' : isExpired ? 'expired' : isFailed ? 'failed' : null;
 
     if (remoteStatus === 'success') {
-      const vipToken = await markOrderPaidAndUnlock(orderId, order);
-      return res.status(200).json({ ok: true, status: 'success', vipToken });
+      const unlocked = await markOrderPaidAndUnlock(orderId, order);
+      return res.status(200).json({
+        ok: true,
+        status: 'success',
+        vipToken: unlocked.vipToken,
+        plan: unlocked.plan,
+        vipExpiry: unlocked.vipExpiry
+      });
     }
     if (remoteStatus === 'expired' || remoteStatus === 'failed') {
       await kv.set(`order:${orderId}`, { ...order, status: remoteStatus }, { ex: 1800 });
       return res.status(200).json({ ok: true, status: remoteStatus });
     }
-    // remoteStatus === null -> field tidak dikenali sama sekali, tetap pending
-    // tapi sudah ke-log di atas supaya bisa disesuaikan lagi kalau perlu
 
     return res.status(200).json({ ok: true, status: 'pending' });
   } catch (err) {
@@ -88,20 +93,44 @@ export default async function handler(req, res) {
 }
 
 // Dipakai juga oleh webhook.js — ditaruh di sini supaya logikanya satu tempat.
+// Signature (orderId, order) TIDAK berubah, jadi webhook.js tidak perlu diedit.
+//
+// RETURN: object { vipToken, plan, vipExpiry }.
+// (Dulu hanya string vipToken. Kalau webhook.js memakai hasilnya sebagai string,
+//  pakai `(await markOrderPaidAndUnlock(...)).vipToken`.)
 export async function markOrderPaidAndUnlock(orderId, order) {
-  // Webhook dan polling check-status bisa memanggil fungsi ini bersamaan untuk
-  // order yang sama. Token dibuat DETERMINISTIK dari orderId, jadi semua
-  // pemanggil menghasilkan token yang sama; penulisan `vip:` memakai SET NX
-  // (atomik) sehingga tidak pernah ada dua token untuk satu order.
+  // Webhook & polling bisa memanggil fungsi ini bersamaan untuk order yang sama.
+  // Token DETERMINISTIK dari orderId; penulisan `vip:` memakai SET NX (atomik),
+  // jadi tidak pernah ada dua token / dua masa aktif untuk satu order.
   const vipToken = 'vip_' + Buffer.from(orderId).toString('base64url');
 
-  // Token VIP permanen (tanpa TTL): pembayaran sekali = VIP selamanya.
-  // Kalau sudah ada (pemanggil lain duluan), biarkan -- hasilnya sama.
-  await kv.setnx(`vip:${vipToken}`, { orderId, unlockedAt: Date.now() });
+  // Order lama (dibuat sebelum update ini) tidak punya `plan` -> perilaku lama: permanen.
+  const planId = getPlan(order && order.plan) ? order.plan : 'permanent';
+  const plan = getPlan(planId);
 
-  // Tandai order sukses SETELAH token tersimpan, supaya order tidak pernah
-  // 'success' tanpa token yang valid.
-  await kv.set(`order:${orderId}`, { ...order, status: 'success', vipToken }, { ex: 60 * 60 * 24 * 30 });
+  const now = Date.now();
+  const expiresAt = plan.days ? now + plan.days * DAY_MS : null;
+  const record = { orderId, plan: planId, unlockedAt: now, expiresAt };
 
-  return vipToken;
+  // Timed: TTL = durasi + 1 hari cadangan (Redis membersihkan sendiri).
+  // Permanen: tanpa TTL.
+  const ttl = plan.days ? Math.ceil(plan.days * 86400 + 86400) : undefined;
+  await kv.setnx(`vip:${vipToken}`, record, ttl ? { ex: ttl } : undefined);
+
+  // Kalau pemanggil lain sudah menulis duluan, pakai masa aktif yang tersimpan
+  // supaya semua pemanggil mendapat tanggal berakhir yang SAMA.
+  let stored = null;
+  try { stored = await kv.get(`vip:${vipToken}`); } catch (e) { console.error('read vip record error:', e); }
+  const finalExpiry = stored && Object.prototype.hasOwnProperty.call(stored, 'expiresAt')
+    ? stored.expiresAt
+    : expiresAt;
+
+  // Tandai order sukses SETELAH token tersimpan.
+  await kv.set(
+    `order:${orderId}`,
+    { ...order, plan: planId, status: 'success', vipToken, vipExpiry: finalExpiry },
+    { ex: 60 * 60 * 24 * 30 }
+  );
+
+  return { vipToken, plan: planId, vipExpiry: finalExpiry };
 }

@@ -1,21 +1,14 @@
 // /api/notify-vip.js
 //
-// Endpoint TUNGGAL untuk notifikasi Telegram "VIP baru" -- dipanggil dari
-// FRONTEND (index.html), untuk KEDUA jalur (QRIS maupun Key), persis di
-// titik yang sama saat akses VIP berhasil terbuka (fungsi success() /
-// markVipUnlocked() di index.html).
-//
-// Aman dipanggil dari frontend karena file ini TIDAK menyimpan token bot di
-// sisi client -- token tetap hanya ada di Environment Variable Vercel,
-// endpoint ini cuma "jembatan" yang menerima method+detail lalu meneruskan
-// ke Telegram dari sisi server.
+// Endpoint TUNGGAL notifikasi Telegram "VIP baru" -- dipanggil dari FRONTEND
+// untuk jalur QRIS maupun Key. Token bot hanya ada di Environment Variable Vercel.
 //
 // ── SETUP WAJIB DI VERCEL ──
-// Settings -> Environment Variables:
 //   TELEGRAM_BOT_TOKEN = (token dari @BotFather)
 //   TELEGRAM_CHAT_ID   = 8620265239
 // Lalu redeploy.
-// (URL foto sudah ditulis langsung di kode di bawah, tidak perlu env tambahan)
+
+import { getPlan } from './_plans.js';
 
 const NOTIF_PHOTO_URL = 'https://pisylvcyumuygsytxmvg.supabase.co/storage/v1/object/public/Tr/tarzstore.png';
 
@@ -28,24 +21,31 @@ export default async function handler(req, res) {
   const chatId = process.env.TELEGRAM_CHAT_ID;
   if (!token || !chatId) {
     console.error('[notify-vip] TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID belum di-set.');
-    return res.status(200).json({ ok: false }); // tidak boleh gagalkan alur VIP user hanya karena ini
+    return res.status(200).json({ ok: false }); // jangan gagalkan alur VIP user
   }
 
   try {
-    const { method, isTrial, trialHours } = req.body || {};
+    let body = req.body || {};
+    if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
+    const { method, isTrial, trialHours, plan } = body;
     const waktu = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
+
+    // Input dari browser tidak dipercaya: trialHours dipaksa angka (kalau tidak,
+    // karakter HTML bisa membuat Telegram menolak pesan), plan dicek ke daftar paket.
+    const hoursNum = Number(trialHours);
+    const hoursText = Number.isFinite(hoursNum) && hoursNum > 0 ? String(hoursNum) : '?';
+    const planInfo = getPlan(plan);
 
     const lines = ['🟢 <b>VIP BARU!</b> — Tarz Store', ''];
     if (method === 'qris') {
       lines.push('💳 Metode: QRIS');
+      if (planInfo) lines.push(`📦 Paket: ${planInfo.label}`);
     } else if (method === 'key') {
-      lines.push(isTrial ? `🔑 Metode: Key Trial (${trialHours || '?'} jam)` : '🔑 Metode: Key VIP');
+      lines.push(isTrial ? `🔑 Metode: Key Trial (${hoursText} jam)` : '🔑 Metode: Key VIP');
     } else {
       lines.push('❓ Metode: tidak diketahui');
     }
     lines.push(`🕒 Waktu: ${waktu} WIB`);
-
-    const caption = lines.join('\n');
 
     const tgRes = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
       method: 'POST',
@@ -53,7 +53,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         chat_id: chatId,
         photo: NOTIF_PHOTO_URL,
-        caption: caption,
+        caption: lines.join('\n'),
         parse_mode: 'HTML'
       })
     });
@@ -63,6 +63,6 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: true });
   } catch (err) {
     console.error('[notify-vip] error:', err);
-    return res.status(200).json({ ok: false }); // selalu 200 -> jangan pernah ganggu alur VIP di frontend
+    return res.status(200).json({ ok: false });
   }
 }
