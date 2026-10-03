@@ -9028,6 +9028,7 @@ async function giftVipToInfoAkunDetail(){
 
     infoAkunPatchLocalAccount(acc.uid, { isVip: true, vipExpiry: gift.fields.vip_expiry, vipSince: new Date() });
     showToast('VIP ' + gift.label + ' diberikan ke ' + acc.email, 'success');
+    notifyVipGift(planId, null, acc.email, acc.uid);
     infoAkunRefreshAfterAction(acc);
   }catch(e){
     console.error('Gagal memberi VIP:', e);
@@ -12126,7 +12127,7 @@ function keyLogin(){
     fetch('/api/notify-vip', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ method: 'key', isTrial: !!isTrial, trialHours: trialHours })
+      body: JSON.stringify(Object.assign({ method: 'key', isTrial: !!isTrial, trialHours: trialHours }, getBuyerInfoForNotify()))
     }).catch(() => {});
     refreshVipHeaderBadge();
     refreshVipPageCard();
@@ -12524,13 +12525,48 @@ function setQrisStatus(state, title, sub){
    mendeteksi status 'success' untuk orderId yang sama, jadi tanpa guard ini
    bot Telegram bisa kirim 2 notifikasi untuk 1 transaksi yang sama. */
 let _vipNotifiedOrderIds = new Set();
-function notifyVipViaQris(orderId){
+/* Nama & email akun Google pembeli untuk ditampilkan di notifikasi Telegram.
+   Kosong kalau pembeli belum login. */
+function getBuyerInfoForNotify(){
+  let u = null;
+  try{ u = _googleUser || (window.fbAuth && window.fbAuth.currentUser) || null; }catch(e){}
+  if(!u) return { buyerName: null, buyerEmail: null };
+  return {
+    buyerName: u.displayName || null,
+    buyerEmail: u.email || null
+  };
+}
+/* Notifikasi Telegram saat ADMIN memberi VIP (Gift VIP). Fire-and-forget:
+   kalau gagal, pemberian VIP tetap berhasil. Pemberi = akun admin yang login. */
+function notifyVipGift(planId, targetName, targetEmail, targetUid){
+  try{
+    const admin = getBuyerInfoForNotify();
+    fetch('/api/notify-vip', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: 'gift', plan: planId,
+        targetName: targetName || null, targetEmail: targetEmail || null, targetUid: targetUid || null,
+        adminName: admin.buyerName, adminEmail: admin.buyerEmail
+      })
+    }).catch(() => {});
+  }catch(e){}
+}
+async function notifyVipViaQris(orderId){
   if(orderId && _vipNotifiedOrderIds.has(orderId)) return;
   if(orderId) _vipNotifiedOrderIds.add(orderId);
+  /* Sesi Google bisa belum selesai dipulihkan kalau halaman baru dimuat ulang
+     (mis. balik dari app e-wallet) -> tunggu sebentar (maks ~3 detik) supaya nama
+     pembeli ikut terkirim. Tidak menghambat UI: pemanggil tidak menunggu fungsi ini. */
+  let info = getBuyerInfoForNotify();
+  for(let i = 0; i < 10 && !info.buyerEmail && !info.buyerName; i++){
+    await new Promise(r => setTimeout(r, 300));
+    info = getBuyerInfoForNotify();
+  }
   fetch('/api/notify-vip', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ method: 'qris', orderId: orderId || null, plan: (typeof _vipSelectedPlan === 'string' ? _vipSelectedPlan : null) })
+    body: JSON.stringify({ method: 'qris', orderId: orderId || null, buyerName: info.buyerName, buyerEmail: info.buyerEmail })
   }).catch(() => {});
 }
 
@@ -16539,7 +16575,7 @@ const CHAT_FIREBASE_CONFIG = {
         const expiryMs = toMillis(vd.vip_expiry);
         if(expiryMs && Date.now() > expiryMs) isVip = false;
       }
-      _uaAcc = { isVip: isVip, isBanned: !!vd.is_banned };
+      _uaAcc = { isVip: isVip, isBanned: !!vd.is_banned, email: vd.email || '' };
       tzchatRenderUserActionButtons();
     }).catch(err => {
       console.error('[chat] gagal ambil status akun:', err);
@@ -16594,9 +16630,11 @@ const CHAT_FIREBASE_CONFIG = {
       }
       toast(successMsg, successType || 'success');
       closeTzchatUserActionSheet();
+      return true;
     }catch(e){
       console.error('[chat] aksi akun gagal:', e);
       toast('Gagal memproses aksi. Coba lagi.', 'error');
+      return false;
     }finally{
       if(btn) btn.classList.remove('loading');
     }
@@ -16606,8 +16644,11 @@ const CHAT_FIREBASE_CONFIG = {
     const planId = await showGiftPlanPicker(_uaName);
     if(!planId) return;
     const gift = buildGiftVipFields(planId);
-    tzchatUserActionRun('tzchatActionGiftBtn', null, gift.fields,
-      'VIP ' + gift.label + ' diberikan ke ' + _uaName, 'success');
+    // simpan dulu: sheet bisa ditutup/ganti akun saat proses berjalan
+    const _gName = _uaName, _gUid = _uaUid, _gEmail = (_uaAcc && _uaAcc.email) || '';
+    const ok = await tzchatUserActionRun('tzchatActionGiftBtn', null, gift.fields,
+      'VIP ' + gift.label + ' diberikan ke ' + _gName, 'success');
+    if(ok) notifyVipGift(planId, _gName, _gEmail, _gUid);
   };
 
   window.tzchatActionRevokeVip = async function(){
