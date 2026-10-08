@@ -11,7 +11,7 @@ export const VIP_PLANS = {
   '3d':        { label: '7 Days',    days: 7,    price: 10000 },
   '7d':        { label: '15 Days',   days: 15,   price: 15000 },
   '30d':       { label: '30 Days',   days: 30,   price: 25000 },
-  'permanent': { label: 'Permanent', days: null, price: 1000 }
+  'permanent': { label: 'Permanent', days: null, price: 50000 }
 };
 
 export const DAY_MS = 86400000;
