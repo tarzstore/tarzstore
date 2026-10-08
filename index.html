@@ -12978,6 +12978,13 @@ async function isVipUnlockedAsync(){
     const data = await res.json();
     if(data.vip === true){
       try{ localStorage.removeItem('tarz_vip_false_count'); }catch(e){}
+      /* FIX: server adalah sumber kebenaran masa aktif. Sebelumnya tarz_vip_paid_expiry
+         hanya dari cache lokal; kalau basi/lewat, handler load menghapus token padahal
+         server bilang VIP masih aktif -> user terkunci. Sekarang disinkronkan dari server. */
+      try{
+        if(typeof data.expiresAt === 'number') localStorage.setItem('tarz_vip_paid_expiry', String(data.expiresAt));
+        else if(data.expiresAt === null) localStorage.removeItem('tarz_vip_paid_expiry');
+      }catch(e){}
       return true;
     }
     if(data.vip === false && data.expired === true){
