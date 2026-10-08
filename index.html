@@ -13458,8 +13458,10 @@ async function pollVipPayment(orderId, silentMode){
     if(elapsed > 900){ // 15 menit
       clearInterval(_qrisPollTimer);
       clearInterval(_qrisCountdownTimer);
-      try{ localStorage.removeItem('tarz_vip_pending_order'); }catch(e){}
       if(!silentMode) setQrisStatus('error', 'QRIS kedaluwarsa', 'Silakan buat ulang pembayaran.');
+      /* FIX: cek terakhir ke server (bisa saja sudah dibayar di menit-menit akhir);
+         checkPendingVipOrderNow menghapus pending sendiri kalau memang tidak sukses. */
+      checkPendingVipOrderNow(true);
       return;
     }
     try{
@@ -13502,8 +13504,10 @@ function resumePendingVipOrderIfAny(){
   let pending = null;
   try{ pending = JSON.parse(localStorage.getItem('tarz_vip_pending_order') || 'null'); }catch(e){}
   if(!pending || !pending.orderId) return;
+  /* FIX: walau QRIS sudah lewat 15 menit, order mungkin SUDAH dibayar (webhook sudah
+     membuat token di server). Jangan dihapus buta -- tanyakan server dulu. */
   if(Date.now() > pending.expiresAt){
-    try{ localStorage.removeItem('tarz_vip_pending_order'); }catch(e){}
+    checkPendingVipOrderNow(true);
     return;
   }
   pollVipPayment(pending.orderId, true);
@@ -13514,17 +13518,19 @@ function resumePendingVipOrderIfAny(){
    karena browser mobile sering MEMBEKUKAN setInterval saat tab tidak aktif/user pindah
    ke app lain (mis. buka GoPay/DANA untuk scan QRIS) -- begitu balik ke tab, interval lama
    itu tidak selalu otomatis lanjut tepat waktu, jadi kita paksa cek ulang langsung. */
-async function checkPendingVipOrderNow(){
+async function checkPendingVipOrderNow(afterExpiry){
   let pending = null;
   try{ pending = JSON.parse(localStorage.getItem('tarz_vip_pending_order') || 'null'); }catch(e){}
   if(!pending || !pending.orderId) return;
-  if(Date.now() > pending.expiresAt){
-    try{ localStorage.removeItem('tarz_vip_pending_order'); }catch(e){}
-    return;
-  }
+  const pastExpiry = Date.now() > pending.expiresAt;
   try{
     const res = await fetch('/api/check-status?orderId=' + encodeURIComponent(pending.orderId));
     const data = await res.json();
+    /* Sudah lewat masa QRIS: kalau server tidak punya order / bukan sukses -> bersihkan. */
+    if(pastExpiry && data.status !== 'success'){
+      try{ localStorage.removeItem('tarz_vip_pending_order'); }catch(e){}
+      return;
+    }
     if(data.status === 'success'){
       clearInterval(_qrisPollTimer);
       const _paidPlan = getPendingPlanId() || pending.plan;
