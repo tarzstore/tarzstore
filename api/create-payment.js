@@ -7,7 +7,6 @@
 import { kv } from './_kv.js';
 import { getPlan } from './_plans.js';
 import { randomUUID } from 'crypto';
-import { verifyRequestUser } from './_firebase.js';
 
 function readBody(req) {
   const b = req.body;
@@ -21,12 +20,6 @@ function readBody(req) {
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ ok: false, error: 'Method not allowed' });
-  }
-
-  // Pembeli harus login: VIP dicatat server ke akunnya begitu pembayaran sukses.
-  const user = await verifyRequestUser(req);
-  if (!user) {
-    return res.status(401).json({ ok: false, error: 'Silakan login dulu sebelum membeli VIP.' });
   }
 
   try {
@@ -81,7 +74,7 @@ export default async function handler(req, res) {
     // apa yang dibeli (durasi VIP dihitung dari sini). TTL 30 menit.
     await kv.set(
       `order:${orderId}`,
-      { transactionId, plan: planId, amount: plan.price, status: 'pending', createdAt: Date.now(), uid: user.uid, email: user.email },
+      { transactionId, plan: planId, amount: plan.price, status: 'pending', createdAt: Date.now() },
       { ex: 1800 }
     );
     // Mapping sebaliknya supaya webhook (yang cuma tahu transactionId) bisa cari orderId
