@@ -1,28 +1,43 @@
 // /api/_firebase.js
 // Firebase Admin SDK (server). Dipakai untuk:
 //  - memverifikasi ID token login pembeli (siapa yang membeli)
-//  - menulis status VIP ke Firestore vip_users/{uid} (Admin SDK kebal rules,
-//    sehingga rules bisa dibuat ketat: browser TIDAK boleh menulis VIP sendiri)
+//  - mengambil access token service account untuk menulis Firestore lewat REST
+//    (lihat _vip.js). REST dipakai, bukan gRPC, karena koneksi gRPC Firestore di
+//    serverless Vercel bisa menggantung sampai fungsi timeout.
 //
 // ENV WAJIB di Vercel:
 //   FIREBASE_SERVICE_ACCOUNT = isi file JSON service account (satu baris penuh)
-//   (Firebase Console > Project settings > Service accounts > Generate new private key)
 // Dependency: npm i firebase-admin
 
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
-import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 
-function init() {
-  if (getApps().length) return;
+let _sa = null;
+let _cred = null;
+
+function loadServiceAccount() {
+  if (_sa) return _sa;
   const raw = process.env.FIREBASE_SERVICE_ACCOUNT;
   if (!raw) throw new Error('FIREBASE_SERVICE_ACCOUNT belum di-set');
   const sa = JSON.parse(raw);
   if (sa.private_key) sa.private_key = sa.private_key.replace(/\\n/g, '\n');
-  initializeApp({ credential: cert(sa) });
+  _sa = sa;
+  return _sa;
 }
 
-export function adminDb() { init(); return getFirestore(); }
+function init() {
+  if (getApps().length) return;
+  _cred = cert(loadServiceAccount());
+  initializeApp({ credential: _cred });
+}
+
+// Access token + project id untuk memanggil Firestore REST API.
+export async function getFirestoreAccess() {
+  const sa = loadServiceAccount();
+  if (!_cred) _cred = cert(sa);
+  const t = await _cred.getAccessToken();
+  return { token: t.access_token, projectId: sa.project_id };
+}
 
 // Baca header "Authorization: Bearer <idToken>" -> { uid, email } atau null.
 export async function verifyRequestUser(req) {
@@ -38,5 +53,3 @@ export async function verifyRequestUser(req) {
     return null;
   }
 }
-
-export { FieldValue };
