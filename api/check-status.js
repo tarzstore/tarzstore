@@ -34,9 +34,18 @@ export default async function handler(req, res) {
       });
     }
 
+    // BuatQris membatasi api_check_status 1x / 20 detik per transaksi, sedangkan
+    // frontend polling tiap ~3 detik. Pembatas ini (Redis SET NX, 20 detik) membuat
+    // hanya 1 dari sekian polling yang benar-benar menanyai BuatQris; sisanya langsung
+    // dijawab 'pending' tanpa memanggil BuatQris (webhook tetap jalur utama).
+    const allowed = await kv.setnx(`chk:${orderId}`, 1, { ex: 20 });
+    if (!allowed) {
+      return res.status(200).json({ ok: true, status: 'pending' });
+    }
+
     // Masih pending -> tanya langsung ke BuatQris (jaga-jaga webhook belum sampai)
     const payload = {
-      action: 'api_check_transaction',
+      action: 'api_check_status',
       account_id: process.env.BUATQRIS_ACCOUNT_ID,
       secret_token: process.env.BUATQRIS_SECRET_TOKEN,
       transaction_id: order.transactionId
