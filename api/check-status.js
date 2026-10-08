@@ -11,6 +11,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ ok: false, error: 'Method not allowed' });
   }
 
+  res.setHeader('Cache-Control', 'no-store'); // polling: jangan di-cache (hindari respons 304 basi)
   const { orderId } = req.query;
   if (!orderId || typeof orderId !== 'string') {
     return res.status(400).json({ ok: false, error: 'orderId wajib diisi' });
@@ -65,6 +66,7 @@ export default async function handler(req, res) {
       data.transaction_status;
 
     const normalized = String(rawStatus || '').toLowerCase().trim();
+    console.log('[check-status] order=' + orderId + ' rawStatus=' + JSON.stringify(rawStatus ?? null));
     const isSuccess = ['success', 'paid', 'settlement', 'completed', 'sukses'].includes(normalized);
     const isExpired = ['expired', 'expire', 'timeout'].includes(normalized);
     const isFailed = ['failed', 'failure', 'cancel', 'cancelled', 'canceled'].includes(normalized);
