@@ -71,14 +71,14 @@ export default async function handler(req, res) {
     }
 
     // Simpan paket & nominal di order supaya check-status DAN webhook tahu paket
-    // apa yang dibeli (durasi VIP dihitung dari sini). TTL 30 menit.
+    // apa yang dibeli (durasi VIP dihitung dari sini). TTL 24 jam (supaya pembeli yang kembali telat tetap bisa diverifikasi).
     await kv.set(
       `order:${orderId}`,
       { transactionId, plan: planId, amount: plan.price, status: 'pending', createdAt: Date.now() },
-      { ex: 1800 }
+      { ex: 86400 }
     );
     // Mapping sebaliknya supaya webhook (yang cuma tahu transactionId) bisa cari orderId
-    await kv.set(`txn:${transactionId}`, orderId, { ex: 1800 });
+    await kv.set(`txn:${transactionId}`, orderId, { ex: 86400 });
 
     return res.status(200).json({
       ok: true,
