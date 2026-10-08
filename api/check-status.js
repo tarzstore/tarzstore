@@ -4,14 +4,13 @@
 
 import { kv } from './_kv.js';
 import { getPlan, DAY_MS } from './_plans.js';
-import { grantVip } from './_vip.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ ok: false, error: 'Method not allowed' });
   }
 
-  res.setHeader('Cache-Control', 'no-store'); // polling: jangan di-cache (hindari respons 304 basi)
+  res.setHeader('Cache-Control', 'no-store'); // polling: jangan di-cache
   const { orderId } = req.query;
   if (!orderId || typeof orderId !== 'string') {
     return res.status(400).json({ ok: false, error: 'orderId wajib diisi' });
@@ -35,9 +34,9 @@ export default async function handler(req, res) {
     }
 
     // BuatQris membatasi api_check_status 1x / 20 detik per transaksi, sedangkan
-    // frontend polling tiap ~3 detik. Pembatas ini (Redis SET NX, 20 detik) membuat
-    // hanya 1 dari sekian polling yang benar-benar menanyai BuatQris; sisanya langsung
-    // dijawab 'pending' tanpa memanggil BuatQris (webhook tetap jalur utama).
+    // frontend polling tiap ~3 detik. Pembatas (Redis SET NX, 20 detik) membuat hanya
+    // 1 dari sekian polling yang benar-benar menanyai BuatQris; sisanya langsung
+    // dijawab 'pending' (webhook tetap jalur utama).
     const allowed = await kv.setnx(`chk:${orderId}`, 1, { ex: 20 });
     if (!allowed) {
       return res.status(200).json({ ok: true, status: 'pending' });
@@ -75,7 +74,6 @@ export default async function handler(req, res) {
       data.transaction_status;
 
     const normalized = String(rawStatus || '').toLowerCase().trim();
-    console.log('[check-status] order=' + orderId + ' rawStatus=' + JSON.stringify(rawStatus ?? null));
     const isSuccess = ['success', 'paid', 'settlement', 'completed', 'sukses'].includes(normalized);
     const isExpired = ['expired', 'expire', 'timeout'].includes(normalized);
     const isFailed = ['failed', 'failure', 'cancel', 'cancelled', 'canceled'].includes(normalized);
@@ -136,13 +134,6 @@ export async function markOrderPaidAndUnlock(orderId, order) {
   const finalExpiry = stored && Object.prototype.hasOwnProperty.call(stored, 'expiresAt')
     ? stored.expiresAt
     : expiresAt;
-
-  // Catat VIP ke akun pembeli di Firestore (server-side, kebal rules). Dilakukan
-  // SEBELUM order ditandai sukses: kalau gagal, error dilempar -> order tetap
-  // pending, dan polling/webhook berikutnya mencoba lagi. Idempoten per orderId.
-  if (order && order.uid) {
-    await grantVip(order.uid, { expiresAt: finalExpiry, email: order.email, orderId, source: 'qris' });
-  }
 
   // Tandai order sukses SETELAH token tersimpan.
   await kv.set(
