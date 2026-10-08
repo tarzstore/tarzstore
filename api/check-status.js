@@ -4,6 +4,7 @@
 
 import { kv } from './_kv.js';
 import { getPlan, DAY_MS } from './_plans.js';
+import { grantVip } from './_vip.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -124,6 +125,13 @@ export async function markOrderPaidAndUnlock(orderId, order) {
   const finalExpiry = stored && Object.prototype.hasOwnProperty.call(stored, 'expiresAt')
     ? stored.expiresAt
     : expiresAt;
+
+  // Catat VIP ke akun pembeli di Firestore (server-side, kebal rules). Dilakukan
+  // SEBELUM order ditandai sukses: kalau gagal, error dilempar -> order tetap
+  // pending, dan polling/webhook berikutnya mencoba lagi. Idempoten per orderId.
+  if (order && order.uid) {
+    await grantVip(order.uid, { expiresAt: finalExpiry, email: order.email, orderId, source: 'qris' });
+  }
 
   // Tandai order sukses SETELAH token tersimpan.
   await kv.set(
