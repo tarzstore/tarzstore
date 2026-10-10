@@ -9,7 +9,21 @@
 // Lalu redeploy.
 
 import { getPlan } from './_plans.js';
-import { kv } from './_kv.js';
+// kv dimuat belakangan (lazy) supaya kalau Redis bermasalah (env Upstash hilang,
+// kuota habis, dll) endpoint ini TIDAK ikut crash saat dimuat. Untuk notifikasi
+// Code VIP, Redis hanya dipakai untuk anti-dobel dan boleh gagal tanpa menghentikan notifikasi.
+let _kvMod = null;
+async function loadKv() {
+  if (_kvMod) return _kvMod;
+  try {
+    _kvMod = (await import('./_kv.js')).kv;
+  } catch (e) {
+    console.error('[notify-vip] gagal memuat _kv.js:', e && e.message ? e.message : e);
+    const fail = async () => { throw new Error('kv_unavailable'); };
+    _kvMod = { get: fail, set: fail, setnx: fail, del: async () => {}, persist: fail, expire: fail };
+  }
+  return _kvMod;
+}
 
 const NOTIF_PHOTO_URL = 'https://pisylvcyumuygsytxmvg.supabase.co/storage/v1/object/public/Tr/tarzstore.png';
 
@@ -25,6 +39,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: false, reason: 'env_missing' }); // jangan gagalkan alur VIP user
   }
 
+  const kv = await loadKv();
   let claimKey = null;
   try {
     let body = req.body || {};
@@ -91,10 +106,16 @@ export default async function handler(req, res) {
       codeText = String(code == null ? '' : code).replace(/[^A-Za-z0-9-]/g, '').slice(0, 40);
       if (!codeText) return res.status(200).json({ ok: false, reason: 'no_code' });
       claimKey = `codenotif:${codeText}`;
-      const claimed = await kv.setnx(claimKey, 1, { ex: 60 * 60 * 24 * 7 });
-      if (!claimed) {
-        claimKey = null; // bukan milik kita, jangan dilepas
-        return res.status(200).json({ ok: true, duplicate: true });
+      try {
+        const claimed = await kv.setnx(claimKey, 1, { ex: 60 * 60 * 24 * 7 });
+        if (!claimed) {
+          claimKey = null; // bukan milik kita, jangan dilepas
+          return res.status(200).json({ ok: true, duplicate: true });
+        }
+      } catch (e) {
+        // Redis bermasalah: tetap kirim notifikasi (kode sekali pakai, risiko dobel kecil).
+        console.error('[notify-vip] code: dedupe Redis gagal, lanjut kirim:', e && e.message ? e.message : e);
+        claimKey = null;
       }
     }
 
