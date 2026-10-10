@@ -1,7 +1,7 @@
 // /api/notify-vip.js
 //
 // Endpoint TUNGGAL notifikasi Telegram "VIP baru" -- dipanggil dari FRONTEND
-// untuk jalur QRIS maupun Key. Token bot hanya ada di Environment Variable Vercel.
+// untuk jalur QRIS, Key, Gift, dan Code VIP. Token bot hanya ada di Environment Variable Vercel.
 //
 // ── SETUP WAJIB DI VERCEL ──
 //   TELEGRAM_BOT_TOKEN = (token dari @BotFather)
@@ -30,7 +30,8 @@ export default async function handler(req, res) {
     let body = req.body || {};
     if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
     const { method, isTrial, trialHours, orderId, buyerName, buyerEmail,
-            plan, targetName, targetEmail, targetUid, adminName, adminEmail } = body;
+            plan, targetName, targetEmail, targetUid, adminName, adminEmail,
+            code, durationLabel, expiryMs } = body;
 
     // ── QRIS: notifikasi dikirim SEKALI per order, paketnya dibaca dari ORDER di server ──
     // Sebelumnya frontend memanggil endpoint ini dari beberapa jalur (polling, kembali
@@ -83,6 +84,20 @@ export default async function handler(req, res) {
       }
     }
 
+    // ── CODE VIP: pembeli menukar kode lewat menu "Input Code VIP" ──
+    // Dedupe per kode (kode sekali pakai), jadi panggilan ganda tidak bikin notifikasi dobel.
+    let codeText = '';
+    if (method === 'code') {
+      codeText = String(code == null ? '' : code).replace(/[^A-Za-z0-9-]/g, '').slice(0, 40);
+      if (!codeText) return res.status(200).json({ ok: false, reason: 'no_code' });
+      claimKey = `codenotif:${codeText}`;
+      const claimed = await kv.setnx(claimKey, 1, { ex: 60 * 60 * 24 * 7 });
+      if (!claimed) {
+        claimKey = null; // bukan milik kita, jangan dilepas
+        return res.status(200).json({ ok: true, duplicate: true });
+      }
+    }
+
     const waktu = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
 
     // Input dari browser tidak dipercaya: trialHours dipaksa angka (kalau tidak,
@@ -122,6 +137,13 @@ export default async function handler(req, res) {
       if (priceNum) lines.push(`💸 Price: Rp${String(Math.round(priceNum)).replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`);
       if (planInfo && typeof qrisExpiry === 'number') lines.push(`⏳ Expried: ${fmtUntil(qrisExpiry)} WIB`);
       else if (planInfo && qrisExpiry === null) lines.push('♾️ Berlaku: Selamanya');
+    } else if (method === 'code') {
+      lines.push('🎟️ Metode: Code VIP');
+      lines.push(`🔖 Kode: <code>${esc(codeText, 40)}</code>`);
+      const dLabel = esc(durationLabel, 30);
+      if (dLabel) lines.push(`📦 Durasi: ${dLabel}`);
+      if (typeof expiryMs === 'number' && Number.isFinite(expiryMs)) lines.push(`⏳ Expried: ${fmtUntil(expiryMs)} WIB`);
+      else if (expiryMs === null) lines.push('♾️ Berlaku: Selamanya');
     } else if (method === 'key') {
       lines.push(isTrial ? `🔑 Metode: Key Trial (${hoursText} jam)` : '🔑 Metode: Key VIP');
     } else {
